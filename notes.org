@@ -1,0 +1,8 @@
+* TODO
+
+- strip software, overview, test each speech eg. vocoder, LPC
+- number of mode
+
+* panel
+
+- as SIR - size? 18HP 91.44 wide...
