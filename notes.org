@@ -1,8 +1,26 @@
 * TODO
 
+- double check schematic - CHECK!, check footprints, do panel first then match to schematic
+
+- panel
+
+LAYOUT- 5*CV, 5*poti
+
+0-mode
+1-selector
+2- speed
+3-end
+4-selector2/threshold
+IN/OUT JACKS
+
+- print and check panel on rack
+
+SOFT
+
 - strip software, overview, test each speech eg. vocoder, LPC
 - number of mode
 
 * panel
 
 - as SIR - size? 18HP 91.44 wide...
+- 128.5 mm high // 91.44 wide or actually 91.3
