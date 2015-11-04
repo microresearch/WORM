@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Tue 03 Nov 2015 01:07:00 CET
+EESchema Schematic File Version 2  date Wed 04 Nov 2015 00:22:38 CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -47,7 +47,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title ""
-Date "2 nov 2015"
+Date "3 nov 2015"
 Rev ""
 Comp ""
 Comment1 ""
@@ -498,7 +498,7 @@ Wire Wire Line
 Text Notes 1500 -250 0    500  ~ 100
 op amps fixed\n
 Text Notes 4000 750  0    60   ~ 0
-23/9/2015 redo all with potis as seperate to CV and new resistor values
+23/9/2015 redone all with potis as seperate to CV and new resistor values
 Text Notes 5600 3100 0    60   ~ 0
 OUTPUT
 Text Notes 5500 1100 0    60   ~ 0

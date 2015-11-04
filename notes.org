@@ -13,6 +13,7 @@ LAYOUT- 5*CV, 5*poti
 4-selector2/threshold
 IN/OUT JACKS
 
+- organise panel and pcb
 - print and check panel on rack
 
 SOFT

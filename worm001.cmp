@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by CvPcb (2012-apr-16-27)-stable date = Tue 03 Nov 2015 00:19:52 CET
+Cmp-Mod V01 Genere par PcbNew le Wed 04 Nov 2015 00:59:55 CET
 
 BeginCmp
 TimeStamp = /50EDCD45;
@@ -312,7 +312,7 @@ BeginCmp
 TimeStamp = /550B4EA1/55109C00;
 Reference = D5;
 ValeurCmp = ZENER;
-IdModule  = SOD-123;
+IdModule  = SOT23;
 EndCmp
 
 BeginCmp
