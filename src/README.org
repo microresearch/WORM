@@ -1,0 +1,13 @@
+* ERD?WORM dirty speech synth
+
+* TODO
+
+- strip code and sort out memory allocations
+- basics of read/write head and speech integration
+- tests for each speech function/mode
+- vocoder and how we deal with buffers?
+- integrate/test/new knob allocations
+
+* progress
+
+** 4/11/2015
