@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Wed 04 Nov 2015 00:22:38 CET
+EESchema Schematic File Version 2  date Wed 04 Nov 2015 02:21:29 CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -1398,7 +1398,7 @@ L R R1
 U 1 1 55109BCE
 P 1000 6750
 F 0 "R1" V 1080 6750 50  0000 C CNN
-F 1 "2.49K" V 1000 6750 50  0000 C CNN
+F 1 "470R" V 1000 6750 50  0000 C CNN
 	1    1000 6750
 	1    0    0    -1  
 $EndComp
@@ -1407,7 +1407,7 @@ L C C1
 U 1 1 55109BB0
 P 1400 7200
 F 0 "C1" H 1450 7300 50  0000 L CNN
-F 1 "470N" H 1450 7100 50  0000 L CNN
+F 1 "100N" H 1450 7100 50  0000 L CNN
 	1    1400 7200
 	-1   0    0    1   
 $EndComp
