@@ -1,0 +1,39 @@
+#*****************************************************************************#
+# Makefile.inc: Some variable definitions to build CMSIS DSPLib.              #
+#-----------------------------------------------------------------------------#
+# Jesús Alonso Fernández @doragasu, 2012                                      #
+#*****************************************************************************#
+
+# PART: The chip used for the build
+# TODO: Make some conditional assignments to CFLAGS depending on PART
+PART = STM32F4
+# Prefix to the cross compiler
+#PREFIX = arm-none-eabi-
+
+PREFIX = /opt/ARM/arm-linaro-eabi-4.6/bin/arm-none-eabi-
+
+#PRG_PREFIX = $(TOOL_PREFIX)/bin/arm-none-eabi-
+
+# Common stuff
+CC = gcc
+AR = ar
+RM = rm
+MKDIR = mkdir
+LD = gcc
+OBJCOPY = objcopy
+# Some directories
+OBJDIR = $(ROOT)/obj
+INCDIR = $(ROOT)/Include
+LIB = $(ROOT)/Lib/libdsplib_lm4f.a
+
+# Flags for building stuff
+CFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16  -L/opt/ARM/arm-linaro-eabi-4.6/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/			\
+	-Os			\
+	-ffunction-sections	\
+	-fdata-sections		\
+	-fsingle-precision-constant \
+	-std=c99		\
+	-Wall			\
+	-DARM_MATH_CM4 -D'__FPU_PRESENT=1'		\
+	-L/opt/ARM/arm-linaro-eabi-4.6/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/	\
+	-I$(INCDIR) -lm -lc

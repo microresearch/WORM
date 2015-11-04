@@ -1,0 +1,1389 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 4
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.file	"holmes.c"
+  17              		.text
+  18              	.Ltext0:
+  19              		.cfi_sections	.debug_frame
+  20              		.section	.text.linear,"ax",%progbits
+  21              		.align	1
+  22              		.thumb
+  23              		.thumb_func
+  25              	linear:
+  26              	.LFB4:
+  27              		.file 1 "lib/rsynth-2.0-port/holmes.c"
+   1:lib/rsynth-2.0-port/holmes.c **** #include <config.h>
+   2:lib/rsynth-2.0-port/holmes.c **** /* holmes.c
+   3:lib/rsynth-2.0-port/holmes.c ****  */
+   4:lib/rsynth-2.0-port/holmes.c **** #include <stdio.h>
+   5:lib/rsynth-2.0-port/holmes.c **** #include <ctype.h>
+   6:lib/rsynth-2.0-port/holmes.c **** #include <math.h>
+   7:lib/rsynth-2.0-port/holmes.c **** #include "nsynth.h"
+   8:lib/rsynth-2.0-port/holmes.c **** #include "elements.h"
+   9:lib/rsynth-2.0-port/holmes.c **** #include "darray.h"
+  10:lib/rsynth-2.0-port/holmes.c **** #include "holmes.h"
+  11:lib/rsynth-2.0-port/holmes.c **** #include "phfeat.h"
+  12:lib/rsynth-2.0-port/holmes.c **** 
+  13:lib/rsynth-2.0-port/holmes.c **** //#if 0
+  14:lib/rsynth-2.0-port/holmes.c **** 	#define AMP_ADJ 14
+  15:lib/rsynth-2.0-port/holmes.c **** //#else
+  16:lib/rsynth-2.0-port/holmes.c **** //	#define AMP_ADJ 0
+  17:lib/rsynth-2.0-port/holmes.c **** //#endif
+  18:lib/rsynth-2.0-port/holmes.c **** 
+  19:lib/rsynth-2.0-port/holmes.c **** int speed = 1;			//normal
+  20:lib/rsynth-2.0-port/holmes.c **** // int speed = 2; 		//slow
+  21:lib/rsynth-2.0-port/holmes.c **** 
+  22:lib/rsynth-2.0-port/holmes.c **** double frac = 1.0;
+  23:lib/rsynth-2.0-port/holmes.c **** 
+  24:lib/rsynth-2.0-port/holmes.c **** typedef struct
+  25:lib/rsynth-2.0-port/holmes.c ****  {
+  26:lib/rsynth-2.0-port/holmes.c ****   float v;                        /* boundary value */
+  27:lib/rsynth-2.0-port/holmes.c ****   int t;                          /* transition time */
+  28:lib/rsynth-2.0-port/holmes.c ****  }
+  29:lib/rsynth-2.0-port/holmes.c **** slope_t;
+  30:lib/rsynth-2.0-port/holmes.c **** 
+  31:lib/rsynth-2.0-port/holmes.c **** typedef struct
+  32:lib/rsynth-2.0-port/holmes.c ****  {
+  33:lib/rsynth-2.0-port/holmes.c ****   slope_t p[nEparm];
+  34:lib/rsynth-2.0-port/holmes.c ****  }
+  35:lib/rsynth-2.0-port/holmes.c **** trans_t;
+  36:lib/rsynth-2.0-port/holmes.c **** 
+  37:lib/rsynth-2.0-port/holmes.c **** typedef struct
+  38:lib/rsynth-2.0-port/holmes.c ****  {
+  39:lib/rsynth-2.0-port/holmes.c ****   float a;
+  40:lib/rsynth-2.0-port/holmes.c ****   float b;
+  41:lib/rsynth-2.0-port/holmes.c ****   float v;
+  42:lib/rsynth-2.0-port/holmes.c ****  }
+  43:lib/rsynth-2.0-port/holmes.c **** filter_t, *filter_ptr;
+  44:lib/rsynth-2.0-port/holmes.c **** 
+  45:lib/rsynth-2.0-port/holmes.c **** static float filter (filter_ptr p, float v);
+  46:lib/rsynth-2.0-port/holmes.c **** 
+  47:lib/rsynth-2.0-port/holmes.c **** static float filter(filter_ptr p, float v)
+  48:lib/rsynth-2.0-port/holmes.c **** {
+  49:lib/rsynth-2.0-port/holmes.c **** 	return p->v = (p->a * v + p->b * p->v);
+  50:lib/rsynth-2.0-port/holmes.c **** }
+  51:lib/rsynth-2.0-port/holmes.c **** 
+  52:lib/rsynth-2.0-port/holmes.c **** /* 'a' is dominant element, 'b' is dominated
+  53:lib/rsynth-2.0-port/holmes.c ****    ext is flag to say to use external times from 'a' rather
+  54:lib/rsynth-2.0-port/holmes.c ****    than internal i.e. ext != 0 if 'a' is NOT current element.
+  55:lib/rsynth-2.0-port/holmes.c **** 
+  56:lib/rsynth-2.0-port/holmes.c ****  */
+  57:lib/rsynth-2.0-port/holmes.c **** 
+  58:lib/rsynth-2.0-port/holmes.c **** static void set_trans (slope_t * t, Elm_ptr a, Elm_ptr b, int ext, int e);
+  59:lib/rsynth-2.0-port/holmes.c **** 
+  60:lib/rsynth-2.0-port/holmes.c **** static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
+  61:lib/rsynth-2.0-port/holmes.c **** {
+  62:lib/rsynth-2.0-port/holmes.c **** 	int i;
+  63:lib/rsynth-2.0-port/holmes.c **** 	
+  64:lib/rsynth-2.0-port/holmes.c **** 	for (i = 0; i < nEparm; i++)
+  65:lib/rsynth-2.0-port/holmes.c **** 	{
+  66:lib/rsynth-2.0-port/holmes.c **** 		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
+  67:lib/rsynth-2.0-port/holmes.c **** 	
+  68:lib/rsynth-2.0-port/holmes.c **** 		if (t[i].t)
+  69:lib/rsynth-2.0-port/holmes.c **** 			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01;
+  70:lib/rsynth-2.0-port/holmes.c **** 		else
+  71:lib/rsynth-2.0-port/holmes.c **** 			t[i].v = b->p[i].stdy;
+  72:lib/rsynth-2.0-port/holmes.c **** 	}
+  73:lib/rsynth-2.0-port/holmes.c **** }
+  74:lib/rsynth-2.0-port/holmes.c **** 
+  75:lib/rsynth-2.0-port/holmes.c **** static float linear (float a, float b, int t, int d);
+  76:lib/rsynth-2.0-port/holmes.c **** 
+  77:lib/rsynth-2.0-port/holmes.c **** /*              
+  78:lib/rsynth-2.0-port/holmes.c ****    ______________ b
+  79:lib/rsynth-2.0-port/holmes.c ****    /
+  80:lib/rsynth-2.0-port/holmes.c ****    /
+  81:lib/rsynth-2.0-port/holmes.c ****    /
+  82:lib/rsynth-2.0-port/holmes.c ****    a____________/                 
+  83:lib/rsynth-2.0-port/holmes.c ****    0   d
+  84:lib/rsynth-2.0-port/holmes.c ****    ---------------t---------------
+  85:lib/rsynth-2.0-port/holmes.c ****  */
+  86:lib/rsynth-2.0-port/holmes.c **** 
+  87:lib/rsynth-2.0-port/holmes.c **** static float linear(float a, float b, int t, int d)
+  88:lib/rsynth-2.0-port/holmes.c **** {
+  28              		.loc 1 88 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  89:lib/rsynth-2.0-port/holmes.c **** 	if (t <= 0)
+  34              		.loc 1 89 0
+  35 0000 0028     		cmp	r0, #0
+  36 0002 12DD     		ble	.L2
+  90:lib/rsynth-2.0-port/holmes.c **** 		return a;
+  91:lib/rsynth-2.0-port/holmes.c **** 	else if (t >= d)
+  37              		.loc 1 91 0
+  38 0004 8842     		cmp	r0, r1
+  39 0006 0EDA     		bge	.L3
+  40              	.LVL1:
+  41              	.LBB3:
+  92:lib/rsynth-2.0-port/holmes.c **** 		return b;
+  93:lib/rsynth-2.0-port/holmes.c **** 	else
+  94:lib/rsynth-2.0-port/holmes.c **** 	{
+  95:lib/rsynth-2.0-port/holmes.c **** 		float f = (float) t / (float) d;
+  96:lib/rsynth-2.0-port/holmes.c **** 		return a + (b - a) * f;
+  42              		.loc 1 96 0
+  43 0008 70EEC00A 		fsubs	s1, s1, s0
+  44              	.LVL2:
+  95:lib/rsynth-2.0-port/holmes.c **** 		float f = (float) t / (float) d;
+  45              		.loc 1 95 0
+  46 000c 06EE900A 		fmsr	s13, r0	@ int
+  47 0010 B8EEE67A 		fsitos	s14, s13
+  48 0014 06EE901A 		fmsr	s13, r1	@ int
+  49 0018 F8EEE67A 		fsitos	s15, s13
+  50 001c C7EE277A 		fdivs	s15, s14, s15
+  51              	.LVL3:
+  52              		.loc 1 96 0
+  53 0020 A0EEA70A 		vfma.f32	s0, s1, s15
+  54              	.LVL4:
+  55 0024 7047     		bx	lr
+  56              	.LVL5:
+  57              	.L3:
+  58              	.LBE3:
+  92:lib/rsynth-2.0-port/holmes.c **** 		return b;
+  59              		.loc 1 92 0
+  60 0026 B0EE600A 		fcpys	s0, s1
+  61              	.LVL6:
+  62              	.L2:
+  97:lib/rsynth-2.0-port/holmes.c **** 	}
+  98:lib/rsynth-2.0-port/holmes.c **** }
+  63              		.loc 1 98 0
+  64 002a 7047     		bx	lr
+  65              		.cfi_endproc
+  66              	.LFE4:
+  68              		.section	.text.set_trans.isra.0,"ax",%progbits
+  69              		.align	1
+  70              		.thumb
+  71              		.thumb_func
+  73              	set_trans.isra.0:
+  74              	.LFB9:
+  60:lib/rsynth-2.0-port/holmes.c **** static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
+  75              		.loc 1 60 0
+  76              		.cfi_startproc
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+  79              	.LVL7:
+  80 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  81              	.LCFI0:
+  82              		.cfi_def_cfa_offset 20
+  83              		.cfi_offset 4, -20
+  84              		.cfi_offset 5, -16
+  85              		.cfi_offset 6, -12
+  86              		.cfi_offset 7, -8
+  87              		.cfi_offset 14, -4
+  88              	.LVL8:
+  60:lib/rsynth-2.0-port/holmes.c **** static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
+  89              		.loc 1 60 0
+  90 0002 0024     		movs	r4, #0
+  66:lib/rsynth-2.0-port/holmes.c **** 		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
+  91              		.loc 1 66 0
+  92 0004 134F     		ldr	r7, .L11
+  69:lib/rsynth-2.0-port/holmes.c **** 			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01;
+  93              		.loc 1 69 0
+  94 0006 9FED147A 		flds	s14, .L11+4
+  95              	.LVL9:
+  96              	.L9:
+  66:lib/rsynth-2.0-port/holmes.c **** 		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
+  97              		.loc 1 66 0
+  98 000a 13B1     		cbz	r3, .L5
+  99 000c 91F91D50 		ldrsb	r5, [r1, #29]
+ 100 0010 01E0     		b	.L6
+ 101              	.L5:
+ 102 0012 91F91E50 		ldrsb	r5, [r1, #30]
+ 103              	.L6:
+ 104 0016 3E68     		ldr	r6, [r7, #0]
+ 105 0018 6E43     		muls	r6, r5, r6
+  60:lib/rsynth-2.0-port/holmes.c **** static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
+ 106              		.loc 1 60 0
+ 107 001a 0519     		adds	r5, r0, r4
+  66:lib/rsynth-2.0-port/holmes.c **** 		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
+ 108              		.loc 1 66 0
+ 109 001c 6E60     		str	r6, [r5, #4]
+  68:lib/rsynth-2.0-port/holmes.c **** 		if (t[i].t)
+ 110              		.loc 1 68 0
+ 111 001e 86B1     		cbz	r6, .L7
+  69:lib/rsynth-2.0-port/holmes.c **** 			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01;
+ 112              		.loc 1 69 0
+ 113 0020 91F91C60 		ldrsb	r6, [r1, #28]
+ 114 0024 06EE906A 		fmsr	s13, r6	@ int
+ 115 0028 F8EEE66A 		fsitos	s13, s13
+ 116 002c D2ED057A 		flds	s15, [r2, #20]
+ 117 0030 66EEA76A 		fmuls	s13, s13, s15
+ 118 0034 D1ED067A 		flds	s15, [r1, #24]
+ 119 0038 E6EE877A 		vfma.f32	s15, s13, s14
+ 120 003c C5ED007A 		fsts	s15, [r5, #0]
+ 121 0040 01E0     		b	.L8
+ 122              	.L7:
+  71:lib/rsynth-2.0-port/holmes.c **** 			t[i].v = b->p[i].stdy;
+ 123              		.loc 1 71 0
+ 124 0042 5669     		ldr	r6, [r2, #20]	@ float
+ 125 0044 2E60     		str	r6, [r5, #0]	@ float
+ 126              	.L8:
+ 127 0046 0C31     		adds	r1, r1, #12
+ 128 0048 0C32     		adds	r2, r2, #12
+ 129 004a 0834     		adds	r4, r4, #8
+  64:lib/rsynth-2.0-port/holmes.c **** 	for (i = 0; i < nEparm; i++)
+ 130              		.loc 1 64 0
+ 131 004c 982C     		cmp	r4, #152
+ 132 004e DCD1     		bne	.L9
+  73:lib/rsynth-2.0-port/holmes.c **** }
+ 133              		.loc 1 73 0
+ 134 0050 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 135              	.L12:
+ 136 0052 00BF     		.align	2
+ 137              	.L11:
+ 138 0054 00000000 		.word	.LANCHOR0
+ 139 0058 0AD7233C 		.word	1008981770
+ 140              		.cfi_endproc
+ 141              	.LFE9:
+ 143              		.section	.text.interpolate.isra.1,"ax",%progbits
+ 144              		.align	1
+ 145              		.thumb
+ 146              		.thumb_func
+ 148              	interpolate.isra.1:
+ 149              	.LFB10:
+  99:lib/rsynth-2.0-port/holmes.c **** 
+ 100:lib/rsynth-2.0-port/holmes.c **** static float interpolate (char *w, char *p, slope_t * s, slope_t * e, float mid, int t, int d);
+ 101:lib/rsynth-2.0-port/holmes.c **** 
+ 102:lib/rsynth-2.0-port/holmes.c **** static float interpolate(char *w, char *p, slope_t *s, slope_t *e, float mid, int t, int d)
+ 150              		.loc 1 102 0
+ 151              		.cfi_startproc
+ 152              		@ args = 0, pretend = 0, frame = 0
+ 153              		@ frame_needed = 0, uses_anonymous_args = 0
+ 154              	.LVL10:
+ 155 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 156              	.LCFI1:
+ 157              		.cfi_def_cfa_offset 24
+ 158              		.cfi_offset 3, -24
+ 159              		.cfi_offset 4, -20
+ 160              		.cfi_offset 5, -16
+ 161              		.cfi_offset 6, -12
+ 162              		.cfi_offset 7, -8
+ 163              		.cfi_offset 14, -4
+ 164 0002 2DED048B 		fstmfdd	sp!, {d8, d9}
+ 165              	.LCFI2:
+ 166              		.cfi_def_cfa_offset 40
+ 167              		.cfi_offset 80, -40
+ 168              		.cfi_offset 82, -32
+ 169 0006 0D46     		mov	r5, r1
+ 170 0008 B0EE408A 		fcpys	s16, s0
+ 171 000c 1446     		mov	r4, r2
+ 172 000e 1F46     		mov	r7, r3
+ 173              	.LVL11:
+ 103:lib/rsynth-2.0-port/holmes.c **** {
+ 104:lib/rsynth-2.0-port/holmes.c **** 	float steady = d - (s->t + e->t);
+ 174              		.loc 1 104 0
+ 175 0010 4168     		ldr	r1, [r0, #4]
+ 176              	.LVL12:
+ 177 0012 6E68     		ldr	r6, [r5, #4]
+ 178 0014 8B19     		adds	r3, r1, r6
+ 179              	.LVL13:
+ 180 0016 FB1A     		subs	r3, r7, r3
+ 181 0018 06EE903A 		fmsr	s13, r3	@ int
+ 182 001c F8EEE67A 		fsitos	s15, s13
+ 183              	.LVL14:
+ 105:lib/rsynth-2.0-port/holmes.c **** 	#ifdef DEBUG
+ 106:lib/rsynth-2.0-port/holmes.c **** 	fprintf(stdout, "%4s %s s=%g,%d e=%g,%d m=%g,%g\n",
+ 107:lib/rsynth-2.0-port/holmes.c **** 			w, p, s->v, s->t, e->v, e->t, mid, steady);
+ 108:lib/rsynth-2.0-port/holmes.c **** 	#endif
+ 109:lib/rsynth-2.0-port/holmes.c **** 	
+ 110:lib/rsynth-2.0-port/holmes.c **** 	if (steady >= 0)
+ 184              		.loc 1 110 0
+ 185 0020 F5EEC07A 		fcmpezs	s15
+ 186 0024 F1EE10FA 		fmstat
+ 187 0028 20DB     		blt	.L19
+ 111:lib/rsynth-2.0-port/holmes.c **** 	{
+ 112:lib/rsynth-2.0-port/holmes.c **** 		/* Value reaches stready state somewhere ... */
+ 113:lib/rsynth-2.0-port/holmes.c **** 		if (t < s->t)
+ 188              		.loc 1 113 0
+ 189 002a 8A42     		cmp	r2, r1
+ 190 002c 05DA     		bge	.L16
+ 114:lib/rsynth-2.0-port/holmes.c **** 			return linear(s->v, mid, t, s->t);	/* initial transition */
+ 191              		.loc 1 114 0
+ 192 002e 90ED000A 		flds	s0, [r0, #0]
+ 193              	.LVL15:
+ 194 0032 F0EE480A 		fcpys	s1, s16
+ 195 0036 1046     		mov	r0, r2
+ 196              	.LVL16:
+ 197 0038 12E0     		b	.L20
+ 198              	.LVL17:
+ 199              	.L16:
+ 115:lib/rsynth-2.0-port/holmes.c **** 		else
+ 116:lib/rsynth-2.0-port/holmes.c **** 		{
+ 117:lib/rsynth-2.0-port/holmes.c **** 			t -= s->t;
+ 200              		.loc 1 117 0
+ 201 003a 541A     		subs	r4, r2, r1
+ 202              	.LVL18:
+ 118:lib/rsynth-2.0-port/holmes.c **** 			if (t <= steady)
+ 203              		.loc 1 118 0
+ 204 003c 06EE904A 		fmsr	s13, r4	@ int
+ 205 0040 B8EEE67A 		fsitos	s14, s13
+ 206 0044 B4EEE77A 		fcmpes	s14, s15
+ 207 0048 F1EE10FA 		fmstat
+ 208 004c 33D9     		bls	.L17
+ 119:lib/rsynth-2.0-port/holmes.c **** 				return mid;                 /* steady state */
+ 120:lib/rsynth-2.0-port/holmes.c **** 			else
+ 121:lib/rsynth-2.0-port/holmes.c **** 				return linear(mid, e->v, (int) (t - steady), e->t);
+ 209              		.loc 1 121 0
+ 210 004e 77EE677A 		fsubs	s15, s14, s15
+ 211              	.LVL19:
+ 212 0052 D5ED000A 		flds	s1, [r5, #0]
+ 213 0056 FDEEE77A 		ftosizs	s15, s15
+ 214 005a 17EE900A 		fmrs	r0, s15	@ int
+ 215              	.LVL20:
+ 216 005e 3146     		mov	r1, r6
+ 217              	.LVL21:
+ 218              	.L20:
+ 122:lib/rsynth-2.0-port/holmes.c **** 				/* final transition */
+ 123:lib/rsynth-2.0-port/holmes.c **** 		}
+ 124:lib/rsynth-2.0-port/holmes.c **** 	}
+ 125:lib/rsynth-2.0-port/holmes.c **** 	else
+ 126:lib/rsynth-2.0-port/holmes.c **** 	{
+ 127:lib/rsynth-2.0-port/holmes.c **** 		float f = (float) 1.0 - ((float) t / (float) d);
+ 128:lib/rsynth-2.0-port/holmes.c **** 		float sp = linear(s->v, mid, t, s->t);
+ 129:lib/rsynth-2.0-port/holmes.c **** 		float ep = linear(e->v, mid, d - t, e->t);
+ 130:lib/rsynth-2.0-port/holmes.c **** 		return f * sp + ((float) 1.0 - f) * ep;
+ 131:lib/rsynth-2.0-port/holmes.c **** 	}
+ 132:lib/rsynth-2.0-port/holmes.c **** }
+ 219              		.loc 1 132 0
+ 220 0060 BDEC048B 		fldmfdd	sp!, {d8, d9}
+ 221 0064 BDE8F840 		pop	{r3, r4, r5, r6, r7, lr}
+ 121:lib/rsynth-2.0-port/holmes.c **** 				return linear(mid, e->v, (int) (t - steady), e->t);
+ 222              		.loc 1 121 0
+ 223 0068 FFF7FEBF 		b	linear
+ 224              	.LVL22:
+ 225              	.L19:
+ 226              	.LBB4:
+ 127:lib/rsynth-2.0-port/holmes.c **** 		float f = (float) 1.0 - ((float) t / (float) d);
+ 227              		.loc 1 127 0
+ 228 006c 07EE102A 		fmsr	s14, r2	@ int
+ 229 0070 F8EEC78A 		fsitos	s17, s14
+ 230 0074 06EE907A 		fmsr	s13, r7	@ int
+ 231 0078 F8EEE67A 		fsitos	s15, s13
+ 232              	.LVL23:
+ 233 007c C8EEA78A 		fdivs	s17, s17, s15
+ 234 0080 B7EE009A 		fconsts	s18, #112
+ 235 0084 79EE688A 		fsubs	s17, s18, s17
+ 236              	.LVL24:
+ 128:lib/rsynth-2.0-port/holmes.c **** 		float sp = linear(s->v, mid, t, s->t);
+ 237              		.loc 1 128 0
+ 238 0088 90ED000A 		flds	s0, [r0, #0]
+ 239              	.LVL25:
+ 240 008c F0EE480A 		fcpys	s1, s16
+ 241 0090 1046     		mov	r0, r2
+ 242              	.LVL26:
+ 243 0092 FFF7FEFF 		bl	linear
+ 244              	.LVL27:
+ 245 0096 F0EE409A 		fcpys	s19, s0
+ 246              	.LVL28:
+ 129:lib/rsynth-2.0-port/holmes.c **** 		float ep = linear(e->v, mid, d - t, e->t);
+ 247              		.loc 1 129 0
+ 248 009a 95ED000A 		flds	s0, [r5, #0]
+ 249              	.LVL29:
+ 250 009e F0EE480A 		fcpys	s1, s16
+ 251 00a2 381B     		subs	r0, r7, r4
+ 252 00a4 3146     		mov	r1, r6
+ 253 00a6 FFF7FEFF 		bl	linear
+ 254              	.LVL30:
+ 130:lib/rsynth-2.0-port/holmes.c **** 		return f * sp + ((float) 1.0 - f) * ep;
+ 255              		.loc 1 130 0
+ 256 00aa 39EE688A 		fsubs	s16, s18, s17
+ 257              	.LVL31:
+ 258 00ae 28EE008A 		fmuls	s16, s16, s0
+ 259 00b2 A8EEA98A 		vfma.f32	s16, s17, s19
+ 260              	.LVL32:
+ 261              	.L17:
+ 262              	.LBE4:
+ 263              		.loc 1 132 0
+ 264 00b6 B0EE480A 		fcpys	s0, s16
+ 265 00ba BDEC048B 		fldmfdd	sp!, {d8, d9}
+ 266 00be F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 267              		.cfi_endproc
+ 268              	.LFE10:
+ 270              		.global	__aeabi_i2d
+ 271              		.global	__aeabi_dmul
+ 272              		.global	__aeabi_d2f
+ 273              		.global	__aeabi_f2d
+ 274              		.section	.text.holmes,"ax",%progbits
+ 275              		.align	1
+ 276              		.global	holmes
+ 277              		.thumb
+ 278              		.thumb_func
+ 280              	holmes:
+ 281              	.LFB6:
+ 133:lib/rsynth-2.0-port/holmes.c **** 
+ 134:lib/rsynth-2.0-port/holmes.c **** 
+ 135:lib/rsynth-2.0-port/holmes.c **** unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_base)
+ 136:lib/rsynth-2.0-port/holmes.c **** {
+ 282              		.loc 1 136 0
+ 283              		.cfi_startproc
+ 284              		@ args = 0, pretend = 0, frame = 808
+ 285              		@ frame_needed = 0, uses_anonymous_args = 0
+ 286              	.LVL33:
+ 287 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 288              	.LCFI3:
+ 289              		.cfi_def_cfa_offset 36
+ 290              		.cfi_offset 4, -36
+ 291              		.cfi_offset 5, -32
+ 292              		.cfi_offset 6, -28
+ 293              		.cfi_offset 7, -24
+ 294              		.cfi_offset 8, -20
+ 295              		.cfi_offset 9, -16
+ 296              		.cfi_offset 10, -12
+ 297              		.cfi_offset 11, -8
+ 298              		.cfi_offset 14, -4
+ 299 0004 2DED088B 		fstmfdd	sp!, {d8, d9, d10, d11}
+ 300              	.LCFI4:
+ 301              		.cfi_def_cfa_offset 68
+ 302              		.cfi_offset 80, -68
+ 303              		.cfi_offset 82, -60
+ 304              		.cfi_offset 84, -52
+ 305              		.cfi_offset 86, -44
+ 306 0008 ADF54B7D 		sub	sp, sp, #812
+ 307              	.LCFI5:
+ 308              		.cfi_def_cfa_offset 880
+ 309 000c 0746     		mov	r7, r0
+ 310 000e 8946     		mov	r9, r1
+ 311 0010 0593     		str	r3, [sp, #20]
+ 312              	.LVL34:
+ 137:lib/rsynth-2.0-port/holmes.c **** 	filter_t flt[nEparm];
+ 138:lib/rsynth-2.0-port/holmes.c **** 	klatt_frame_t pars;
+ 139:lib/rsynth-2.0-port/holmes.c **** 	short *samp = samp_base;
+ 140:lib/rsynth-2.0-port/holmes.c **** 	Elm_ptr le = &Elements[0];
+ 141:lib/rsynth-2.0-port/holmes.c **** 	unsigned i = 0;
+ 142:lib/rsynth-2.0-port/holmes.c **** 	unsigned tstress = 0;
+ 143:lib/rsynth-2.0-port/holmes.c **** 	unsigned ntstress = 0;
+ 144:lib/rsynth-2.0-port/holmes.c **** 	slope_t stress_s;
+ 145:lib/rsynth-2.0-port/holmes.c **** 	slope_t stress_e;
+ 146:lib/rsynth-2.0-port/holmes.c **** 	float top = 1.1 * def_pars.F0hz10;
+ 313              		.loc 1 146 0
+ 314 0012 774C     		ldr	r4, .L61+16
+ 315 0014 2068     		ldr	r0, [r4, #0]
+ 316              	.LVL35:
+ 317 0016 FFF7FEFF 		bl	__aeabi_i2d
+ 318              	.LVL36:
+ 319 001a 71A3     		adr	r3, .L61
+ 320 001c D3E90023 		ldrd	r2, [r3]
+ 321 0020 FFF7FEFF 		bl	__aeabi_dmul
+ 322              	.LVL37:
+ 323 0024 FFF7FEFF 		bl	__aeabi_d2f
+ 324              	.LVL38:
+ 325 0028 08EE900A 		fmsr	s17, r0
+ 326              	.LVL39:
+ 147:lib/rsynth-2.0-port/holmes.c **** 	int j;
+ 148:lib/rsynth-2.0-port/holmes.c **** 	pars = def_pars;
+ 327              		.loc 1 148 0
+ 328 002c 69A8     		add	r0, sp, #420
+ 329              	.LVL40:
+ 330 002e 2146     		mov	r1, r4
+ 331 0030 A022     		movs	r2, #160
+ 332 0032 FFF7FEFF 		bl	memcpy
+ 333              	.LVL41:
+ 149:lib/rsynth-2.0-port/holmes.c **** 	pars.FNPhz = le->p[fn].stdy;
+ 334              		.loc 1 149 0
+ 335 0036 6F4D     		ldr	r5, .L61+20
+ 336 0038 D5ED057A 		flds	s15, [r5, #20]
+ 337 003c FDEEE77A 		ftosizs	s15, s15
+ 338 0040 CDED797A 		fsts	s15, [sp, #484]	@ int
+ 150:lib/rsynth-2.0-port/holmes.c **** 	pars.B1phz = pars.B1hz = 60;
+ 339              		.loc 1 150 0
+ 340 0044 3C23     		movs	r3, #60
+ 341 0046 6C93     		str	r3, [sp, #432]
+ 342 0048 8293     		str	r3, [sp, #520]
+ 151:lib/rsynth-2.0-port/holmes.c **** 	pars.B2phz = pars.B2hz = 90;
+ 343              		.loc 1 151 0
+ 344 004a 5A23     		movs	r3, #90
+ 345 004c 6E93     		str	r3, [sp, #440]
+ 346 004e 8493     		str	r3, [sp, #528]
+ 152:lib/rsynth-2.0-port/holmes.c **** 	pars.B3phz = pars.B3hz = 150;
+ 347              		.loc 1 152 0
+ 348 0050 9623     		movs	r3, #150
+ 349 0052 7093     		str	r3, [sp, #448]
+ 350 0054 8693     		str	r3, [sp, #536]
+ 153:lib/rsynth-2.0-port/holmes.c **** 	#if 0
+ 154:lib/rsynth-2.0-port/holmes.c **** 	pars.F4hz = 3500;
+ 155:lib/rsynth-2.0-port/holmes.c **** 	#endif
+ 156:lib/rsynth-2.0-port/holmes.c **** 	pars.B4phz = def_pars.B4phz;
+ 351              		.loc 1 156 0
+ 352 0056 E36F     		ldr	r3, [r4, #124]
+ 353 0058 8893     		str	r3, [sp, #544]
+ 157:lib/rsynth-2.0-port/holmes.c **** 
+ 158:lib/rsynth-2.0-port/holmes.c **** 	/* flag new utterance */
+ 159:lib/rsynth-2.0-port/holmes.c **** 	parwave_init(&klatt_global);
+ 354              		.loc 1 159 0
+ 355 005a 6748     		ldr	r0, .L61+24
+ 356 005c FFF7FEFF 		bl	parwave_init
+ 357              	.LVL42:
+ 160:lib/rsynth-2.0-port/holmes.c **** 
+ 161:lib/rsynth-2.0-port/holmes.c **** 	/* Set stress attack/decay slope */
+ 162:lib/rsynth-2.0-port/holmes.c **** 	stress_s.t = 40;
+ 358              		.loc 1 162 0
+ 359 0060 2823     		movs	r3, #40
+ 360 0062 0793     		str	r3, [sp, #28]
+ 163:lib/rsynth-2.0-port/holmes.c **** 	stress_e.t = 40;
+ 361              		.loc 1 163 0
+ 362 0064 0993     		str	r3, [sp, #36]
+ 164:lib/rsynth-2.0-port/holmes.c **** 	stress_e.v = 0.0;
+ 363              		.loc 1 164 0
+ 364 0066 0023     		movs	r3, #0
+ 365 0068 0893     		str	r3, [sp, #32]	@ float
+ 366              	.LVL43:
+ 165:lib/rsynth-2.0-port/holmes.c **** 
+ 166:lib/rsynth-2.0-port/holmes.c **** 	for (j = 0; j < nEparm; j++)
+ 167:lib/rsynth-2.0-port/holmes.c **** 	{
+ 168:lib/rsynth-2.0-port/holmes.c **** 		flt[j].v = le->p[j].stdy;
+ 169:lib/rsynth-2.0-port/holmes.c **** 		flt[j].a = frac;
+ 367              		.loc 1 169 0
+ 368 006a 644B     		ldr	r3, .L61+28
+ 369 006c D3E90001 		ldrd	r0, [r3]
+ 370 0070 FFF7FEFF 		bl	__aeabi_d2f
+ 371              	.LVL44:
+ 372 0074 07EE900A 		fmsr	s15, r0
+ 170:lib/rsynth-2.0-port/holmes.c **** 		flt[j].b = (float) 1.0 - (float) frac;
+ 373              		.loc 1 170 0
+ 374 0078 B7EE007A 		fconsts	s14, #112
+ 375 007c 37EE677A 		fsubs	s14, s14, s15
+ 376 0080 93AB     		add	r3, sp, #588
+ 377 0082 0022     		movs	r2, #0
+ 378              	.LVL45:
+ 379              	.L22:
+ 135:lib/rsynth-2.0-port/holmes.c **** unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_base)
+ 380              		.loc 1 135 0 discriminator 2
+ 381 0084 5119     		adds	r1, r2, r5
+ 168:lib/rsynth-2.0-port/holmes.c **** 		flt[j].v = le->p[j].stdy;
+ 382              		.loc 1 168 0 discriminator 2
+ 383 0086 4969     		ldr	r1, [r1, #20]	@ float
+ 384 0088 1960     		str	r1, [r3, #0]	@ float
+ 169:lib/rsynth-2.0-port/holmes.c **** 		flt[j].a = frac;
+ 385              		.loc 1 169 0 discriminator 2
+ 386 008a 43ED027A 		fsts	s15, [r3, #-8]
+ 387              		.loc 1 170 0 discriminator 2
+ 388 008e 03ED017A 		fsts	s14, [r3, #-4]
+ 389 0092 0C32     		adds	r2, r2, #12
+ 390 0094 0C33     		adds	r3, r3, #12
+ 166:lib/rsynth-2.0-port/holmes.c **** 	for (j = 0; j < nEparm; j++)
+ 391              		.loc 1 166 0 discriminator 2
+ 392 0096 E42A     		cmp	r2, #228
+ 393 0098 F4D1     		bne	.L22
+ 394 009a CDF80490 		str	r9, [sp, #4]
+ 166:lib/rsynth-2.0-port/holmes.c **** 	for (j = 0; j < nEparm; j++)
+ 395              		.loc 1 166 0 is_stmt 0
+ 396 009e 0598     		ldr	r0, [sp, #20]
+ 397 00a0 0290     		str	r0, [sp, #8]
+ 398 00a2 0024     		movs	r4, #0
+ 399 00a4 A046     		mov	r8, r4
+ 400 00a6 2646     		mov	r6, r4
+ 401 00a8 524A     		ldr	r2, .L61+20
+ 402              	.LBB13:
+ 403              	.LBB14:
+ 404              	.LBB15:
+ 405              	.LBB16:
+ 406              	.LBB17:
+ 407              	.LBB18:
+ 171:lib/rsynth-2.0-port/holmes.c **** 	}
+ 172:lib/rsynth-2.0-port/holmes.c **** 	while (i < nelm)
+ 173:lib/rsynth-2.0-port/holmes.c **** 	{
+ 174:lib/rsynth-2.0-port/holmes.c **** 		Elm_ptr ce = &Elements[elm[i++]];
+ 175:lib/rsynth-2.0-port/holmes.c **** 		unsigned dur = elm[i++];
+ 176:lib/rsynth-2.0-port/holmes.c **** 		i++; /* skip stress */
+ 177:lib/rsynth-2.0-port/holmes.c **** 		/* Skip zero length elements which are only there to affect
+ 178:lib/rsynth-2.0-port/holmes.c **** 		boundary values of adjacent elements
+ 179:lib/rsynth-2.0-port/holmes.c **** 		*/
+ 180:lib/rsynth-2.0-port/holmes.c **** 		if (dur > 0)
+ 181:lib/rsynth-2.0-port/holmes.c **** 		{
+ 182:lib/rsynth-2.0-port/holmes.c **** 			Elm_ptr ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+ 183:lib/rsynth-2.0-port/holmes.c **** 			slope_t start[nEparm];
+ 184:lib/rsynth-2.0-port/holmes.c **** 			slope_t end[nEparm];
+ 185:lib/rsynth-2.0-port/holmes.c **** 			unsigned t;
+ 186:lib/rsynth-2.0-port/holmes.c **** 
+ 187:lib/rsynth-2.0-port/holmes.c **** 			if (ce->rk > le->rk)
+ 188:lib/rsynth-2.0-port/holmes.c **** 			{
+ 189:lib/rsynth-2.0-port/holmes.c **** 				set_trans(start, ce, le, 0, 's');
+ 190:lib/rsynth-2.0-port/holmes.c **** 				/* we dominate last */
+ 191:lib/rsynth-2.0-port/holmes.c **** 			}
+ 192:lib/rsynth-2.0-port/holmes.c **** 			else
+ 193:lib/rsynth-2.0-port/holmes.c **** 			{
+ 194:lib/rsynth-2.0-port/holmes.c **** 				set_trans(start, le, ce, 1, 's');
+ 195:lib/rsynth-2.0-port/holmes.c **** 				/* last dominates us */
+ 196:lib/rsynth-2.0-port/holmes.c **** 			}
+ 197:lib/rsynth-2.0-port/holmes.c **** 
+ 198:lib/rsynth-2.0-port/holmes.c **** 			if (ne->rk > ce->rk)
+ 199:lib/rsynth-2.0-port/holmes.c **** 			{
+ 200:lib/rsynth-2.0-port/holmes.c **** 				set_trans(end, ne, ce, 1, 'e');
+ 201:lib/rsynth-2.0-port/holmes.c **** 				/* next dominates us */
+ 202:lib/rsynth-2.0-port/holmes.c **** 			}
+ 203:lib/rsynth-2.0-port/holmes.c **** 			else
+ 204:lib/rsynth-2.0-port/holmes.c **** 			{
+ 205:lib/rsynth-2.0-port/holmes.c **** 				set_trans(end, ce, ne, 0, 'e');
+ 206:lib/rsynth-2.0-port/holmes.c **** 				/* we dominate next */
+ 207:lib/rsynth-2.0-port/holmes.c **** 			}
+ 208:lib/rsynth-2.0-port/holmes.c **** 
+ 209:lib/rsynth-2.0-port/holmes.c **** 
+ 210:lib/rsynth-2.0-port/holmes.c **** 			for (t = 0; t < dur; t++, tstress++)
+ 211:lib/rsynth-2.0-port/holmes.c **** 			{
+ 212:lib/rsynth-2.0-port/holmes.c **** 				float base = top * 0.8 /* 3 * top / 5 */;
+ 213:lib/rsynth-2.0-port/holmes.c **** 				float tp[nEparm];
+ 214:lib/rsynth-2.0-port/holmes.c **** 				int j;
+ 215:lib/rsynth-2.0-port/holmes.c **** 
+ 216:lib/rsynth-2.0-port/holmes.c **** 				if (tstress == ntstress)
+ 217:lib/rsynth-2.0-port/holmes.c **** 				{
+ 218:lib/rsynth-2.0-port/holmes.c **** 					unsigned j = i;
+ 219:lib/rsynth-2.0-port/holmes.c **** 					stress_s = stress_e;
+ 220:lib/rsynth-2.0-port/holmes.c **** 					tstress = 0;
+ 221:lib/rsynth-2.0-port/holmes.c **** 					ntstress = dur;
+ 222:lib/rsynth-2.0-port/holmes.c **** 					#ifdef DEBUG_STRESS
+ 223:lib/rsynth-2.0-port/holmes.c **** 					printf("Stress %g -> ", stress_s.v);
+ 224:lib/rsynth-2.0-port/holmes.c **** 					#endif
+ 225:lib/rsynth-2.0-port/holmes.c **** 					while (j <= nelm)
+ 226:lib/rsynth-2.0-port/holmes.c **** 					{
+ 227:lib/rsynth-2.0-port/holmes.c **** 						Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 228:lib/rsynth-2.0-port/holmes.c **** 						unsigned du = (j < nelm) ? elm[j++] : 0;
+ 229:lib/rsynth-2.0-port/holmes.c **** 						unsigned s  = (j < nelm) ? elm[j++] : 3;
+ 230:lib/rsynth-2.0-port/holmes.c **** 						if (s || e->feat & vwl)
+ 231:lib/rsynth-2.0-port/holmes.c **** 						{
+ 232:lib/rsynth-2.0-port/holmes.c **** 							unsigned d = 0;
+ 233:lib/rsynth-2.0-port/holmes.c **** 							if (s)
+ 234:lib/rsynth-2.0-port/holmes.c **** 								stress_e.v = (float) s / 3;
+ 408              		.loc 1 234 0 is_stmt 1
+ 409 00aa B0EE08AA 		fconsts	s20, #8
+ 235:lib/rsynth-2.0-port/holmes.c **** 							else
+ 236:lib/rsynth-2.0-port/holmes.c **** 								stress_e.v = (float) 0.1;
+ 410              		.loc 1 236 0
+ 411 00ae 9FED54BA 		flds	s22, .L61+32
+ 412              	.LBE18:
+ 413              	.LBE17:
+ 414              	.LBE16:
+ 237:lib/rsynth-2.0-port/holmes.c **** 							do
+ 238:lib/rsynth-2.0-port/holmes.c **** 							{
+ 239:lib/rsynth-2.0-port/holmes.c **** 								d += du;
+ 240:lib/rsynth-2.0-port/holmes.c **** 								#ifdef DEBUG_STRESS
+ 241:lib/rsynth-2.0-port/holmes.c **** 								printf("%s", (e && e->dict) ? e->dict : "");
+ 242:lib/rsynth-2.0-port/holmes.c **** 								#endif
+ 243:lib/rsynth-2.0-port/holmes.c **** 								e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 244:lib/rsynth-2.0-port/holmes.c **** 								du = elm[j++];
+ 245:lib/rsynth-2.0-port/holmes.c **** 							}
+ 246:lib/rsynth-2.0-port/holmes.c **** 							while ((e->feat & vwl) && elm[j++] == s);
+ 247:lib/rsynth-2.0-port/holmes.c **** 							ntstress += d / 2;
+ 248:lib/rsynth-2.0-port/holmes.c **** 							break;
+ 249:lib/rsynth-2.0-port/holmes.c **** 						}
+ 250:lib/rsynth-2.0-port/holmes.c **** 						ntstress += du;
+ 251:lib/rsynth-2.0-port/holmes.c **** 					}
+ 252:lib/rsynth-2.0-port/holmes.c **** 					#ifdef DEBUG_STRESS
+ 253:lib/rsynth-2.0-port/holmes.c **** 					printf(" %g @ %d\n", stress_e.v, ntstress);
+ 254:lib/rsynth-2.0-port/holmes.c **** 					#endif
+ 255:lib/rsynth-2.0-port/holmes.c **** 				}
+ 256:lib/rsynth-2.0-port/holmes.c **** 
+ 257:lib/rsynth-2.0-port/holmes.c **** 				for (j = 0; j < nEparm; j++)
+ 258:lib/rsynth-2.0-port/holmes.c **** 					tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &start[j], &end[j], (float) ce->p[j]
+ 259:lib/rsynth-2.0-port/holmes.c **** 
+ 260:lib/rsynth-2.0-port/holmes.c **** 				/* Now call the synth for each frame */
+ 261:lib/rsynth-2.0-port/holmes.c **** 
+ 262:lib/rsynth-2.0-port/holmes.c **** 				pars.F0hz10 = base + (top - base) *
+ 263:lib/rsynth-2.0-port/holmes.c **** 				interpolate("", "f0", &stress_s, &stress_e, (float) 0, tstress, ntstress);
+ 264:lib/rsynth-2.0-port/holmes.c **** 
+ 265:lib/rsynth-2.0-port/holmes.c **** 				pars.AVdb = pars.AVpdb = tp[av];
+ 266:lib/rsynth-2.0-port/holmes.c **** 				pars.AF = tp[af];
+ 267:lib/rsynth-2.0-port/holmes.c **** 				pars.FNZhz = tp[fn];
+ 268:lib/rsynth-2.0-port/holmes.c **** 				pars.ASP = tp[asp];
+ 269:lib/rsynth-2.0-port/holmes.c **** 				pars.Aturb = tp[avc];
+ 270:lib/rsynth-2.0-port/holmes.c **** 				pars.B1phz = pars.B1hz = tp[b1];
+ 271:lib/rsynth-2.0-port/holmes.c **** 				pars.B2phz = pars.B2hz = tp[b2];
+ 272:lib/rsynth-2.0-port/holmes.c **** 				pars.B3phz = pars.B3hz = tp[b3];
+ 273:lib/rsynth-2.0-port/holmes.c **** 				pars.F1hz = tp[f1];
+ 274:lib/rsynth-2.0-port/holmes.c **** 				pars.F2hz = tp[f2];
+ 275:lib/rsynth-2.0-port/holmes.c **** 				pars.F3hz = tp[f3];
+ 276:lib/rsynth-2.0-port/holmes.c **** 				/* AMP_ADJ + is a bodge to get amplitudes up to klatt-compatible levels
+ 277:lib/rsynth-2.0-port/holmes.c **** 				Needs to be fixed properly in tables
+ 278:lib/rsynth-2.0-port/holmes.c **** 				*/
+ 279:lib/rsynth-2.0-port/holmes.c **** 				/*
+ 280:lib/rsynth-2.0-port/holmes.c **** 				pars.ANP  = AMP_ADJ + tp[an];
+ 281:lib/rsynth-2.0-port/holmes.c **** 				*/
+ 282:lib/rsynth-2.0-port/holmes.c **** 				pars.AB = AMP_ADJ + tp[ab];
+ 415              		.loc 1 282 0
+ 416 00b2 B2EE0C8A 		fconsts	s16, #44
+ 417 00b6 89E1     		b	.L23
+ 418              	.LVL46:
+ 419              	.L44:
+ 420              	.LBE15:
+ 421              	.LBE14:
+ 174:lib/rsynth-2.0-port/holmes.c **** 		Elm_ptr ce = &Elements[elm[i++]];
+ 422              		.loc 1 174 0
+ 423 00b8 19F80650 		ldrb	r5, [r9, r6]	@ zero_extendqisi2
+ 424 00bc F821     		movs	r1, #248
+ 425 00be 4D4B     		ldr	r3, .L61+20
+ 426 00c0 01FB0535 		mla	r5, r1, r5, r3
+ 427              	.LVL47:
+ 175:lib/rsynth-2.0-port/holmes.c **** 		unsigned dur = elm[i++];
+ 428              		.loc 1 175 0
+ 429 00c4 0198     		ldr	r0, [sp, #4]
+ 430 00c6 4078     		ldrb	r0, [r0, #1]	@ zero_extendqisi2
+ 431 00c8 0390     		str	r0, [sp, #12]
+ 432              	.LVL48:
+ 176:lib/rsynth-2.0-port/holmes.c **** 		i++; /* skip stress */
+ 433              		.loc 1 176 0
+ 434 00ca 0336     		adds	r6, r6, #3
+ 435              	.LVL49:
+ 180:lib/rsynth-2.0-port/holmes.c **** 		if (dur > 0)
+ 436              		.loc 1 180 0
+ 437 00cc 0028     		cmp	r0, #0
+ 438 00ce 00F07981 		beq	.L24
+ 439              	.LBB35:
+ 182:lib/rsynth-2.0-port/holmes.c **** 			Elm_ptr ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+ 440              		.loc 1 182 0
+ 441 00d2 BE42     		cmp	r6, r7
+ 442 00d4 3DBF     		ittte	cc
+ 443 00d6 0198     		ldrcc	r0, [sp, #4]
+ 444              	.LVL50:
+ 445 00d8 90F803A0 		ldrbcc	sl, [r0, #3]	@ zero_extendqisi2
+ 446 00dc 01FB0A3A 		mlacc	sl, r1, sl, r3
+ 447 00e0 9A46     		movcs	sl, r3
+ 448              	.LVL51:
+ 187:lib/rsynth-2.0-port/holmes.c **** 			if (ce->rk > le->rk)
+ 449              		.loc 1 187 0
+ 450 00e2 95F90410 		ldrsb	r1, [r5, #4]
+ 451 00e6 92F90430 		ldrsb	r3, [r2, #4]
+ 189:lib/rsynth-2.0-port/holmes.c **** 				set_trans(start, ce, le, 0, 's');
+ 452              		.loc 1 189 0
+ 453 00ea 1DA8     		add	r0, sp, #116
+ 187:lib/rsynth-2.0-port/holmes.c **** 			if (ce->rk > le->rk)
+ 454              		.loc 1 187 0
+ 455 00ec 9942     		cmp	r1, r3
+ 456 00ee 02DD     		ble	.L26
+ 189:lib/rsynth-2.0-port/holmes.c **** 				set_trans(start, ce, le, 0, 's');
+ 457              		.loc 1 189 0
+ 458 00f0 2946     		mov	r1, r5
+ 459 00f2 0023     		movs	r3, #0
+ 460 00f4 02E0     		b	.L58
+ 461              	.L26:
+ 194:lib/rsynth-2.0-port/holmes.c **** 				set_trans(start, le, ce, 1, 's');
+ 462              		.loc 1 194 0
+ 463 00f6 1146     		mov	r1, r2
+ 464 00f8 2A46     		mov	r2, r5
+ 465              	.LVL52:
+ 466 00fa 0123     		movs	r3, #1
+ 467              	.LVL53:
+ 468              	.L58:
+ 469 00fc FFF7FEFF 		bl	set_trans.isra.0
+ 470              	.LVL54:
+ 198:lib/rsynth-2.0-port/holmes.c **** 			if (ne->rk > ce->rk)
+ 471              		.loc 1 198 0
+ 472 0100 9AF90420 		ldrsb	r2, [sl, #4]
+ 473 0104 95F90430 		ldrsb	r3, [r5, #4]
+ 200:lib/rsynth-2.0-port/holmes.c **** 				set_trans(end, ne, ce, 1, 'e');
+ 474              		.loc 1 200 0
+ 475 0108 43A8     		add	r0, sp, #268
+ 198:lib/rsynth-2.0-port/holmes.c **** 			if (ne->rk > ce->rk)
+ 476              		.loc 1 198 0
+ 477 010a 9A42     		cmp	r2, r3
+ 478 010c 03DD     		ble	.L28
+ 200:lib/rsynth-2.0-port/holmes.c **** 				set_trans(end, ne, ce, 1, 'e');
+ 479              		.loc 1 200 0
+ 480 010e 5146     		mov	r1, sl
+ 481 0110 2A46     		mov	r2, r5
+ 482 0112 0123     		movs	r3, #1
+ 483 0114 02E0     		b	.L59
+ 484              	.L28:
+ 205:lib/rsynth-2.0-port/holmes.c **** 				set_trans(end, ce, ne, 0, 'e');
+ 485              		.loc 1 205 0
+ 486 0116 2946     		mov	r1, r5
+ 487 0118 5246     		mov	r2, sl
+ 488 011a 0023     		movs	r3, #0
+ 489              	.L59:
+ 490 011c FFF7FEFF 		bl	set_trans.isra.0
+ 491              	.LVL55:
+ 182:lib/rsynth-2.0-port/holmes.c **** 			Elm_ptr ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+ 492              		.loc 1 182 0
+ 493 0120 0022     		movs	r2, #0
+ 494 0122 0492     		str	r2, [sp, #16]
+ 495              	.LBB32:
+ 283:lib/rsynth-2.0-port/holmes.c **** 				pars.A5 = AMP_ADJ + tp[a5];
+ 284:lib/rsynth-2.0-port/holmes.c **** 				pars.A6 = AMP_ADJ + tp[a6];
+ 285:lib/rsynth-2.0-port/holmes.c **** 				pars.A1 = AMP_ADJ + tp[a1];
+ 286:lib/rsynth-2.0-port/holmes.c **** 				pars.A2 = AMP_ADJ + tp[a2];
+ 287:lib/rsynth-2.0-port/holmes.c **** 				pars.A3 = AMP_ADJ + tp[a3];
+ 288:lib/rsynth-2.0-port/holmes.c **** 				pars.A4 = AMP_ADJ + tp[a4];
+ 289:lib/rsynth-2.0-port/holmes.c **** 
+ 290:lib/rsynth-2.0-port/holmes.c **** 				parwave(&klatt_global, &pars, samp);
+ 291:lib/rsynth-2.0-port/holmes.c **** 
+ 292:lib/rsynth-2.0-port/holmes.c **** 				samp += klatt_global.nspfr;
+ 293:lib/rsynth-2.0-port/holmes.c **** 				/* Declination of f0 envelope 0.25Hz / cS */
+ 294:lib/rsynth-2.0-port/holmes.c **** 				top -= 0.5;
+ 496              		.loc 1 294 0
+ 497 0124 F6EE009A 		fconsts	s19, #96
+ 498              	.LVL56:
+ 499              	.L43:
+ 212:lib/rsynth-2.0-port/holmes.c **** 				float base = top * 0.8 /* 3 * top / 5 */;
+ 500              		.loc 1 212 0
+ 501 0128 18EE900A 		fmrs	r0, s17
+ 502 012c FFF7FEFF 		bl	__aeabi_f2d
+ 503              	.LVL57:
+ 504 0130 2DA3     		adr	r3, .L61+8
+ 505 0132 D3E90023 		ldrd	r2, [r3]
+ 506 0136 FFF7FEFF 		bl	__aeabi_dmul
+ 507              	.LVL58:
+ 508 013a FFF7FEFF 		bl	__aeabi_d2f
+ 509              	.LVL59:
+ 510 013e 09EE100A 		fmsr	s18, r0
+ 511              	.LVL60:
+ 216:lib/rsynth-2.0-port/holmes.c **** 				if (tstress == ntstress)
+ 512              		.loc 1 216 0
+ 513 0142 A045     		cmp	r8, r4
+ 514 0144 65D1     		bne	.L30
+ 515              	.LVL61:
+ 516              	.LBB25:
+ 219:lib/rsynth-2.0-port/holmes.c **** 					stress_s = stress_e;
+ 517              		.loc 1 219 0
+ 518 0146 06AB     		add	r3, sp, #24
+ 519 0148 08AA     		add	r2, sp, #32
+ 520 014a 92E80300 		ldmia	r2, {r0, r1}
+ 521              	.LVL62:
+ 522 014e 83E80300 		stmia	r3, {r0, r1}
+ 523              	.LVL63:
+ 225:lib/rsynth-2.0-port/holmes.c **** 					while (j <= nelm)
+ 524              		.loc 1 225 0
+ 525 0152 019A     		ldr	r2, [sp, #4]
+ 176:lib/rsynth-2.0-port/holmes.c **** 		i++; /* skip stress */
+ 526              		.loc 1 176 0
+ 527 0154 3346     		mov	r3, r6
+ 225:lib/rsynth-2.0-port/holmes.c **** 					while (j <= nelm)
+ 528              		.loc 1 225 0
+ 529 0156 039C     		ldr	r4, [sp, #12]
+ 530              	.LBB21:
+ 227:lib/rsynth-2.0-port/holmes.c **** 						Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 531              		.loc 1 227 0
+ 532 0158 4FF0F80E 		mov	lr, #248
+ 533 015c DFF894C0 		ldr	ip, .L61+20
+ 534              	.LBE21:
+ 225:lib/rsynth-2.0-port/holmes.c **** 					while (j <= nelm)
+ 535              		.loc 1 225 0
+ 536 0160 53E0     		b	.L31
+ 537              	.LVL64:
+ 538              	.L41:
+ 539              	.LBB22:
+ 227:lib/rsynth-2.0-port/holmes.c **** 						Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 540              		.loc 1 227 0
+ 541 0162 80F04B81 		bcs	.L32
+ 227:lib/rsynth-2.0-port/holmes.c **** 						Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 542              		.loc 1 227 0 is_stmt 0 discriminator 1
+ 543 0166 92F80380 		ldrb	r8, [r2, #3]	@ zero_extendqisi2
+ 544 016a 0EFB08C8 		mla	r8, lr, r8, ip
+ 545 016e 591C     		adds	r1, r3, #1
+ 546              	.LVL65:
+ 228:lib/rsynth-2.0-port/holmes.c **** 						unsigned du = (j < nelm) ? elm[j++] : 0;
+ 547              		.loc 1 228 0 is_stmt 1 discriminator 1
+ 548 0170 B942     		cmp	r1, r7
+ 549 0172 80F04281 		bcs	.L47
+ 550 0176 1179     		ldrb	r1, [r2, #4]	@ zero_extendqisi2
+ 551              	.LVL66:
+ 552 0178 981C     		adds	r0, r3, #2
+ 553              	.LVL67:
+ 229:lib/rsynth-2.0-port/holmes.c **** 						unsigned s  = (j < nelm) ? elm[j++] : 3;
+ 554              		.loc 1 229 0 discriminator 1
+ 555 017a B842     		cmp	r0, r7
+ 556 017c 80F02E81 		bcs	.L33
+ 557 0180 5079     		ldrb	r0, [r2, #5]	@ zero_extendqisi2
+ 558              	.LVL68:
+ 559 0182 0333     		adds	r3, r3, #3
+ 560              	.LVL69:
+ 230:lib/rsynth-2.0-port/holmes.c **** 						if (s || e->feat & vwl)
+ 561              		.loc 1 230 0 discriminator 1
+ 562 0184 0028     		cmp	r0, #0
+ 563 0186 40F02F81 		bne	.L34
+ 564 018a 0332     		adds	r2, r2, #3
+ 565 018c D8F81080 		ldr	r8, [r8, #16]
+ 566              	.LVL70:
+ 567 0190 18F0805F 		tst	r8, #268435456
+ 568 0194 38D0     		beq	.L56
+ 569 0196 24E1     		b	.L35
+ 570              	.LVL71:
+ 571              	.L45:
+ 572              	.LBE22:
+ 573              	.LBE25:
+ 574              	.LBE32:
+ 182:lib/rsynth-2.0-port/holmes.c **** 			Elm_ptr ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+ 575              		.loc 1 182 0
+ 576 0198 0022     		movs	r2, #0
+ 577 019a DFF858A0 		ldr	sl, .L61+20
+ 578              	.LBB33:
+ 579              	.LBB26:
+ 580              	.LBB23:
+ 581              	.LBB19:
+ 243:lib/rsynth-2.0-port/holmes.c **** 								e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 582              		.loc 1 243 0
+ 583 019e 4FF0F808 		mov	r8, #248
+ 584              	.LVL72:
+ 585              	.L39:
+ 239:lib/rsynth-2.0-port/holmes.c **** 								d += du;
+ 586              		.loc 1 239 0
+ 587 01a2 5218     		adds	r2, r2, r1
+ 588              	.LVL73:
+ 243:lib/rsynth-2.0-port/holmes.c **** 								e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 589              		.loc 1 243 0
+ 590 01a4 BB42     		cmp	r3, r7
+ 591 01a6 3DBF     		ittte	cc
+ 592 01a8 19F803E0 		ldrbcc	lr, [r9, r3]	@ zero_extendqisi2
+ 593 01ac 08FB0EAE 		mlacc	lr, r8, lr, sl
+ 594 01b0 0133     		addcc	r3, r3, #1
+ 595              	.LVL74:
+ 596 01b2 DFF840E0 		ldrcs	lr, .L61+20
+ 597              	.LVL75:
+ 244:lib/rsynth-2.0-port/holmes.c **** 								du = elm[j++];
+ 598              		.loc 1 244 0
+ 599 01b6 19F80310 		ldrb	r1, [r9, r3]	@ zero_extendqisi2
+ 600              	.LVL76:
+ 601 01ba 03F1010C 		add	ip, r3, #1
+ 602              	.LVL77:
+ 246:lib/rsynth-2.0-port/holmes.c **** 							while ((e->feat & vwl) && elm[j++] == s);
+ 603              		.loc 1 246 0
+ 604 01be DEF810E0 		ldr	lr, [lr, #16]
+ 605              	.LVL78:
+ 606 01c2 1EF0805F 		tst	lr, #268435456
+ 607 01c6 02D1     		bne	.L38
+ 608              	.LVL79:
+ 609              	.L40:
+ 247:lib/rsynth-2.0-port/holmes.c **** 							ntstress += d / 2;
+ 610              		.loc 1 247 0
+ 611 01c8 04EB5204 		add	r4, r4, r2, lsr #1
+ 612              	.LVL80:
+ 613 01cc 1FE0     		b	.L60
+ 614              	.LVL81:
+ 615              	.L38:
+ 246:lib/rsynth-2.0-port/holmes.c **** 							while ((e->feat & vwl) && elm[j++] == s);
+ 616              		.loc 1 246 0 discriminator 1
+ 617 01ce 0233     		adds	r3, r3, #2
+ 618              	.LVL82:
+ 619 01d0 19F80CE0 		ldrb	lr, [r9, ip]	@ zero_extendqisi2
+ 620 01d4 8645     		cmp	lr, r0
+ 621 01d6 E4D0     		beq	.L39
+ 622 01d8 F6E7     		b	.L40
+ 623              	.L62:
+ 624 01da 00BFAFF3 		.align	3
+ 624      0080
+ 625              	.L61:
+ 626 01e0 9A999999 		.word	-1717986918
+ 627 01e4 9999F13F 		.word	1072798105
+ 628 01e8 9A999999 		.word	-1717986918
+ 629 01ec 9999E93F 		.word	1072273817
+ 630 01f0 00000000 		.word	def_pars
+ 631 01f4 00000000 		.word	Elements
+ 632 01f8 00000000 		.word	klatt_global
+ 633 01fc 00000000 		.word	.LANCHOR1
+ 634 0200 CDCCCC3D 		.word	1036831949
+ 635 0204 00000000 		.word	0
+ 636              	.LVL83:
+ 637              	.L56:
+ 638              	.LBE19:
+ 250:lib/rsynth-2.0-port/holmes.c **** 						ntstress += du;
+ 639              		.loc 1 250 0
+ 640 0208 6418     		adds	r4, r4, r1
+ 641              	.LVL84:
+ 642              	.L31:
+ 643              	.LBE23:
+ 225:lib/rsynth-2.0-port/holmes.c **** 					while (j <= nelm)
+ 644              		.loc 1 225 0 discriminator 1
+ 645 020a BB42     		cmp	r3, r7
+ 646 020c A9D9     		bls	.L41
+ 647              	.LVL85:
+ 648              	.L60:
+ 220:lib/rsynth-2.0-port/holmes.c **** 					tstress = 0;
+ 649              		.loc 1 220 0
+ 650 020e 4FF00008 		mov	r8, #0
+ 651              	.LVL86:
+ 652              	.L30:
+ 653 0212 AC46     		mov	ip, r5
+ 654 0214 0DF5137B 		add	fp, sp, #588
+ 257:lib/rsynth-2.0-port/holmes.c **** 				for (j = 0; j < nEparm; j++)
+ 655              		.loc 1 257 0
+ 656 0218 4FF0000A 		mov	sl, #0
+ 657              	.LVL87:
+ 658              	.L42:
+ 659              	.LBE26:
+ 258:lib/rsynth-2.0-port/holmes.c **** 					tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &start[j], &end[j], (float) ce->p[j]
+ 660              		.loc 1 258 0 discriminator 2
+ 661 021c 4FEACA01 		lsl	r1, sl, #3
+ 662 0220 1DAB     		add	r3, sp, #116
+ 663 0222 5818     		adds	r0, r3, r1
+ 664 0224 43AA     		add	r2, sp, #268
+ 665 0226 5118     		adds	r1, r2, r1
+ 666 0228 9CED050A 		flds	s0, [ip, #20]
+ 667 022c 049A     		ldr	r2, [sp, #16]
+ 668 022e 039B     		ldr	r3, [sp, #12]
+ 669 0230 CDF800C0 		str	ip, [sp, #0]
+ 670 0234 FFF7FEFF 		bl	interpolate.isra.1
+ 671              	.LVL88:
+ 672              	.LBB27:
+ 673              	.LBB28:
+  49:lib/rsynth-2.0-port/holmes.c **** 	return p->v = (p->a * v + p->b * p->v);
+ 674              		.loc 1 49 0 discriminator 2
+ 675 0238 1BED017A 		flds	s14, [fp, #-4]
+ 676 023c DBED007A 		flds	s15, [fp, #0]
+ 677 0240 67EE277A 		fmuls	s15, s14, s15
+ 678              	.LBE28:
+ 679              	.LBE27:
+ 680 0244 1BED027A 		flds	s14, [fp, #-8]
+ 681 0248 E7EE007A 		vfma.f32	s15, s14, s0
+ 682              	.LBB30:
+ 683              	.LBB29:
+ 684 024c 17EE903A 		fmrs	r3, s15
+ 685 0250 4BF80C3B 		str	r3, [fp], #12	@ float
+ 686              	.LBE29:
+ 687              	.LBE30:
+ 135:lib/rsynth-2.0-port/holmes.c **** unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_base)
+ 688              		.loc 1 135 0 discriminator 2
+ 689 0254 0AA8     		add	r0, sp, #40
+ 690 0256 00EB8A03 		add	r3, r0, sl, lsl #2
+ 258:lib/rsynth-2.0-port/holmes.c **** 					tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &start[j], &end[j], (float) ce->p[j]
+ 691              		.loc 1 258 0 discriminator 2
+ 692 025a C3ED007A 		fsts	s15, [r3, #0]
+ 257:lib/rsynth-2.0-port/holmes.c **** 				for (j = 0; j < nEparm; j++)
+ 693              		.loc 1 257 0 discriminator 2
+ 694 025e 0AF1010A 		add	sl, sl, #1
+ 695              	.LVL89:
+ 696 0262 DDF800C0 		ldr	ip, [sp, #0]
+ 697 0266 0CF10C0C 		add	ip, ip, #12
+ 698 026a BAF1130F 		cmp	sl, #19
+ 699 026e D5D1     		bne	.L42
+ 262:lib/rsynth-2.0-port/holmes.c **** 				pars.F0hz10 = base + (top - base) *
+ 700              		.loc 1 262 0
+ 701 0270 78EEC9AA 		fsubs	s21, s17, s18
+ 263:lib/rsynth-2.0-port/holmes.c **** 				interpolate("", "f0", &stress_s, &stress_e, (float) 0, tstress, ntstress);
+ 702              		.loc 1 263 0
+ 703 0274 06A8     		add	r0, sp, #24
+ 704 0276 08A9     		add	r1, sp, #32
+ 705 0278 1FED1E0A 		flds	s0, .L61+36
+ 706              	.LVL90:
+ 707 027c 4246     		mov	r2, r8
+ 708 027e 2346     		mov	r3, r4
+ 709 0280 FFF7FEFF 		bl	interpolate.isra.1
+ 710              	.LVL91:
+ 262:lib/rsynth-2.0-port/holmes.c **** 				pars.F0hz10 = base + (top - base) *
+ 711              		.loc 1 262 0
+ 712 0284 AAEE809A 		vfma.f32	s18, s21, s0
+ 713              	.LVL92:
+ 714 0288 BDEEC99A 		ftosizs	s18, s18
+ 715 028c 8DED699A 		fsts	s18, [sp, #420]	@ int
+ 265:lib/rsynth-2.0-port/holmes.c **** 				pars.AVdb = pars.AVpdb = tp[av];
+ 716              		.loc 1 265 0
+ 717 0290 DDED197A 		flds	s15, [sp, #100]
+ 718 0294 FDEEE77A 		ftosizs	s15, s15
+ 719 0298 CDED8F7A 		fsts	s15, [sp, #572]	@ int
+ 720 029c CDED6A7A 		fsts	s15, [sp, #424]	@ int
+ 266:lib/rsynth-2.0-port/holmes.c **** 				pars.AF = tp[af];
+ 721              		.loc 1 266 0
+ 722 02a0 DDED1C7A 		flds	s15, [sp, #112]
+ 723 02a4 FDEEE77A 		ftosizs	s15, s15
+ 724 02a8 CDED7F7A 		fsts	s15, [sp, #508]	@ int
+ 267:lib/rsynth-2.0-port/holmes.c **** 				pars.FNZhz = tp[fn];
+ 725              		.loc 1 267 0
+ 726 02ac DDED0A7A 		flds	s15, [sp, #40]
+ 727 02b0 FDEEE77A 		ftosizs	s15, s15
+ 728 02b4 CDED777A 		fsts	s15, [sp, #476]	@ int
+ 268:lib/rsynth-2.0-port/holmes.c **** 				pars.ASP = tp[asp];
+ 729              		.loc 1 268 0
+ 730 02b8 DDED1B7A 		flds	s15, [sp, #108]
+ 731 02bc FDEEE77A 		ftosizs	s15, s15
+ 732 02c0 CDED7B7A 		fsts	s15, [sp, #492]	@ int
+ 269:lib/rsynth-2.0-port/holmes.c **** 				pars.Aturb = tp[avc];
+ 733              		.loc 1 269 0
+ 734 02c4 DDED1A7A 		flds	s15, [sp, #104]
+ 735 02c8 FDEEE77A 		ftosizs	s15, s15
+ 736 02cc CDED7D7A 		fsts	s15, [sp, #500]	@ int
+ 270:lib/rsynth-2.0-port/holmes.c **** 				pars.B1phz = pars.B1hz = tp[b1];
+ 737              		.loc 1 270 0
+ 738 02d0 DDED0E7A 		flds	s15, [sp, #56]
+ 739 02d4 FDEEE77A 		ftosizs	s15, s15
+ 740 02d8 CDED6C7A 		fsts	s15, [sp, #432]	@ int
+ 741 02dc CDED827A 		fsts	s15, [sp, #520]	@ int
+ 271:lib/rsynth-2.0-port/holmes.c **** 				pars.B2phz = pars.B2hz = tp[b2];
+ 742              		.loc 1 271 0
+ 743 02e0 DDED0F7A 		flds	s15, [sp, #60]
+ 744 02e4 FDEEE77A 		ftosizs	s15, s15
+ 745 02e8 CDED6E7A 		fsts	s15, [sp, #440]	@ int
+ 746 02ec CDED847A 		fsts	s15, [sp, #528]	@ int
+ 272:lib/rsynth-2.0-port/holmes.c **** 				pars.B3phz = pars.B3hz = tp[b3];
+ 747              		.loc 1 272 0
+ 748 02f0 DDED107A 		flds	s15, [sp, #64]
+ 749 02f4 FDEEE77A 		ftosizs	s15, s15
+ 750 02f8 CDED707A 		fsts	s15, [sp, #448]	@ int
+ 751 02fc CDED867A 		fsts	s15, [sp, #536]	@ int
+ 273:lib/rsynth-2.0-port/holmes.c **** 				pars.F1hz = tp[f1];
+ 752              		.loc 1 273 0
+ 753 0300 DDED0B7A 		flds	s15, [sp, #44]
+ 754 0304 FDEEE77A 		ftosizs	s15, s15
+ 755 0308 CDED6B7A 		fsts	s15, [sp, #428]	@ int
+ 274:lib/rsynth-2.0-port/holmes.c **** 				pars.F2hz = tp[f2];
+ 756              		.loc 1 274 0
+ 757 030c DDED0C7A 		flds	s15, [sp, #48]
+ 758 0310 FDEEE77A 		ftosizs	s15, s15
+ 759 0314 CDED6D7A 		fsts	s15, [sp, #436]	@ int
+ 275:lib/rsynth-2.0-port/holmes.c **** 				pars.F3hz = tp[f3];
+ 760              		.loc 1 275 0
+ 761 0318 DDED0D7A 		flds	s15, [sp, #52]
+ 762 031c FDEEE77A 		ftosizs	s15, s15
+ 763 0320 CDED6F7A 		fsts	s15, [sp, #444]	@ int
+ 282:lib/rsynth-2.0-port/holmes.c **** 				pars.AB = AMP_ADJ + tp[ab];
+ 764              		.loc 1 282 0
+ 765 0324 DDED187A 		flds	s15, [sp, #96]
+ 766 0328 77EE887A 		fadds	s15, s15, s16
+ 767 032c FDEEE77A 		ftosizs	s15, s15
+ 768 0330 CDED8E7A 		fsts	s15, [sp, #568]	@ int
+ 283:lib/rsynth-2.0-port/holmes.c **** 				pars.A5 = AMP_ADJ + tp[a5];
+ 769              		.loc 1 283 0
+ 770 0334 DDED167A 		flds	s15, [sp, #88]
+ 771 0338 77EE887A 		fadds	s15, s15, s16
+ 772 033c FDEEE77A 		ftosizs	s15, s15
+ 773 0340 CDED897A 		fsts	s15, [sp, #548]	@ int
+ 284:lib/rsynth-2.0-port/holmes.c **** 				pars.A6 = AMP_ADJ + tp[a6];
+ 774              		.loc 1 284 0
+ 775 0344 DDED177A 		flds	s15, [sp, #92]
+ 776 0348 77EE887A 		fadds	s15, s15, s16
+ 777 034c FDEEE77A 		ftosizs	s15, s15
+ 778 0350 CDED8B7A 		fsts	s15, [sp, #556]	@ int
+ 285:lib/rsynth-2.0-port/holmes.c **** 				pars.A1 = AMP_ADJ + tp[a1];
+ 779              		.loc 1 285 0
+ 780 0354 DDED127A 		flds	s15, [sp, #72]
+ 781 0358 77EE887A 		fadds	s15, s15, s16
+ 782 035c FDEEE77A 		ftosizs	s15, s15
+ 783 0360 CDED817A 		fsts	s15, [sp, #516]	@ int
+ 286:lib/rsynth-2.0-port/holmes.c **** 				pars.A2 = AMP_ADJ + tp[a2];
+ 784              		.loc 1 286 0
+ 785 0364 DDED137A 		flds	s15, [sp, #76]
+ 786 0368 77EE887A 		fadds	s15, s15, s16
+ 787 036c FDEEE77A 		ftosizs	s15, s15
+ 788 0370 CDED837A 		fsts	s15, [sp, #524]	@ int
+ 287:lib/rsynth-2.0-port/holmes.c **** 				pars.A3 = AMP_ADJ + tp[a3];
+ 789              		.loc 1 287 0
+ 790 0374 DDED147A 		flds	s15, [sp, #80]
+ 791 0378 77EE887A 		fadds	s15, s15, s16
+ 792 037c FDEEE77A 		ftosizs	s15, s15
+ 793 0380 CDED857A 		fsts	s15, [sp, #532]	@ int
+ 288:lib/rsynth-2.0-port/holmes.c **** 				pars.A4 = AMP_ADJ + tp[a4];
+ 794              		.loc 1 288 0
+ 795 0384 DDED157A 		flds	s15, [sp, #84]
+ 796 0388 77EE887A 		fadds	s15, s15, s16
+ 797 038c FDEEE77A 		ftosizs	s15, s15
+ 798 0390 CDED877A 		fsts	s15, [sp, #540]	@ int
+ 290:lib/rsynth-2.0-port/holmes.c **** 				parwave(&klatt_global, &pars, samp);
+ 799              		.loc 1 290 0
+ 800 0394 DFF878A0 		ldr	sl, .L63
+ 801              	.LVL93:
+ 802 0398 5046     		mov	r0, sl
+ 803 039a 69A9     		add	r1, sp, #420
+ 804 039c 029A     		ldr	r2, [sp, #8]
+ 805 039e FFF7FEFF 		bl	parwave
+ 806              	.LVL94:
+ 292:lib/rsynth-2.0-port/holmes.c **** 				samp += klatt_global.nspfr;
+ 807              		.loc 1 292 0
+ 808 03a2 DAF81C30 		ldr	r3, [sl, #28]
+ 809 03a6 029A     		ldr	r2, [sp, #8]
+ 810 03a8 02EB4302 		add	r2, r2, r3, lsl #1
+ 811 03ac 0292     		str	r2, [sp, #8]
+ 812              	.LVL95:
+ 813              		.loc 1 294 0
+ 814 03ae 78EEE98A 		fsubs	s17, s17, s19
+ 815              	.LVL96:
+ 816              	.LBE33:
+ 210:lib/rsynth-2.0-port/holmes.c **** 			for (t = 0; t < dur; t++, tstress++)
+ 817              		.loc 1 210 0
+ 818 03b2 049B     		ldr	r3, [sp, #16]
+ 819 03b4 0133     		adds	r3, r3, #1
+ 820 03b6 0493     		str	r3, [sp, #16]
+ 821              	.LVL97:
+ 822 03b8 08F10108 		add	r8, r8, #1
+ 823              	.LVL98:
+ 824 03bc 0398     		ldr	r0, [sp, #12]
+ 825 03be 8342     		cmp	r3, r0
+ 826 03c0 FFF4B2AE 		bcc	.L43
+ 827              	.LVL99:
+ 828              	.L24:
+ 829 03c4 019A     		ldr	r2, [sp, #4]
+ 830 03c6 0332     		adds	r2, r2, #3
+ 831 03c8 0192     		str	r2, [sp, #4]
+ 832              	.LBE35:
+ 833              	.LBE13:
+ 174:lib/rsynth-2.0-port/holmes.c **** 		Elm_ptr ce = &Elements[elm[i++]];
+ 834              		.loc 1 174 0 discriminator 1
+ 835 03ca 2A46     		mov	r2, r5
+ 836              	.LVL100:
+ 837              	.L23:
+ 172:lib/rsynth-2.0-port/holmes.c **** 	while (i < nelm)
+ 838              		.loc 1 172 0 discriminator 1
+ 839 03cc BE42     		cmp	r6, r7
+ 840 03ce FFF473AE 		bcc	.L44
+ 295:lib/rsynth-2.0-port/holmes.c **** 			}
+ 296:lib/rsynth-2.0-port/holmes.c **** 		}
+ 297:lib/rsynth-2.0-port/holmes.c **** 		le = ce;
+ 298:lib/rsynth-2.0-port/holmes.c **** 	}
+ 299:lib/rsynth-2.0-port/holmes.c **** 	return (samp - samp_base);
+ 841              		.loc 1 299 0
+ 842 03d2 029B     		ldr	r3, [sp, #8]
+ 843 03d4 059A     		ldr	r2, [sp, #20]
+ 844              	.LVL101:
+ 845 03d6 981A     		subs	r0, r3, r2
+ 846 03d8 4010     		asrs	r0, r0, #1
+ 847 03da 12E0     		b	.L57
+ 848              	.LVL102:
+ 849              	.L33:
+ 174:lib/rsynth-2.0-port/holmes.c **** 		Elm_ptr ce = &Elements[elm[i++]];
+ 850              		.loc 1 174 0
+ 851 03dc 0346     		mov	r3, r0
+ 229:lib/rsynth-2.0-port/holmes.c **** 						unsigned s  = (j < nelm) ? elm[j++] : 3;
+ 852              		.loc 1 229 0
+ 853 03de 0320     		movs	r0, #3
+ 854 03e0 02E0     		b	.L34
+ 855              	.LVL103:
+ 856              	.L35:
+ 857              	.LBB37:
+ 858              	.LBB36:
+ 859              	.LBB34:
+ 860              	.LBB31:
+ 861              	.LBB24:
+ 862              	.LBB20:
+ 236:lib/rsynth-2.0-port/holmes.c **** 								stress_e.v = (float) 0.1;
+ 863              		.loc 1 236 0
+ 864 03e2 8DED08BA 		fsts	s22, [sp, #32]
+ 865 03e6 D7E6     		b	.L45
+ 866              	.LVL104:
+ 867              	.L34:
+ 234:lib/rsynth-2.0-port/holmes.c **** 								stress_e.v = (float) s / 3;
+ 868              		.loc 1 234 0
+ 869 03e8 07EE100A 		fmsr	s14, r0	@ int
+ 870 03ec F8EEC77A 		fsitos	s15, s14
+ 871 03f0 C7EE8A7A 		fdivs	s15, s15, s20
+ 872 03f4 CDED087A 		fsts	s15, [sp, #32]
+ 873 03f8 CEE6     		b	.L45
+ 874              	.LVL105:
+ 875              	.L47:
+ 876              	.LBE20:
+ 227:lib/rsynth-2.0-port/holmes.c **** 						Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+ 877              		.loc 1 227 0
+ 878 03fa 0B46     		mov	r3, r1
+ 879              	.LVL106:
+ 880              	.L32:
+ 881              	.LBE24:
+ 882              	.LBE31:
+ 883              	.LBE34:
+ 884              	.LBE36:
+ 885              	.LBE37:
+ 174:lib/rsynth-2.0-port/holmes.c **** 		Elm_ptr ce = &Elements[elm[i++]];
+ 886              		.loc 1 174 0
+ 887 03fc 1846     		mov	r0, r3
+ 888 03fe 0021     		movs	r1, #0
+ 889 0400 ECE7     		b	.L33
+ 890              	.LVL107:
+ 891              	.L57:
+ 300:lib/rsynth-2.0-port/holmes.c **** }
+ 892              		.loc 1 300 0
+ 893 0402 0DF54B7D 		add	sp, sp, #812
+ 894 0406 BDEC088B 		fldmfdd	sp!, {d8, d9, d10, d11}
+ 895 040a BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 896              	.L64:
+ 897 040e 00BF     		.align	2
+ 898              	.L63:
+ 899 0410 00000000 		.word	klatt_global
+ 900              		.cfi_endproc
+ 901              	.LFE6:
+ 903 0414 AFF30080 		.section	.text.init_holmes,"ax",%progbits
+ 904              		.align	1
+ 905              		.global	init_holmes
+ 906              		.thumb
+ 907              		.thumb_func
+ 909              	init_holmes:
+ 910              	.LFB7:
+ 301:lib/rsynth-2.0-port/holmes.c **** 
+ 302:lib/rsynth-2.0-port/holmes.c **** //int init_holmes(int argc, char **argv)
+ 303:lib/rsynth-2.0-port/holmes.c **** void init_holmes(void)
+ 304:lib/rsynth-2.0-port/holmes.c **** {
+ 911              		.loc 1 304 0
+ 912              		.cfi_startproc
+ 913              		@ args = 0, pretend = 0, frame = 0
+ 914              		@ frame_needed = 0, uses_anonymous_args = 0
+ 915              		@ link register save eliminated.
+ 916 0000 7047     		bx	lr
+ 917              		.cfi_endproc
+ 918              	.LFE7:
+ 920              		.section	.text.term_holmes,"ax",%progbits
+ 921              		.align	1
+ 922              		.global	term_holmes
+ 923              		.thumb
+ 924              		.thumb_func
+ 926              	term_holmes:
+ 927              	.LFB8:
+ 305:lib/rsynth-2.0-port/holmes.c **** }
+ 306:lib/rsynth-2.0-port/holmes.c **** 
+ 307:lib/rsynth-2.0-port/holmes.c **** void term_holmes(void)
+ 308:lib/rsynth-2.0-port/holmes.c **** {
+ 928              		.loc 1 308 0
+ 929              		.cfi_startproc
+ 930              		@ args = 0, pretend = 0, frame = 0
+ 931              		@ frame_needed = 0, uses_anonymous_args = 0
+ 932              		@ link register save eliminated.
+ 933              		.loc 1 308 0
+ 934 0000 7047     		bx	lr
+ 935              		.cfi_endproc
+ 936              	.LFE8:
+ 938              		.global	frac
+ 939              		.global	speed
+ 940              		.section	.data.frac,"aw",%progbits
+ 941              		.align	3
+ 942              		.set	.LANCHOR1,. + 0
+ 945              	frac:
+ 946 0000 00000000 		.word	0
+ 947 0004 0000F03F 		.word	1072693248
+ 948              		.section	.data.speed,"aw",%progbits
+ 949              		.align	2
+ 950              		.set	.LANCHOR0,. + 0
+ 953              	speed:
+ 954 0000 01000000 		.word	1
+ 955              		.text
+ 956              	.Letext0:
+ 957              		.file 2 "lib/rsynth-2.0-port/nsynth.h"
+ 958              		.file 3 "lib/rsynth-2.0-port/elements.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 holmes.c
+     /tmp/ccrbI9SU.s:21     .text.linear:00000000 $t
+     /tmp/ccrbI9SU.s:25     .text.linear:00000000 linear
+     /tmp/ccrbI9SU.s:69     .text.set_trans.isra.0:00000000 $t
+     /tmp/ccrbI9SU.s:73     .text.set_trans.isra.0:00000000 set_trans.isra.0
+     /tmp/ccrbI9SU.s:138    .text.set_trans.isra.0:00000054 $d
+     /tmp/ccrbI9SU.s:144    .text.interpolate.isra.1:00000000 $t
+     /tmp/ccrbI9SU.s:148    .text.interpolate.isra.1:00000000 interpolate.isra.1
+     /tmp/ccrbI9SU.s:275    .text.holmes:00000000 $t
+     /tmp/ccrbI9SU.s:280    .text.holmes:00000000 holmes
+     /tmp/ccrbI9SU.s:626    .text.holmes:000001e0 $d
+     /tmp/ccrbI9SU.s:640    .text.holmes:00000208 $t
+     /tmp/ccrbI9SU.s:899    .text.holmes:00000410 $d
+     /tmp/ccrbI9SU.s:904    .text.init_holmes:00000000 $t
+     /tmp/ccrbI9SU.s:909    .text.init_holmes:00000000 init_holmes
+     /tmp/ccrbI9SU.s:921    .text.term_holmes:00000000 $t
+     /tmp/ccrbI9SU.s:926    .text.term_holmes:00000000 term_holmes
+     /tmp/ccrbI9SU.s:945    .data.frac:00000000 frac
+     /tmp/ccrbI9SU.s:953    .data.speed:00000000 speed
+     /tmp/ccrbI9SU.s:941    .data.frac:00000000 $d
+     /tmp/ccrbI9SU.s:949    .data.speed:00000000 $d
+                     .debug_frame:00000010 $d
+     /tmp/ccrbI9SU.s:903    .text.holmes:00000414 $t
+
+UNDEFINED SYMBOLS
+__aeabi_i2d
+__aeabi_dmul
+__aeabi_d2f
+__aeabi_f2d
+memcpy
+parwave_init
+def_pars
+Elements
+klatt_global
+parwave
