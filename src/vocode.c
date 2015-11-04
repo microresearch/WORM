@@ -4,7 +4,6 @@
 #include <sys/unistd.h>
 #include "stm32f4xx.h"
 #include "audio.h"
-#include "simulation.h"
 #include "vocode.h"
 
 const LADSPA_Data decay_table[] =

@@ -7,13 +7,11 @@
 
 //#define ARM_MATH_CM4
 
-#ifdef PCSIM
-#define int16_t signed short int
-#define u16 unsigned short int
-#else
 #include "stm32f4xx.h"
 #include "arm_math.h"
-#endif
+#include "stdlib.h"
+#include "stdint.h"
+#include "arm_const_structs.h"
 
 #define MAX_VILLAGERS 64 // was 64
 #define BUFF_LEN 128 // TEST! reduce to 16 

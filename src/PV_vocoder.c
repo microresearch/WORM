@@ -4,7 +4,6 @@
 //also maybe faster filters there and using routines from dspinst.h
 
 #include "audio.h"
-#include "simulation.h"
 #include "PV_vocoder.h"
 
 /*const int16_t AudioWindowHanning256[] __attribute__ ((aligned (4))) = {

@@ -1,6 +1,5 @@
 #include "biquad.h"
 #include "audio.h"
-#include "simulation.h"
 
 /* Computes a BiQuad filter on a sample */
 smp_type BiQuad(smp_type sample, biquad * b)

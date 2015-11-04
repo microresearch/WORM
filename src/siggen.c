@@ -1,11 +1,9 @@
 #include "audio.h"
-#include "simulation.h"
 #include <malloc.h>
 #include <math.h>
 #include <audio.h>
 #include "stm32f4xx.h"
 #include "arm_math.h"
-#define randi() (adc_buffer[9])
 extern __IO uint16_t adc_buffer[10];
 extern u16 *buf16;
 
@@ -189,8 +187,8 @@ void runVOSIM_SC(villager_generic* vill){
      if (count>start+wrap) count=start;
   
      float z = vosim;
-     //          float trigin = (float)(buf16[(count+16000)&32767]-32768)/32768.0f;
-            float trigin = (float)((rand()%65536)-32768)/32768.0f;
+               float trigin = (float)(buf16[(count+16000)&32767]-32768)/32768.0f;
+     //            float trigin = (float)((rand()%65536)-32768)/32768.0f;
 
      if(phase > 0.f && number <= numberCycles ){
        float sine = sinf(phase);
