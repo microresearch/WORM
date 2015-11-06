@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date Wed 04 Nov 2015 23:20:25 CET
+PCBNEW-BOARD Version 1 date Fri 06 Nov 2015 02:36:35 CET
 
 # Created by Pcbnew(2012-apr-16-27)-stable
 
@@ -10,7 +10,7 @@ EnabledLayers 1FFF8001
 Links 0
 NoConn 0
 Di 25069 17506 88666 75954
-Ndraw 25
+Ndraw 26
 Ntrack 0
 Nzone 0
 BoardThickness 630
@@ -21,7 +21,7 @@ $EndGENERAL
 $SHEETDESCR
 Sheet A4 11700 8267
 Title ""
-Date "4 nov 2015"
+Date "6 nov 2015"
 Rev ""
 Comp ""
 Comment1 ""
@@ -19911,6 +19911,11 @@ Ne 0 ""
 Po 0 0
 $EndPAD
 $EndMODULE  panel_jack
+$TEXTPCB
+Te "height is 128.5mm"
+Po 80150 40780 600 800 120 0
+De 25 1 0 Normal C
+$EndTEXTPCB
 $DRAWSEGMENT
 Po 3 59100 40850 64000 32350 150
 De 24 0 900 0 0
