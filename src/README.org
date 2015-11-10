@@ -1,5 +1,7 @@
 * ERD?WORM dirty speech synth
 
+32k sample rate
+
 * TODO
 
 - sort out memory allocations
@@ -16,12 +18,32 @@
 
 ** 9-10/11/2015
 
-knobs left/right from top (pcb and lach=test) = 0/mode-(2..3) 1/sel.egX-(3..2) 2/speed-(0..4) 3/end-(4..1) 4/trigthresh/vocoderfreq/othersel.eg/Y-(1..0)
+- knobs left/right from top (pcb and lach=test) = 0/mode-(2..3)
+1/selX.egX-(3..2) 2/speed-(0..4) 3/end-(4..1)
+4/trigthresh/vocoderfreq/othersel.eg/selY-(1..0)
 
-input=threshold/vocoder_voice
+- input=threshold/vocoder_voice
 
-question of scheduling
+- question of scheduling: examples? trigger_to_sync needs to be in reading in code (and trigger say new phoneme)
 
-list modes and examples: 0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder 5/klatt screwed
+what is framesize for audio=32 x u16, and how frames work for speech/klatt
 
-what are other speech synth???
+- list modes and examples: 0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder 5/klatt screwed
+
+- what are other speech synth??? LIST from earthvoice2:
+
+PropTermialTract: propellor assembly
+robo: arduino 
+sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64
+SAMarduino: arduino of SAM above
+Talkie-LPCcode: :LPC
+tinySAM.c: small SAM above
+Tiny Speech Synth: C code
+TTS: as robo above
+
+other: cantarino, 
+
+
+*This week to have basic scheduling for klatt and knob allocations, memory. Also kind of template for other generators*
+
+W/T/F
