@@ -1,6 +1,6 @@
 * TODO
 
-- double check schematic - CHECK!, check footprints, do panel first then match to schematic
+- double check schematic - CHECK!, check footprints, do panel first then match to schematicDONE
 
 - panel
 
@@ -18,10 +18,21 @@ IN/OUT JACKS
 
 SOFT
 
-- strip software, overview, test each speech eg. vocoder, LPC
-- number of mode
+- strip softwareDONE, overview, test each speech eg. vocoder, LPC
+- number of modes
 
 * panel
 
 - as SIR - size? 18HP 91.44 wide...
 - 128.5 mm high // 91.44 wide or actually 91.3
+
+* parts list and ordering info
+
+zener is: LM4040B10
+
+LME49720
+
+MCP6002
+
+
+* manual notes

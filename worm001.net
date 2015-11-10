@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  Tue 03 Nov 2015 01:01:58 CET
+# EESchema Netlist Version 1.1 created  Mon 09 Nov 2015 23:32:07 CET
 (
  ( /55113020 $noname  P1 CONN_5X2 {Lib=CONN_5X2}
   (    1 N-000071 )
@@ -418,7 +418,7 @@
   (    1 LINEOUTL )
   (    2 N-000105 )
  )
- ( /550B4EA1/5511D5FF $noname  C30 10P {Lib=C}
+ ( /550B4EA1/5511D5FF $noname  C30 22P {Lib=C}
   (    1 N-000106 )
   (    2 N-000103 )
  )
@@ -480,11 +480,11 @@
   (    1 /Sheet550B4EA0/REF-10 )
   (    2 GND )
  )
- ( /550B4EA1/55109BCE $noname  R1 2.49K {Lib=R}
+ ( /550B4EA1/55109BCE $noname  R1 470R {Lib=R}
   (    1 -12V )
   (    2 /Sheet550B4EA0/REF-10 )
  )
- ( /550B4EA1/55109BB0 $noname  C1 470N {Lib=C}
+ ( /550B4EA1/55109BB0 $noname  C1 100N {Lib=C}
   (    1 GND )
   (    2 /Sheet550B4EA0/REF-10 )
  )

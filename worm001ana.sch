@@ -1,4 +1,4 @@
-EESchema Schematic File Version 2  date Wed 04 Nov 2015 02:21:29 CET
+EESchema Schematic File Version 2  date Mon 09 Nov 2015 23:32:39 CET
 LIBS:power
 LIBS:device
 LIBS:transistors
@@ -47,7 +47,7 @@ $Descr A4 11700 8267
 encoding utf-8
 Sheet 2 2
 Title ""
-Date "3 nov 2015"
+Date "9 nov 2015"
 Rev ""
 Comp ""
 Comment1 ""
@@ -497,8 +497,6 @@ Wire Wire Line
 	6300 1800 6400 1800
 Text Notes 1500 -250 0    500  ~ 100
 op amps fixed\n
-Text Notes 4000 750  0    60   ~ 0
-23/9/2015 redone all with potis as seperate to CV and new resistor values
 Text Notes 5600 3100 0    60   ~ 0
 OUTPUT
 Text Notes 5500 1100 0    60   ~ 0
@@ -1125,7 +1123,7 @@ L C C30
 U 1 1 5511D5FF
 P 6700 2650
 F 0 "C30" H 6750 2750 50  0000 L CNN
-F 1 "10P" H 6750 2550 50  0000 L CNN
+F 1 "22P" H 6750 2550 50  0000 L CNN
 	1    6700 2650
 	0    1    1    0   
 $EndComp
