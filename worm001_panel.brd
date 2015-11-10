@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date Fri 06 Nov 2015 02:36:35 CET
+PCBNEW-BOARD Version 1 date Tue 10 Nov 2015 21:28:11 CET
 
 # Created by Pcbnew(2012-apr-16-27)-stable
 
@@ -9,8 +9,8 @@ Ly 1FFF8001
 EnabledLayers 1FFF8001
 Links 0
 NoConn 0
-Di 25069 17506 88666 75954
-Ndraw 26
+Di 25069 17506 88666 80545
+Ndraw 25
 Ntrack 0
 Nzone 0
 BoardThickness 630
@@ -21,7 +21,7 @@ $EndGENERAL
 $SHEETDESCR
 Sheet A4 11700 8267
 Title ""
-Date "6 nov 2015"
+Date "10 nov 2015"
 Rev ""
 Comp ""
 Comment1 ""
@@ -55,11 +55,11 @@ TextPcbSize 600 800
 EdgeModWidth 150
 TextModSize 600 600
 TextModWidth 120
-PadSize 4724 4724
-PadDrill 3701
+PadSize 3307 3307
+PadDrill 2520
 Pad2MaskClearance 100
 AuxiliaryAxisOrg 0 0
-PcbPlotParams (pcbplotparams (layerselection 12615681) (usegerberextensions true) (excludeedgelayer false) (linewidth 60) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 0) (pscolor true) (psnegative false) (psa4output false) (plotreference false) (plotvalue false) (plotothertext false) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk false) (outputformat 2) (mirror false) (drillshape 1) (scaleselection 1) (outputdirectory ""))
+PcbPlotParams (pcbplotparams (layerselection 281051137) (usegerberextensions true) (excludeedgelayer true) (linewidth 60) (plotframeref false) (viasonmask false) (mode 1) (useauxorigin false) (hpglpennumber 1) (hpglpenspeed 20) (hpglpendiameter 15) (hpglpenoverlay 0) (pscolor true) (psnegative false) (psa4output false) (plotreference false) (plotvalue false) (plotothertext false) (plotinvisibletext false) (padsonsilk false) (subtractmaskfromsilk false) (outputformat 1) (mirror false) (drillshape 1) (scaleselection 1) (outputdirectory ""))
 $EndSETUP
 
 $EQUIPOT
@@ -77,6 +77,28 @@ uViaDia 200
 uViaDrill 50
 AddNet ""
 $EndNCLASS
+$MODULE SIL-1
+Po 58930 63000 0 15 56421AC7 550A0422 F~
+Li SIL-1
+Cd Connecteurs 1 pin
+Kw CONN DEV
+Sc 550A0422
+AR SIL-1
+Op 0 0 0
+T0 0 -1000 681 428 0 107 N V 21 N "SIL-1"
+T1 0 -1000 600 400 0 100 N I 21 N "Val**"
+DS -500 500 500 500 125 21
+DS -500 -500 500 -500 125 21
+DS -500 500 -500 -500 120 21
+DS 500 -500 500 500 120 21
+$PAD
+Sh "1" C 3307 3307 0 0 0
+Dr 2520 0 0
+At STD N 00400001
+Ne 0 ""
+Po 0 0
+$EndPAD
+$EndMODULE  SIL-1
 $MODULE SIL-1
 Po 72220 68618 0 15 563807D3 550B30DD F~
 Li SIL-1
@@ -160,28 +182,6 @@ DS 500 -500 500 500 120 21
 $PAD
 Sh "1" C 1417 1417 0 0 0
 Dr 1260 0 0
-At STD N 00E0FFFF
-Ne 0 ""
-Po 0 0
-$EndPAD
-$EndMODULE  SIL-1
-$MODULE SIL-1
-Po 58930 63000 0 15 550A03FF 550A0422 F~
-Li SIL-1
-Cd Connecteurs 1 pin
-Kw CONN DEV
-Sc 550A0422
-AR SIL-1
-Op 0 0 0
-T0 0 -1000 681 428 0 107 N V 21 N "SIL-1"
-T1 0 -1000 600 400 0 100 N I 21 N "Val**"
-DS -500 500 500 500 125 21
-DS -500 -500 500 -500 125 21
-DS -500 500 -500 -500 120 21
-DS 500 -500 500 500 120 21
-$PAD
-Sh "1" C 3307 3307 0 0 0
-Dr 2520 0 0
 At STD N 00E0FFFF
 Ne 0 ""
 Po 0 0
@@ -19911,6 +19911,31 @@ Ne 0 ""
 Po 0 0
 $EndPAD
 $EndMODULE  panel_jack
+$COTATION
+Ge 0 24 0
+Va 31965
+Te "81.191 mm"
+Po 58979 79910 600 800 120 0 1
+Sb 0 42997 79264 74962 79276 120
+Sd 0 74965 69803 74962 80556 120
+Sg 0 43000 69791 42997 80544 120
+S1 0 74962 79276 74519 79506 120
+S2 0 74962 79276 74519 79045 120
+S3 0 42997 79264 43440 79495 120
+S4 0 42997 79264 43440 79034 120
+$endCOTATION
+$DRAWSEGMENT
+Po 0 74969 19201 74728 19201 8
+De 28 0 900 0 0
+$EndDRAWSEGMENT
+$DRAWSEGMENT
+Po 0 74969 69799 74969 19201 8
+De 28 0 900 0 0
+$EndDRAWSEGMENT
+$DRAWSEGMENT
+Po 0 43000 69799 74969 69799 8
+De 28 0 900 0 0
+$EndDRAWSEGMENT
 $TEXTPCB
 Te "height is 128.5mm"
 Po 80150 40780 600 800 120 0
@@ -19925,27 +19950,11 @@ Te "positions fixed."
 Po 68350 29300 600 800 120 0
 De 25 1 0 Normal C
 $EndTEXTPCB
-$COTATION
-Ge 0 25 0
-Va 27902
-Te "70.871 mm"
-Po 58952 75304 600 800 120 0 1
-Sb 0 45001 74673 72903 74655 120
-Sd 0 72870 23170 72903 75935 120
-Sg 0 44968 23188 45001 75953 120
-S1 0 72903 74655 72460 74886 120
-S2 0 72903 74655 72460 74425 120
-S3 0 45001 74673 45444 74903 120
-S4 0 45001 74673 45444 74442 120
-$endCOTATION
 $TEXTPCB
 Te "align for lower pcb = 10mm down, 5mm in"
 Po 35200 25990 600 800 120 0
 De 25 1 0 Normal C
 $EndTEXTPCB
-$PCB_TARGET
-Po 0 28 44970 23170 5000 8 00000000
-$EndPCB_TARGET
 $DRAWSEGMENT
 Po 0 68810 23170 38360 23170 150
 De 24 0 900 0 0
@@ -20013,19 +20022,11 @@ Po 0 58960 32160 58960 71460 150
 De 24 0 900 0 0
 $EndDRAWSEGMENT
 $DRAWSEGMENT
-Po 0 74860 69800 74860 19200 8
-De 28 0 900 0 0
-$EndDRAWSEGMENT
-$DRAWSEGMENT
 Po 0 58380 19200 74860 19200 8
 De 28 0 900 0 0
 $EndDRAWSEGMENT
-$DRAWSEGMENT
-Po 0 43000 69800 74860 69800 8
-De 28 0 900 0 0
-$EndDRAWSEGMENT
 $TEXTPCB
-Te "width 80.9"
+Te "width 81.2"
 Po 63080 72620 600 800 120 0
 De 25 1 0 Normal C
 $EndTEXTPCB
@@ -20074,10 +20075,6 @@ S4 0 64399 19200 64629 19643 120
 $endCOTATION
 $DRAWSEGMENT
 Po 0 43000 69800 43000 19200 8
-De 28 0 900 0 0
-$EndDRAWSEGMENT
-$DRAWSEGMENT
-Po 0 59000 69800 43000 69800 8
 De 28 0 900 0 0
 $EndDRAWSEGMENT
 $DRAWSEGMENT

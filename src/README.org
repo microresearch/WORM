@@ -2,7 +2,7 @@
 
 * TODO
 
--  sort out memory allocations
+- sort out memory allocations
 - basics of read/write head and speech integration
 - tests for each speech function/mode
 - vocoder and how we deal with buffers?
@@ -13,3 +13,15 @@
 ** 4/11/2015
 
 - stripped code and it compiles
+
+** 9-10/11/2015
+
+knobs left/right from top (pcb and lach=test) = 0/mode-(2..3) 1/sel.egX-(3..2) 2/speed-(0..4) 3/end-(4..1) 4/trigthresh/vocoderfreq/othersel.eg/Y-(1..0)
+
+input=threshold/vocoder_voice
+
+question of scheduling
+
+list modes and examples: 0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder 5/klatt screwed
+
+what are other speech synth???

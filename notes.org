@@ -36,3 +36,5 @@ MCP6002
 
 
 * manual notes
+
+for software see README.org in src
