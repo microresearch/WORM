@@ -161,7 +161,7 @@ SECTIONS
   .ccm_data (NOLOAD) :
   { 	    
   . = ALIGN(4);
-  *(.ccm   )
+  *(.ccmdata   )
   . = ALIGN(4);
   } >CCM
 

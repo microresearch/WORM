@@ -149,4 +149,32 @@ either way simplify to numericals an no string stuff/memory
 
 - TODO: generate and test square for vocoder
 
+** 12/11
 
+- fixed stm32_flash.ld CCM mistake
+
+- retest trigger - fixed as VOLATILE
+
+- break down rsynth - problem is if we even have 1 phoneme + stress then is ended!
+
+so we need to open up holmes.c so keeps running and writes directly
+into audio_buffer and deals with trigger/phoneme selection (is always
+one phoneme behind?)
+
+how do we get stress and dur from phoneme?
+
+this is dur in phone_to_elm
+
+t += phone_append(elm,StressDur(p,stress));
+(int) (StressDur(p, stress, islong)));
+#define StressDur(e,s,l) ((e->ud + (e->du - e->ud) * s / 3)*speed)
+
+for each one in elements.def
+
+next bit is stress?
+
+stress is 0/1/2/3
+
+so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??)
+
+- also need to get rid of pwavebuffer and write straight IN

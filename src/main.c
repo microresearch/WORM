@@ -89,8 +89,8 @@ float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2
 
 extern int errno;
 
-u8 trigger=0;
-u16 generated=0;
+volatile u8 trigger=0;
+volatile u16 generated=0;
 
 void main(void)
 {
@@ -154,6 +154,9 @@ void main(void)
 
   while(1)
     {
+
+      // Just now work with mode=0/klatt_phoneme and then  when running we need to deal with changes between modes etc.
+
       //      if (trigger==1){
 	trigger=0;
 	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69

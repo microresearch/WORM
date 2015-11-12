@@ -94,8 +94,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       if (generated<=eaten){
 	//	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
 	//	generated=klatt_phoneme(&writepos,phonemm); // too slow here so break up frames or place in main (but then?)
-	trigger=1;
 	eaten=0.0f;
+	trigger=1;
       }
       samplepos+=samplespeed;
       eaten+=samplespeed;
