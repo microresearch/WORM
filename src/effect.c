@@ -396,7 +396,7 @@ void doformantfilterf(float *inbuffer, float *outbuffer, u8 howmany, u8 vowel){/
   memcpy(outbuffer,tmpotherotherbuffer,howmany*4);//dest,src,howmany//4bytes
   }
 
-void do_effect(villager_effect* vill_eff){
+/*void do_effect(villager_effect* vill_eff){
   int32_t tmp;float tmpp; 
   float freq;
   int16_t inbuffer[32],modbuffer[32],outbuffer[32];
@@ -411,14 +411,6 @@ void do_effect(villager_effect* vill_eff){
   // chunk in size 32
   // pos and wrap are fixed by select/knob in audio.c!
   // pos is NOT with start!
-
-  /*
-      u8 whicheffect,speed,step;
-      u16 instart,modstart,outstart;
-      u16 inpos,modpos,outpos;// various counters
-      u16 inwrap,modwrap,outwrap;
-      u16  modifier;
-   */
 
     if (++vill_eff->del>=vill_eff->speed){
       vill_eff->del=0;
@@ -643,6 +635,7 @@ void do_effect(villager_effect* vill_eff){
   }
     }
 }
+*/
 
 void test_effect(int16_t* inbuffer, int16_t* outbuffer){
   //  extern VocoderInstance* vocoder; u8 x;

@@ -44,7 +44,7 @@ MEMORY
 {
   FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 256K /* was 1024?*/
   RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K /* was 112K */
-/*  CCM (rwx)       : ORIGIN = 0x10000000, LENGTH = 64k*/
+  CCM (rwx)       : ORIGIN = 0x10000000, LENGTH = 64K
 }
 
 
@@ -156,6 +156,14 @@ SECTIONS
     *(.ccmdata)
     *(.ccmdata*)
   } >CCM*/
+
+
+  .ccm_data (NOLOAD) :
+  { 	    
+  . = ALIGN(4);
+  *(.ccm   )
+  . = ALIGN(4);
+  } >CCM
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }

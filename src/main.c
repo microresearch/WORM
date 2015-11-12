@@ -21,6 +21,7 @@
 #include "effect.h"
 #include "PV_vocoder.h"
 #include "say.h"
+#include "klatt_phoneme.h"
 #include "nsynth.h"
 
 /* DMA buffers for I2S */
@@ -61,7 +62,7 @@ static const float mull[5][5] __attribute__ ((section (".flash"))) = {
     { 1, 0.1, 0.025118864315096, 0.03981071705535, 0.015848931924611}
   };
 
-u16 *buf16;
+//u16 *buf16;
 
 #define delay()						 do {	\
     register unsigned int ix;					\
@@ -75,57 +76,32 @@ u16 *buf16;
       __asm__ __volatile__ ("nop\n\t":::"memory");		\
   } while (0)
 
-/* MEMORY - our 2 bufferzzz */
-
 extern int16_t audio_buffer[AUDIO_BUFSZ];
-u8* datagenbuffer = (u8*)0x10000000;
-
-u16 sin_data[256];  // sine LUT Array
+u16 sin_data[256] __attribute__ ((section (".ccmdata")));  // sine LUT Array
 
 
 // effects tests
 
-mdavocoder *mdavocod;
-arm_biquad_casd_df1_inst_f32 df[5][5];
-float coeffs[5][5][5];//{a0 a1 a2 -b1 -b2} b1 and b2 negate
+//mdavocoder *mdavocod;
+arm_biquad_casd_df1_inst_f32 df[5][5] __attribute__ ((section (".ccmdata")));
+float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2} b1 and b2 negate
 
-  void runvoice(villager_generic* vill){      
-    char phonOUT[3]; 
-    static u16 dirrry=0;
-    u16 x;
-    u16 count=vill->position;
-    u16 start=vill->start;
-    u16 wrap=vill->wrap;
-    
-    //   for (u8 xx=0;xx<vill->howmany;xx++){
-            strcpy(phonOUT,phonemmm[(buf16[dirrry&32767]>>9)%69]);
-    //    strcpy(phonOUT,phonemmm[(dirrry)%69]);
-    dirrry++;
-
-    PhonemeToWaveData(phonOUT,1, 0);
-    for (x=0;x<wav_len;x++){
-      buf16[count&32767]=pWavBuffer[x]+32768;//>>16; // but pwav is 32 bits or how many???? do we need to add 32768 or?
-      count+=vill->step; // TODO: slow down or speed up! - but will need to be only _howmany_
-      if (count>start+wrap) count=start;
-    }
-        FreePhonemeToWaveData();
-	//   }
-  vill->position=count;
-
-}
 
 extern int errno;
+
+u8 trigger=0;
+u16 generated=0;
 
 void main(void)
 {
   int32_t samplepos;
+  u16 writepos=0;
   u16 count,x,xx;
 
   // effects init
 
-  mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
-  mdaVocoder_init(mdavocod);
-  buf16 = (u16*) datagenbuffer;
+  //  mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
+  //  mdaVocoder_init(mdavocod);
 
   float Fc,Q,peakGain;
   const float Fs=32000.0f;// TODO
@@ -170,73 +146,19 @@ void main(void)
     }
 
   ADC1_Init((uint16_t *)adc_buffer);
-  Codec_Init(32000); // TODO!
+  Codec_Init(32000); 
   delay();
   I2S_Block_Init();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
-
-  // fill datagenbuffer???
-
-  for (x=0;x<32768;x++){
-    buf16[x]=rand()&65535; // was RANDI OCT
-    delayxx();
-  }
-
   init_synth();
-  char phonOUT[3]; 
 
   while(1)
     {
-
-      u8 trigger;
-
-      // test phoneme: free? copy from pwav here or in audio.c? busy flag?
-
-      // how phonemes are represented?
-      /*
-**		IY	bEEt		IH	bIt
-**		EY	gAte		EH	gEt
-**		AE	fAt		AA	fAther
-**		AO	lAWn		OW	lOne
-**		UH	fUll		UW	fOOl
-**		ER	mURdER		AX	About
-**		AH	bUt		AY	hIde
-**		AW	hOW		OY	tOY
-a**	
-**		p	Pack		b	Back
-**		t	Time		d	Dime
-**		k	Coat		g	Goat
-**		f	22Fault		v	Vault
-**		TH	24eTHer		DH	eiTHer
-**		s	26Sue		z	Zoo
-**		SH	28leaSH		ZH	leiSure
-**		HH	How		m	suM
-**		n	suN		NG	suNG
-**		l	Laugh		w	Wear
-**		y	Young		r	Rate
-**		CH	CHar		j	Jar
-**		WH	WHere
-*/
-      // translate buf16 into these codes? then into phonout which is in buf16
-      //test with phrase
-
-      //      strcpy(phonOUT,"SHHH ");
-
-      /*      strcpy(phonOUT,phonemmm[adc_buffer[FIRST]>>6]);
-      PhonemeToWaveData(phonOUT,1, 0);
-      for (x=0;x<wav_len;x++){
-	audio_buffer[samplepos]=pWavBuffer[x];//>>16; // but pwav is 32 bits or how many????
-	samplepos++;
-	samplepos=samplepos&32767;
-	if ((adc_buffer[FOURTH]>>4)>128 && trigger==0) {samplepos=0; trigger=1;}
-	if ((adc_buffer[FOURTH]>>4)<=128) trigger=0;
-      }
-
-      FreePhonemeToWaveData();*/
-
-      // TODO: test VOSIM
-      //            (*ddd[1])(&village_datagen[0]); redo as ddd[1] which was one of runvoice, runVOSIM_SC, runVOSIMaud
-
+      //      if (trigger==1){
+	trigger=0;
+	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
+	generated=klatt_phoneme(&writepos,phonemm); // too slow here so break up frames or place in main (but then?)
+	//      }
     }
 }
 

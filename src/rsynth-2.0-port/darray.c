@@ -77,7 +77,7 @@ int darray_delete(darray_t *a, unsigned int n)
 			return 1;
 		}
 		else
-				return NULL;
+				return 0;
 		  //			abort();
 	}
 	else

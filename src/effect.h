@@ -75,7 +75,8 @@ hanningprocess(int16_t* inbuffer, int16_t* outbuffer);
 port all above to do_effect(eff_villagerr)
 
 */
-void do_effect(villager_effect* vill_eff);
+
+//void do_effect(villager_effect* vill_eff);
 void test_effect(int16_t* inbuffer, int16_t* outbuffer);
 void BBandPass_process(BBandPass *unit, int inNumSamples, float* inbuffer, float* outbuffer);
 void BBandPass_init(BBandPass* unit);

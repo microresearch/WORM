@@ -29,9 +29,8 @@ uint16_t mapPhaseInc(uint16_t input) {
   return (antilogTable[input & 0x3f]) >> (input >> 6);
 }
 
-
 void runVOSIMaud(villager_generic* vill){
-  u8 step=vill->step;
+  u8 step;
   u16 count=vill->position;
   u16 start=vill->start;
   u16 wrap=vill->wrap;
@@ -110,7 +109,7 @@ void runflam(villager_generic* vill){ // single impulse sine*sine
   //  float numberCycles = nCycles;
   //  int number = numberCurCycle;
   //  static int count=0; int start=0, wrap=1000;
-  u8 step=vill->step;
+  u8 step;
   u16 count=vill->position;
   u16 start=vill->start;
   u16 wrap=vill->wrap;
@@ -159,12 +158,12 @@ void runflam(villager_generic* vill){ // single impulse sine*sine
 
 }
 
-void runVOSIM_SC(villager_generic* vill){
+void runVOSIM_SC(){
 
-  u8 step=vill->step;
-  u16 count=vill->position;
-  u16 start=vill->start;
-  u16 wrap=vill->wrap;
+  u8 step;
+  u16 count;
+  u16 start; 
+  u16 wrap;
   u16 out;
 
   /*  float freq = (float)(buf16[0]>>7)+1.0f;
@@ -181,7 +180,7 @@ void runVOSIM_SC(villager_generic* vill){
   u16 numberCycles = nCycles;
   u16 number = numberCurCycle;
  
-  for (u8 xx=0;xx<vill->howmany;xx++){
+  for (u8 xx=0;xx<howmany;xx++){
 
      count+=step;
      if (count>start+wrap) count=start;
@@ -235,3 +234,4 @@ void runVOSIM_SC(villager_generic* vill){
   nCycles = numberCycles;
   numberCurCycle = number;
 }
+

@@ -20,19 +20,31 @@
 
 - knobs left/right from top (pcb and lach=test) = 0/mode-(2..3)
 1/selX.egX-(3..2) 2/speed-(0..4) 3/end-(4..1)
-4/trigthresh/vocoderfreq/othersel.eg/selY-(1..0)
+4/trigthresh/vocoderfreq/othersel.eg/selY-(1..0) SEE audio.h
 
 - input=threshold/vocoder_voice
 
-- question of scheduling: examples? trigger_to_sync needs to be in reading in code (and trigger say new phoneme)
+- question of scheduling: examples? trigger_to_sync needs to be in
+  reading in code (and trigger say new phoneme), braids operates with blocks-sync_buffer and render_buffer?
 
-what is framesize for audio=32 x u16, and how frames work for speech/klatt
+what is framesize for audio=32 x u16, and how frames work for speech/klatt?
 
-- list modes and examples: 0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder 5/klatt screwed
+- list modes and examples: 
 
-- what are other speech synth??? LIST from earthvoice2:
+0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder+different channel
+swops/arrangements x/klatt screwed x/other filter x/raw wormed klatt
+x/wormed vosim x/wormed x/y filter
 
-PropTermialTract: propellor assembly
++++ vocoder options with different sources - square wave, white noise etc.
+
+all modes doubled by worm - worm through parameters for each
+
+- what effects we implement in DI: mdavoc, pvvoc
+
+- what are other speech synth/modes??? LIST from earthvoice2:
+
+raw//klatt?
+PropTermialTract: propellor assembly NO-X
 robo: arduino 
 sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64
 SAMarduino: arduino of SAM above
@@ -41,9 +53,87 @@ tinySAM.c: small SAM above
 Tiny Speech Synth: C code
 TTS: as robo above
 
-other: cantarino, 
+other: cantarino - daisybell, braids(?), flite, VOSIMUGens (SC), formlets, espeak
 
+https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
+
++ from DI/voice - also question is what we tried already there:
+
+Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
+
+VOSIM: [[file:~/sc3-plugins/source/VOSIMUGens/VOSIM.cpp::VOSIM%20implemented%20by%20L%C3%A9on%20Spek][file:~/sc3-plugins/source/VOSIMUGens/VOSIM.cpp::VOSIM implemented by Léon Spek]]
+
+LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
+
+1. phase vocoder/FFT - our old pitchscale.c??? 
+
+JoshUGens/sc/classes/Vocoder.sc
+
+SCcode=PV_SpectralMap, borsboom, snokoder
+
+2. 16 channel bandpass/formant/vocoder: ladspa DONE
+
+or vst-mda version: mdaVocoder.cpp TEST/TRY
+
+3. FFT based (spectral swops/exchange - SCcode=PV_SpectralMap, borsboom/zerius=vocoder in docs,
+snokoder) - breakdown stages
+
+FFT on ARM: http://coactionos.com/embedded%20design%20tips/2013/10/13/Tips-FFT-on-the-ARM-Cortex-M3/
+
+(convolution = multiplication in freq domain)
+
+4. simple formant filtering (above)//generic filter conv.
+
+formant frequency/vowel table (vowels announced from buf16 as text->vowels,Qlength of vowel?) 
+formant ugens: http://gurzil.livejournal.com/15375.html
+
+SC synthdef for vowels with BBandPass : http://sccode.org/1-4Vk:
+
+and:
+
+http://www.sussex.ac.uk/Users/nc81/modules/cm1/scfiles/12.2%20Singing%20Voice%20Synthesis.html
+
+csound vosim
+
+CLM: https://ccrma.stanford.edu/software/snd/snd/clm.html#formant
+
+biquad: http://www.musicdsp.org/showone.php?id=64
 
 *This week to have basic scheduling for klatt and knob allocations, memory. Also kind of template for other generators*
 
-W/T/F
+** 11/11
+
+- can we have say 128k contig memory? can use say 120k but need to assign memory to ccm if need more than 8k for other tasks
+
+but not enuff memory in that case and can't program it (look for
+larger arrays?) - set now to 32768 so can do loggy as is and can
+always change loggy
+
+will need to look into stm32_flash.ld for ccm definition - TESTed okayyyy....
+
+eg. u16 sin_data[256] __attribute__ ((section (".ccmdata")));  // sine LUT Array
+
+- stmlib => fft etc.
+
+so we putr eg.  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
+
+// testing now basics - why is so quiet?
+
+// parwave is in nsynth - this handles the klatt frames
+
+*** final notes
+
+- need to break down phoneme frames and/or move phoneme generation out
+  of audio.c interrupt as is too long/slow - also as if we re-trigger
+  fast then is only start of phoneme we hear...
+
+  moves out of interrupt which means we have 32 samples/trigger always issue (so is 32 samples max slowed)
+
+- to test all phonemes... also still question of volume to solve - HW on test board?
+
+- enter_phonemes() in phtoelm is executed only once? and can we bypass
+  this for individual phonemes? or is case of phoneme and last one?
+
+- klatt/rsynth on pc verbose to check all...
+
+- TODO: raw klatt with certain start positions and worm off from these within parameter bounds for each

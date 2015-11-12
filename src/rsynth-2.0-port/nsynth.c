@@ -182,7 +182,7 @@ static resonator_t rout =
  *
  *      natglot[nopen - 40] = 1920000 / (nopen * nopen)
  */
-static const short natglot[224] =
+static const short natglot[224] __attribute__ ((section (".flash"))) =
 {
  1200, 1142, 1088, 1038, 991, 948, 907, 869, 833, 799,
  768, 738, 710, 683, 658, 634, 612, 590, 570, 551,
@@ -222,7 +222,7 @@ static const short natglot[224] =
  *   steps.
  */
 
-static const float amptable[88] =
+static const float amptable[88] __attribute__ ((section (".flash"))) =
 {
  0.0, 0.0, 0.0, 0.0, 0.0,
  0.0, 0.0, 0.0, 0.0, 0.0,
@@ -285,7 +285,7 @@ static void setzeroabc (long int f, long int bw, resonator_ptr rp);
 static float DBtoLIN (klatt_global_ptr globals, long int dB);
 static float dBconvert (long int arg);
 static void overload_warning (klatt_global_ptr globals, long int arg);
-static short clip (klatt_global_ptr globals, float input);
+static int16_t clip (klatt_global_ptr globals, float input);
 static void pitch_synch_par_reset (klatt_global_ptr globals,
                                          klatt_frame_ptr frame, long ns);
 static void frame_init (klatt_global_ptr globals, klatt_frame_ptr frame);
@@ -684,18 +684,18 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
 	setabcg(0L, (long) globals->samrate, &rout, DBtoLIN(globals, Gain0));
 }
 
-static short clip(klatt_global_ptr globals, float input)
+static int16_t clip(klatt_global_ptr globals, float input)
 {
 	long temp = input;
 	/* clip on boundaries of 16-bit word */
 	if (temp < -32767)
 	{
-		overload_warning(globals, -temp);
+	  //		overload_warning(globals, -temp);
 		temp = -32767;
 	}
 	else if (temp > 32767)
 	{
-		overload_warning(globals, temp);
+	  //		overload_warning(globals, temp);
 		temp = 32767;
 	}
 	return (temp);
