@@ -53,40 +53,49 @@ extern char *Revision;
 #include "darray.h"
 #include "holmes.h"
 #include "phtoelm.h"
+#include "elements.h"
 #include "say.h"
 
 
 //short *pWavBuffer;
- int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
+int16_t pWavBuffer[10240] __attribute__ ((section (".ccmdata")));
 
 darray_t wav_elm;
 unsigned short wav_len;
 
-void PhonemeToWaveData(char *phone, int len, int verbose) // len here is 1
+#define StressDur(e,s) ((e->ud + (e->du - e->ud) * s / 3)*speed)
+
+
+void PhonemeToWaveData(u8 phone, int len, int verbose) // len here is 1
 {
-  unsigned frames; //int16_t *pwav;
-  //  char intern[4];
-  //  intern=phone;
-  //  intern[0]=1;
-  //  intern[1]=2;
-  //  intern[2]=3;
+  unsigned int frames; //int16_t *pwav;
+    unsigned char intern[9];
+    intern[0]=phone; // phoneme
 
-	int i, j;
+    Elm_ptr p = &Elements[phone];
+    intern[1]=StressDur(p,1); // duration
+    intern[2]=0; // stress - 0/1/2/3 - set by phoneme as additional possible
+
+    //    intern[3]=24;
+    //    intern[4]=15;
+    //    intern[5]=0;
  
-		darray_init(&wav_elm, sizeof(char), len); // char=2
+    //	darray_init(&wav_elm, sizeof(char), len); // char=2
 	
-		//	frames=len;
-		frames = phone_to_elm(phone, len, &wav_elm);
+        frames=intern[1]; // add the durs - how long is a frame in samples? 256 samples...
+
+
+	//		frames = phone_to_elm(phone, len, &wav_elm);
 	
-	unsigned max_samples = frames * klatt_global.nspfr;
+    unsigned max_samples = frames * klatt_global.nspfr;
 
-		wav_len = holmes(	wav_elm.items, 
-				(unsigned char *) darray_find(&wav_elm, 0),
-       /			max_samples, pWavBuffer	);
+    //		wav_len = holmes(	wav_elm.items, 
+    //				(unsigned char *) darray_find(&wav_elm, 0),
+    // 			max_samples, pWavBuffer	);
 
-	//	wav_len = holmes(1, 
-	//		 intern,
-	//		 max_samples, pWavBuffer	);
+			    wav_len = holmes(3, 
+					     intern,
+					     max_samples, pWavBuffer	);
 
 		//		}
 }

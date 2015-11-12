@@ -14,7 +14,7 @@
 #include "arm_const_structs.h"
 
 #define BUFF_LEN 128 // was 128
-#define AUDIO_BUFSZ 32768 // 59392 // was 32768- now 58k samples (x2)
+#define AUDIO_BUFSZ 58870 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 
 #define MODE 3 // for pcb=2
 #define SELX 0 //3

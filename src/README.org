@@ -113,6 +113,8 @@ will need to look into stm32_flash.ld for ccm definition - TESTed okayyyy....
 
 eg. u16 sin_data[256] __attribute__ ((section (".ccmdata")));  // sine LUT Array
 
+FIXED 12/11
+
 - stmlib => fft etc.
 
 so we putr eg.  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
@@ -143,7 +145,7 @@ or do X/Y of 2 phonemes - but what of trigger? or trigger on max!
 
 either way simplify to numericals an no string stuff/memory 
 
-- klatt/rsynth on pc verbose to check all...
+- klatt/rsynth on pc verbose to check all...-> see Downloads/rsynth-2.0 (also updated rsynth version?)
 
 - TODO: raw klatt with certain start positions and worm off from these within parameter bounds for each
 
@@ -159,12 +161,14 @@ either way simplify to numericals an no string stuff/memory
 
 so we need to open up holmes.c so keeps running and writes directly
 into audio_buffer and deals with trigger/phoneme selection (is always
-one phoneme behind?)
+one phoneme behind? - but not great idea as we can't look ahead?
 
 how do we get stress and dur from phoneme?
 
 this is dur in phone_to_elm
 
+if (!(p->feat & vwl))
+stress = 0;
 t += phone_append(elm,StressDur(p,stress));
 (int) (StressDur(p, stress, islong)));
 #define StressDur(e,s,l) ((e->ud + (e->du - e->ud) * s / 3)*speed)
@@ -173,8 +177,32 @@ for each one in elements.def
 
 next bit is stress?
 
-stress is 0/1/2/3
+stress is either 0,1,2 or 3
 
 so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??)
 
 - also need to get rid of pwavebuffer and write straight IN
+
+- 32k=64k=128 frames
+
+- can enlarge audio buffer now we have fixed ccm so could be 60k = 120k = say 200 frames???
+
+*if we enlarge then re-do loggy for this size*
+
+*69 is number of phonetic elements - stress or no stress = 69x4=272 - close to 255???* leave stress as 0 for now
+
+*** notes
+
+- how does CV select phoneme - like how often do we sample CV to give
+phoneme? do we have phoneme list which we run through into buffer and
+shift out or? based on speed? as have it trigger is the one
+
+- working on run_holmes which is constant running and trigger-able -
+  test this and then figure out how to update list... 
+
+- clip in nsynth *4.0f for volume increase
+
+- still scheduling question - say for run_holmes so doesn't just cycle
+  over itself... wait until playhead passes how?
+
+// and run_holmes seem start with phrase fine and run DOWN!

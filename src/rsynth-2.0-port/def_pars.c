@@ -19,7 +19,7 @@ long samp_rate = 32000;
 void init_synth(void)
 {
 	//double mSec_per_frame = 10;
-	float mSec_per_frame = 8;
+  float mSec_per_frame = 8; // 10?
 	//int impulse = 0;
 	int impulse = 1;
 	//int casc = 1;

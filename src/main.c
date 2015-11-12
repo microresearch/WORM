@@ -23,6 +23,8 @@
 #include "say.h"
 #include "klatt_phoneme.h"
 #include "nsynth.h"
+#include "elements.h"
+#include "holmes.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -89,6 +91,7 @@ float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2
 
 extern int errno;
 
+volatile u8 holmes_trigger=0;
 volatile u8 trigger=0;
 volatile u16 generated=0;
 
@@ -158,10 +161,12 @@ void main(void)
       // Just now work with mode=0/klatt_phoneme and then  when running we need to deal with changes between modes etc.
 
       //      if (trigger==1){
-	trigger=0;
-	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
-	generated=klatt_phoneme(&writepos,phonemm); // too slow here so break up frames or place in main (but then?)
+      //	trigger=0;
+      //	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
+      //	generated=klatt_phoneme(&writepos,phonemm); // or full holmes thing writes straight to audio buffer
 	//      }
+      	run_holmes();
+
     }
 }
 
