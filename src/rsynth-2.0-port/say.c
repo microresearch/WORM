@@ -55,60 +55,40 @@ extern char *Revision;
 #include "phtoelm.h"
 #include "say.h"
 
+
 //short *pWavBuffer;
  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
 
 darray_t wav_elm;
 unsigned short wav_len;
 
-void PhonemeToWaveData(char *phone, int len, int verbose)
+void PhonemeToWaveData(char *phone, int len, int verbose) // len here is 1
 {
   unsigned frames; //int16_t *pwav;
- 
+  //  char intern[4];
+  //  intern=phone;
+  //  intern[0]=1;
+  //  intern[1]=2;
+  //  intern[2]=3;
+
 	int i, j;
  
-	darray_init(&wav_elm, sizeof(char), len);
+		darray_init(&wav_elm, sizeof(char), len); // char=2
 	
-	//	frames=len;
-		if((frames = phone_to_elm(phone, len, &wav_elm))){
+		//	frames=len;
+		frames = phone_to_elm(phone, len, &wav_elm);
 	
-		unsigned max_samples = frames * klatt_global.nspfr;
+	unsigned max_samples = frames * klatt_global.nspfr;
 
-		//		int xxxy=crashfun();
+		wav_len = holmes(	wav_elm.items, 
+				(unsigned char *) darray_find(&wav_elm, 0),
+       /			max_samples, pWavBuffer	);
 
-		if (verbose){
-			printf("max_samples = %d\n", max_samples);
-		}
-   
-		//		pWavBuffer = (short *) malloc(sizeof(short) * max_samples);
-		//		pwav=&pWavBuffer[0];
+	//	wav_len = holmes(1, 
+	//		 intern,
+	//		 max_samples, pWavBuffer	);
 
-		if (verbose){
-			printf("%.*s\n", len, phone);
-		}
-			
-		//		if (pWavBuffer){
-			wav_len = holmes(	wav_elm.items, 
-								(unsigned char *) darray_find(&wav_elm, 0),
-						max_samples, pWavBuffer	);
-
-			if (verbose){
-				printf("wav_len = %d\n", wav_len);
-		
-				j = wav_len;
-				if(j>256) j = 256;
-				for(i=0;i<j;i++){
-					printf("%04X %04X\n", pWavBuffer[i], (0x1000 + pWavBuffer[i]));
-				}
-			}
-
-			// free(pWavBuffer);
-			//				}
-			//		}else{
-		  //			fprintf(stderr, "memory shortage (PhonemeToWaveData)\n");
-			//					}
-		}
-	// darray_free(&wav_elm);
+		//		}
 }
 
 

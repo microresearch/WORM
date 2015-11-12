@@ -121,19 +121,32 @@ so we putr eg.  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
 
 // parwave is in nsynth - this handles the klatt frames
 
-*** final notes
+*** final 11/11 notes
 
 - need to break down phoneme frames and/or move phoneme generation out
   of audio.c interrupt as is too long/slow - also as if we re-trigger
   fast then is only start of phoneme we hear...
 
-  moves out of interrupt which means we have 32 samples/trigger always issue (so is 32 samples max slowed)
+  moved out of interrupt which means we have 32 samples/trigger always issue (so is 32 samples max slowed)- seems okay now
 
 - to test all phonemes... also still question of volume to solve - HW on test board?
 
-- enter_phonemes() in phtoelm is executed only once? and can we bypass
-  this for individual phonemes? or is case of phoneme and last one?
+[- enter_phonemes() in phtoelm is executed only once? and can we bypass
+  this for individual phonemes? or is case of phoneme and last one?]
+
+/// all of rsynth is about transitions between phonemes and we just
+have one - so simplify or fake this/make longer phoneme cases. see holmes.c
+
+/BUT/and our list of phonemes is the lookup list - to figure out what we
+need to send to holmes for 2nd part and simplify holmes for 1 phoneme 12/11
+or do X/Y of 2 phonemes - but what of trigger? or trigger on max!
+
+either way simplify to numericals an no string stuff/memory 
 
 - klatt/rsynth on pc verbose to check all...
 
 - TODO: raw klatt with certain start positions and worm off from these within parameter bounds for each
+
+- TODO: generate and test square for vocoder
+
+
