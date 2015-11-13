@@ -15,7 +15,6 @@
 #include "adc.h"
 #include "audio.h"
 #include "mdavocoder.h"
-#include "siggen.h"
 #include "vocode.h"
 #include "biquad.h"
 #include "effect.h"
@@ -39,14 +38,6 @@ static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {400, 750, 2400, 2600, 2900},
       {350, 600, 2400, 2675, 2950}
   };
-
-/*static const char phonemmm[42][3] __attribute__ ((section (".flash"))) =
-{"IY\0","IH\0","EY\0","EH\0","AE\0","AA\0","AO\0","OW\0","UH\0","UW\0","ER\0","AX\0","AH\0"," \0","AW\0","OY\0","p\0","b\0","t\0","d\0","k\0","g\0","f\0","v\0","TH\0","DH\0","s\0","z\0","SH\0","ZH\0","HH\0","m\0","n\0","NG\0","l\0","w\0","y\0","r\0","CH\0","j\0","WH\0"," \0"};
-*/
-
-static const char phonemmm[69][4] __attribute__ ((section (".flash"))) =
-{"END\0","Q\0","P\0","PY\0","PZ\0","T\0","TY\0","TZ\0","K\0","KY\0","KZ\0","B\0","BY\0","BZ\0","D\0","DY\0","DZ\0","G\0","GY\0","GZ\0","M\0","N\0","NG\0","F\0","TH\0","S\0","SH\0","X\0","H\0","V\0","QQ\0","DH\0","DI\0","Z\0","ZZ\0","ZH\0","CH\0","CI\0","J\0","JY\0","L\0","LL\0","RX\0","R\0","W\0","Y\0","I\0","E\0","AA\0","U\0","O\0","OO\0","A\0","EE\0","ER\0","AR\0","AW\0","UU\0","AI\0","IE\0","OI\0","OU\0","OV\0","OA\0","IA\0","IB\0","AIR\0","OOR\0","OR\0"};
-
 
 static const float qqq[5][5] __attribute__ ((section (".flash"))) = {
     {14.424072,21.432398,29.508234,29.453644,30.517193},
@@ -163,21 +154,36 @@ void main(void)
   mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
 
   // if there is a change in mode do something?
-  mode=0;
+  mode=3;
 
   switch(mode){
   case 0:// rsynth/klatt-single phoneme
            if (trigger==1){
 	     trigger=0;
 	     u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
-	     struct pair xx=klatt_phoneme(writepos,phonemm); // or full holmes thing writes straight to audio buffer
+	     pair xx=klatt_phoneme(writepos,phonemm); 
 	     generated=xx.generated;
 	     writepos=xx.writepos;
 	   }
 	   break;
   case 1: // rsynth/klatt-chain of phonemes
-      	run_holmes();
-	break;
+    writepos=run_holmes(writepos);
+    break;
+  case 2: // vosim free running
+    writepos=runVOSIM_SC(writepos);
+    break;
+  case 3: // VOSIMondemand
+    if (trigger==1){
+      trigger=0;
+      float freqwency = (float)(adc_buffer[SELX]+100);//1500.0f; 
+      float cycles = (float)((adc_buffer[SELY]>>8)+1);
+      float decay = 0.5f; //TODO!
+      pair xx=demandVOSIM_SC(writepos,freqwency,cycles,decay); 
+      generated=xx.generated;
+      writepos=xx.writepos;
+    }
+    break;
+    
   }
     }
 }

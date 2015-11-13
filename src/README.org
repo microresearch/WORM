@@ -10,7 +10,15 @@
 - vocoder and how we deal with buffers?
 - integrate/test/new knob allocations
 
-* modes so far imagined - say 32!
+* knobs
+
+#define MODE 3 // for pcb=2
+#define SELX 0 //3
+#define SPEED 2 //0
+#define END 4 //4
+#define SELY 1 //1
+
+* modes so far imagined - say 32 total!
 
 0/klatt - single phoneme
 0.1/klatt - list of phonemes
@@ -26,6 +34,7 @@ x/raw wormed klatt
 x/wormed vosim 
 x/wormed x/y filter
 
++ variations say on vosim etc...
 + other speech synths
 
 ++ vocoder options with different sources - square wave, white noise etc.
@@ -67,27 +76,36 @@ all modes doubled by worm - worm through parameters for each
 
 - what are other speech synth/modes??? LIST from earthvoice2:
 
-raw//klatt?
-PropTermialTract: propellor assembly NO-X
-robo: arduino 
-sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64
-SAMarduino: arduino of SAM above
-Talkie-LPCcode: :LPC
-tinySAM.c: small SAM above
-Tiny Speech Synth: C code
-TTS: as robo above
+raw//basic klatt parameters?
 
-other: cantarino - daisybell, braids(?), flite, VOSIMUGens (SC), formlets, espeak
+[PropTermialTract: propellor assembly NO-X]
 
-https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
+robo: arduino = 8 bit
+TTS: same as robo above
+
+sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64 - 8 bit and messy
+tinySAM.c: small SAM above - 8 bit
+
+SAMarduino: arduino of tinySAM above - 8 bit
+
+Talkie-LPCcode: :LPC - encode new words with QBoxPro
+
+xx
+Tiny Speech Synth: C code - 
+
+///
+
+other: cantarino - daisybell, braids(=), formlets=SC FOF style filter, (espeak/flite=too big), csound fof=http://www.csounds.com/manual/html/fof.html
+
+https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/ =
 
 + from DI/voice - also question is what we tried already there:
 
 Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
 
-VOSIM: [[file:~/sc3-plugins/source/VOSIMUGens/VOSIM.cpp::VOSIM%20implemented%20by%20L%C3%A9on%20Spek][file:~/sc3-plugins/source/VOSIMUGens/VOSIM.cpp::VOSIM implemented by Léon Spek]]
+[LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
 
-LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
+and LPCsynth]
 
 1. phase vocoder/FFT - our old pitchscale.c??? 
 
@@ -117,13 +135,13 @@ and:
 
 http://www.sussex.ac.uk/Users/nc81/modules/cm1/scfiles/12.2%20Singing%20Voice%20Synthesis.html
 
-csound vosim
-
 CLM: https://ccrma.stanford.edu/software/snd/snd/clm.html#formant
 
 biquad: http://www.musicdsp.org/showone.php?id=64
 
 *This week to have basic scheduling for klatt and knob allocations, memory. Also kind of template for other generators*
+
+template should be triggerable version and free-running version - mark each as such!
 
 ** 11/11
 
@@ -237,10 +255,41 @@ shift out or? based on speed? as have it trigger is the one
 
 - how does run_holmes know how much to fill buffer? - overfill?/average - silence is ok
 
-- triggering and scheduling is main issue// add to end of phoneme list and shift left or just re-write (more modes?)re-write!
+- triggering and scheduling is main issue// add to end of phoneme list and shift left or just re-write (more modes?)re-write!-TODO
 
-- mode1-run_holmes - use trigger to freeze any changes to phoneme list as extra mode
+- mode1-run_holmes - use trigger to freeze any changes to phoneme list as extra mode-TODO
 
-*TODO: proof tests on VOSIM(sc/braids/csound/sc-formlets),
-XY(bbandpass,library?), vocoder(ladspa?/mdavoc=input and
+*TODO: proof tests on VOSIM(sc/braids/csound/sc-formlets),XY(bbandpass,doformantfilter, biquad), vocoder(ladspa?/mdavoc=input and
 mdavocoder?/mdatalkbox/pv_vocoder=justFFTsofar), LPC(talkie and SC), canto etc.*
+
+*check all effect.c, other DI files*
+
+*TODO: changes suggested above//how to test-simulate triggerCV also*
+
+** 13/11
+
+Note that trigger will always be slow as we _just_ process the buffer in audio.c - not LIVE...
+
+Working on *VOSIM_SC* versionings - trigin could also be seperate timer/counter - controlled by? - Impulse.ar - LFUGens.cpp
+
+- need to organise parameters for VOSIM as so far we don't do decay
+
+- writepos always given and returned so we can sync
+
+- single VOSIM - until it ends, how is triggered? - but this is just SC triggering
+
+*** notes
+
+- do impulse.ar in vosim, but also like random triger variant that we have
+
+VOSIM_SC:
+
+*ar (trig: 0.1, freq: 400, nCycles: 1, decay: 0.9, mul: 1, add: 0)
+Arguments:
+trig [ar kr] starts a vosim pulse when a transition from non-positive to positive occurs and no other vosim is still going. audio rate input will produce sample accurate triggering.
+freq [ar kr] the frequency of the squared sinewave.
+nCycles	- the number of squared sinewaves to use in one vosim pulse. nCycles gets checked when VOSIM receives a trigger.
+decay - the decay factor.
+
+eg. http://doc.sccode.org/Classes/VOSIM.html
+

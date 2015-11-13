@@ -75,14 +75,19 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   u16 x;
   u8 speedy;
 
-  // WORM - first tests. select mode. trigger will need to be INSIDE generator
   // trigger to take care of but figure out basics step by step first!
 
   u16 ending=loggy[adc_buffer[END]];
   //  u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=8.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
-      //    samplespeed=1.0f;
+  //    samplespeed=1.0f;
+
+  // PROCESS incoming audio and activate master_triger
+  // TODO:read in audio and process for trigger
+  // trigger will set samplepos=0.0f, writepos=0 and trigger=1
+  // but readpos only after we have written?
+
 
   switch(mode){
   case 0: // rsynth/klatt-single phoneme
@@ -97,10 +102,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       samplepos+=samplespeed;
       eaten+=samplespeed;
       if (readpos>=ending) samplepos=0.0f;    
-
-      // read in audio and process for trigger
-      // trigger will set samplepos=0.0f, writepos=0 and trigger=1
-
     }
     break;
   case 1: // rsynth/klatt-chain of phonemes
@@ -111,14 +112,36 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       samplepos+=samplespeed;
-      eaten+=samplespeed;
       if (readpos>=ending) samplepos=0.0f;    
     }
     framecount++;
     if (framecount>(64/speedy)){
       // update next 3 elements in phoneme chain=test_elm - so need to track elements
     }
+
+  case 2: // start VOSIM-SC tests
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      samplepos+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+    framecount++;
     break;
+  case 3: // single or running VOSIM?
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      if (generated<=eaten){
+	eaten=0.0f;
+	trigger=1;
+      }
+      samplepos+=samplespeed;
+      eaten+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+    break;
+
 
   } // mode end
 
