@@ -91,14 +91,16 @@ float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2
 
 extern int errno;
 
-volatile u8 holmes_trigger=0;
+volatile u8 mode;
 volatile u8 trigger=0;
 volatile u16 generated=0;
+volatile u16 writepos=0;
+
+u8 test_elm[30]={54, 16, 0, 24, 15, 0, 1, 6, 0, 1, 6, 0, 44, 8, 0, 54, 16, 0, 20, 8, 0, 1, 6, 0, 1, 6, 0, 1, 6, 0};
 
 void main(void)
 {
   int32_t samplepos;
-  u16 writepos=0;
   u16 count,x,xx;
 
   // effects init
@@ -158,15 +160,25 @@ void main(void)
   while(1)
     {
 
-      // Just now work with mode=0/klatt_phoneme and then  when running we need to deal with changes between modes etc.
+  mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
 
-      //      if (trigger==1){
-      //	trigger=0;
-      //	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
-      //	generated=klatt_phoneme(&writepos,phonemm); // or full holmes thing writes straight to audio buffer
-	//      }
+  // if there is a change in mode do something?
+  mode=0;
+
+  switch(mode){
+  case 0:// rsynth/klatt-single phoneme
+           if (trigger==1){
+	     trigger=0;
+	     u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
+	     struct pair xx=klatt_phoneme(writepos,phonemm); // or full holmes thing writes straight to audio buffer
+	     generated=xx.generated;
+	     writepos=xx.writepos;
+	   }
+	   break;
+  case 1: // rsynth/klatt-chain of phonemes
       	run_holmes();
-
+	break;
+  }
     }
 }
 

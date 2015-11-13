@@ -63,45 +63,64 @@ inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *
 
 extern u8 trigger;
 extern u16 generated;
+extern u16 writepos;
+extern u8 mode;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   u16 readpos;
+  static u8 framecount=0;
   static float eaten=0;
   static float samplepos=0.0f; float samplespeed;
   u16 x;
+  u8 speedy;
 
   // WORM - first tests. select mode. trigger will need to be INSIDE generator
-  // scheduling questions - will speech break this interrupt? how long one frame takes to generate and if we need divide up? 
-  // well each phoneme is actually several klatt frames - look into managing this...
   // trigger to take care of but figure out basics step by step first!
 
-  u8 mode=adc_buffer[MODE]>>8; // 12 bits to say 16 modes (4 bits)
-        u16 ending=loggy[adc_buffer[END]];
+  u16 ending=loggy[adc_buffer[END]];
   //  u16 ending=AUDIO_BUFSZ;
-      samplespeed=8.0f/(float)((adc_buffer[SPEED]>>6)+1); // what range this gives?
+  speedy=(adc_buffer[SPEED]>>6)+1;
+  samplespeed=8.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
       //    samplespeed=1.0f;
-    mode=0;
 
   switch(mode){
-  case 0: 
+  case 0: // rsynth/klatt-single phoneme
     for (x=0;x<sz/2;x++){
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       //                mono_buffer[x]=rand()%65536;
-      // if we have overrun audio_buffer
-      // question is do we just keep running generator across whole of audio_buffer or?
       if (generated<=eaten){
-	//	u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
-	//	generated=klatt_phoneme(&writepos,phonemm); // too slow here so break up frames or place in main (but then?)
 	eaten=0.0f;
 	trigger=1;
       }
       samplepos+=samplespeed;
       eaten+=samplespeed;
       if (readpos>=ending) samplepos=0.0f;    
+
+      // read in audio and process for trigger
+      // trigger will set samplepos=0.0f, writepos=0 and trigger=1
+
     }
-  }
+    break;
+  case 1: // rsynth/klatt-chain of phonemes
+    // how to update that chain - every x callbacks
+    // (256=framesize*say8frames for phoneme -2048 // 32 frame
+    // here=every 64 frames - divided by speedy 64/speedy
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      samplepos+=samplespeed;
+      eaten+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+    framecount++;
+    if (framecount>(64/speedy)){
+      // update next 3 elements in phoneme chain=test_elm - so need to track elements
+    }
+    break;
+
+  } // mode end
 
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);
 

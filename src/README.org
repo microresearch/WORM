@@ -10,6 +10,30 @@
 - vocoder and how we deal with buffers?
 - integrate/test/new knob allocations
 
+* modes so far imagined - say 32!
+
+0/klatt - single phoneme
+0.1/klatt - list of phonemes
+0.2/klatt - worm away starting on phoneme base (earth worm) - or trigger that base
+1/vosim 
+2/x-y filter 
+3/LPC 
+4/vocoder+different channel
+swops/arrangements 
+x/klatt screwed/bent 
+x/other filter 
+x/raw wormed klatt
+x/wormed vosim 
+x/wormed x/y filter
+
++ other speech synths
+
+++ vocoder options with different sources - square wave, white noise etc.
+
+all modes doubled by worm - worm from base through parameter
+constraints for each. trigger resets to base. thus double for each mode more or less
+
+
 * progress
 
 ** 4/11/2015
@@ -185,7 +209,9 @@ so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??)
 
 - 32k=64k=128 frames
 
-- can enlarge audio buffer now we have fixed ccm so could be 60k = 120k = say 200 frames???
+- can enlarge audio buffer now we have fixed ccm so could be 60k =
+  120k = say 200 frames audio.h = 58870 with log_gen.py calculating
+  end
 
 *if we enlarge then re-do loggy for this size*
 
@@ -200,9 +226,21 @@ shift out or? based on speed? as have it trigger is the one
 - working on run_holmes which is constant running and trigger-able -
   test this and then figure out how to update list... 
 
-- clip in nsynth *4.0f for volume increase
+- clip in nsynth *4.0f for volume increase ADDED - VOLUME fixed
 
 - still scheduling question - say for run_holmes so doesn't just cycle
   over itself... wait until playhead passes how?
 
-// and run_holmes seem start with phrase fine and run DOWN!
+// and run_holmes seem start with phrase fine and run DOWN - if we run continuous then will tail off!
+
+- run_holmes as 2nd mode (MODE=1)
+
+- how does run_holmes know how much to fill buffer? - overfill?/average - silence is ok
+
+- triggering and scheduling is main issue// add to end of phoneme list and shift left or just re-write (more modes?)re-write!
+
+- mode1-run_holmes - use trigger to freeze any changes to phoneme list as extra mode
+
+*TODO: proof tests on VOSIM(sc/braids/csound/sc-formlets),
+XY(bbandpass,library?), vocoder(ladspa?/mdavoc=input and
+mdavocoder?/mdatalkbox/pv_vocoder=justFFTsofar), LPC(talkie and SC), canto etc.*
