@@ -62,7 +62,7 @@ constraints for each. trigger resets to base. thus double for each mode more or 
 
 what is framesize for audio=32 x u16, and how frames work for speech/klatt?
 
-- list modes and examples: 
+*** - list modes and examples: 
 
 0/klatt 1/vosim 2/x-y filter 3/LPC 4/vocoder+different channel
 swops/arrangements x/klatt screwed x/other filter x/raw wormed klatt
@@ -78,70 +78,58 @@ all modes doubled by worm - worm through parameters for each
 
 raw//basic klatt parameters?
 
-[PropTermialTract: propellor assembly NO-X]
-
 robo: arduino = 8 bit
 TTS: same as robo above
 
 sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64 - 8 bit and messy
 tinySAM.c: small SAM above - 8 bit
-
 SAMarduino: arduino of tinySAM above - 8 bit
 
-Talkie-LPCcode: :LPC - encode new words with QBoxPro
+Talkie-LPCcode: :LPC - encode new words with QBoxPro/windows
 
-xx
-Tiny Speech Synth: C code - 
+*Tiny Speech Synth: C code - TinySynth.h 16 bit*
 
-///
+other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto
 
-other: cantarino - daisybell, braids(=), formlets=SC FOF style filter, (espeak/flite=too big), csound fof=http://www.csounds.com/manual/html/fof.html
+braids(=rendervowel and rendervowelfof)
+
+Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
 
 https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/ =
 
-+ from DI/voice - also question is what we tried already there:
-
-Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
+csound fof= http://www.csounds.com/manual/html/fof.html - ugens7.c
 
 [LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
 
 and LPCsynth]
 
-1. phase vocoder/FFT - our old pitchscale.c??? 
+[1. phase vocoder/FFT - our old pitchscale.c??? 
 
 JoshUGens/sc/classes/Vocoder.sc
 
-SCcode=PV_SpectralMap, borsboom, snokoder
+SCcode=PV_SpectralMap, borsboom, snokoder]
 
-2. 16 channel bandpass/formant/vocoder: ladspa DONE
+- 2. 16 channel bandpass/formant/vocoder: ladspa DONE= vocoder.c //pv is not fully functional
 
-or vst-mda version: mdaVocoder.cpp TEST/TRY
+or vst-mda version: mdaVocoder.cpp TEST/TRY mdavoc=input and mdavocoder? see effect.c
 
-3. FFT based (spectral swops/exchange - SCcode=PV_SpectralMap, borsboom/zerius=vocoder in docs,
-snokoder) - breakdown stages
+X/Y//simple formant filtering (above)//generic filter conv. bbandpass, biquad, bandpass in effect.c and setup of 
 
-FFT on ARM: http://coactionos.com/embedded%20design%20tips/2013/10/13/Tips-FFT-on-the-ARM-Cortex-M3/
+runform in simforstacksansmem 
 
-(convolution = multiplication in freq domain)
+and biquad in doformantfilter
 
-4. simple formant filtering (above)//generic filter conv.
+- formant frequency/vowel table (vowels announced from buf16 as text->vowels,Q,length of vowel?) ????===arm_biquad_cascade_df1_init_f32??? in main.c in DI
 
-formant frequency/vowel table (vowels announced from buf16 as text->vowels,Qlength of vowel?) 
 formant ugens: http://gurzil.livejournal.com/15375.html
 
 SC synthdef for vowels with BBandPass : http://sccode.org/1-4Vk:
 
-and:
-
-http://www.sussex.ac.uk/Users/nc81/modules/cm1/scfiles/12.2%20Singing%20Voice%20Synthesis.html
-
-CLM: https://ccrma.stanford.edu/software/snd/snd/clm.html#formant
-
-biquad: http://www.musicdsp.org/showone.php?id=64
+** xxx
 
 *This week to have basic scheduling for klatt and knob allocations, memory. Also kind of template for other generators*
 
-template should be triggerable version and free-running version - mark each as such!
+*template should be triggerable version and free-running version - mark each as such!*
 
 ** 11/11
 
