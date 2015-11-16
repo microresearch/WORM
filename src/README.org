@@ -4,11 +4,19 @@
 
 * TODO
 
-- sort out memory allocations
-- basics of read/write head and speech integration
+- sort out memory allocationsDONE
+- basics of read/write head and speech integrationDONE
 - tests for each speech function/mode
-- vocoder and how we deal with buffers?
-- integrate/test/new knob allocations
+- vocoder 
+- integrate/test/new knob allocations when we have PCB
+
+...
+- port all speech algos
+- x/y bandpass
+- wormcode and klatt parameter limits
+- inverse filter/LPC
+- phoneme probabilities
+- run_holmes see below
 
 * knobs
 
@@ -240,9 +248,9 @@ next bit is stress?
 
 stress is either 0,1,2 or 3
 
-so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??)
+so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??) *TODO* make that array which is test_elm
 
-- also need to get rid of pwavebuffer and write straight IN
+- also need to get rid of pwavebuffer and write straight IN DONE
 
 - 32k=64k=128 frames
 
@@ -250,7 +258,7 @@ so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??)
   120k = say 200 frames audio.h = 58870 with log_gen.py calculating
   end
 
-*if we enlarge then re-do loggy for this size*
+*if we enlarge then re-do loggy for this size* DONE
 
 *69 is number of phonetic elements - stress or no stress = 69x4=272 - close to 255???* leave stress as 0 for now
 
@@ -273,6 +281,8 @@ shift out or? based on speed? as have it trigger is the one
 - run_holmes as 2nd mode (MODE=1)
 
 - how does run_holmes know how much to fill buffer? - overfill?/average - silence is ok
+
+*** TODO
 
 - triggering and scheduling is main issue// add to end of phoneme list and shift left or just re-write (more modes?)re-write!-TODO
 
@@ -312,8 +322,7 @@ decay - the decay factor.
 
 eg. http://doc.sccode.org/Classes/VOSIM.html
 
-*do away with END and use as 3rd parameter - in some cases. eg. in
-phonemes do we even use 2nd par?*
+*do away with END and use as 3rd parameter - eg. in phonemes do we even use 2nd par?*
 
 *TODO: rationalise phonemes so there are 64 or is probability table - also order in which they are arranged could follow probability of transitions...*
 
@@ -348,7 +357,7 @@ https://github.com/freedv/codec2/blob/master/src/lpc.c
 
 [[file:~/projects/ERD_modules/worm/lpc.c::FILE........:%20lpc.c][file:~/projects/ERD_modules/worm/lpc.c::FILE........: lpc.c]]
 
-Klatt:Flutter?
+Klatt:Flutter is one of few globals?
 
 also NATURAL and IMPULSIVE in def_pars.c to test as is always now set to impulsive
 
@@ -364,10 +373,40 @@ now klatt_params - see also http://linguistics.berkeley.edu/plab/guestwiki/index
 
 - klatt LPC stuff
 
-- new scheduling template from notebook
+- finish making/remaking phoneme list in klatt/run_holmes above and re-check if runs off/how to re-start or does that happen now?
 
 /////
 
 - raw klatt and other wormings....
 
-- phoneme probabilities and all TODO above!
+- phoneme probabilities (n-grams) and all TODO above!
+
+** 16/11
+
+- added resync on mode change - to TEST all
+
+- phoneme list rewrite based on probabilities so now 64 phonemes
+
+*** TODO:
+
+- howmany written should depend on readspeed [note: that we can also
+  break down klatt frame into smaller chunks as long as we buffer and
+  keep track of these in an array]
+
+- Klatt elements - new definitions, other voices eg. whisper, croak, female?
+
+also X= change parameter, Y select parameter - need list and constraints see klatt_params - also this will use code in holmes.c
+
+notes: klattsyn.py, new python code in downloads
+
+*** phoneme probabilities 
+
+phoneme_prob.py
+
+using rsynth-2.0 printing phonemes from
+/root/projects/earthcode/worm/beddoesvol1gosse_trimmed we can lose a
+few phonemes and re-order as:
+
+u8 phoneme_prob_remap[64]={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}
+
+[prob_other to be used for other phoneme description on laptop]

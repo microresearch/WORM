@@ -65,10 +65,10 @@ extern u8 trigger;
 extern u16 generated;
 extern u16 writepos;
 extern u8 mode;
+extern u16 readpos;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
-  u16 readpos;
   static u8 framecount=0;
   static float eaten=0;
   static float samplepos=0.0f; float samplespeed;

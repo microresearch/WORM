@@ -82,10 +82,14 @@ float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2
 
 extern int errno;
 
-volatile u8 mode;
+volatile u16 readpos=0;
+volatile u8 mode=0;
 volatile u8 trigger=0;
+volatile u8 maintrigger=0;
 volatile u16 generated=0;
 volatile u16 writepos=0;
+
+static const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62};
 
 u8 test_elm[30]={54, 16, 0, 24, 15, 0, 1, 6, 0, 1, 6, 0, 44, 8, 0, 54, 16, 0, 20, 8, 0, 1, 6, 0, 1, 6, 0, 1, 6, 0};
 
@@ -93,6 +97,7 @@ void main(void)
 {
   int32_t samplepos;
   u16 count,x,xx;
+  u8 oldmode=0;
 
   // effects init
 
@@ -151,16 +156,23 @@ void main(void)
   while(1)
     {
 
-  mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
+      oldmode=mode;    
+      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
 
   // if there is a change in mode do something?
+  if (oldmode!=mode){
+    maintrigger=1;
+  }
+
+  if (maintrigger==1) {writepos=0;trigger=1;}
+
   mode=3;
 
   switch(mode){
   case 0:// rsynth/klatt-single phoneme
            if (trigger==1){
 	     trigger=0;
-	     u8 phonemm=(adc_buffer[SELX]>>5)%69; // 7bits=128 %69
+	     u8 phonemm=phoneme_prob_remap[(adc_buffer[SELX]>>5)]; // 7bits=128 %69//6=64
 	     pair xx=klatt_phoneme(writepos,phonemm); 
 	     generated=xx.generated;
 	     writepos=xx.writepos;
@@ -183,7 +195,13 @@ void main(void)
       writepos=xx.writepos;
     }
     break;
-    
+  
+    // now readpos is back to one now that we have written something 
+    if (maintrigger==1) {
+      readpos=0;
+      maintrigger=0;
+}
+ 
   }
     }
 }
