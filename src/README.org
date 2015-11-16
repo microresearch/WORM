@@ -60,7 +60,11 @@ constraints for each. trigger resets to base. thus double for each mode more or 
 - question of scheduling: examples? trigger_to_sync needs to be in
   reading in code (and trigger say new phoneme), braids operates with blocks-sync_buffer and render_buffer?
 
-what is framesize for audio=32 x u16, and how frames work for speech/klatt?
+what is framesize for audio=32 x u16//
+
+- and how frames work for speech/klatt? - frame is 256 samples = 512 bytes
+
+frame=XmS of audio output p so we have ms at 32K = 
 
 *** - list modes and examples: 
 
@@ -85,9 +89,20 @@ sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth
 tinySAM.c: small SAM above - 8 bit
 SAMarduino: arduino of tinySAM above - 8 bit
 
-Talkie-LPCcode: :LPC - encode new words with QBoxPro/windows
+Talkie-LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
 *Tiny Speech Synth: C code - TinySynth.h 16 bit*
+
+*/afs/athena/astaff/project/phones/Speak emulates SPO256*
+
+see also phoneme sample version at: [[file:~/Downloads/stuff.mit.edu/afs/athena/astaff/project/phones/Speak/speak.c]]
+
+- need convert samples to arrays in flash - clip header. format is: mu-law 8 bit 
+
+sox AA --bits 8 --channels 1 --encoding unsigned-integer --rate 8000 file.raw
+
+but as array// short code - open filename, output array_name=blah,,,,
+
 
 other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto
 
@@ -281,3 +296,44 @@ decay - the decay factor.
 
 eg. http://doc.sccode.org/Classes/VOSIM.html
 
+*do away with END and use as 3rd parameter - in some cases. eg. in
+phonemes do we even use 2nd par?*
+
+*TODO: rationalise phonemes so there are 64 or is probability table - also order in which they are arranged could follow probability of transitions...*
+
+** 15/11
+
+Different voices:
+
+Note in Klatt: The facility to use a sampled natural excitation
+waveform has been implemented. Naturalness of the resulting synthetic
+speech can be greatly improved by using the glottal excitation
+waveform from a natural speaker, especially if it is the speaker on
+whose voice the synthesis is actually based. This may be obtained
+indirectly by inverse-filtering a vowel.
+
+HOW? - this function is in different klatt: [[file:~/Downloads/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::/*]]
+
+but we could use incoming samples as this? inverse filtering?
+
+Take a recorded vowel and locate the overall peaks and valleys in the spectrum (the formants) by using an LPC (linear predictive coding) algorithm
+
+These peaks and valleys, at least theoretically, should represent the resonances in the mouth caused by a given tongue shape
+
+Use this information to reconstruct the voicing signal (the source) without those peaks and valleys
+
+This is accomplished by inverse-filtering the signal with the LPC, raising the parts of the spectrum which the LPC says are low, and lowering the parts which the LPC says are high. The end result, ideally, will be the source signal as if the person had no vocal tract at all.
+
+http://doc.sccode.org/Classes/LPCAnalyzer.html
+
+but inverse filter?
+
+https://github.com/freedv/codec2/blob/master/src/lpc.c
+
+[[file:~/projects/ERD_modules/worm/lpc.c::FILE........:%20lpc.c][file:~/projects/ERD_modules/worm/lpc.c::FILE........: lpc.c]]
+
+Klatt:Flutter?
+
+also NATURAL and IMPULSIVE in def_pars.c to test as is always now set to impulsive
+
+now klatt_params - see also http://linguistics.berkeley.edu/plab/guestwiki/index.php?title=Klatt_Synthesizer_Parameters
