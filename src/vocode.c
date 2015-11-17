@@ -30,7 +30,7 @@ VocoderInstance* instantiateVocoder(void) {
   //  if (vocoder == NULL)
   //    return NULL;
 
-  vocoder->SampleRate = 48000.0f;
+  vocoder->SampleRate = 32000.0f;
 
   for (u8 x=0;x<MAX_BANDS;x++){
     vocoder->bands_out[x].oldval = 0.0f;
@@ -117,12 +117,12 @@ void runVocoder(VocoderInstance *vocoder, float *formant, float *carrier, float 
       for (j=0; j < 16; j++)
 	{
 	  vocoder->bands_out[j].oldval = vocoder->bands_out[j].oldval
-	    + vocoder->bands_formant[j].y;
-	    //	    + (fabsf (vocoder->bands_formant[j].y) - vocoder->bands_out[j].oldval) * vocoder->bands_out[j].decay;
+	    //  + vocoder->bands_formant[j].y;
+	    + (fabsf (vocoder->bands_formant[j].y) - vocoder->bands_out[j].oldval) * vocoder->bands_out[j].decay;
 
 	  x = vocoder->bands_carrier[j].y * vocoder->bands_out[j].oldval;
 	  vocoder->portOutput[i] += x;
 	}
-      vocoder->portOutput[i] *= 16.0f;
+      vocoder->portOutput[i] *= 32.0f;
     }
 }

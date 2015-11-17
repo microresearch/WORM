@@ -77,6 +77,10 @@ port all above to do_effect(eff_villagerr)
 */
 
 //void do_effect(villager_effect* vill_eff);
+
+void floot_to_int(int16_t* outbuffer, float* inbuffer,u16 howmany);
+void int_to_floot(int16_t* inbuffer, float* outbuffer, u16 howmany);
+
 void test_effect(int16_t* inbuffer, int16_t* outbuffer);
 void BBandPass_process(BBandPass *unit, int inNumSamples, float* inbuffer, float* outbuffer);
 void BBandPass_init(BBandPass* unit);
@@ -84,3 +88,7 @@ void Formlet_init(Formlet* unit, float frequency);
 void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* outbuffer);
 void BPFSC_init(BPFSC* unit, float frequency, float bandwidth);
 void BPFSC_process(BPFSC *unit, int inNumSamples, float* inbuffer, float* outbuffer);
+
+float bandpassx(float sample,float q, float fc, float gain); // from OWL code - statevariable
+float bandpassy(float sample,float q, float fc, float gain); // from OWL code - statevariable
+void doformantfilter(int16_t *inbuffer, int16_t *outbuffer, u8 howmany, u8 vowel);

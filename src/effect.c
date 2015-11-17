@@ -70,11 +70,11 @@ void BPFSC_process(BPFSC *unit, int inNumSamples, float* inbuffer, float* outbuf
 
 void Formlet_init(Formlet* unit, float frequency){
   const float log001=logf(0.001);
-  const float mRadiansPerSample=(2 * M_PI) /48000.0f;
+  const float mRadiansPerSample=(2 * M_PI) /32000.0f;
   unit->m_freq = frequency;
   //  unit->m_bw = bandwidth;
-  unit->m_attackTime = 0.001f;
-  unit->m_decayTime = 0.001f;
+  unit->m_attackTime = 0.5f; // was both 0.001
+  unit->m_decayTime = 0.5f;
   unit->m_b01 = 0.f;
   unit->m_b02 = 0.f;
   unit->m_y01 = 0.f;
@@ -101,7 +101,7 @@ void Formlet_init(Formlet* unit, float frequency){
 
   float ffreq = unit->m_freq * mRadiansPerSample;
   
-  float R = decayTime == 0.f ? 0.f : expf(log001/(decayTime * 48000.0f));
+  float R = decayTime == 0.f ? 0.f : expf(log001/(decayTime * 32000.0f));
   float twoR = 2.f * R;
   float R2 = R * R;
   float cost = (twoR * cosf(ffreq)) / (1.f + R2);
@@ -163,7 +163,7 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
 void BBandPass_init(BBandPass* unit){
 	float freq = unit->m_freq = 2000.0;
 	float bw = unit->m_bw = 0.1;
-	float w0 = 2*M_PI * (float)freq / 48000.0;
+	float w0 = 2*M_PI * (float)freq / 32000.0;
 	float sinw0 = sinf(w0);
 	float alpha = sinw0 * (sinhf((0.34657359027997 * (float)bw * w0) / sinw0));
 	float b0rz = 1. / (1. + alpha);
@@ -262,10 +262,10 @@ void convolve1D(float* in, float* out, int dataSize, float* kernel, int kernelSi
 
 
 
-float bandpass(float sample,float q, float fc, float gain){ // from OWL code - statevariable
+float bandpassx(float sample,float q, float fc, float gain){ // from OWL code - statevariable
   float f,fb,hp,bp,scale;
   static float buf0=0,buf1=0;
-  f = 2.0*M_PI*fc/48000.0f;
+  f = 2.0*M_PI*fc/32000.0f;
   fb= q + q/(1.0 - f);
 
   hp=sample-buf0;
@@ -274,6 +274,21 @@ float bandpass(float sample,float q, float fc, float gain){ // from OWL code - s
   buf1 = buf1 + f * (buf0 - buf1);
   return bp*gain;
 }
+
+float bandpassy(float sample,float q, float fc, float gain){ // from OWL code - statevariable
+  float f,fb,hp,bp,scale;
+  static float buf0=0,buf1=0;
+  f = 2.0*M_PI*fc/32000.0f;
+  fb= q + q/(1.0 - f);
+
+  hp=sample-buf0;
+  bp = buf0 - buf1; 
+  buf0 = buf0 + f * (hp + fb * bp); 
+  buf1 = buf1 + f * (buf0 - buf1);
+  return bp*gain;
+}
+
+
 
 float dobandpass(float sample,float f,float fb){ // from OWL code - statevariable
   float hp,bp;
@@ -288,13 +303,13 @@ float dobandpass(float sample,float f,float fb){ // from OWL code - statevariabl
 }
 
 
-void int_to_floot(int16_t* inbuffer, float* outbuffer, u16 howmany){
+inline void int_to_floot(int16_t* inbuffer, float* outbuffer, u16 howmany){
   for (int n = 0; n < howmany; n++) {
     outbuffer[n]=(float32_t)(inbuffer[n])/32768.0f;
   }
 }
 
-void intun_to_floot(u16* inbuffer, float* outbuffer,u16 howmany){
+inline void intun_to_floot(u16* inbuffer, float* outbuffer,u16 howmany){
   for (int n = 0; n < howmany; n++) {
     outbuffer[n]=((float32_t)(inbuffer[n])/32768.0f)-1.0f;
   }
@@ -351,7 +366,7 @@ void doringcopy(int16_t *inbuffer,int16_t *modbuffer,int16_t* outbuffer,u8 longe
 
 void accumbuffer(float *tmpotherbuffer,float *tmpotherotherbuffer,u8 howmany){
   for (u8 x=0;x<howmany;x++){
-    tmpotherotherbuffer[x]+=(tmpotherbuffer[x]*10.0f);
+    tmpotherotherbuffer[x]+=(tmpotherbuffer[x]*2.0f);
   }
 }
 
@@ -360,7 +375,7 @@ void doformantfilter(int16_t *inbuffer, int16_t *outbuffer, u8 howmany, u8 vowel
   float tmpotherbuffer[BUFF_LEN/4];
   float tmpotherotherbuffer[BUFF_LEN/4];
   memset(tmpotherotherbuffer,0,32*4); 
-  vowel=vowel>>5;  
+  //  vowel=vowel>>5;  
   int_to_floot(inbuffer,tmpbuffer,howmany);///or do conv when we sort out buffers
   arm_biquad_cascade_df1_f32(&df[vowel][0],tmpbuffer,tmpotherbuffer,32); 
   accumbuffer(tmpotherbuffer,tmpotherotherbuffer,howmany);

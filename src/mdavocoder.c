@@ -7,7 +7,7 @@ void mdaVocoder_init(mdavocoder* unit)
   float param[7];
   
   param[0] = 0.33f;  //input select
-  param[1] = 0.5f;  //output dB
+  param[1] = 0.99f;  //output dB
   param[2] = 0.40f;  //hi unit->thru was 0.40
   param[3] = 0.40f;  //hi band was 0.40
   param[4] = 0.16f;  //envelope was 0.16
@@ -16,7 +16,7 @@ void mdaVocoder_init(mdavocoder* unit)
   
   //  param[7] = 0.66f;  //num bands      was 0.66 
   
-  const float tpofs = 6.2831853f/48000.0f;
+  const float tpofs = 6.2831853f/32000.0f;
   float rr, th, re;
   float sh;
   u8 i,ii;
@@ -25,8 +25,8 @@ void mdaVocoder_init(mdavocoder* unit)
       for (ii=0;ii<13;ii++){
 	unit->f[i][ii]=0.0f;
       }
-            unit->offset[i]=rand()%16;
-      //          unit->offset[i]=0;
+      //            unit->offset[i]=rand()%16;
+               unit->offset[i]=0;
       }
 
   unit->kval=0;
@@ -182,11 +182,11 @@ void mdaVocoderprocess(mdavocoder* unit,float *input1, float *input2, float *out
 
   unit->kout = oo;  
   unit->kval = k & 1;
-  /*  if(fabsf(unit->f[0][11])<1.0e-10) unit->f[0][11] = 0.0f; //catch HF envelope denormal
+    if(fabsf(unit->f[0][11])<1.0e-10) unit->f[0][11] = 0.0f; //catch HF envelope denormal
 
       for(i=1;i<nb;i++) 
     if(fabsf(unit->f[i][3])<1.0e-10 || fabsf(unit->f[i][7])<1.0e-10) 
       for(k=3; k<12; k++) unit->f[i][k] = 0.0f; //catch reson & envelope denormals
     
-      if(fabs(o)>10.0f) mdaVocodersuspend(unit); //catch instability*/
+      if(fabs(o)>10.0f) mdaVocodersuspend(unit); //catch 
 }

@@ -32,10 +32,11 @@ void mdavocal_init(mdavocal* unit)
   unit->root = 0.0;
 
   float fs, ifs;
-  fs = 48000.0f;
+  fs = 32000.0f;
   ifs = 1.0f / fs;
 
   unit->track = (int32_t)(2.99f * unit->param[0]);
+  unit->track = 1;
   unit->pmult = (float)powf(1.0594631f, floor(48.0f * unit->param[1] - 24.0f));
   if(unit->track==0) unit->pstep = 110.0f * unit->pmult * ifs;
 
@@ -48,7 +49,7 @@ void mdavocal_init(mdavocal* unit)
 }
 
 
-void mdavocal_process(mdavocal *unit, float *input1, float *input2, float *output, int sampleFrames)
+void mdavocal_process(mdavocal *unit, float *input1, float *output, int sampleFrames)
 {
   /*  float *in1 = inputs[0];
   float *in2 = inputs[1];
@@ -63,13 +64,13 @@ void mdavocal_process(mdavocal *unit, float *input1, float *input2, float *outpu
   int32_t  tr=unit->track;
 
   --input1;
-  --input2;
+  //  --input2;
   --output;
 
   while(--sampleFrames >= 0)
   {
     a = *++input1;
-    b = *++input2;
+    //    b = *++input2;
 
     l0 -= lf * (l1 + a);       //fundamental filter (peaking 2nd-order 100Hz lpf)
     l1 -= lf * (l1 - l0);
@@ -82,6 +83,7 @@ void mdavocal_process(mdavocal *unit, float *input1, float *input2, float *outpu
     he -= et * (he - b);       //overall level (+ constant so >f0 when quiet)
 
     l3 += 1.0f;
+
     if(tr>0)                   //pitch tracking
     {
       if(l1>0.0f && l2<=0.0f)  //found +ve zero crossing

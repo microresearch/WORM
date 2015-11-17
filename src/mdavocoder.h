@@ -35,4 +35,4 @@ typedef struct {
 void mdaVocoderprocess(mdavocoder* unit,float *input1, float *input2, float *output, int sampleFrames);
 void mdaVocoder_init(mdavocoder* unit);
 void mdavocal_init(mdavocal* unit);
-void mdavocal_process(mdavocal *unit, float *input1, float *input2, float *output, int sampleFrames);
+void mdavocal_process(mdavocal *unit, float *input1, float *output, int sampleFrames);

@@ -1,5 +1,4 @@
 #define MAX_BANDS  16
-#define AMPLIFIER 16.0
 #define LADSPA_Data float
 
 

@@ -40,7 +40,6 @@ static 	u16 numberCurCycle=0;
 static 	float prevsine;
 static 	float decay=0.5f;
 static 	float amp=1.0f;
-static u8 running=1;
 const float PII = 3.1415926535f;
 
 /*void runVOSIMaud(villager_generic* vill){
@@ -231,16 +230,18 @@ u16 runVOSIM_SC(u16 count){
   u16 out; 
   // so we need control of freq, cycles and decay... within bounds and from SELX, SELY..
   // trigger will come from INPUT!
-  /*  float freq = 1500.0f; // reference figures as these work.
+  /*    float freq = 1500.0f; // reference figures as these work.
   float nCycles = 32.0f;
   float nDecay = 0.5f;
   float phaseinc = freq * 2.f * PII / 32000.0f;
   */
 
-  float freq = (float)(adc_buffer[SELX]+100);//1500.0f; 
-  float nCycles = (float)((adc_buffer[SELY]>>8)+1);
-  float nDecay = 0.5f; // TODO!
+  float freq = (float)((adc_buffer[SELX])+100);//1500.0f; 
+  float nCycles = (float)((adc_buffer[SELY]>>4)+2);
+  float nDecay = ((float)(adc_buffer[SELZ])/4096.0f); // TODO as SELZ!
+  
   float phaseinc = freq * 2.f * PII / 32000.0f;
+ 
 
   /*  float freq = (float)(adc_buffer[2]);
     u16 nCycles = (adc_buffer[0]>>8);
@@ -276,7 +277,8 @@ u16 runVOSIM_SC(u16 count){
        prevsine = sine;
        phase = phase + phaseinc;
 
-     }else if(trigin > 0.f && prevtrig <= 0.f){
+     }
+     else if(trigin > 0.f && prevtrig <= 0.f){
      //        else if(1){
 
        numberCycles = nCycles;
