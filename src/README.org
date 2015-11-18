@@ -94,7 +94,7 @@ raw//basic klatt parameters?
 robo: arduino = 8 bit
 TTS: same as robo above
 
-2-
+2- DONE sam - not TINYsss....
 sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64 - 8 bit and messy
 tinySAM.c: small SAM above - 8 bit
 SAMarduino: arduino of tinySAM above - 8 bit
@@ -437,15 +437,23 @@ Formant object also in SC:
 
 - formlet code = FOF - see also: http://composerprogrammer.com/teaching/supercollider/sctutorial/12.2%20Singing%20Voice%20Synthesis.html
 
+SAM working but only with arrays in RAM - not CCMdata or FLASH -????
 
-Notes:
+do we need to init like:
+
+const unsigned char flags[81]  __attribute__ ((section (".flash")))={
+with [81]???? TRY!
+
+*** Notes:
 
 BPFSC and BBandpass would operate as fixed and this is what we have already so leave for now
 with doformant - somehow need to figure out offset and mix for this for kind of singing - multiple voices/oscillators
 
-Also seems like common to some effects that we would 
+Also seems like common to some effects that we would have oscillator/noise etc. triggered?
 
-*** TODO: - PRIORITISE: vocoder and X/Y// changes/TODO as above and all tests
+for SAM: http://www.retrobits.net/atari/sam.shtml
+
+*** TODO: - PRIORITISE: changes/TODO as above and all tests
 
 - possibilities of vocoding with buffer generated audio
 - Borsboom/zerius vocoder in earthvoice2 dir to look at
@@ -455,4 +463,6 @@ Also seems like common to some effects that we would
 
 - klatt as singing - constant sounds?
 
-SAM: http://www.retrobits.net/atari/sam.shtml
+- different voices in sam.c - parameter live altering, speed of sam, lookup array for phonemes
+
+- trigger/schedule for one word/phrase after the other
