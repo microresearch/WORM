@@ -23,6 +23,7 @@
 #include "nsynth.h"
 #include "elements.h"
 #include "holmes.h"
+#include "sam.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -51,7 +52,7 @@ volatile u8 maintrigger=0;
 volatile u16 generated=0;
 volatile u16 writepos=0;
 
-static const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62};
+const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62};
 
 u8 test_elm[30]={54, 16, 0, 24, 15, 0, 1, 6, 0, 1, 6, 0, 44, 8, 0, 54, 16, 0, 20, 8, 0, 1, 6, 0, 1, 6, 0, 1, 6, 0};
 
@@ -67,12 +68,14 @@ void main(void)
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
   init_synth();
   Audio_Init();
+  //  SAMINIT();
+
   while(1)
     {
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-  mode=8; // TESTING
+      mode=9; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
@@ -80,7 +83,6 @@ void main(void)
   //  }
 
   if (maintrigger==1) {writepos=0;trigger=1;}
-
 
   switch(mode){
   case 0:// rsynth/klatt-single phoneme
@@ -109,16 +111,20 @@ void main(void)
       writepos=xx.writepos;
     }
     break;
-  
+  case 9: // SAM full. no writepos though and just a simple proof here
+        if (trigger==0){
+    	SAMMain();
+	trigger=1;
+	     }     
+    break;
   } // cases
 
     // now readpos is back to one now that we have written something 
-    if (maintrigger==1) {
+  if (maintrigger==1) {
       readpos=0;
       maintrigger=0;
-
- 
   }
+
     }
 }
 

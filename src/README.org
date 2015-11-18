@@ -90,7 +90,7 @@ all modes doubled by worm - worm through parameters for each
 
 raw//basic klatt parameters?
 
-1-
+1- NON - as is too much timing based!
 robo: arduino = 8 bit
 TTS: same as robo above
 
@@ -124,7 +124,7 @@ other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/
 
 braids(=rendervowel and rendervowelfof)
 
-8-
+8-DONE
 
 Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
 
@@ -454,3 +454,5 @@ Also seems like common to some effects that we would
 - other speech synths ported and look at propellor/cordic thing
 
 - klatt as singing - constant sounds?
+
+SAM: http://www.retrobits.net/atari/sam.shtml

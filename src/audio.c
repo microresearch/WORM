@@ -283,9 +283,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
         int_to_floot(sample_buffer,flinbuffer,sz/2);
 	Formlet_process(formy, sz/2, flinbuffer, floutbuffer);
         floot_to_int(mono_buffer,floutbuffer,sz/2);
-
     break;
-
+  case 9: // free running SAM
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      samplepos+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+    break;
   } // mode end
 
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);
