@@ -1,0 +1,174 @@
+// reformat as array - what is order in klatt itself of params - eg. for frame
+
+// what are globals - flutter, and across all phonemes F0hz10 is the same
+
+typedef struct
+ {
+  long F0hz10;            /* Voicing fund freq in Hz                          */        
+  long AVdb;              /* Amp of voicing in dB,            0 to   70       */        
+  long F1hz;              /* First formant freq in Hz,        200 to 1300     */        
+  long B1hz;              /* First formant bw in Hz,          40 to 1000      */        
+  long F2hz;              /* Second formant freq in Hz,       550 to 3000     */        
+  long B2hz;              /* Second formant bw in Hz,         40 to 1000      */        
+  long F3hz;              /* Third formant freq in Hz,        1200 to 4999    */        
+  long B3hz;              /* Third formant bw in Hz,          40 to 1000      */        
+  long F4hz;              /* Fourth formant freq in Hz,       1200 to 4999    */        
+  long B4hz;              /* Fourth formant bw in Hz,         40 to 1000      */        
+  long F5hz;              /* Fifth formant freq in Hz,        1200 to 4999    */        
+  long B5hz;              /* Fifth formant bw in Hz,          40 to 1000      */        
+  long F6hz;              /* Sixth formant freq in Hz,        1200 to 4999    */        
+  long B6hz;              /* Sixth formant bw in Hz,          40 to 2000      */        
+  long FNZhz;             /* Nasal zero freq in Hz,           248 to  528     */        
+  long BNZhz;             /* Nasal zero bw in Hz,             40 to 1000      */        
+  long FNPhz;             /* Nasal pole freq in Hz,           248 to  528     */        
+  long BNPhz;             /* Nasal pole bw in Hz,             40 to 1000      */        
+  long ASP;               /* Amp of aspiration in dB,         0 to   70       */        
+  long Kopen;             /* # of samples in open period,     10 to   65      */        
+  long Aturb;             /* Breathiness in voicing,          0 to   80       */        
+  long TLTdb;             /* Voicing spectral tilt in dB,     0 to   24       */        
+  long AF;                /* Amp of frication in dB,          0 to   80       */        
+  long Kskew;             /* Skewness of alternate periods,   0 to   40 in sample#/2  */
+  long A1;                /* Amp of par 1st formant in dB,    0 to   80       */        
+  long B1phz;             /* Par. 1st formant bw in Hz,       40 to 1000      */        
+  long A2;                /* Amp of F2 frication in dB,       0 to   80       */        
+  long B2phz;             /* Par. 2nd formant bw in Hz,       40 to 1000      */        
+  long A3;                /* Amp of F3 frication in dB,       0 to   80       */        
+  long B3phz;             /* Par. 3rd formant bw in Hz,       40 to 1000      */        
+  long A4;                /* Amp of F4 frication in dB,       0 to   80       */        
+  long B4phz;             /* Par. 4th formant bw in Hz,       40 to 1000      */        
+  long A5;                /* Amp of F5 frication in dB,       0 to   80       */        
+  long B5phz;             /* Par. 5th formant bw in Hz,       40 to 1000      */        
+  long A6;                /* Amp of F6 (same as r6pa),        0 to   80       */        
+  long B6phz;             /* Par. 6th formant bw in Hz,       40 to 2000      */        
+  long ANP;               /* Amp of par nasal pole in dB,     0 to   80       */        
+  long AB;                /* Amp of bypass fric. in dB,       0 to   80       */        
+  long AVpdb;             /* Amp of voicing,  par in dB,      0 to   70       */        
+  long Gain0;             /* Overall gain, 60 dB is unity,    0 to   60       */        
+ } klatt_frame_t, *klatt_frame_ptr;
+
+
+HOLMES.c replace with our code
+
+				/* Now call the synth for each frame */
+
+				pars.F0hz10 = base + (top - base) *
+				interpolate("", "f0", &stress_s, &stress_e, (float) 0, tstress, ntstress);
+
+				pars.AVdb = pars.AVpdb = tp[av];
+				pars.AF = tp[af];
+				pars.FNZhz = tp[fn];
+				pars.ASP = tp[asp];
+				pars.Aturb = tp[avc];
+				pars.B1phz = pars.B1hz = tp[b1];
+				pars.B2phz = pars.B2hz = tp[b2];
+				pars.B3phz = pars.B3hz = tp[b3];
+				pars.F1hz = tp[f1];
+				pars.F2hz = tp[f2];
+				pars.F3hz = tp[f3];
+				/* AMP_ADJ + is a bodge to get amplitudes up to klatt-compatible levels
+				Needs to be fixed properly in tables
+				*/
+				/*
+				pars.ANP  = AMP_ADJ + tp[an];
+				*/
+				pars.AB = AMP_ADJ + tp[ab];
+				pars.A5 = AMP_ADJ + tp[a5];
+				pars.A6 = AMP_ADJ + tp[a6];
+				pars.A1 = AMP_ADJ + tp[a1];
+				pars.A2 = AMP_ADJ + tp[a2];
+				pars.A3 = AMP_ADJ + tp[a3];
+				pars.A4 = AMP_ADJ + tp[a4];
+
+				parwave(&klatt_global, &pars, samp);
+
+				samp += klatt_global.nspfr;
+				/* Declination of f0 envelope 0.25Hz / cS */
+				top -= 0.5;
+
+
+
+// compare this to Elements.def
+
+ {float stdy; - calc transitions in holmes.c
+  float fixd;
+  char  prop;
+  char  ed;
+  char  id;
+}
+
+- how does stdy,fixd and prop (ed/id?) work?
+
+{"DZ",  26, 1, 1,0x64,"d","d",alv|stp|vcd,
+ {
+  {   270,    135,  50,  0,  0}, /* fn       0 */
+  {   190,    110,  50,  2,  0}, /* f1      15 */
+  {  1780,    950,  50,  2,  0}, /* f2      60 */
+  {  2680,   2680,   0,  2,  0}, /* f3       0 */
+  {    60,     30,  50,  2,  0}, /* b1       0 */
+  {    90,     45,  50,  2,  0}, /* b2       0 */
+  {   150,    150,   0,  2,  0}, /* b3       0 */
+  {   -30,      0, 100,  0,  0}, /* an       0 */
+  {  38.5,      0, 100,  0,  0}, /* a1       0 */
+  {    28,      0, 100,  0,  0}, /* a2       0 */
+  {  24.5,      0, 100,  0,  0}, /* a3       0 */
+  {    35,      0, 100,  0,  0}, /* a4       0 */
+  {   -30,      0, 100,  0,  0}, /* a5       0 */
+  {   -30,      0, 100,  0,  0}, /* a6       0 */
+  {   -30,      0, 100,  0,  0}, /* ab       0 */
+  {    62,     31,  50,  0,  0}, /* av       0 */
+  {    62,     31,  50,  0,  0}, /* avc      0 */
+  {     0,      0,  50,  0,  0}, /* asp      0 */
+  {     0,      0,  50,  0,  0}  /* af       0 */
+ }
+},
+
+
+
+// discard what is not used?
+
+Name	Meaning	default	Min	Max
+
+AV	Amplitude of voicing 	0 	0 	80
+AF	Amplitude of Frication 	0 	0 	80
+AH	Amplitude of Aspiration 	0 	0 	80
+AVS	Amplitude of Sinusoidal voicing 	0 	0 	80
+F0	Fundamental Frequency 	0 	0 	500
+F1	First Formant 	450 	150 	900
+F2	Second Formant 	1450 	500 	2500
+F3	Third Formant 	2450 	1300 	3500
+F4	Fourth Formant 	3300 	2500 	4500
+FNZ	Frequency of Nasal Zero 	250 	200 	700
+AN	Amplitude of Nasal formant 	0 	0 	80
+A1	Amplitude of F1 (Parallel only) 	0 	0 	80
+A2	Amplitude of F2 " 	0 	0 	80
+A3	Amplitude of F3 " 	0 	0 	80
+A4	Amplitude of F4 " 	0 	0 	80
+A5	Amplitude of F5 " 	0 	0 	80
+A6	Amplitude of F6 " 	0 	0 	80
+AB	Ampl of Cascade/Parallel Bypass 	0 	0 	80
+B1	Bandwidth of F1 	50 	40 	500
+B2	Bandwidth of F2 	70 	40 	500
+B3	Bandwidth of F3 	110 	40 	500
+SW	Parallel/Cascade switch* 	0 	0 	2
+FGP	Frequency of Glottal Pole 	0 	0 	600
+BGP	Bandwidth of Glottal Pole 	100 	100 	2000
+FGZ	Frequency of Glottal Zero 	1500 	0 	5000
+BGZ	Bandwidth of Glottal Zero 	6000 	100 	9000
+B4	Bandwidth of F4 	250 	100 	500
+F5	Fifth Formant Frequency 	3850 	3500 	4900
+B5	Bandwidth of F5 	200 	150 	700
+F6	Sixth Formant Frequency 	4900 	4000 	4999
+B6	Bandwidth of F6 	1000 	200 	2000
+FNP	Frequency of Nasal Pole 	250 	200 	500
+BNP	Bandwidth of Nasal Pole 	100 	50 	500
+BNZ	Bandwidth of Nasal Zero 	100 	50 	500
+FRA	Second Glottal resonator bandwidth	200 	100 	1000
+
+X-SR	Sampling rate 	10000 	5000 	20000
+X-NWS	Number of samples per frame 	50 	1 	200
+X-GAI	Overall Gain control 	48 	0 	80
+X-NFC	Number of cascaded formants 	5 	4 	6 
+
+from 
+
+http://www.asel.udel.edu/speech/tutorials/synthesis/gensyn.htm

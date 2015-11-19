@@ -18,6 +18,7 @@ LINEIN/OUTL-filter
 #include "klatt_phoneme.h"
 #include "mdavocoder.h"
 #include "vocode.h"
+#include "scformant.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -61,6 +62,7 @@ mdavocal *mdavocall;
 mdavocoder *mdavocod;
 VocoderInstance* vocoder;
 Formlet *formy;
+Formant *formanty;
 
 void Audio_Init(void)
 {
@@ -79,6 +81,8 @@ void Audio_Init(void)
 	vocoder=instantiateVocoder();
 	formy=(Formlet *)malloc(sizeof(Formlet));
 	Formlet_init(formy, 110.0f);
+	formanty=(Formant *)malloc(sizeof(Formant));
+	Formant_init(formanty);
 
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
@@ -293,6 +297,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       if (readpos>=ending) samplepos=0.0f;    
     }
     break;
+  case 11: // basic SC formant:
+    Formant_process(formanty, adc_buffer[SELX], adc_buffer[SELY], adc_buffer[SELZ], sz/2, floutbuffer); // fundfreq: 440, formfreq: 1760, bwfreq>funfreq: 880
+
+        floot_to_int(mono_buffer,floutbuffer,sz/2);
+    break;
+
   } // mode end
 
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);

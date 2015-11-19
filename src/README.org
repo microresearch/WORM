@@ -15,11 +15,10 @@ chip or algorithm ERD/WORM implements multiple speech codecs...
 - vocoder 
 - integrate/test/new knob allocations when we have PCB
 
-...
-- port all speech algos
-- x/y bandpass
+...///
+- port all speech algos - close
 - wormcode and klatt parameter limits
-- inverse filter/LPC
+- inverse filter/LPC??? for klatt
 - phoneme probabilities
 - run_holmes see below
 
@@ -110,16 +109,8 @@ Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 [4-
 Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
-5-
-*/afs/athena/astaff/project/phones/Speak emulates SPO256*
-
-at: [[file:~/Downloads/stuff.mit.edu/afs/athena/astaff/project/phones/Speak/speak.c]]
-
-- need convert samples to arrays in flash - clip header. format is: mu-law 8 bit 
-
-sox AA --bits 8 --channels 1 --encoding unsigned-integer --rate 8000 file.raw
-
-but as array// short code - open filename, output array_name=blah,,,,
+[5-
+/afs/athena/astaff/project/phones/Speak emulates SPO256 - not really ]
 
 6-
 
@@ -127,7 +118,7 @@ but as array// short code - open filename, output array_name=blah,,,,
 
 7-
 
-braids(=rendervowel and rendervowelfof)
+*braids(=rendervowel and rendervowelfof)*
 
 8-DONE
 
@@ -438,6 +429,8 @@ need to remember how to convert db and bw!
 
 - formlet code = FOF - see also: http://composerprogrammer.com/teaching/supercollider/sctutorial/12.2%20Singing%20Voice%20Synthesis.html
 
+need to be able to change frequency
+
 SAM working but only with arrays in RAM - not CCMdata or FLASH -????
 
 do we need to init like:
@@ -456,15 +449,13 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 
 *** TODO: - PRIORITISE: changes/TODO as above and all tests
 
-*Formant object also in SC:*
-
 - possibilities of vocoding with buffer generated audio
 
 *- Borsboom/zerius vocoder in earthvoice2 dir to look at*
 
 - mdavoc.c is wierd for carrier source
 
-- other speech synths ported and look at propellor/cordic thing
+- look at propellor/cordic thing for worm tract simulation
 
 - klatt as singing - constant sounds?
 
@@ -478,11 +469,20 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 
 - done lpc.c (talkie) - but triggering - always issue with free-running round in buffer overwrites itself
 
+- using encoder - calc.m and romgen from talkie with freemat - use 8 KHz 16 bit mono recordings to encode words for lpc.c
+
+- Formant object also in SC - done
+
 ** TODO
 
-- wormlpc, wormvoice simulation, how to do crossfading
+- wormlpc (but there in analysis phase also see sc live stuff),
+  wormvoice simulation, how to do crossfading - see borsboom vocoder
+  also for overlap
 
-- analysis for LPC and sc 
 - increase LPC vocabulary - pointers to flash works or not?
 
 - *triggering and scheduling on all*
+
+To see: braids code only for worming, Borsboom vocoder to port to static memory allocation, LPC live analysis = 
+
+vocoder added and compiles (doubles to floats and lots of commented out) but long way off
