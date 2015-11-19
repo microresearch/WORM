@@ -26,7 +26,7 @@ void init_synth(void)
 	int casc = 2;
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
-	klatt_global.glsource = NATURAL;// IMPULSIVE doesn't work
+	klatt_global.glsource = NATURAL;// IMPULSIVE doesn't work - but is set below!
 	klatt_global.f0_flutter = 0;
 
 	//	klatt_global.quiet_flag, "Quiet - minimal messages",

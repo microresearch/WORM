@@ -133,7 +133,7 @@ unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
 				*/
 				phone_append(elm, x);
 				if (!(p->feat & vwl))
-					stress = 0;
+				  stress = 0;
 				t += phone_append(elm,StressDur(p,stress));
 				phone_append(elm, stress);
 			}
