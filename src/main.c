@@ -24,6 +24,7 @@
 #include "elements.h"
 #include "holmes.h"
 #include "sam.h"
+#include "LPC/lpc.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -70,12 +71,16 @@ void main(void)
   Audio_Init();
   //  SAMINIT();
 
+  lpc_init();
+  lpc_newsay();
+
+
   while(1)
     {
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-      mode=9; // TESTING
+      mode=10; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
@@ -117,6 +122,11 @@ void main(void)
 	trigger=1;
 	     }     
     break;
+  case 10:
+    //    if(lpc_busy() == 0) lpc_newsay();   
+
+    if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
+
   } // cases
 
     // now readpos is back to one now that we have written something 

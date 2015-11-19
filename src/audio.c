@@ -150,7 +150,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=8.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
-  //    samplespeed=1.0f;
+  //     samplespeed=1.0f;
 
   // PROCESS incoming audio and activate master_triger
   // TODO:read in audio and process for trigger
@@ -284,7 +284,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	Formlet_process(formy, sz/2, flinbuffer, floutbuffer);
         floot_to_int(mono_buffer,floutbuffer,sz/2);
     break;
-  case 9: // free running SAM
+  case 9: // free running SAM and LPC code
+  case 10:
     for (x=0;x<sz/2;x++){
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];

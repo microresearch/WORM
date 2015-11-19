@@ -16,7 +16,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_gpio.o stm32f4xx_i2c.o stm32f4xx_rcc.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
 			syscalls.o audio.o vosim.o mdavoc.o mdavocoder.o effect.o vocode.o\
-			klatt_phoneme.o sam.o render.o
+			klatt_phoneme.o sam.o render.o LPC/lpc.o
 
 OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\
@@ -38,7 +38,7 @@ LDSCRIPT = stm32_flash.ld
 #CFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard 
 # was -02 before below... 
 
-CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -std=gnu99 \
+CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -I/LPC -std=gnu99 \
 	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' -DTENE \
 	-mthumb -ggdb\
 	-mfpu=fpv4-sp-d16 \

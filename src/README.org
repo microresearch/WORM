@@ -2,6 +2,11 @@
 
 32k sample rate
 
+* desc
+
+In contrast to other speech modules which make use of a single speech
+chip or algorithm ERD/WORM implements multiple speech codecs...
+
 * TODO
 
 - sort out memory allocationsDONE
@@ -100,10 +105,10 @@ tinySAM.c: small SAM above - 8 bit
 SAMarduino: arduino of tinySAM above - 8 bit
 
 3-
-Talkie-LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
+Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
-4-
-*Tiny Speech Synth: C code - TinySynth.h 16 bit*
+[4-
+Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
 5-
 */afs/athena/astaff/project/phones/Speak emulates SPO256*
@@ -118,7 +123,7 @@ but as array// short code - open filename, output array_name=blah,,,,
 
 6-
 
-other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto
+[other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto]
 
 7-
 
@@ -146,7 +151,7 @@ SCcode=PV_SpectralMap, borsboom, snokoder]
 
 - 2. 16 channel bandpass/formant/vocoder: ladspa DONE?in effect.c= vocoder.c //pv is not fully functional
 
-or vst-mda version: mdaVocoder.cpp TEST/TRY mdavoc=input and mdavocoder? see effect.c/mda...
+or vst-mda version: mdaVocoder.cpp TEST/TRY mdavoc=input and mdavocoder? see effect.c/mda...DONE
 
 ///????DONE???
 
@@ -291,9 +296,7 @@ shift out or? based on speed? as have it trigger is the one
 - mode1-run_holmes - use trigger to freeze any changes to phoneme list as extra mode-TODO
 
 *TODO: proof tests on VOSIM(sc/braids/csound/sc-formlets),XY(bbandpass,doformantfilter, biquad), vocoder(ladspa?/mdavoc=input and
-mdavocoder?/mdatalkbox/pv_vocoder=justFFTsofar), LPC(talkie and SC), canto etc.*
-
-*check all effect.c, other DI files*
+mdavocoder?/mdatalkbox/pv_vocoder=justFFTsofar), LPC(talkie and SC), canto etc.* nearly DONE
 
 *TODO: changes suggested above//how to test-simulate triggerCV also*
 
@@ -433,8 +436,6 @@ also more formants at: https://github.com/supercollider-quarks/Vowel/blob/master
 
 need to remember how to convert db and bw!
 
-Formant object also in SC: 
-
 - formlet code = FOF - see also: http://composerprogrammer.com/teaching/supercollider/sctutorial/12.2%20Singing%20Voice%20Synthesis.html
 
 SAM working but only with arrays in RAM - not CCMdata or FLASH -????
@@ -455,8 +456,12 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 
 *** TODO: - PRIORITISE: changes/TODO as above and all tests
 
+*Formant object also in SC:*
+
 - possibilities of vocoding with buffer generated audio
-- Borsboom/zerius vocoder in earthvoice2 dir to look at
+
+*- Borsboom/zerius vocoder in earthvoice2 dir to look at*
+
 - mdavoc.c is wierd for carrier source
 
 - other speech synths ported and look at propellor/cordic thing
@@ -466,3 +471,18 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 - different voices in sam.c - parameter live altering, speed of sam, lookup array for phonemes
 
 - trigger/schedule for one word/phrase after the other
+
+- pull audio-bufsz back up from 32768
+
+** 18-19/11
+
+- done lpc.c (talkie) - but triggering - always issue with free-running round in buffer overwrites itself
+
+** TODO
+
+- wormlpc, wormvoice simulation, how to do crossfading
+
+- analysis for LPC and sc 
+- increase LPC vocabulary - pointers to flash works or not?
+
+- *triggering and scheduling on all*

@@ -28,11 +28,110 @@ SOFT
 
 * parts list and ordering info
 
-zener is: LM4040B10
+res now segor
 
-LME49720
+| 100K         R5        ;              
+| 100K         R7        ;             
+| 100K         R8        ;             
+| 100K         R12       ;            
+| 100K         R16       ;             
+| 100N         C1        ;             
+| 100N         C2        ;             
+| 100N         C3        ;             
+| 100N         C4        ;             
+| 100N         C5        ;             
+| 100N         C9        ;             
+| 100N         C10       ;             
+| 100N         C11       ;             
+| 100N         C32       ;             
+| 100N         C33       ;             
+| 100nF        C13       ;             
+| 100nF        C15       ;             
+| 100nF        C16       ;             
+| 100nF        C17       ;             
+| 100nF        C18       ;             
+| 10K          R2        ;             
+| 10u          C14       ; xXsegor            
+| 10u          C20       ;             
+| 10u          C27       ;             
+| 10u          C34       ;             
+| 10uF         C21       ;             
+| 10uF         C22       ;             
+| 10uF         C23       ;             
+| 10uF         C24       ;             
+| 10uF         C25       ;             
+| 10uF         C26       ;             
+| 18pF         C28       ; 22pf            
+| 18pF         C29       ;             
+| 1K           R33       ;             
+| 1N           C6        ;             
+| 1N           C7        ;             
+| 1N           C8        ;             
+| 1N           C12       ;             
+| 1N           C19       ;             
+| 2.2uF        C35       ; x Xsegor           
+| 2.2uF        C36       ;            
+| 200K         R3        ; x - segor X
+| 200K         R4        ;             
+| 200K         R6        ;             
+| 200K         R11       ;             
+| 200K         R13       ;             
+| 220P         C31       ; x - segorX         
+| 22P          C30       ;             
 
-MCP6002
+| 27K          R24       ; x - reichX           
+| 330R         R26       ;             
+| 33K          R28       ; x - reichX           
+| 39K          R18       ; x - reichX           
+| 39K          R29       ;             
+| 4.7K         R30       ;             
+| 4.7K         R31       ;             
+| 4.7uF        C38       ; xX segor            
+| 470R         R1        ; x - reichX           
+| 5.6K         R27       ; x - reichX           
+| 5.6K         R32       ;             
+| 5.6K         R34       ;             
+| 66.5K        R9        ; x - mouserX           
+| 66.5K        R10       ;             
+| 66.5K        R14       ;             
+| 66.5K        R15       ;             
+| 66.5K        R17       ;             
+| 8 MHz        X1        ; x - reichX            
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK1     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK2     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK3     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK4     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK5     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK6     ;             
+| AUDIO-JACKERTHENVAR_ERTHENVAR-JACK JACK7     ;             
+
+| AUDIOINT_WM8731 audioint1 ; x - mouserX                            |
+
+| CONN_5X2     P1        ; 10 pin connector - reich X                |
+| DIODE        D3        ; x protection as on all=  - 1N5819HW-7-F X |
+| DIODE        D4        ; x                                         |
+| INDUCTOR     L1        ;                                           |
+| LED          D2        ; x - reich X                               |
+
+| LM1117-3.3V  U7        ; ebay                                      |
+| LM1117-5V    U8        ; ebay                                      |
+
+| LME          U5        ; xLME49720 - mouser X                      |
+| MCP          U6        ; xMCP6002 - mouserX                        |
+| MCP          U9        ;                                           |
+| MCP          U10       ;                                           |
+
+| POT          RV1       ;                                           |
+| POT          RV2       ;                                           |
+| POT          RV3       ;                                           |
+| POT          RV4       ;                                           |
+| POT          RV5       ;                                           |
+
+| STM32F405RGT6 U14      ; x LQFP64 - mouser  |X
+| SWD          P45       ; 4 pins - reich X   |
+
+| ZENER        D5        ; LM4040B10   595-LM4040C10IDBZR  - mouser  X
+
 
 
 * manual notes
