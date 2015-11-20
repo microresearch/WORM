@@ -124,10 +124,6 @@ Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
 Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
 
-9-
-
-https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/ =
-
 csound fof= http://www.csounds.com/manual/html/fof.html - ugens7.c
 
 [LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
@@ -318,9 +314,9 @@ decay - the decay factor.
 
 eg. http://doc.sccode.org/Classes/VOSIM.html
 
-*do away with END and use as 3rd parameter - eg. in phonemes do we even use 2nd par?*
+*do away with END and use as 3rd parameter - eg. in phonemes do we even use 2nd par?*DONE
 
-*TODO: rationalise phonemes so there are 64 or is probability table - also order in which they are arranged could follow probability of transitions...*
+*TODO: rationalise phonemes so there are 64 or is probability table - also order in which they are arranged could follow probability of transitions...*DONE
 
 ** 15/11
 
@@ -476,13 +472,21 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 ** TODO
 
 - wormlpc (but there in analysis phase also see sc live stuff),
-  wormvoice simulation, how to do crossfading - see borsboom vocoder
-  also for overlap
+  wormvoice simulation, how to do crossfading - need run 2 filters
 
 - increase LPC vocabulary - pointers to flash works or not?
 
 - *triggering and scheduling on all*
 
-To see: braids code only for worming, Borsboom vocoder to port to static memory allocation, LPC live analysis = 
+- braids code only for worming, 
 
-vocoder added and compiles (doubles to floats and lots of commented out) but long way off
+- Borsboom vocoder to port to static memory allocation [vocoder added and compiles/runs but not result and slows incoming audio]
+
+*Still nothing - maybe in realfftmag and sqrt/timing?????*
+
+- LPC live analysis = [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalyzer.cpp::/*]]
+
+*Think about* - mixing of round-buffer and live(where is no speed),
+scheduling questions always... eg. vosim is more in live audio.c than
+round buffer and others other way round...
+

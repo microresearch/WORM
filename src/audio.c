@@ -18,6 +18,7 @@ LINEIN/OUTL-filter
 #include "klatt_phoneme.h"
 #include "mdavocoder.h"
 #include "vocode.h"
+#include "vocoder/vocode.h"
 #include "scformant.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
@@ -56,11 +57,16 @@ float flinbuffer[MONO_BUFSZ];
 float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
+//for vocoder
+int16_t modulator_sample_buffer[256];
+int16_t carrier_sample_buffer[256];
+int16_t output_sample_buffer[256];
+
 #define float float32_t
 
 mdavocal *mdavocall;
 mdavocoder *mdavocod;
-VocoderInstance* vocoder;
+VocoderInstance* vocoderz;
 Formlet *formy;
 Formant *formanty;
 
@@ -78,7 +84,7 @@ void Audio_Init(void)
 	mdavocal_init(mdavocall);
 	mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
 	mdaVocoder_init(mdavocod);
-	vocoder=instantiateVocoder();
+	vocoderz=instantiateVocoder();
 	formy=(Formlet *)malloc(sizeof(Formlet));
 	Formlet_init(formy, 110.0f);
 	formanty=(Formant *)malloc(sizeof(Formant));
@@ -141,7 +147,7 @@ extern u16 readpos;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
-  static u8 framecount=0;
+  static u8 framecount=0, tmpcount=0;
   static float eaten=0;
   static float samplepos=0.0f; float samplespeed;
   u16 x;
@@ -242,7 +248,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	//  }
 
     // vocode sample_buffer with carrier_buffer and copy to output buffer
-	runVocoder(vocoder, flinbuffer, floutbuffer, floutbufferz, sz/2);
+	runVocoder(vocoderz, flinbuffer, floutbuffer, floutbufferz, sz/2);
         floot_to_int(mono_buffer,floutbufferz,sz/2);
 	break;
 	
@@ -270,8 +276,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	}
 	break;
   case 7: // SELX selects different vowels for filtering. so far we have 0-4
-    // could also be used with own oscillator/carriers=white noise, vibrato etc/
-    // rough on transitions TODO - cross fade?
+    // could also be used with own oscillator/carriers=white noise,
+    // vibrato etc/ rough on transitions TODO - cross fade with two
+    // formant instances (one for last vowel) and cross fade
         for (x=0;x<sz/2;x++){
 	    src++;
 	    sample_buffer[x]=*(src++); // right is input
@@ -298,10 +305,27 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     }
     break;
   case 11: // basic SC formant:
-    Formant_process(formanty, adc_buffer[SELX], adc_buffer[SELY], adc_buffer[SELZ], sz/2, floutbuffer); // fundfreq: 440, formfreq: 1760, bwfreq>funfreq: 880
-
+    Formant_process(formanty, adc_buffer[SELX], adc_buffer[SELY], adc_buffer[SELZ], sz/2, floutbuffer); // fundfreq: 440, formfreq: 1760, bwfreq>funfreq: 880 TODO- figure out where is best for these to lie/freq ranges
         floot_to_int(mono_buffer,floutbuffer,sz/2);
     break;
+  case 12: // borboom vocoder TESTING
+    // accumulate into 256 buffer noise for carrier and voice input
+	for (x=0;x<sz/2;x++){
+	  src++;
+	  modulator_sample_buffer[x+(tmpcount*32)]=*(src++); // right is input
+	  carrier_sample_buffer[x+(tmpcount*32)]=(rand()%65536)-32768; 
+	}
+	tmpcount++;
+	if (tmpcount==8) {
+	  tmpcount=0;
+	  vocoder(modulator_sample_buffer,carrier_sample_buffer, output_sample_buffer); // wihtout overlap - NOT fast enuff and doesn't work
+	}
+
+    // and piece out into mono_buffer
+	for (x=0;x<sz/2;x++){
+	  mono_buffer[x]=output_sample_buffer[x+(tmpcount*32)];
+	}
+	
 
   } // mode end
 

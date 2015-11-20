@@ -2,7 +2,7 @@
 #include "render.h"
 #include "SamTabs.h"
 
-char input[256]={"AY5 AEM EY TAO4LXKIHNX KAX4MPYUX4TAH.\x9b"}; //tab39445
+char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445
 //standard sam sound
 
 
