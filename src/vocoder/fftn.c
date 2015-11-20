@@ -67,7 +67,7 @@ int n;
                         /* For each dual node pair */
                         for (i = 0; i < dual_space; i++, j++) {
                                 REAL treal, timag;              /* Temp of w**p */
-                                register int p = rev[j >> nu1];
+                                register int p = revhalf[j >> nu1];
                                 
                                 treal = x[j+dual_space][0]*chalf[p] + x[j+dual_space][1]*shalf[p];
                                 timag = x[j+dual_space][1]*chalf[p] - x[j+dual_space][0]*shalf[p];
@@ -393,7 +393,7 @@ int n;
 
         for (i = 1; i < n/2; i++) {
                 float xr, xi;
-                float  arg, ti, tr;
+                float  ti, tr;
 		float cc, ss;            /* Cosine and sin */
 
 		//                arg = 2.0f * PI * (float)i / (float)n; // AS LOOKUP n/2=128
@@ -408,7 +408,7 @@ int n;
 
                 xr /= n/2.0f;
                 xi /= n/2.0f;
-		data[i] = fastsqrt2(fastsqrt2(xr) + fastsqrt2(xi));
+		data[i] = sqrtf(sqr(xr) + sqr(xi));
         }
         
         /* Nyquist frequency is returned in data[0] */

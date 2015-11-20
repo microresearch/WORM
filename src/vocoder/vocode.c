@@ -35,7 +35,7 @@ size_t vocode_window_length=256;
 size_t vocode_window_overlap;
 unsigned char vocode_band_count=16;
 VREAL vocode_volume=1.0f;
-VBOOL vocode_normalize=0;
+VBOOL vocode_normalize=1;
 
 static SAMPLE modulator_max_magnitude=32768, carrier_max_magnitude=32768,
               output_max_magnitude=32768;
@@ -114,10 +114,10 @@ float output[256][2];
   
     vocode_window(modulator, looped_carrier, output);
   
-    complex_to_sample_array(output, output_old, vocode_window_length,
-                            output_max_magnitude, vocode_volume);
-  //    complex_to_sample_array(looped_carrier, output_old, vocode_window_length,
-  //                        output_max_magnitude, vocode_volume); // tested OK so issue is in vocode_window
+        complex_to_sample_array(output, output_old, vocode_window_length,
+                          output_max_magnitude, vocode_volume);
+    //  complex_to_sample_array(looped_carrier, output_old, vocode_window_length,
+    //                    output_max_magnitude, vocode_volume); // tested OK so issue is in vocode_window
 
   // output is in output_old
 }

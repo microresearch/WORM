@@ -313,7 +313,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	for (x=0;x<sz/2;x++){
 	  src++;
 	  modulator_sample_buffer[x+(tmpcount*32)]=*(src++); // right is input
-	  carrier_sample_buffer[x+(tmpcount*32)]=(rand()%65536)-32768; 
+	  carrier_sample_buffer[x+(tmpcount*32)]=(rand()%65000)-32000; // carrier as something else? 
 	}
 	tmpcount++;
 	if (tmpcount==8) {

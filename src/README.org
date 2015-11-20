@@ -2,6 +2,11 @@
 
 32k sample rate
 
+* worming
+
+- wormbounds x/y exerted on parameters + speed of worming z?
+- worm trigger?
+
 * desc
 
 In contrast to other speech modules which make use of a single speech
@@ -465,7 +470,7 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 
 - done lpc.c (talkie) - but triggering - always issue with free-running round in buffer overwrites itself
 
-- using encoder - calc.m and romgen from talkie with freemat - use 8 KHz 16 bit mono recordings to encode words for lpc.c
+- using encoder - calc.m and romgen from talkie with freemat and online convertor - use 8 KHz 16 bit mono recordings to encode words for lpc.c
 
 - Formant object also in SC - done
 
@@ -478,11 +483,9 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 
 - *triggering and scheduling on all*
 
-- braids code only for worming, 
+- braids code only for worming
 
 - Borsboom vocoder to port to static memory allocation [vocoder added and compiles/runs but not result and slows incoming audio]
-
-*Still nothing - maybe in realfftmag and sqrt/timing?????*
 
 - LPC live analysis = [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalyzer.cpp::/*]]
 
@@ -490,3 +493,8 @@ for SAM: http://www.retrobits.net/atari/sam.shtml
 scheduling questions always... eg. vosim is more in live audio.c than
 round buffer and others other way round...
 
+
+** 20/11
+
+- vocoder fixed (was sqr in fft_mag) - without overlap and would be nice to try different carriers
+(check also timing in interrupt? - done and seems okay so far)
