@@ -498,3 +498,7 @@ round buffer and others other way round...
 
 - vocoder fixed (was sqr in fft_mag) - without overlap and would be nice to try different carriers
 (check also timing in interrupt? - done and seems okay so far)
+
+- started on [[file:lpcanalysissc.c::*%20LPCAnalysis.h][file:lpcanalysissc.c::* LPCAnalysis.h]] - just rough filling in so far
+
+- braids for worming: [[file:braidworm.c::/%20vosim/vowel/vowelfof][file:braidworm.c::/ vosim/vowel/vowelfof]] - again filling in - also we need dsp from stmlib!
