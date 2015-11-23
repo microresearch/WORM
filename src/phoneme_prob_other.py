@@ -1,6 +1,6 @@
 import nltk,random,sys
 from nltk.tokenize import RegexpTokenizer
-f = open('/root/beddoes_phonemes_other')
+f = open('/root/beddoes_phonemes_other_fixed')
 raw = f.read()
 
 #tokens = nltk.word_tokenize(raw)

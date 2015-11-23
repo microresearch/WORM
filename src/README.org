@@ -502,3 +502,34 @@ round buffer and others other way round...
 - started on [[file:lpcanalysissc.c::*%20LPCAnalysis.h][file:lpcanalysissc.c::* LPCAnalysis.h]] - just rough filling in so far
 
 - braids for worming: [[file:braidworm.c::/%20vosim/vowel/vowelfof][file:braidworm.c::/ vosim/vowel/vowelfof]] - again filling in - also we need dsp from stmlib!
+
+Vowel.sc definitions at: [[file:~/projects/earthvoice2/Vowel/Formants.sc::/%20Pseudo%20Ugens%20to%20be%20used%20together%20with%20Vowel][file:~/projects/earthvoice2/Vowel/Formants.sc::/ Pseudo Ugens to be used together with Vowel]]
+
+and Vowel.SC there!
+
+along with Formants and BPFstack which could be adapted also for these vowel lists.
+
+how vowels compare with braids?
+
+interleaving between vowels
+
+SC dynklank resonators - example in Vowel.schelp - klank= [[file:~/SuperCollider-Source/server/plugins/OscUGens.cpp::void%20Klank_Dtor(Klank%20*unit)][file:~/SuperCollider-Source/server/plugins/OscUGens.cpp::void Klank_Dtor(Klank *unit)]]
+
+** 22/11
+
+https://github.com/thestk/stk/blob/master/src/VoicForm.cpp
+
+https://github.com/thestk/stk/blob/master/src/FMVoices.cpp
+
+NOTES: phoneme_prob_other is used for our phoneme probabilities on
+laptop/NOT worm with say.c modified in rsynth-2.0 as marked with xxxxx
+
+- modded just to print selected phonemes (what was scheme which was just their number as in Elements.def?), and re-modded just to say these phonemes
+
+- but conversion of text to phoneme using say.c repeats sections? - FIXED but should do 2 versions of say and co...
+
+TODO: 
+
+- summary for each mode and TODO
+
+- how klatt frame size relates to each change in parameters - where we need to intersect for raw klatt?
