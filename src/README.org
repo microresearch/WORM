@@ -526,10 +526,18 @@ laptop/NOT worm with say.c modified in rsynth-2.0 as marked with xxxxx
 
 - modded just to print selected phonemes (what was scheme which was just their number as in Elements.def?), and re-modded just to say these phonemes
 
-- but conversion of text to phoneme using say.c repeats sections? - FIXED but should do 2 versions of say and co...
+- but conversion of text to phoneme using say.c repeats sections? -
+  FIXED but should do 2 versions of say and co, also vague fullstop
+  business 
+
+TO FIX: // fullstops // 2 versions // readable phonemes
 
 TODO: 
 
 - summary for each mode and TODO
 
 - how klatt frame size relates to each change in parameters - where we need to intersect for raw klatt?
+
+- pull rsynth-2.0 into src git
+
+- port rsynth changes back to darkint voice code
