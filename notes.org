@@ -1,5 +1,11 @@
 * TODO
 
+- redo panel and order - not as prototype as no silkscreen
+- swap potis/CVs if do new design and think on wired swops
+
+//////
+DONE
+
 - double check schematic - CHECK!, check footprints, do panel first then match to schematicDONE
 
 - panel

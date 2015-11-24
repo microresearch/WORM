@@ -17,11 +17,19 @@
 //#define AUDIO_BUFSZ 58870 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 #define AUDIO_BUFSZ 32768 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 
+#ifdef TEST
 #define MODE 3 // for pcb=2
 #define SELX 0 //3
 #define SPEED 2 //0
 #define SELY 4 //4
 #define SELZ 1 //1
+#else
+#define MODE 2 // for pcb=2 - speed is at TOP
+#define SELX 3 //3 - left
+#define SPEED 4 // - right
+#define SELY 0 // down left
+#define SELZ 1 // down right
+#endif
 
 
 void Audio_Init(void);

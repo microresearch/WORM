@@ -12,6 +12,20 @@
 In contrast to other speech modules which make use of a single speech
 chip or algorithm ERD/WORM implements multiple speech codecs...
 
+* discard
+
+csound fof= http://www.csounds.com/manual/html/fof.html - ugens7.c
+
+[1. phase vocoder/FFT - our old pitchscale.c??? 
+
+JoshUGens/sc/classes/Vocoder.sc
+
+SCcode=PV_SpectralMap, borsboom, snokoder]
+
+runform in simforstacksansmem 
+
+- what effects we implement in DI: mdavoc, pvvoc
+
 * TODO
 
 - sort out memory allocationsDONE
@@ -21,10 +35,10 @@ chip or algorithm ERD/WORM implements multiple speech codecs...
 - integrate/test/new knob allocations when we have PCB
 
 ...///
-- port all speech algos - close
+- port all speech algos 
 - wormcode and klatt parameter limits
 - inverse filter/LPC??? for klatt
-- phoneme probabilities
+- phoneme probabilities DONE
 - run_holmes see below
 
 * knobs
@@ -59,7 +73,6 @@ x/wormed x/y filter
 all modes doubled by worm - worm from base through parameter
 constraints for each. trigger resets to base. thus double for each mode more or less
 
-
 * progress
 
 ** 4/11/2015
@@ -93,15 +106,11 @@ x/wormed vosim x/wormed x/y filter
 
 all modes doubled by worm - worm through parameters for each
 
-- what effects we implement in DI: mdavoc, pvvoc
-
 - what are other speech synth/modes??? LIST from earthvoice2:
 
 raw//basic klatt parameters?
 
-1- NON - as is too much timing based!
-robo: arduino = 8 bit
-TTS: same as robo above
+[1- NON - as is too much timing based!  robo: arduino = 8 bit TTS:same as robo above]
 
 2- DONE sam - not TINYsss....
 sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64 - 8 bit and messy
@@ -111,45 +120,27 @@ SAMarduino: arduino of tinySAM above - 8 bit
 3-
 Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
-[4-
-Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
+[4-Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
-[5-
-/afs/athena/astaff/project/phones/Speak emulates SPO256 - not really ]
+[5-/afs/athena/astaff/project/phones/Speak emulates SPO256 - not really ]
 
-6-
+[6-other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto]
 
-[other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto]
+7- *braids(=rendervowel and rendervowelfof)*
 
-7-
-
-*braids(=rendervowel and rendervowelfof)*
-
-8-DONE
+8-DONE:
 
 Formlet as filter in SC: [[file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void%20Formlet_next_1(Formlet*%20unit,%20int%20inNumSamples)][file:~/SuperCollider-Source/server/plugins/FilterUGens.cpp::void Formlet_next_1(Formlet* unit, int inNumSamples)]]
 
-csound fof= http://www.csounds.com/manual/html/fof.html - ugens7.c
+LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]] and LPCsynth
 
-[LPC: [[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]]
-
-and LPCsynth]
-
-[1. phase vocoder/FFT - our old pitchscale.c??? 
-
-JoshUGens/sc/classes/Vocoder.sc
-
-SCcode=PV_SpectralMap, borsboom, snokoder]
-
-- 2. 16 channel bandpass/formant/vocoder: ladspa DONE?in effect.c= vocoder.c //pv is not fully functional
+- 2. 16 channel bandpass/formant/vocoder: ladspa DONE?in effect.c= vocoder.c
 
 or vst-mda version: mdaVocoder.cpp TEST/TRY mdavoc=input and mdavocoder? see effect.c/mda...DONE
 
 ///????DONE???
 
 X/Y//simple formant filtering (above)//generic filter conv. bbandpass, biquad, bandpass in effect.c and setup of 
-
-runform in simforstacksansmem 
 
 and biquad in doformantfilter
 
@@ -183,9 +174,9 @@ eg. u16 sin_data[256] __attribute__ ((section (".ccmdata")));  // sine LUT Array
 
 FIXED 12/11
 
-- stmlib => fft etc.
+- stmlib => fft etc. ???
 
-so we putr eg.  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
+so we put eg.  int16_t pWavBuffer[3840] __attribute__ ((section (".ccmdata")));
 
 // testing now basics - why is so quiet?
 
@@ -507,7 +498,7 @@ Vowel.sc definitions at: [[file:~/projects/earthvoice2/Vowel/Formants.sc::/%20Ps
 
 and Vowel.SC there!
 
-along with Formants and BPFstack which could be adapted also for these vowel lists.
+along with Formants and BPFstack (multiples of Formant we have and BPF) which could be adapted also for these vowel lists.
 
 how vowels compare with braids?
 
@@ -517,7 +508,7 @@ SC dynklank resonators - example in Vowel.schelp - klank= [[file:~/SuperCollider
 
 ** 22/11
 
-https://github.com/thestk/stk/blob/master/src/VoicForm.cpp
+https://github.com/thestk/stk/blob/master/src/VoicForm.cpp - also in old formantsketch.c
 
 https://github.com/thestk/stk/blob/master/src/FMVoices.cpp
 
@@ -534,10 +525,53 @@ TO FIX: // fullstops // 2 versions // readable phonemes
 
 TODO: 
 
-- summary for each mode and TODO
+- summary for each mode so far and each TODO
 
-- how klatt frame size relates to each change in parameters - where we need to intersect for raw klatt?
+- how klatt frame size relates to each change in parameters - where we need to intersect for raw klatt? nsynth -> parwave?
 
-- pull rsynth-2.0 into src git
+"Each frame of parameters usually represents 10ms of output speech. Two
+(simple!) example parameter files are supplied with the package."
+
+at 32000 samples per sec 10ms=320 samples - in def_pars.c we have 8ms per frame = 256 samples
+
+see also: http://www.asel.udel.edu/speech/tutorials/production/gensyn.htm
+
+[- pull rsynth-2.0 into src git]
 
 - port rsynth changes back to darkint voice code
+
+** 23/11
+
+TODO from yesterday TODO
+
++
+
+finish working through braids, lpcanalysis, vowel.sc, stk above and look at dynklank resonators:
+
+note:
+
+inline float32 zapgremlins(float32 x)
+{
+	float32 absx = std::abs(x);
+	// very small numbers fail the first test, eliminating denormalized numbers
+	//    (zero also fails the first test, but that is OK since it returns zero.)
+	// very large numbers fail the second test, eliminating infinities
+	// Not-a-Numbers fail both tests and are eliminated.
+	return (absx > (float32)1e-15 && absx < (float32)1e15) ? x : (float32)0.;
+}
+
++ mul in SC portings? and db and bw in vowel parameters - how we did this for doformant
+
++ const arrays of vocal filter parameters eg. for klank resonators
+
++ basic LPC to try out
+
+// so break down to:
+
+1- new experiments/code as above
+2- summary and tweaking of what modes we have so far: basic excitation osc generation, fixed filters stored
+3- scheduling and triggering schemes overall...
+4- towards manual
+5- HW tests for basic design and trigger in!
+6- worming and raw Klatt/LPC broken down
+
