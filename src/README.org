@@ -575,3 +575,25 @@ inline float32 zapgremlins(float32 x)
 5- HW tests for basic design and trigger in!
 6- worming and raw Klatt/LPC broken down
 
+** 24/11
+
+hardware - powers up fine. need to rewire top 3 potis to mirror CV ins
+below (do with cuts marked on diagram) - redone in revised.brd//TODO
+after all tests: recheck all, zones, vias.
+
+** 25/11
+
+Board tested and audio working. TODO: test potis and CV... 
+
+*** Hardware notes:
+
+- Define as TEST in audio.c also as worm.brd output is on LEFT
+not on RIGHT!
+- Programmer header is straight to STLINK rather than swop we have in DARKINT
+
+*** Software
+
+- braids - compiled and working - just need to tweak parameter ranges... and WORM out as is too clean (esp... RenderVowel)
+also if we 
+
+

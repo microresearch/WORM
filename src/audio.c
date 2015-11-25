@@ -20,6 +20,7 @@ LINEIN/OUTL-filter
 #include "vocode.h"
 #include "vocoder/vocode.h"
 #include "scformant.h"
+#include "braidworm.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -89,6 +90,7 @@ void Audio_Init(void)
 	Formlet_init(formy, 110.0f);
 	formanty=(Formant *)malloc(sizeof(Formant));
 	Formant_init(formanty);
+initbraidworm();
 
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
@@ -325,10 +327,23 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	for (x=0;x<sz/2;x++){
 	  mono_buffer[x]=output_sample_buffer[x+(tmpcount*32)];
 	}
-	
+	break;
+  case 13: //void RenderVosim(		 uint8_t sync, // sync signal, int16_t* buffer, size_t size, u16 param1,u16 param2,pitch);
+    RenderVosim(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
+    // limit params...
+    break;
+  case 14: //void RenderVowel(    uint8_t sync,    int16_t* buffer,    size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_);
+    RenderVowel(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3,256); // what kinds of param are expected?
+    break;
+  case 15:// void RenderVowelFof(
+    RenderVowelFof(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
+    break;
 
   } // mode end
 
+#ifdef TEST
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);
-
+#else // left is out on our WORM BOARD!
+  audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
+#endif
 }
