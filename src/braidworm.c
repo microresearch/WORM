@@ -59,7 +59,7 @@ inline int16_t Interpolate88(const int16_t* table, uint16_t index) {
   return a + ((b - a) * (int32_t)(index & 0xff) >> 8);
 }
 
-const int16_t wav_formant_sine[] = {
+const int16_t wav_formant_sine[]   __attribute__ ((section (".flash"))) = {
        0,      0,      0,      0,
        0,      0,      0,      0,
        0,      0,      0,      0,
@@ -125,7 +125,7 @@ const int16_t wav_formant_sine[] = {
       -7,     -8,    -10,    -12,
      -14,    -17,    -20,    -24,
 };
-const int16_t wav_formant_square[] = {
+const int16_t wav_formant_square[]  __attribute__ ((section (".flash"))) = {
        0,      1,      1,      2,
        2,      3,      3,      4,
        4,      5,      6,      8,
@@ -193,7 +193,7 @@ const int16_t wav_formant_square[] = {
 };
 
 
-const int16_t wav_sine[] = {
+const int16_t wav_sine[]  __attribute__ ((section (".flash"))) = {
   -32512, -32502, -32473, -32423,
   -32356, -32265, -32160, -32031,
   -31885, -31719, -31533, -31331,
@@ -261,7 +261,7 @@ const int16_t wav_sine[] = {
   -32512,
 };
 
-const int16_t ws_moderate_overdrive[] = {
+const int16_t ws_moderate_overdrive[]   __attribute__ ((section (".flash"))) = {
   -32766, -32728, -32689, -32648,
   -32607, -32564, -32519, -32474,
   -32427, -32378, -32328, -32277,
@@ -329,7 +329,7 @@ const int16_t ws_moderate_overdrive[] = {
    32728,
 };
 
-const uint32_t lut_oscillator_increments[] = {
+const uint32_t lut_oscillator_increments[]   __attribute__ ((section (".flash"))) = {
   594573364, 598881888, 603221633, 607592826,
   611995694, 616430467, 620897376, 625396654,
   629928536, 634493258, 639091058, 643722175,
@@ -357,7 +357,7 @@ const uint32_t lut_oscillator_increments[] = {
   1189146729,
 };
 
-const uint16_t lut_bell[] = {
+const uint16_t lut_bell[]   __attribute__ ((section (".flash"))) = {
        0,    670,   2655,   5873,
    10191,  15434,  21387,  27805,
    34427,  40980,  47198,  52824,
@@ -424,7 +424,7 @@ const uint16_t lut_bell[] = {
       25,     11,      2,      0,
        0,
 };
-const uint16_t lut_fof_envelope[] = {
+const uint16_t lut_fof_envelope[]  __attribute__ ((section (".flash"))) = {
        0,      9,     39,     89,
      159,    248,    357,    486,
      634,    802,    989,   1196,

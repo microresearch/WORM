@@ -508,10 +508,6 @@ SC dynklank resonators - example in Vowel.schelp - klank= [[file:~/SuperCollider
 
 ** 22/11
 
-https://github.com/thestk/stk/blob/master/src/VoicForm.cpp - also in old formantsketch.c
-
-https://github.com/thestk/stk/blob/master/src/FMVoices.cpp
-
 NOTES: phoneme_prob_other is used for our phoneme probabilities on
 laptop/NOT worm with say.c modified in rsynth-2.0 as marked with xxxxx
 
@@ -587,8 +583,9 @@ Board tested and audio working. TODO: test potis and CV...
 
 *** Hardware notes:
 
-- Define as TEST in audio.c also as worm.brd output is on LEFT
+- Define as TEST in Makefile - audio.c for DARKINT test board -  also as worm.brd output is on LEFT
 not on RIGHT!
+
 - Programmer header is straight to STLINK rather than swop we have in DARKINT
 
 *** Software
@@ -596,16 +593,19 @@ not on RIGHT!
 - braids - compiled and working - just need to tweak parameter ranges... and WORM out as is too clean (esp... RenderVowel)
 also if we can use square etc. as excitation?
 
+-lpcanalysis - compiles and seems to work from SC - need more exciters...
+
+
 TODO: 
 
-1-lpcanalysis - compiles and seems to work
+4-dynklank resonators - save coeffs as table first
 
-2-vowel.sc - lists for other generators
+/// more structural
 
-3-2x stk above - see formantsketch
-
-4-dynklank resonators
+2-vowel.sc - lists for other generators to use...
 
 5-basic LPC code to re-worm
 
 6- klatt to re-worm
+
++ carrier generation and use of audio_buffer as either carrier or as voice? 
