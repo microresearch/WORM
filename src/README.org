@@ -572,13 +572,13 @@ inline float32 zapgremlins(float32 x)
 2- summary and tweaking of what modes we have so far: basic excitation osc generation, fixed filters stored
 3- scheduling and triggering schemes overall...
 4- towards manual
-5- HW tests for basic design and trigger in!
+5- HW tests for basic design and trigger in! IN PROGRESS
 6- worming and raw Klatt/LPC broken down
 
 ** 24/11
 
 hardware - powers up fine. need to rewire top 3 potis to mirror CV ins
-below (do with cuts marked on diagram) - redone in revised.brd//TODO
+below (do with cuts marked on diagram), enlarged poti side holes - redone in revised.brd//TODO
 after all tests: recheck all, zones, vias.
 
 ** 25/11
@@ -594,6 +594,18 @@ not on RIGHT!
 *** Software
 
 - braids - compiled and working - just need to tweak parameter ranges... and WORM out as is too clean (esp... RenderVowel)
-also if we 
+also if we can use square etc. as excitation?
 
+TODO: 
 
+1-lpcanalysis - compiles and seems to work
+
+2-vowel.sc - lists for other generators
+
+3-2x stk above - see formantsketch
+
+4-dynklank resonators
+
+5-basic LPC code to re-worm
+
+6- klatt to re-worm

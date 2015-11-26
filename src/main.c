@@ -80,7 +80,7 @@ void main(void)
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-      mode=15; // TESTING
+      mode=16; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){

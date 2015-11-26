@@ -1,3 +1,7 @@
+#include "audio.h"
+#include <math.h>
+#include "arm_const_structs.h"
+
 /*
  *  LPCAnalysis.h
  *
@@ -8,263 +12,23 @@
 
 typedef float LPCfloat;
 
-
-	int windowsize;
-	float * windowfunction; //can add later if start cross fading consecutive windows with hop
-	int windowtype; //0 is rectangular, 1 is triangular, 2 is squared cosine, 3 is custom passed in buffer?
-
-	float * input;
-	//float * output;
-	//int blocksize;
-	int numpoles;
-	int pos;
-	float * coeff;
-	float * last;
-
-
-	int testdelta;
-	LPCfloat delta;
-	LPCfloat latesterror;
-	float G; //gain;
-
-	//matrix calculations at double resolution to help avoid errors?
-	//storage for Levinson-Durbin iteration to calculate coefficients
-	LPCfloat * R;
-	LPCfloat * preva;
-	LPCfloat * a;
-
-LPCAnalysis(int _windowsize, int _windowtype=0, int offset=0): windowsize(_windowsize), windowtype(_windowtype) {
-		//need to know about stupid unit->mWorld
-		input= new float[windowsize];
-		windowfunction= new float[windowsize];
-		//output= new float[blocksize];
-		coeff= new float[windowsize];
-		last= new float[windowsize];
-
-		R= new LPCfloat[windowsize+1];
-		preva= new LPCfloat[windowsize+1];
-		a= new LPCfloat[windowsize+1];
-
-		zeroAll();
-
-		pos=offset;
-	};
-
-
-	void zeroAll() {
-
-		int i;
-
-		numpoles=10;
-
-		pos=0;
-
-		for (i=0; i<windowsize;++i) {
-			input[i]= 0.0;
-			coeff[i]=0.0;
-			last[i]=0.0;
-		}
-
-		int half= windowsize>>1;
-
-		switch(windowtype) {
-
-		default:
-		case 0:
-			//rectangular window
-			for (i=0; i<windowsize;++i) {
-				windowfunction[i]= 1.0;
-			}
-			break;
-
-		case 1:
-				//triangular window
-				float mult= 1.0/(float)half;
-				for (i=0; i<half;++i) {
-					float value= mult*((float)i);
-					windowfunction[i]= value;
-					windowfunction[half+i]=1.0-value;
-				}
-
-
-			break;
-		//
-//		case 2:
-//
-//
-//			break;
-//
-		}
-
-
-		//for (i=0; i<blocksize;++i) {
-//			output[i]= 0.0;
-//		}
-
-		testdelta=0;
-		delta= 0.999;
-		latesterror=0.0;
-
-		G=0.0; //gain starts at zero;
-	}
-
-
-	//latest value of p is number of poles for fitting; if -1 adapt using criteria
-	//assess if tonal or transient via error?
-	//source is driver signal for filtering, newinput is data arriving for analysis
-
-/*
- *  LPCAnalyzer.cpp
- *  xSC3ExtPlugins-Universal
- *
- *  Created by Nick Collins on 10/04/2009.
- *  Copyright 2009 Nick Collins. All rights reserved.
- *
- */
-LPCAnalysis * lpc;
-LPCAnalysis * lpc2; //two of them, for corssfading when changing filter
-
-//also can do test to return convergence point; clue to transient vs tonal?
-//toggle to freeze or not on current filter coefficients?
-
-void LPCAnalyzer_Ctor(LPCAnalyzer* unit) {
-
-	int windowsize= (int)ZIN0(2);
-	int windowtype= (int)ZIN0(6);
-
-	int blocksize= unit->mWorld->mFullRate.mBufLength;
-
-	if(windowsize<blocksize) windowsize=blocksize;
-	//must be divisible by two?
-	if((windowsize & 0x01))
-		windowsize= windowsize+1;
-	if(windowsize>1024) windowsize=1024;
-
-
-	//overloaded new operator so realtime safe
-	//unit->mWorld->mFullRate.mBufLength, no need to pass blocksize now
-	unit->lpc= (LPCAnalysis*) new(unit->mWorld, ft) LPCAnalysis(windowsize,windowtype,0,unit->mWorld, ft);
-
-	if(windowtype>0)
-		unit->lpc2= (LPCAnalysis*) new(unit->mWorld, ft) LPCAnalysis(windowsize,windowtype,windowsize/2,unit->mWorld, ft);
-	else
-		unit->lpc2=NULL;
-
-	//put them out of sync by half window for crossfading purposes
-	//unit->lpc2->pos= windowsize/2;
-
-	SETCALC(LPCAnalyzer_next);
-
-}
-
-void LPCAnalyzer_next(LPCAnalyzer *unit, int inNumSamples) {
-
-	float * inoriginal= IN(0);
-	float * indriver= IN(1);
-	int p= (int)ZIN0(3);
-	float * out= OUT(0);
-
-	int testE= (int)ZIN0(4);
-	LPCfloat delta= (LPCfloat)ZIN0(5);
-
-	for (int i=0; i<inNumSamples; ++i) {
-		out[i]= 0.0;
-	}
-
-	unit->lpc->testdelta= testE;
-	unit->lpc->delta= delta;
-	unit->lpc->update(inoriginal, indriver, out, inNumSamples, p);
-
-	if(unit->lpc2) {
-		unit->lpc2->testdelta= testE;
-		unit->lpc2->delta= delta;
-		unit->lpc2->update(inoriginal, indriver, out, inNumSamples, p);
-	}
-
-}
-
-
-//blocksize MUST be less than or equal to windowsize
-
-void update(float * newinput, float * newsource, float * output, int numSamples, int p) {
-
-	int i;
-
-	int left= windowsize-pos;
-
-	if(numSamples>=left) {
-
-		for (i=0; i<left;++i) {
-
-			input[pos++]= newinput[i];
-		}
-
-		//output up to here
-		calculateOutput(newsource, output, windowsize-left, left);
-
-		//update
-		numpoles=p;
-		calculatePoles();
-
-		pos=0;
-
-		int remainder= numSamples-left;
-
-		for (i=0; i<remainder;++i) {
-
-			input[pos++]= newinput[left+i];
-
-		}
-
-		//output too
-		calculateOutput(newsource+left, output+left, pos-remainder, remainder);
-
-
-	} else {
-
-		for (i=0; i<numSamples;++i) {
-
-			input[pos++]= newinput[i];
-		}
-
-		//output
-		calculateOutput(newsource, output, pos-numSamples, numSamples);
-
-
-	}
-
-	//return output;
-}
-
-
-void calculateOutput(float * source, float * target, int startpos, int num) {
-	int i,j;
-
-	int basepos,posnow;
-
-	for(i=0; i<num; ++i) {
-
-		basepos= startpos+i+windowsize-1; //-1 since coefficients for previous values starts here
-
-		float sum=0.0;
-
-		for(j=0; j<numpoles; ++j) {
-			posnow= (basepos-j)%windowsize;
-
-			//where is pos used?
-			sum += last[posnow]*coeff[j]; //was coeff i
-		}
-
-		sum= G*source[i]-sum; //scale factor G calculated by squaring energy E below
-
-		last[startpos+i]=sum;
-
-		//ZXP(out)=
-		target[i]+= sum*windowfunction[startpos+i];
-
-	}
-
-}
+int windowsize;
+float * windowfunction; //can add later if start cross fading consecutive windows with hop
+float * inputty;
+int numpoles;
+static int pos;
+float * coeff;
+float * last;
+int testdelta;
+LPCfloat delta;
+LPCfloat latesterror;
+static float G; //gain;
+
+//matrix calculations at double resolution to help avoid errors?
+//storage for Levinson-Durbin iteration to calculate coefficients
+static LPCfloat * R;
+static LPCfloat * preva;
+static LPCfloat * a;
 
 //recalculate poles based on recent window of input
 void calculatePoles() {
@@ -293,7 +57,7 @@ void calculatePoles() {
 		sum=0.0;
 
 		for (j=0; j<= windowsize-1-i; ++j)
-			sum+= input[j]*input[j+i];
+			sum+= inputty[j]*inputty[j+i];
 
 		R[i]=sum;
 	}
@@ -383,7 +147,7 @@ void calculatePoles() {
 
 	}
 
-	G= sqrt(E);
+	G= sqrtf(E);
 
 	latesterror= E;
 
@@ -397,3 +161,190 @@ void calculatePoles() {
 	//MUST CHECK gain?
 
 }
+
+
+void calculateOutput(float * source, float * target, int startpos, int num) {
+	int i,j;
+
+	int basepos,posnow;
+
+	for(i=0; i<num; ++i) {
+
+		basepos= startpos+i+windowsize-1; //-1 since coefficients for previous values starts here
+
+		float sum=0.0;
+
+		for(j=0; j<numpoles; ++j) {
+			posnow= (basepos-j)%windowsize;
+
+			//where is pos used?
+			sum += last[posnow]*coeff[j]; //was coeff i
+		}
+
+		sum= G*source[i]-sum; //scale factor G calculated by squaring energy E below
+
+		last[startpos+i]=sum;
+
+		//ZXP(out)=
+		target[i]+= sum*windowfunction[startpos+i];
+
+	}
+
+}
+
+
+void zeroAll() {
+
+  int i;
+
+  numpoles=10;
+
+  pos=0;
+
+  for (i=0; i<windowsize;++i) {
+    inputty[i]= 0.0;
+    coeff[i]=0.0;
+    last[i]=0.0;
+  }
+
+  int half= windowsize>>1;
+
+  float mult,value;
+
+    //rectangular window
+    for (i=0; i<windowsize;++i) {
+      windowfunction[i]= 1.0;
+    }
+
+
+  //for (i=0; i<blocksize;++i) {
+  //			output[i]= 0.0;
+  //		}
+
+  testdelta=0;
+  delta= 0.999;
+  latesterror=0.0;
+
+  G=0.0; //gain starts at zero;
+}
+
+
+void LPCAnalysisinit(int _windowsize) {
+  windowsize=_windowsize;
+  windowfunction=(float *)malloc(windowsize*sizeof(float));
+  inputty=(float *)malloc(windowsize*sizeof(float));
+  coeff=(float *)malloc(windowsize*sizeof(float));
+  last=(float *)malloc(windowsize*sizeof(float));
+  R=(float *)malloc(windowsize*sizeof(float));
+  preva=(float *)malloc(windowsize*sizeof(float));
+  a=(float *)malloc(windowsize*sizeof(float));
+  zeroAll();
+  pos=0;
+};
+
+
+
+
+	//latest value of p is number of poles for fitting; if -1 adapt using criteria
+	//assess if tonal or transient via error?
+	//source is driver signal for filtering, newinput is data arriving for analysis
+
+/*
+ *  LPCAnalyzer.cpp
+ *  xSC3ExtPlugins-Universal
+ *
+ *  Created by Nick Collins on 10/04/2009.
+ *  Copyright 2009 Nick Collins. All rights reserved.
+ *
+ */
+
+//also can do test to return convergence point; clue to transient vs tonal?
+//toggle to freeze or not on current filter coefficients?
+
+void LPCAnalyzer_init() {
+
+  int windowsize= 32; // ???
+
+	if((windowsize & 0x01))
+		windowsize= windowsize+1;
+	if(windowsize>1024) windowsize=1024;
+
+	LPCAnalysisinit(windowsize);
+}
+
+
+//blocksize MUST be less than or equal to windowsize
+
+void update(float * newinput, float * newsource, float * output, int numSamples, int p) {
+
+	int i;
+
+	int left= windowsize-pos;
+
+	if(numSamples>=left) {
+
+		for (i=0; i<left;++i) {
+
+			inputty[pos++]= newinput[i];
+		}
+
+		//output up to here
+		calculateOutput(newsource, output, windowsize-left, left);
+
+		//update
+		numpoles=p;
+		calculatePoles();
+
+		pos=0;
+
+		int remainder= numSamples-left;
+
+		for (i=0; i<remainder;++i) {
+
+			inputty[pos++]= newinput[left+i];
+
+		}
+
+		//output too
+		calculateOutput(newsource+left, output+left, pos-remainder, remainder);
+
+
+	} else {
+
+		for (i=0; i<numSamples;++i) {
+
+			inputty[pos++]= newinput[i];
+		}
+
+		//output
+		calculateOutput(newsource, output, pos-numSamples, numSamples);
+
+
+	}
+
+	//return output;
+}
+
+void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float undelta, int inNumSamples) {
+
+  //	float * inoriginal= IN(0);
+  //	float * indriver= IN(1); // we have 2 inputs????
+
+	/*	int p= (int)ZIN0(3);
+	int testE= (int)ZIN0(4);
+	LPCfloat delta= (LPCfloat)ZIN0(5);*/
+
+	//	float * out= OUT(0);
+
+	for (int i=0; i<inNumSamples; ++i) {
+		out[i]= 0.0;
+	}
+
+	testdelta= testE;
+	delta= undelta;
+	update(inoriginal, indriver, out, inNumSamples, p);
+}
+
+
+
+

@@ -21,6 +21,7 @@ LINEIN/OUTL-filter
 #include "vocoder/vocode.h"
 #include "scformant.h"
 #include "braidworm.h"
+#include "lpcansc.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -55,6 +56,7 @@ extern u8* datagenbuffer;
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 float flinbuffer[MONO_BUFSZ];
+float flinbufferz[MONO_BUFSZ];
 float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
@@ -90,7 +92,8 @@ void Audio_Init(void)
 	Formlet_init(formy, 110.0f);
 	formanty=(Formant *)malloc(sizeof(Formant));
 	Formant_init(formanty);
-initbraidworm();
+	initbraidworm();
+	LPCAnalyzer_init();
 
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
@@ -338,7 +341,22 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   case 15:// void RenderVowelFof(
     RenderVowelFof(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
     break;
+  case 16: // void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+    // convert in to float
+    // exciter=indriver to float
+        for (x=0;x<sz/2;x++){
+	    src++;
+	    sample_buffer[x]=*(src++); // right is input
+	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
+    }
+        int_to_floot(sample_buffer,flinbuffer,sz/2);
 
+
+	LPCAnalyzer_next(flinbuffer, flinbufferz, floutbuffer, 10, 0, 0.999, 32); //poles/testE=0/delta=close to 1 - what can we change?
+    // out from float to int
+    floot_to_int(mono_buffer,floutbuffer,sz/2);
+
+    break;
   } // mode end
 
 #ifdef TEST
