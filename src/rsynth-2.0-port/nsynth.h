@@ -77,7 +77,8 @@ typedef struct
 
 extern klatt_global_t klatt_global;
 
-extern void parwave(klatt_global_ptr, klatt_frame_ptr pars,short int *jwave);
+extern void parwave(klatt_global_ptr, klatt_frame_ptr pars,short *jwave);
+extern unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr pars,short *jwave, unsigned int klatthead);
 extern void parwave_init  (klatt_global_ptr);
 extern void pr_pars (void);
 extern void init_synth(void);

@@ -7,10 +7,13 @@
 - wormbounds x/y exerted on parameters + speed of worming z?
 - worm trigger?
 
-* desc
+* desc/manual
 
 In contrast to other speech modules which make use of a single speech
 chip or algorithm ERD/WORM implements multiple speech codecs...
+
+for cv and knobs - as above so below.... mirroring...
+
 
 * discard
 
@@ -608,4 +611,35 @@ TODO:
 
 6- klatt to re-worm
 
-+ carrier generation and use of audio_buffer as either carrier or as voice? 
++ carrier generation and use of audio_buffer as either carrier or as voice?
+
+** 27/11
+
+Cook - singer/SPASM - only code is in CLM but see TRM below 
+
+see also STK/voicform: tick in includes eg. [[file:~/darkint/docs/stk/include/VoicForm.h]]
+
+** 30/11
+
+Vocal tract simulations: TRM in gnuspeech: http://svn.savannah.gnu.org/viewvc/nextstep/trunk/src/softwareTRM/?root=gnuspeech
+
+and: https://github.com/lmjohns3/py-trm/blob/master/README.rst
+
+see [[file:~/projects/ERD_modules/worm/docs/softwareTRM/tube.c]]
+
+//List excitations: square wave, cluster of sine waves, looped excitation, white noise, impulses - what else and how? as tables?
+
+//VoicForm: 
+
+Phoneme definitions at: [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Phonemes.cpp]]
+
+SingWave modulates input wavetable (raw file=impuls20.raw) could be buffer
+
+FormSwep is filter sweepable.
+
+[see also:   onezero_.setZero( -0.9 ): [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/OneZero.cpp]]
+  onepole: [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/OnePole.cpp]] ; noiseEnv_.setRate( 0.001 ) [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Envelope.cpp]]
+]
+
+// phoneme definitions from braids, from SC, from STK ???
+
