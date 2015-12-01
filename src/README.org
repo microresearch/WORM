@@ -629,7 +629,7 @@ see [[file:~/projects/ERD_modules/worm/docs/softwareTRM/tube.c]]
 
 //List excitations: square wave, cluster of sine waves, looped excitation, white noise, impulses - what else and how? as tables?
 
-//VoicForm: 
+//VoicForm: compiles// to test
 
 Phoneme definitions at: [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Phonemes.cpp]]
 
@@ -641,5 +641,8 @@ FormSwep is filter sweepable.
   onepole: [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/OnePole.cpp]] ; noiseEnv_.setRate( 0.001 ) [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Envelope.cpp]]
 ]
 
+//////////////////////
+
 // phoneme definitions from braids, from SC, from STK ???
 
+//also FMVoices???

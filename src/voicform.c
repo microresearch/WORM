@@ -1,4 +1,39 @@
+#include "arm_math.h"
+#include "arm_const_structs.h"
+
+#define TWO_PI  6.283185
+
 // tables
+
+// filters_[0].setTargets( Phonemes::formantFrequency(i, 0), Phonemes::formantRadius(i, 0), pow(10.0, Phonemes::formantGain(i, 0 ) / 20.0) );
+
+
+//formantfrequency=phonemeParameters[index][partial][0];
+// formantgain= phonemeParameters[index][partial][2];
+// formantradius= phonemeParameters[index][partial][1];
+// noisegain= phonemeGains[index][1];
+// voicegain= phonemeGains[index][0];
+
+typedef struct 
+{
+ unsigned char  dirty_;
+  float frequency_;
+   float radius_;
+  float gain_;
+ float startFrequency_;
+ float startRadius_;
+ float startGain_;
+ float targetFrequency_;
+ float targetRadius_;
+ float targetGain_;
+ float deltaFrequency_;
+ float deltaRadius_;
+ float deltaGain_;
+ float sweepState_;
+ float sweepRate_;
+  float inputs_[3], outputs_[3];
+  float a_[3],b_[3];
+} filters_;
 
 const float phonemeGains[32][2] =
   {{1.0, 0.0},    // eee
@@ -180,23 +215,182 @@ const float phonemeParameters[32][4][3] =
       {7755, 0.750, -18}}
   };
 
-//TODO: onepole, onezero, envelope, noise, incoming is voiced_!
+//TODO: onepole, onezero, envelope, noise, incoming is voiced or excitation, filters...
 
-void dovoicform(){
+// onepole
+
+static float outputs;
+static float inputs;
+static float b_, a_, b_1, b_0;
+
+float doonepole(float sample){
+//  inputs_[0] = gain_ * input;
+  float lastFrame_ = b_ * sample - a_ * outputs;
+  outputs = lastFrame_;
+  return lastFrame_;
+}
+
+// onezero
+
+//inputs_[0] = gain_ * input;
+float doonezero(float sample){
+  //  lastFrame_[0] = b_[1] * inputs_[1] + b_[0] * inputs_[0];
+  float lastFrame_ = b_1 * inputs + b_0 * sample;
+  inputs = sample;
+  return lastFrame_;
+}
+
+// noiseEnv=envelope 
+
+//  noiseEnv_.setRate( 0.001 );
+//  noiseEnv_.setTarget( 0.0 );
+
+unsigned char state_=0;
+float target_=0.0,rate_=0.001,value_=0.0;
+
+float doenvelope(){
+  if ( state_ ) {
+    if ( target_ > value_ ) {
+      value_ += rate_;
+      if ( value_ >= target_ ) {
+        value_ = target_;
+        state_ = 0;
+      }
+    }
+    else {
+      value_ -= rate_;
+      if ( value_ <= target_ ) {
+        value_ = target_;
+        state_ = 0;
+      }
+    }
+    return value_;
+    }
+}
+
+// noise
+
+//*samples = (float) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
+
+// filters
+
+ // filters_[0].setTargets( Phonemes::formantFrequency(i, 0), Phonemes::formantRadius(i, 0), pow(10.0, Phonemes::formantGain(i, 0 ) / 20.0) );
+
+    void setTargets(filters_ *filter, float frequency, float radius, float gain)
+    {
+  filter->dirty_ = 1;
+  filter->targetFrequency_ = frequency;
+  filter->targetRadius_ = radius;
+  filter->targetGain_ = gain;
+
+  // where are start states defined? - would be minus in next three
+
+  filter->deltaFrequency_ = frequency;
+  filter->deltaRadius_ = radius;
+  filter->deltaGain_ = gain;
+  filter->sweepState_ = 0.0;
+  filter->sweepRate_ = 0.001;
+}
+
+    void setResonance(filters_ *filter, float frequency, float radius )
+{
+  float radius_ = radius;
+  float frequency_ = frequency;
+
+  filter->a_[2] = radius * radius;
+  filter->a_[1] = -2.0 * radius * cosf( TWO_PI * frequency / 32000 ); // samplerate
+
+  // Use zeros at +- 1 and normalize the filter peak gain.
+  filter->b_[0] = 0.5 - 0.5 * filter->a_[2];
+  filter->b_[1] = 0.0;
+  filter->b_[2] = -filter->b_[0];
+}
+
+
+    float dofilter(filters_ *filter, float input){ // and in and out
+      float radius_,frequency_,gain_;
+  if ( filter->dirty_ )  {
+    filter->sweepState_ += filter->sweepRate_;
+    if ( filter->sweepState_ >= 1.0 )   {
+      filter->sweepState_ = 1.0;
+      filter->dirty_ = 0;
+      radius_ = filter->targetRadius_;
+      frequency_ = filter->targetFrequency_;
+      gain_ = filter->targetGain_;
+    }
+    else {
+      radius_ = filter->startRadius_ + (filter->deltaRadius_ * filter->sweepState_);
+      frequency_ = filter->startFrequency_ + (filter->deltaFrequency_ * filter->sweepState_);
+      gain_ = filter->startGain_ + (filter->deltaGain_ * filter->sweepState_);
+    }
+    setResonance(filter, filter->frequency_, filter->radius_ ); //??? and get a b etc?
+  }
+
+  float inputs_ = gain_ * input;
+  float lastFrame_ = filter->b_[0] * inputs_ + filter->b_[1] * filter->inputs_[1] + filter->b_[2] * filter->inputs_[2];
+  lastFrame_ -= filter->a_[2] * filter->outputs_[2] + filter->a_[1] * filter->outputs_[1];
+  filter->inputs_[2] = filter->inputs_[1];
+  filter->inputs_[1] = filter->inputs_[0];
+  filter->outputs_[2] = filter->outputs_[1];
+  filter->outputs_[1] = lastFrame_;
+
+  return lastFrame_;
+    }
+
+filters_ filters[4];
+
+
+void dovoicform(float* incoming, float *outgoing, unsigned char howmany){
+
+  // set other settings defined below - eg. gains on voiced and noiseEnv and change vibrato and onepole
+  // test first all set first...
+  // voiced is incoming or excitation
+
 
   //loop over samples howmany
-// voiced is incoming or excitation
-  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
-  temp += noiseEnv_.tick() * noise_.tick();
-
+  for (int i=0;i<howmany;i++){
+//  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
+//  temp += noiseEnv_.tick() * noise_.tick();
+    float temp=doonepole(doonezero(incoming[i]));
+    temp+=doenvelope()*(float)(rand()%32768-65536)/32678.0f; //noise env
 // lastframe is sample
-  lastFrame_[0] = filters_[0].tick(temp);
-  lastFrame_[0] += filters_[1].tick(temp);
-  lastFrame_[0] += filters_[2].tick(temp);
-  lastFrame_[0] += filters_[3].tick(temp);
-
+  float lastFrame_ = dofilter(&filters[0],temp);
+  lastFrame_ += dofilter(&filters[1],temp);
+  lastFrame_ += dofilter(&filters[2],temp);
+  lastFrame_ += dofilter(&filters[3],temp);
+  outgoing[i]=lastFrame_;
 }
+}
+
 
 void initvoicform(){
 
+
+  for ( int i=0; i<4; i++ )  filters[i].sweepRate_=0.001;
+    
+  //  onezero_.setZero( -0.9 );
+
+  // Normalize coefficients for unity gain. -0.9
+  b_0 = 1.0 / ((float) 1.0 - - 0.9); // 1.0 / 1.9
+
+  b_1 = -0.9 * 0.9; // 0.9 * 0.9
+
+  //  onepole_.setPole( 0.9 );
+
+    b_ = 0.1f;
+    a_ = -0.9f;
+
+    //
+
+    //    noiseEnv_.setRate( 0.001 );
+    //    noiseEnv_.setTarget( 0.0 );
+
+    // initial phoneme and also what are other settings...
+
+    unsigned char index=0; // which phoneme?
+
+    setTargets(&filters[0],phonemeParameters[index][0][0],phonemeParameters[index][0][1], powf(10.0,phonemeParameters[index][0][2] / 20.0) );
+    setTargets(&filters[1],phonemeParameters[index][1][0],phonemeParameters[index][1][1], powf(10.0,phonemeParameters[index][1][2] / 20.0) );
+    setTargets(&filters[2],phonemeParameters[index][2][0],phonemeParameters[index][2][1], powf(10.0,phonemeParameters[index][2][2] / 20.0) );
+    setTargets(&filters[0],phonemeParameters[index][3][0],phonemeParameters[index][3][1], powf(10.0,phonemeParameters[index][3][2] / 20.0) );
 }
