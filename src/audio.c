@@ -21,6 +21,7 @@ LINEIN/OUTL-filter
 #include "vocoder/vocode.h"
 #include "scformant.h"
 #include "braidworm.h"
+#include "voicform.h"
 #include "lpcansc.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
@@ -94,7 +95,7 @@ void Audio_Init(void)
 	Formant_init(formanty);
 	initbraidworm();
 	LPCAnalyzer_init();
-
+	initvoicform();
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
 		i = AUDIO_BUFSZ;
@@ -350,13 +351,21 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
     }
         int_to_floot(sample_buffer,flinbuffer,sz/2);
-
-
 	LPCAnalyzer_next(flinbuffer, flinbufferz, floutbuffer, 10, 0, 0.999, 32); //poles/testE=0/delta=close to 1 - what can we change?
     // out from float to int
     floot_to_int(mono_buffer,floutbuffer,sz/2);
-
     break;
+  case 17: // voicform. exciter is incoming
+    for (x=0;x<sz/2;x++){
+	    src++;
+	    sample_buffer[x]=*(src++); // right is input
+	    }
+	    int_to_floot(sample_buffer,flinbuffer,sz/2);
+	    dovoicform(flinbuffer, floutbuffer, sz/2);
+    floot_to_int(mono_buffer,floutbuffer,sz/2);
+    break;
+
+
   } // mode end
 
 #ifdef TEST

@@ -1,4 +1,4 @@
-* ERD?WORM dirty speech synth
+* ERD/WORM dirty speech synth
 
 32k sample rate
 
@@ -8,6 +8,12 @@
 - worm trigger?
 
 * desc/manual
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
+
+http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
 
 In contrast to other speech modules which make use of a single speech
 chip or algorithm ERD/WORM implements multiple speech codecs...
@@ -129,7 +135,7 @@ Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
 [6-other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto]
 
-7- *braids(=rendervowel and rendervowelfof)*
+7- *braids(=rendervowel and rendervowelfof)* DONE
 
 8-DONE:
 
@@ -629,11 +635,13 @@ see [[file:~/projects/ERD_modules/worm/docs/softwareTRM/tube.c]]
 
 //List excitations: square wave, cluster of sine waves, looped excitation, white noise, impulses - what else and how? as tables?
 
-//VoicForm: compiles// to test
+//VoicForm: compiles// to testTESTED
 
 Phoneme definitions at: [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Phonemes.cpp]]
 
-SingWave modulates input wavetable (raw file=impuls20.raw) could be buffer
+SingWave modulates input wavetable (raw file=impuls20.raw) could be
+buffer or we use as table - what is format of impuls20.raw? 16 bit
+signed but BIG ENDIAN!
 
 FormSwep is filter sweepable.
 
@@ -645,4 +653,31 @@ FormSwep is filter sweepable.
 
 // phoneme definitions from braids, from SC, from STK ???
 
-//also FMVoices???
+TODO: TRM!!!
+
+** 2/12
+
+- VoicForm kind of works but we need to test further and add vibrato
+  and controls. also if we go further with STK (and eg. FMVoices with
+  same dependencies on numerous other files)???
+
+- preparing 
+
+*** *tube.c*
+
+- floats, no tempfiles, compiles now... TODO: memory management, output-framesize?
+
+Notes:
+
+dataEmpty: Converts available portion of the input signal to the new sampling
+rate, and outputs the samples to the sound struct.
+
+buffer is 1024,,,, functions: flushbuffer, datafill , *dataempty writes to temp file*...
+
+*** TODO still:
+
+- play with TRM/tube on PC
+- implement generic wavetables, envelopes etc. for excitations
+- TRM portings
+- triggering, list of modes and tweaks/modifiers to each one
+- wormings, raw LSM tests, raw KLATT

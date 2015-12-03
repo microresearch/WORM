@@ -1,5 +1,6 @@
 #include "arm_math.h"
 #include "arm_const_structs.h"
+#include "audio.h"
 
 #define TWO_PI  6.283185
 
@@ -351,7 +352,7 @@ void dovoicform(float* incoming, float *outgoing, unsigned char howmany){
   for (int i=0;i<howmany;i++){
 //  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
 //  temp += noiseEnv_.tick() * noise_.tick();
-    float temp=doonepole(doonezero(incoming[i]));
+    float temp=doonepole(doonezero(incoming[i])); // in original (Singwave relying on FileLoop) is modulated etc
     temp+=doenvelope()*(float)(rand()%32768-65536)/32678.0f; //noise env
 // lastframe is sample
   float lastFrame_ = dofilter(&filters[0],temp);
