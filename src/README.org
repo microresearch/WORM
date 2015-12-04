@@ -676,8 +676,37 @@ buffer is 1024,,,, functions: flushbuffer, datafill , *dataempty writes to temp 
 
 *** TODO still:
 
-- play with TRM/tube on PC
-- implement generic wavetables, envelopes etc. for excitations
+- play with TRM/tube on PC - worm simulation - width of mouth/nose????
+- implement generic wavetables, envelopes etc. for excitations and how might work with buffer
 - TRM portings
-- triggering, list of modes and tweaks/modifiers to each one
-- wormings, raw LSM tests, raw KLATT
+- triggering, list of modes and tweaks/modifiers to each one - finalise almost
+*- wormings, raw LSM tests, raw KLATT*
+
+- tie up formant filters maybe see https://github.com/4ms/SMR https://www.keil.com/pack/doc/CMSIS/DSP/html/group___g_e_q5_band.html
+
+* 3/12
+
+TRM parameters see: http://pages.cpsc.ucalgary.ca/~hill/papers/synthesizer/body.html
+
+TRM Notes:
+
+- At 32k samples we have 96k samples for 12 sets of parameters in input (so 96/12=8k per set)
+
+- Basic parameters and then frame parameters
+
+- What is set with calloc and can it be set as array/not dynamic?
+
+wavetable can be static allocated (is only rewritten if source is pulse)
+
+number of taps is calculated in init of filter
+
+    FIRData = (float *)calloc(numberTaps, sizeof(float)); // TODO as fixed?
+    FIRCoef = (float *)calloc(numberTaps, sizeof(float));
+
+  return ((INPUT *)malloc(sizeof(INPUT))); // TODO? - from addinput? 
+
+this is inputtable which is each parameter frame/set +1???? so if we have fixed number of parameter sets??? we can fix this...
+
+* 4/12
+
+- TRM tube.c init_parameters but still need get rid of dynamic memory - we just have one input-table (+1=2) so thats 8k samples into audio_buffer 

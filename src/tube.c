@@ -20,139 +20,6 @@
 #define FALSE 0
 #define TRUE 1
 
-
-/* example input to convert to arrays in first INIT
-
-//***** parameters are read in
-//	outputRate = strtod(line, NULL);
-//	controlRate = strtod(line, NULL);
-//	volume = strtod(line, NULL);
-//	waveform = strtol(line, NULL, 10);
-
-      GET THE GLOTTAL PULSE RISE TIME (tp)  
-//	tp = strtod(line, NULL);
-  
-      GET THE GLOTTAL PULSE FALL TIME MINIMUM (tnMin)  
-//	tnMin = strtod(line, NULL);
-  
-      GET THE GLOTTAL PULSE FALL TIME MAXIMUM (tnMax)  
-//	tnMax = strtod(line, NULL);
-
-      GET THE GLOTTAL SOURCE BREATHINESS  
-//	breathiness = strtod(line, NULL);
-
-      GET THE NOMINAL TUBE LENGTH  
-//	length = strtod(line, NULL);
-
-      GET THE TUBE TEMPERATURE  
-//	temperature = strtod(line, NULL);
-
-      GET THE JUNCTION LOSS FACTOR  
-//	lossFactor = strtod(line, NULL);
-
-      GET THE APERTURE SCALING RADIUS  
-//	apScale = strtod(line, NULL);
-
-      GET THE MOUTH APERTURE COEFFICIENT  
-//	mouthCoef = strtod(line, NULL);
-
-      GET THE NOSE APERTURE COEFFICIENT  
-//	noseCoef = strtod(line, NULL);
-
-      GET THE NOSE RADII  
-//	    noseRadius[i] = strtod(line, NULL);
-
-      GET THE THROAT LOWPASS FREQUENCY CUTOFF  
-//	throatCutoff = strtod(line, NULL);
-
-      GET THE THROAT VOLUME  
-//	throatVol = strtod(line, NULL);
-
-      GET THE PULSE MODULATION OF NOISE FLAG  
-//	modulation = strtol(line, NULL, 10);
-
-      GET THE NOISE CROSSMIX OFFSET  
-//	mixOffset = strtod(line, NULL);
-
-      GET THE INPUT TABLE VALUES  
-//	float glotPitch, glotVol, radius[TOTAL_REGIONS], velum, aspVol;
-//	float fricVol, fricPos, fricCF, fricBW;
-
-	  GET EACH PARAMETER  
-	glotPitch = strtod(ptr, &ptr);
-	glotVol = strtod(ptr, &ptr);
-	aspVol = strtod(ptr, &ptr);
-	fricVol = strtod(ptr, &ptr);
-	fricPos = strtod(ptr, &ptr);
-	fricCF = strtod(ptr, &ptr);
-	fricBW = strtod(ptr, &ptr);
-	for (i = 0; i < TOTAL_REGIONS; i++)
-	    radius[i] = strtod(ptr, &ptr);
-	velum = strtod(ptr, &ptr);
-
-	  ADD THE PARAMETERS TO THE INPUT LIST  
-//	addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,
-//		 fricBW, radius, velum);
-
-      FLOAT UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  
-    if (numberInputTables > 0) {
-	int lastTable = numberInputTables - 1;
-	addInput(glotPitchAt(lastTable), glotVolAt(lastTable),
-		 aspVolAt(lastTable), fricVolAt(lastTable),
-		 fricPosAt(lastTable), fricCFAt(lastTable),
-		 fricBWAt(lastTable), radiiAt(lastTable),
-		 velumAt(lastTable));
-		 }(
-
-32000.0   ; output sample rate (22050.0, 44100.0)???
-4.0       ; input control rate (1 - 1000 Hz)
-60.0	  ; master volume (0 - 60 dB)
-0         ; glottal source waveform type (0 = pulse, 1 = sine)
-40.0      ; glottal pulse rise time (5 - 50 % of GP period)
-16.0      ; glottal pulse fall time minimum (5 - 50 % of GP period)
-32.0      ; glottal pulse fall time maximum (5 - 50 % of GP period)
-2.50      ; glottal source breathiness (0 - 10 % of GS amplitude)
-18.0      ; nominal tube length (10 - 20 cm)
-32        ; tube temperature (25 - 40 degrees celsius)
-1.50      ; junction loss factor (0 - 5 % of unity gain)
-3.05      ; aperture scaling radius (3.05 - 12 cm)
-5000.0	  ; mouth aperture coefficient (100 - nyqyist Hz)
-5000.0	  ; nose aperture coefficient (100 - nyquist Hz)
-1.35	  ; radius of nose section 1 (0 - 3 cm)
-1.96	  ; radius of nose section 2 (0 - 3 cm)
-1.91	  ; radius of nose section 3 (0 - 3 cm)
-1.3	  ; radius of nose section 4 (0 - 3 cm)
-0.73	  ; radius of nose section 5 (0 - 3 cm)
-1500.0    ; throat lowpass frequency cutoff (50 - nyquist Hz)
-6.0       ; throat volume (0 - 48 dB)
-1	  ; pulse modulation of noise (0 = off, 1 = on)
-48.0      ; noise crossmix offset (30 - 60 db)
-
-// this is: 
-
-	  GET EACH PARAMETER  
-	glotPitch = strtod(ptr, &ptr);
-	glotVol = strtod(ptr, &ptr);
-	aspVol = strtod(ptr, &ptr);
-	fricVol = strtod(ptr, &ptr);
-	fricPos = strtod(ptr, &ptr);
-	fricCF = strtod(ptr, &ptr);
-	fricBW = strtod(ptr, &ptr);
-	for (i = 0; i < TOTAL_REGIONS; i++) // 8 values
-	    radius[i] = strtod(ptr, &ptr);
-	velum = strtod(ptr, &ptr);
-
--12.0	0.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.4	0.4	1.78	1.78	1.26	0.8	0.0
--12.5	54.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.4	0.4	1.78	1.78	1.26	0.8	0.0
--13.0	60.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.6	0.6	1.58	1.58	1.13	1.01	0.1
--13.5	60.0	0.0	0.0	4.0	4450	550	0.8	0.8	1.28	1.28	1.0	1.0	1.0	0.8	1.0
--14.0	54.0	0.0	0.0	4.0	4500	500	0.8	0.8	1.68	1.58	0.8	0.8	0.5	0.4	1.0
--14.5	51.0	0.0	0.0	4.0	4500	500	0.8	0.8	1.78	1.78	0.2	0.2	0.4	0.0	1.0
-*/
-
-
-/*  LOCAL DEFINES  ***********************************************************/
-
 /*  COMPILE WITH OVERSAMPLING OR PLAIN OSCILLATOR  */
 #define OVERSAMPLING_OSCILLATOR   1
 
@@ -521,6 +388,161 @@ void flushBuffer(void);
 void srIncrement(int *pointer, int modulus);
 void srDecrement(int *pointer, int modulus);
 
+/////////////////////////////////////////////=???????
+
+
+
+// example input to convert to arrays in first INIT
+// and transcribe that list of vowels/frames
+
+
+float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
+
+float input_frame[16]={-12.0, 0.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.0};
+
+void init_parameters(void){
+
+float glotPitch, glotVol, radius[TOTAL_REGIONS], velum, aspVol;
+float fricVol, fricPos, fricCF, fricBW;
+unsigned char i;
+
+outputRate = 32000;
+controlRate = 4.0;
+
+// what happened to volume?
+volume = parameter_list[0];
+
+// glottal source waveform
+waveform = parameter_list[1];
+
+//      GET THE GLOTTAL PULSE RISE TIME (tp)  
+tp = parameter_list[2];
+  
+//      GET THE GLOTTAL PULSE FALL TIME MINIMUM (tnMin)  
+tnMin = parameter_list[3];
+  
+//      GET THE GLOTTAL PULSE FALL TIME MAXIMUM (tnMax)  
+tnMax = parameter_list[4];
+
+//      GET THE GLOTTAL SOURCE BREATHINESS  
+breathiness = parameter_list[5];
+
+//      GET THE NOMINAL TUBE LENGTH  
+length = parameter_list[6];
+
+//      GET THE TUBE TEMPERATURE  
+temperature = parameter_list[7];
+
+//      GET THE JUNCTION LOSS FACTOR  
+lossFactor = parameter_list[8];
+
+//      GET THE APERTURE SCALING RADIUS  
+apScale = parameter_list[9];
+
+//    GET THE MOUTH APERTURE COEFFICIENT  
+mouthCoef = parameter_list[10];
+
+//      GET THE NOSE APERTURE COEFFICIENT  
+noseCoef = parameter_list[11];
+
+//      GET THE NOSE RADII for how many? 6 
+noseRadius[1] = parameter_list[12]; // starts at 1 tho
+noseRadius[2] = parameter_list[13];
+noseRadius[3] = parameter_list[14];
+noseRadius[4] = parameter_list[15];
+noseRadius[5] = parameter_list[16];
+
+//      GET THE THROAT LOWPASS FREQUENCY CUTOFF  
+throatCutoff = parameter_list[17];
+
+//      GET THE THROAT VOLUME  
+throatVol = parameter_list[18];
+
+//      GET THE PULSE MODULATION OF NOISE FLAG  
+modulation = parameter_list[19];
+
+//      GET THE NOISE CROSSMIX OFFSET  
+mixOffset = parameter_list[20];
+
+// then read in frame - so we will have 2 inputtables!
+
+glotPitch = input_frame[0];
+glotVol = input_frame[1];
+aspVol = input_frame[2];
+fricVol = input_frame[3];
+fricPos = input_frame[4];
+fricCF = input_frame[5];
+fricBW = input_frame[6];
+
+for (i = 0; i < TOTAL_REGIONS; i++) radius[i] = input_frame[7+i];
+velum = input_frame[i];
+
+//ADD THE PARAMETERS TO THE INPUT LIST  
+addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,
+fricBW, radius, velum);
+
+//FLOAT UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  -- adds one
+if (numberInputTables > 0) {
+int lastTable = numberInputTables - 1;
+addInput(glotPitchAt(lastTable), glotVolAt(lastTable),
+aspVolAt(lastTable), fricVolAt(lastTable),
+fricPosAt(lastTable), fricCFAt(lastTable),
+fricBWAt(lastTable), radiiAt(lastTable),
+velumAt(lastTable));
+}
+}
+
+/*
+// parameters from input
+
+32000.0   ; output sample rate (22050.0, 44100.0)??? FIXED
+4.0       ; input control rate (1 - 1000 Hz) FIXED
+60.0	  ; master volume (0 - 60 dB)
+0         ; glottal source waveform type (0 = pulse, 1 = sine)
+40.0      ; glottal pulse rise time (5 - 50 % of GP period)
+16.0      ; glottal pulse fall time minimum (5 - 50 % of GP period)
+32.0      ; glottal pulse fall time maximum (5 - 50 % of GP period)
+2.50      ; glottal source breathiness (0 - 10 % of GS amplitude)
+18.0      ; nominal tube length (10 - 20 cm)
+32        ; tube temperature (25 - 40 degrees celsius)
+1.50      ; junction loss factor (0 - 5 % of unity gain)
+3.05      ; aperture scaling radius (3.05 - 12 cm)
+5000.0	  ; mouth aperture coefficient (100 - nyqyist Hz)
+5000.0	  ; nose aperture coefficient (100 - nyquist Hz)
+1.35	  ; radius of nose section 1 (0 - 3 cm)
+1.96	  ; radius of nose section 2 (0 - 3 cm)
+1.91	  ; radius of nose section 3 (0 - 3 cm)
+1.3	  ; radius of nose section 4 (0 - 3 cm)
+0.73	  ; radius of nose section 5 (0 - 3 cm)
+1500.0    ; throat lowpass frequency cutoff (50 - nyquist Hz)
+6.0       ; throat volume (0 - 48 dB)
+1	  ; pulse modulation of noise (0 = off, 1 = on)
+48.0      ; noise crossmix offset (30 - 60 db)
+
+// this is: 
+
+	  GET EACH PARAMETER  
+	glotPitch = strtod(ptr, &ptr);
+	glotVol = strtod(ptr, &ptr);
+	aspVol = strtod(ptr, &ptr);
+	fricVol = strtod(ptr, &ptr);
+	fricPos = strtod(ptr, &ptr);
+	fricCF = strtod(ptr, &ptr);
+	fricBW = strtod(ptr, &ptr);
+	for (i = 0; i < TOTAL_REGIONS; i++) // 8 values
+	    radius[i] = strtod(ptr, &ptr);
+	velum = strtod(ptr, &ptr); // last value
+
+-12.0	0.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.4	0.4	1.78	1.78	1.26	0.8	0.0
+-12.5	54.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.4	0.4	1.78	1.78	1.26	0.8	0.0
+-13.0	60.0	0.0	0.0	4.0	4400	600	0.8	0.8	0.6	0.6	1.58	1.58	1.13	1.01	0.1
+-13.5	60.0	0.0	0.0	4.0	4450	550	0.8	0.8	1.28	1.28	1.0	1.0	1.0	0.8	1.0
+-14.0	54.0	0.0	0.0	4.0	4500	500	0.8	0.8	1.68	1.58	0.8	0.8	0.5	0.4	1.0
+-14.5	51.0	0.0	0.0	4.0	4500	500	0.8	0.8	1.78	1.78	0.2	0.2	0.4	0.0	1.0
+*/
+
+
+
 /******************************************************************************
 *
 *	function:	speedOfSound
@@ -748,7 +770,7 @@ void initializeFIR(float beta, float gamma, float cutoff)
     numberTaps = (numberCoefficients * 2) - 1;
 
     /*  ALLOCATE MEMORY FOR DATA AND COEFFICIENTS  */
-    FIRData = (float *)calloc(numberTaps, sizeof(float)); // TODO fixed?
+    FIRData = (float *)calloc(numberTaps, sizeof(float)); // TODO as fixed?
     FIRCoef = (float *)calloc(numberTaps, sizeof(float));
 
     /*  INITIALIZE THE COEFFICIENTS  */
@@ -2820,7 +2842,7 @@ void dataEmpty(void)
 	    numberSamples++;
     
 	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
-	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr);
+	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr);  // TODO write scaled (see SCALE) to our buffer and update/return pointer
 
 	    /*  CHANGE TIME REGISTER BACK TO ORIGINAL FORM  */
 	    timeRegister = ~timeRegister;
@@ -2888,7 +2910,7 @@ void dataEmpty(void)
 	    numberSamples++;
     
 	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
-	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr); // TODO write to our buffer and update/return pointer
+	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr); // TODO write scaled (see SCALE) to our buffer and update/return pointer
 
 	    /*  INCREMENT THE TIME REGISTER  */
 	    timeRegister += timeRegisterIncrement;

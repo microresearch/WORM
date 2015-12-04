@@ -140,6 +140,18 @@ res now segor
 
 
 
-* manual notes
+* manual 
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
+
+http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
+
+In contrast to other speech modules which make use of a single speech
+chip or algorithm ERD/WORM implements multiple speech codecs...
+
+for cv and knobs - as above so below.... mirroring...
+
 
 for software see README.org in src
