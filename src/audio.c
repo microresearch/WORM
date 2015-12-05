@@ -332,17 +332,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	  mono_buffer[x]=output_sample_buffer[x+(tmpcount*32)];
 	}
 	break;
-  case 13: //void RenderVosim(		 uint8_t sync, // sync signal, int16_t* buffer, size_t size, u16 param1,u16 param2,pitch);
+  case 13: //braidworm- void RenderVosim(		 uint8_t sync, // sync signal, int16_t* buffer, size_t size, u16 param1,u16 param2,pitch);
     RenderVosim(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
     // limit params...
     break;
-  case 14: //void RenderVowel(    uint8_t sync,    int16_t* buffer,    size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_);
+  case 14: //braidworm- void RenderVowel(    uint8_t sync,    int16_t* buffer,    size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_);
     RenderVowel(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3,256); // what kinds of param are expected?
     break;
-  case 15:// void RenderVowelFof(
+  case 15://braidworm-  void RenderVowelFof(
     RenderVowelFof(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
     break;
-  case 16: // void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+  case 16: // braidworm- void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
     // convert in to float
     // exciter=indriver to float
         for (x=0;x<sz/2;x++){
@@ -364,7 +364,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	    dovoicform(flinbuffer, floutbuffer, sz/2);
     floot_to_int(mono_buffer,floutbuffer,sz/2);
     break;
-
+  case 18: // TRM/tube.c - no input, output writes so just write from buffer
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      //                mono_buffer[x]=rand()%65536;
+      samplepos+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+      break;
 
   } // mode end
 

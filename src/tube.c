@@ -142,7 +142,7 @@
 #define RANGE_MAX                 32767.0
 
 /*  MATH CONSTANTS  */
-#define PI                        3.14159265358979
+#define PI                        3.1415927
 #define TWO_PI                    (2.0 * PI)
 
 /*  FUNCTION RETURN CONSTANTS  */
@@ -179,13 +179,15 @@
 #define fractionValue(x)          ((x) & FRACTION_MASK)
 
 #define BETA                      5.658        /*  kaiser window parameters  */
-#define IzeroEPSILON              1E-21
+#define IzeroEPSILON              1E-21 // was 21
 
 #define OUTPUT_SRATE_LOW          22050.0
 #define OUTPUT_SRATE_HIGH         44100.0
 #define BUFFER_SIZE               1024                 /*  ring buffer size  */
 
-
+extern signed int audio_buffer[32768];
+//signed int audio_buffer[32767];
+static unsigned int laststart;
 
 /*  DATA TYPES  **************************************************************/
 
@@ -245,7 +247,9 @@ float actualTubeLength;            /*  actual length in cm  */
 float dampingFactor;               /*  calculated damping factor  */
 float crossmixFactor;              /*  calculated crossmix factor  */
 
-float *wavetable;
+float wavetable[TABLE_LENGTH];
+
+//float *wavetable;
 int    tableDiv1;
 int    tableDiv2;
 float tnLength;
@@ -291,6 +295,9 @@ INPUT *inputHead = NULL;
 INPUT *inputTail = NULL;
 int numberInputTables = 0;
 
+INPUT tableone;
+INPUT tabletwo;
+
 /*  VARIABLES FOR INTERPOLATION  */
 struct {
     float glotPitch;
@@ -314,7 +321,7 @@ struct {
 } current;
 
 /*  VARIABLES FOR FIR LOWPASS FILTER  */
-float *FIRData, *FIRCoef;
+float FIRData[128], FIRCoef[128];
 int FIRPtr, numberTaps;
 
 /*  VARIABLES FOR SAMPLE RATE CONVERSION  */
@@ -395,10 +402,144 @@ void srDecrement(int *pointer, int modulus);
 // example input to convert to arrays in first INIT
 // and transcribe that list of vowels/frames
 
-
 float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
-float input_frame[16]={-12.0, 0.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.0};
+float input_frame[16]={-12.5,54.0,0.0,0.0,4.0,4400,600,0.8,0.8,0.4,0.4,1.78,1.78,1.26,0.8,0.0};
+
+/// with microint 64 x 16:
+
+float input_frames[64][16]=
+{
+{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 0.010000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.650000, 0.650000, 1.310000, 1.230000, 1.310000, 1.670000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.840000, 1.150000, 1.310000, 1.590000, 1.590000, 2.610000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.450000, 0.940000, 1.100000, 1.520000, 1.460000, 2.450000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.520000, 0.450000, 0.790000, 1.490000, 1.670000, 1.020000, 1.590000, 1.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.520000, 0.450000, 0.790000, 1.490000, 1.670000, 1.020000, 1.590000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.100000, 0.940000, 0.420000, 1.490000, 1.670000, 1.780000, 1.050000, 0.100000},
+
+{-2.000000, 43.500000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
+
+{-2.000000, 43.500000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
+
+{-2.000000, 0.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.000000, 0.790000, 0.790000, 0.100000},
+
+{-2.000000, 43.500000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.300000, 0.100000},
+
+{-1.000000, 54.000000, 0.000000, 0.250000, 6.000000, 4400.000000, 4500.000000, 0.800000, 1.200000, 1.500000, 1.350000, 1.200000, 1.200000, 0.400000, 1.000000, 0.100000},
+
+{-2.000000, 43.500000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.680000, 1.120000, 1.695000, 1.385000, 1.070000, 1.045000, 2.060000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.670000, 1.905000, 1.985000, 0.810000, 0.495000, 0.730000, 1.485000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
+
+{-1.000000, 0.000000, 0.000000, 0.500000, 7.000000, 3300.000000, 1000.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 0.890000, 0.840000, 0.500000, 0.100000},
+
+{-2.000000, 43.500000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
+
+{0.000000, 0.000000, 10.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
+
+{0.000000, 0.000000, 10.000000, 0.000000, 1.000000, 1000.000000, 1000.000000, 0.800000, 0.240000, 0.400000, 0.810000, 0.760000, 1.050000, 1.230000, 1.120000, 0.100000},
+
+{0.000000, 42.000000, 10.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.045000, 1.565000, 1.750000, 0.940000, 0.680000, 0.785000, 1.120000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.835000, 1.150000, 1.305000, 1.590000, 1.590000, 2.610000, 1.500000},
+
+{-2.000000, 48.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.000000, 0.790000, 0.790000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 1.100000, 0.970000, 0.890000, 0.340000, 0.290000, 1.120000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.630000, 0.470000, 0.650000, 1.540000, 0.450000, 0.260000, 1.050000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.630000, 0.470000, 0.650000, 1.540000, 0.450000, 0.260000, 1.050000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 1.000000, 0.050000, 1.440000, 1.310000, 0.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.000000, 0.925000, 0.600000, 1.270000, 1.830000, 1.970000, 1.120000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.000000, 0.925000, 0.600000, 1.265000, 1.830000, 1.965000, 1.120000, 1.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
+
+{-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 0.010000, 0.100000},
+
+{-2.000000, 0.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.100000, 0.790000, 0.790000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.000000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.400000, 1.310000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
+
+{-1.000000, 0.000000, 0.000000, 0.000000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.600000, 1.310000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 0.730000, 1.070000, 2.120000, 0.470000, 1.780000, 0.650000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 0.730000, 1.310000, 2.120000, 0.630000, 1.780000, 0.650000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.800000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.400000, 1.310000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.400000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.370000, 0.790000, 0.790000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.250000, 6.000000, 4400.000000, 4500.000000, 0.800000, 1.200000, 1.500000, 1.350000, 1.200000, 1.200000, 0.400000, 1.000000, 0.100000},
+
+{-10.000000, 0.000000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.625000, 0.600000, 0.705000, 1.120000, 1.930000, 1.515000, 0.625000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 1.120000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 1.500000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.910000, 1.440000, 0.600000, 1.020000, 1.330000, 1.560000, 0.550000, 0.100000},
+
+{-1.000000, 54.000000, 0.000000, 0.200000, 7.000000, 3300.000000, 1000.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 0.890000, 0.840000, 0.500000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.910000, 1.440000, 0.600000, 1.020000, 1.330000, 1.560000, 0.550000, 0.100000},
+
+{0.000000, 0.000000, 0.000000, 0.500000, 2.000000, 1770.000000, 900.000000, 0.800000, 1.700000, 1.300000, 0.400000, 0.990000, 1.070000, 0.730000, 1.490000, 0.100000},
+
+{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.670000, 1.910000, 1.990000, 0.630000, 0.290000, 0.580000, 1.490000, 0.250000},
+
+{-1.000000, 54.000000, 0.000000, 0.800000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 00, 0.600000, 1.310000, 0.100000},
+
+{-1.000000, 54.000000, 0.000000, 0.400000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.370000, 0.790000, 0.790000, 0.100000}
+};
+
+
 
 void init_parameters(void){
 
@@ -406,8 +547,9 @@ float glotPitch, glotVol, radius[TOTAL_REGIONS], velum, aspVol;
 float fricVol, fricPos, fricCF, fricBW;
 unsigned char i;
 
-outputRate = 32000;
-controlRate = 4.0;
+ laststart=0;
+ outputRate = 32000;
+ controlRate = 4.0;
 
 // what happened to volume?
 volume = parameter_list[0];
@@ -475,11 +617,14 @@ fricCF = input_frame[5];
 fricBW = input_frame[6];
 
 for (i = 0; i < TOTAL_REGIONS; i++) radius[i] = input_frame[7+i];
-velum = input_frame[i];
+
+velum = input_frame[7+i];
 
 //ADD THE PARAMETERS TO THE INPUT LIST  
-addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,
-fricBW, radius, velum);
+addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,fricBW, radius, velum);
+
+// printff("NUMMMMMM %d",numberInputTables);
+
 
 //FLOAT UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  -- adds one
 if (numberInputTables > 0) {
@@ -490,13 +635,17 @@ fricPosAt(lastTable), fricCFAt(lastTable),
 fricBWAt(lastTable), radiiAt(lastTable),
 velumAt(lastTable));
 }
+
+//    printff("NUMMMMMM %d",numberInputTables);
+
+
 }
 
 /*
 // parameters from input
 
-32000.0   ; output sample rate (22050.0, 44100.0)??? FIXED
-4.0       ; input control rate (1 - 1000 Hz) FIXED
+//32000.0   ; output sample rate (22050.0, 44100.0)??? FIXED
+//4.0       ; input control rate (1 - 1000 Hz) FIXED we skip these
 60.0	  ; master volume (0 - 60 dB)
 0         ; glottal source waveform type (0 = pulse, 1 = sine)
 40.0      ; glottal pulse rise time (5 - 50 % of GP period)
@@ -583,7 +732,7 @@ float speedOfSound(float temperature)
 *                       initializeConversion
 *
 *	library
-*	functions:	rint, fprintf, tmpfile, rewind
+*	functions:	rintf, fprintff, tmpfile, rewind
 *
 ******************************************************************************/
 
@@ -591,11 +740,13 @@ int initializeSynthesizer(void)
 {
     float nyquist;
 
+    init_parameters(); // reads our parameter array
+
     /*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL
 	TUBE LENGTH AND SPEED OF SOUND  */
 	float c = speedOfSound(temperature);
 	controlPeriod =
-	    rint((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+	    rintf((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
 	sampleRate = controlRate * controlPeriod;
 	actualTubeLength = (c * TOTAL_SECTIONS * 100.0) / sampleRate;
 	nyquist = (float)sampleRate / 2.0;
@@ -648,7 +799,7 @@ int initializeSynthesizer(void)
 *	functions:	none
 *
 *	library
-*	functions:	calloc, rint
+*	functions:	calloc, rintf
 *
 ******************************************************************************/
 
@@ -658,13 +809,14 @@ void initializeWavetable(void)
 
 
     /*  ALLOCATE MEMORY FOR WAVETABLE  */
-    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
+    //    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
+
 
     /*  CALCULATE WAVE TABLE PARAMETERS  */
-    tableDiv1 = rint(TABLE_LENGTH * (tp / 100.0));
-    tableDiv2 = rint(TABLE_LENGTH * ((tp + tnMax) / 100.0));
+    tableDiv1 = rintf(TABLE_LENGTH * (tp / 100.0));
+    tableDiv2 = rintf(TABLE_LENGTH * ((tp + tnMax) / 100.0));
     tnLength = tableDiv2 - tableDiv1;
-    tnDelta = rint(TABLE_LENGTH * ((tnMax - tnMin) / 100.0));
+    tnDelta = rintf(TABLE_LENGTH * ((tnMax - tnMin) / 100.0));
     basicIncrement = (float)TABLE_LENGTH / (float)sampleRate;
     currentPosition = 0;
 
@@ -711,7 +863,7 @@ void initializeWavetable(void)
 *	functions:	none
 *
 *	library
-*	functions:	rint
+*	functions:	rintf
 *
 ******************************************************************************/
 
@@ -721,7 +873,7 @@ void updateWavetable(float amplitude)
 
 
     /*  CALCULATE NEW CLOSURE POINT, BASED ON AMPLITUDE  */
-    float newDiv2 = tableDiv2 - rint(amplitude * tnDelta);
+    float newDiv2 = tableDiv2 - rintf(amplitude * tnDelta);
     float newTnLength = newDiv2 - tableDiv1;
 
     /*  RECALCULATE THE FALLING PORTION OF THE GLOTTAL PULSE  */
@@ -761,7 +913,7 @@ void initializeFIR(float beta, float gamma, float cutoff)
   
 
     /*  DETERMINE IDEAL LOW PASS FILTER COEFFICIENTS  */
-    maximallyFlat(beta, gamma, &numberCoefficients, coefficient);
+    maximallyFlat(beta, gamma, &numberCoefficients, coefficient); 
 
     /*  TRIM LOW-VALUE COEFFICIENTS  */
     trim(cutoff, &numberCoefficients, coefficient);
@@ -770,8 +922,8 @@ void initializeFIR(float beta, float gamma, float cutoff)
     numberTaps = (numberCoefficients * 2) - 1;
 
     /*  ALLOCATE MEMORY FOR DATA AND COEFFICIENTS  */
-    FIRData = (float *)calloc(numberTaps, sizeof(float)); // TODO as fixed?
-    FIRCoef = (float *)calloc(numberTaps, sizeof(float));
+    //    FIRData = (float *)calloc(numberTaps, sizeof(float)); // NOT FIXED as dependent on BETA!
+    //    FIRCoef = (float *)calloc(numberTaps, sizeof(float));
 
     /*  INITIALIZE THE COEFFICIENTS  */
     increment = (-1);
@@ -1037,6 +1189,8 @@ float nasalRadiationFilter(float input)
 *
 ******************************************************************************/
 
+// TODO as there are only 2 tables
+
 void addInput(float glotPitch, float glotVol, float aspVol, float fricVol,
 	      float fricPos, float fricCF, float fricBW, float *radius,
 	      float velum)
@@ -1045,13 +1199,16 @@ void addInput(float glotPitch, float glotVol, float aspVol, float fricVol,
     INPUT *tempPtr;
 
 
-    if (inputHead == NULL) {
-	inputTail = inputHead = newInputTable();
+    if (inputHead == NULL) { // first table
+            inputTail = inputHead = &tableone;
+      //            inputTail = inputHead = newInputTable();
 	inputTail->previous = NULL;
     }
     else {
-	tempPtr = inputTail;
-	inputTail = tempPtr->next = newInputTable();
+      tempPtr = inputTail; // second table
+            inputTail = tempPtr->next = &tabletwo;
+      //      inputTail = tempPtr->next = newInputTable();
+
 	inputTail->previous = tempPtr;
     }
 
@@ -1099,6 +1256,7 @@ void addInput(float glotPitch, float glotVol, float aspVol, float fricVol,
 *	functions:	malloc
 *
 ******************************************************************************/
+
 
 INPUT *newInputTable(void)
 {
@@ -1451,41 +1609,31 @@ void synthesize(void)
     int i, j;
     float f0, ax, ah1, pulse, lp_noise, pulsed_noise, signal, crossmix;
 
-
-    /*  CONTROL RATE LOOP  */
+    
     for (i = 1; i < numberInputTables; i++) {
-	/*  SET CONTROL RATE PARAMETERS FROM INPUT TABLES  */
-	setControlRateParameters(i);
-
-	/*  SAMPLE RATE LOOP  */
+      setControlRateParameters(i); // just replace with straight array in
+	   
 	for (j = 0; j < controlPeriod; j++) {
-	    /*  CONVERT PARAMETERS HERE  */
 	    f0 = frequency(current.glotPitch);
 	    ax = amplitude(current.glotVol);
+	    //	    printf("sig %f", current.glotPitch);
 	    ah1 = amplitude(current.aspVol);
 	    calculateTubeCoefficients();
 	    setFricationTaps();
 	    calculateBandpassCoefficients();
 
-	    /*  DO SYNTHESIS HERE  */
-	    /*  CREATE LOW-PASS FILTERED NOISE  */
 	    lp_noise = noiseFilter(noise());
 
-	    /*  UPDATE THE SHAPE OF THE GLOTTAL PULSE, IF NECESSARY  */
-	    if (waveform == PULSE)
-		updateWavetable(ax);
+	    if (waveform == PULSE)		updateWavetable(ax);
 
-	    /*  CREATE GLOTTAL PULSE (OR SINE TONE)  */
 	    pulse = oscillator(f0);
 
-	    /*  CREATE PULSED NOISE  */
 	    pulsed_noise = lp_noise * pulse;
 
-	    /*  CREATE NOISY GLOTTAL PULSE  */
 	    pulse = ax * ((pulse * (1.0 - breathinessFactor)) +
 			  (pulsed_noise * breathinessFactor));
 
-	    /*  CROSS-MIX PURE NOISE WITH PULSED NOISE  */
+
 	    if (modulation) {
 		crossmix = ax * crossmixFactor;
 		crossmix = (crossmix < 1.0) ? crossmix : 1.0;
@@ -1495,20 +1643,19 @@ void synthesize(void)
 	    else
 		signal = lp_noise;
 
-	    /*  PUT SIGNAL THROUGH VOCAL TRACT  */
-	    signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE),
-				bandpassFilter(signal));
+	    signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE), bandpassFilter(signal));
 
-	    /*  PUT PULSE THROUGH THROAT  */
+	    // here signal is 00000
+
 	    signal += throaty(pulse * VT_SCALE);
+	    
 
-	    /*  OUTPUT SAMPLE HERE  */
 	    dataFill(signal);
 
-	    /*  DO SAMPLE RATE INTERPOLATION OF CONTROL PARAMETERS  */
 	    sampleRateInterpolation();
+    
+	    }
 	}
-    }
 }
 
 
@@ -2163,8 +2310,8 @@ float bandpassFilter(float input)
 *	functions:	flushbuffer, amplitude
 *
 *	library
-*	functions:	rewind, fopen, NXSwapHostIntToBig, fwrite, printf,
-*                       fread, NXSwapHostShortToBig, rint, fclose
+*	functions:	rewind, fopen, NXSwapHostIntToBig, fwrite, printff,
+*                       fread, NXSwapHostShortToBig, rintf, fclose
 *
 ******************************************************************************/
 
@@ -2183,7 +2330,7 @@ void writeOutputToFile(char *fileName)
 	    short data;
 
 	    fread(&sample, sizeof(sample), 1, tempFilePtr); // tempfile?????
-	    data = NXSwapHostShortToBig((short)rint(sample * scale));
+	    data = NXSwapHostShortToBig((short)rintf(sample * scale));
 	    fwrite(&data, sizeof(data), 1, fd);
 	}
 }
@@ -2560,7 +2707,7 @@ int decrement(int pointer, int modulus)
 *	functions:	initializeFilter, initializeBuffer
 *
 *	library
-*	functions:	rint, pow
+*	functions:	rintf, pow
 *
 ******************************************************************************/
 
@@ -2577,7 +2724,7 @@ void initializeConversion(void)
 
     /*  CALCULATE TIME REGISTER INCREMENT  */
     timeRegisterIncrement =
-	(int)rint( powf(2.0, FRACTION_BITS) / sampleRateRatio );
+	(int)rintf( powf(2.0, FRACTION_BITS) / sampleRateRatio );
 
     /*  CALCULATE ROUNDED SAMPLE RATE RATIO  */
     roundedSampleRateRatio =
@@ -2589,7 +2736,7 @@ void initializeConversion(void)
     }
     else {
 	phaseIncrement = 
-	     (unsigned int)rint(sampleRateRatio * (float)FRACTION_RANGE);
+	     (unsigned int)rintf(sampleRateRatio * (float)FRACTION_RANGE);
     }
     
     /*  CALCULATE PAD SIZE  */
@@ -2753,7 +2900,7 @@ void dataFill(float data)
 
     /*  INCREMENT THE COUNTER, AND EMPTY THE BUFFER IF FULL  */
     if (++fillCounter >= fillSize) {
-	dataEmpty();
+      dataEmpty();
 	/* RESET THE FILL COUNTER  */
 	fillCounter = 0;
     }
@@ -2775,9 +2922,10 @@ void dataFill(float data)
 *	functions:	srDecrement, srIncrement
 *
 *	library
-*	functions:	rint, fabs, fwrite
+*	functions:	rintf, fabs, fwrite
 *
 ******************************************************************************/
+
 
 void dataEmpty(void)
 {
@@ -2843,6 +2991,13 @@ void dataEmpty(void)
     
 	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
 	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr);  // TODO write scaled (see SCALE) to our buffer and update/return pointer
+	    // should deal with ringbuffer but... TODO
+	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
+	    audio_buffer[laststart]=rintf(output*scale);
+	    //	    	    audio_buffer[laststart]=rand()%32768;
+	    	    printf("fff %f", output);
+	      laststart++;
+	      if (laststart>=32768) laststart=0;
 
 	    /*  CHANGE TIME REGISTER BACK TO ORIGINAL FORM  */
 	    timeRegister = ~timeRegister;
@@ -2873,7 +3028,7 @@ void dataEmpty(void)
 	    output = 0.0;
 
 	    /*  COMPUTE P PRIME  */
-	    phaseIndex = (unsigned int)rint(
+	    phaseIndex = (unsigned int)rintf(
 		   ((float)fractionValue(timeRegister)) * sampleRateRatio);
 
 	    /*  COMPUTE THE LEFT SIDE OF THE FILTER CONVOLUTION  */
@@ -2887,7 +3042,7 @@ void dataEmpty(void)
 	    }
 
 	    /*  COMPUTE P PRIME, ADJUSTED FOR RIGHT SIDE  */
-	    phaseIndex = (unsigned int)rint(
+	    phaseIndex = (unsigned int)rintf(
 		((float)fractionValue(~timeRegister)) * sampleRateRatio);
 
 	    /*  COMPUTE THE RIGHT SIDE OF THE FILTER CONVOLUTION  */
@@ -2911,6 +3066,15 @@ void dataEmpty(void)
     
 	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
 	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr); // TODO write scaled (see SCALE) to our buffer and update/return pointer
+	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
+	    	    audio_buffer[laststart]=rintf(output*scale);
+	    //	    	    audio_buffer[laststart]=rand()%32768;
+		    printf("fff %f", output);
+
+	      laststart++;
+	      if (laststart>=32768) laststart=0;
+
+
 
 	    /*  INCREMENT THE TIME REGISTER  */
 	    timeRegister += timeRegisterIncrement;
@@ -3008,4 +3172,15 @@ void srDecrement(int *pointer, int modulus)
 {
     if ( --(*pointer) < 0)
 	(*pointer) += modulus;
+
 }
+
+
+ // testcode in gdb
+/*void main(void){
+
+  //  init_parameters(); // TUBE.C - TRM!
+  initializeSynthesizer(); 
+  synthesize();
+  }*/
+

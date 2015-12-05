@@ -24,6 +24,7 @@
 #include "elements.h"
 #include "holmes.h"
 #include "sam.h"
+#include "tube.h"
 #include "LPC/lpc.h"
 
 /* DMA buffers for I2S */
@@ -67,20 +68,28 @@ void main(void)
   delay();
   I2S_Block_Init();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
-  init_synth();
+  init_synth(); // which one?
   Audio_Init();
   //  SAMINIT();
 
   lpc_init();
   lpc_newsay();
 
+  initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM!
+  synthesize();
+			
+  // test audio fill
+
+  /*   for (x=0;x<32768;x++){
+    audio_buffer[x]=rand()%32768;
+    }*/
 
   while(1)
     {
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-      mode=16; // TESTING
+      mode=18; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
@@ -126,7 +135,7 @@ void main(void)
     //    if(lpc_busy() == 0) lpc_newsay();   
 
     if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
-
+    break;
   } // cases
 
     // now readpos is back to one now that we have written something 
