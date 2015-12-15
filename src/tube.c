@@ -211,6 +211,8 @@ typedef struct _INPUT {
 
 /*  GLOBAL VARIABLES *********************************************************/
 
+float globglotpitch=0.0; // female
+
 /*  INPUT VARIABLES  */
 float  outputRate;                  /*  output sample rate (22.05, 44.1)  */
 float  controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
@@ -608,7 +610,7 @@ mixOffset = parameter_list[20];
 
 // then read in frame - so we will have 2 inputtables!
 
-glotPitch = input_frame[0];
+glotPitch = input_frame[0]+globglotpitch;
 glotVol = input_frame[1];
 aspVol = input_frame[2];
 fricVol = input_frame[3];

@@ -887,4 +887,17 @@ TODO:
 - raw KLATT and LSM wormings
 - check CV allocations for new board and test!
 
-- trigger//when_mode_change in main
+- trigger//when_mode_change in main -??? 
+- look at SMR??? https://github.com/4ms/SMR
+
+** 14/12
+
+- re-acquaint with tube.c - where we can deal with say glotpitch and
+  where inits are made --> most of initializeSynthesizer uses
+  nyquist/samplerate which is determined by tube length?
+
+solutions as length and pitch is what we want to vary = pitch should
+be fine live, and have set of tables for different tube lengths as above
+
+but still need to clean up linked list, how to add new frames and so
+on, also how that change in glotPitch works with interpolation?
