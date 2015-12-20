@@ -40,7 +40,7 @@ int runitlpc(void)
 		}
 	}
 
-/* For frames 1..n_frames, interpolate the intermediate LPC vectors		*/
+	/* For frames 1..n_frames, interpolate the intermediate LPC vectors		*/ //TODO - skip this!
 	for (frame=1;frame<n_frames;frame++) {
 		prev = frame*k*80-k;
 		next = prev+k*80;
