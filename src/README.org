@@ -2,6 +2,8 @@
 
 32k sample rate
 
+*we always need transition from previous phoneme for each mode (inc X/Y)!*
+
 * worming
 
 - wormbounds x/y exerted on parameters + speed of worming z?
@@ -978,3 +980,12 @@ also from FormantTable.sc for BBandPass:
 - MAME portings - test
 - excitations
 - wormings/tweaks all modes
+- *we always need transition from previous phoneme for each mode (inc X/Y)!*
+
+** 22/12
+
+- Mode 11-     Formant_process crashes????
+
+** 23/12
+
+- porting votrax.c from mame as above - compiles (no tested on ARM) but no output?

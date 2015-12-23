@@ -102,7 +102,7 @@ void main(void)
   case 0:// rsynth/klatt-single phoneme
            if (trigger==1){
 	     trigger=0;
-	     u8 phonemm=phoneme_prob_remap[(adc_buffer[SELX]>>5)]; // 7bits=128 %69//6=64
+	     u8 phonemm=phoneme_prob_remap[(adc_buffer[SELX]>>6)]; // 7bits=128 %69//6=64
 	     pair xx=klatt_phoneme(writepos,phonemm); 
 	     generated=xx.generated;
 	     writepos=xx.writepos;
