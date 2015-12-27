@@ -1,4 +1,4 @@
-f/***************************************************************************
+/***************************************************************************
 
     votrax.h
 
@@ -91,7 +91,7 @@ void device_clock_changed();
 
 	// internal helpers
 void update_subphoneme_clock_period();
-//static double bits_to_caps(unsigned int value, int caps_count, const double *caps_values);
+static double bits_to_caps(unsigned int value, int caps_count, const double *caps_values);
 static void shift_hist(double val, double *hist_array, int hist_size);
 static void filter_s_to_z(const double *k, double fs, double *a, double *b);
 static double apply_filter(const double *x, const double *y, const double *a, const double *b);

@@ -989,3 +989,17 @@ also from FormantTable.sc for BBandPass:
 ** 23/12
 
 - porting votrax.c from mame as above - compiles (no tested on ARM) but no output?
+//TODO: compiles but no output, all doubles, ceil/sqrt/tan/fabs to tanf etc... float
+
+- what is missing? does that code even work?
+
+NOTES:
+
+	MCFG_VOTRAX_SC01_ADD("votrax", 1700000, votrtnt_votrax_interface ) /* 1.70 MHz? needs verify */
+
+[[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/mess/drivers/votrtnt.c::*%20Votrax%20Type%20'N%20Talk%20Driver][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/mess/drivers/votrtnt.c::* Votrax Type 'N Talk Driver]]
+
+how/where we write data to SC01/votrax: WRITE8_MEMBER( votrax_sc01_device::write )
+
+- now test code seems to work // 0x3f = 63 // need to figure out speeds!
+  

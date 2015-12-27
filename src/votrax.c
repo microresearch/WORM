@@ -1,6 +1,8 @@
 //TODO: compiles but no output, all doubles, ceil/sqrt/tan/fabs to tanf etc... float
 
 // no noise and nada even simulated
+// possibles: our clocks/timing is wrong, the rom image is incorrect or loaded/converted badly, the code doesn't work!
+
 
 /***************************************************************************
 
@@ -56,7 +58,8 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 #define CLEAR_LINE	0	/* clear (a fired, held or pulsed) line */
 #define ASSERT_LINE 1 /* assert an interrupt immediately */
 #define BIT(x,n) (((x)>>(n))&1)
-
+#define SAMPLE 80000 // samle_freq /clok/16???
+#define TEMP_HACKS      (1)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -302,9 +305,9 @@ void update_subphoneme_clock_period()
 //  a grid of bit-selected caps
 //-------------------------------------------------
 
-double bits_to_caps(unsigned int value, unsigned char caps_count, const double *caps_values)
+double bits_to_caps(unsigned int value, int caps_count, const double *caps_values)
 {
-  unsigned char i;
+  int i;
 	double sum = 0;
 	for(i=0; i<caps_count; i++)
 		if(value & (1<<i))
@@ -530,7 +533,7 @@ void shift_hist(double val, double *hist_array, int hist_size)
 void sound_stream_update(int samples)
 {
 	// determine how many master half-clocks per sample
-	int half_clocks_per_sample = (m_master_clock_freq * 2) / 32000;
+	int half_clocks_per_sample = (m_master_clock_freq * 2) / SAMPLE;
 	int curclock;
 
 	// iterate over clocks (samples)
@@ -544,11 +547,13 @@ void sound_stream_update(int samples)
 		{
 
 
-	if (m_counter_34 % 32 == 0 && m_master_clock == 0)
-	{
-	  //		printf("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X\n", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
+		  //	if (m_counter_34 % 32 == 0 && m_master_clock == 0)
+		  //	{
+		  //		  		  printf("%4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X %4X\n", m_master_clock, m_counter_34, m_latch_70, m_latch_72, m_beta1, m_p1, m_p2, m_phi1, m_phi2, m_phi1_20, m_phi2_20, m_subphoneme_count, m_clock_88, m_counter_84, m_latch_92, m_internal_request);
 
-	}
+	  /// last 4 stay the same
+
+	  //	}
 			//==============================================
 			//
 			// Timing circuit (patent figure 2a)
@@ -591,6 +596,8 @@ void sound_stream_update(int samples)
 				m_p1 = 1;
 			else if (BIT(m_counter_34, P_CLOCK_BIT))
 				m_p1 = 0;
+
+			//printf("PPPP!!!!!111 %d\n",m_p1);
 
 			// derive phi2 clock:
 			//  set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
@@ -730,6 +737,7 @@ void sound_stream_update(int samples)
 
 					// update PH
 					case 7:
+					  //					  printf("MLTACHTIME %d\n",m_latch_80);
 						if (m_latch_80 != (romdata & 0x7f))
 						{
 							m_latch_80 = romdata & 0x7f;
@@ -891,6 +899,7 @@ void sound_stream_update(int samples)
 			// latch some parameter values on rising edge of phi2
 			if (phi2_rising)
 			{
+			  //			  printf("a: %d latch168 %d mfa %d\n", a,m_latch_168,m_fa);
 				switch (a)
 				{
 					case 2:
@@ -903,7 +912,7 @@ void sound_stream_update(int samples)
 
 					case 6:
 						m_fa = m_latch_168;
-						break;
+			break;
 				}
 			}
 
@@ -939,6 +948,7 @@ void sound_stream_update(int samples)
 			{
 				m_latch_168 = m_ram[a] >> 4;
 				m_latch_170 = m_ram[a] & 0xf;
+				//				printf("xxxxxxxxxxxxxxx %d",m_ram[a]>>4);
 			}
 
 			//==============================================
@@ -950,6 +960,8 @@ void sound_stream_update(int samples)
 			// nose is clocked by the NOR of /FA and P1
 			unsigned char old_noise_clock = m_noise_clock;
 			m_noise_clock = !((m_fa == 0) | m_p1);
+			
+			//			printf("fa %d\n", m_fa,m_p1);
 			unsigned char noise_clock_rising = (old_noise_clock ^ m_noise_clock) & m_noise_clock;
 			unsigned char noise_clock_falling = (old_noise_clock ^ m_noise_clock) & old_noise_clock;
 			//			noise_clock_falling=1;
@@ -985,11 +997,11 @@ void sound_stream_update(int samples)
 				else
 					m_counter_250 = (m_counter_250 + 1) & 0xf;
 			}
-
+			//			printf("nnxx %d\n", noise_clock_rising);
 			// compute final noise out signal
 			noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
 			//			noise_out_digital = rand()%2;
-			printf("nn %d\n", noise_out_digital);
+			//	printf("nn %d\n", noise_out_digital);
 		}
 
 		// TODO: cache the filters
@@ -998,7 +1010,7 @@ void sound_stream_update(int samples)
 
 		// base frequencies
 		double fc = m_master_clock_freq / 30.0; // Nominal is 20KHz
-		double fs = 32000.0f;
+		double fs = SAMPLE;
 
 		// useful temporaries
 		double rcp, rcq, rca;
@@ -1120,7 +1132,8 @@ void sound_stream_update(int samples)
 
 		// output the current result
 		//		*dest++ = (unsigned int)(s4_out * 4000);
-				printf("%d\n",(unsigned int)(s4_out*4000));
+		printf("%c",(unsigned int)((s4_out+2)*128));
+		//		printf("%c",(unsigned int)(s4_out));
 		
 	}
 }
@@ -1147,10 +1160,11 @@ void device_start()
   //	m_phoneme_timer = timer_alloc();
   //	m_rom = memregion("phoneme")->base();
 
-  m_master_clock_freq = 1152000;
-  // reset inputs
+  m_master_clock_freq = 1280000; // 1.28MHZ
+   // reset inputs
   m_inflection = 0;
-  m_phoneme = 0x3f;
+  //  m_phoneme = 0x3f;
+  m_phoneme = 0x1;
 
 	// reset outputs
 	//	m_request_func.resolve(m_request_cb, *this);
@@ -1171,7 +1185,7 @@ void device_reset()
   //	m_stream->update();
 
 	// reset inputs
-	m_phoneme = 0x3f;
+	m_phoneme = 0x34;
 	//	m_request_func(m_internal_request = m_request_state = ASSERT_LINE);
 
 	// reset timing circuit
@@ -1321,8 +1335,26 @@ void main(void){
   // TESTING HOW?
   device_start();
   device_reset();
+
   while(1){
-    m_internal_request = CLEAR_LINE;
-    sound_stream_update(132);
+
+  // try this!
+    //  int data=rand()%0x3f;
+    int data=22;
+	m_phoneme = data & 0x3f;
+	// the STROBE signal resets the phoneme counter
+	m_counter_84 = 0xf;
+
+	// not in the schematics, but necessary to fully reset the request latch
+	m_latch_92 = 0;
+
+	// clear the request signal
+	m_request_state = m_internal_request = CLEAR_LINE;
+	//	m_phoneme_timer->adjust(attotime::zero);
+
+
+    //    m_internal_request = CLEAR_LINE;
+    //  device_reset();
+    sound_stream_update(1024);
     }
 }
