@@ -58,8 +58,9 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 #define CLEAR_LINE	0	/* clear (a fired, held or pulsed) line */
 #define ASSERT_LINE 1 /* assert an interrupt immediately */
 #define BIT(x,n) (((x)>>(n))&1)
-#define SAMPLE 80000 // samle_freq /clok/16???
+#define SAMPLE 31250 // samle_freq = /clok/16???
 #define TEMP_HACKS      (1)
+#define MAX(a,b) (((a)>(b))?(a):(b))
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -75,6 +76,7 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 	ROM_END*/
 
 // romdata m_rom
+  int counter=0;
 
 const unsigned char m_rom[512]={0x90,0x80,0x0,0xb0,0x8,0xfe,0x0,0x6c,0x90,0x80,0x0,0xb0,0x4,0xfe,0x0,0x68,
 0x90,0x80,0x0,0xb0,0x4,0xf6,0x0,0x59,0x40,0x60,0xf0,0xc8,0xb,0x6,0x88,0x70,
@@ -123,6 +125,10 @@ const char *const s_phoneme_table[64] =
 	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
 	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
 };
+
+//To make the Votrax speak the word "welcome" you need to type these phonemes in the form: "W EH1 L K UH1 M"
+
+const unsigned char welcome[6] = {45, 2, 24, 25, 50,12};
 
 // this waveform is derived from measuring fig. 10 in the patent
 // it is only an approximation
@@ -298,6 +304,7 @@ void update_subphoneme_clock_period()
 
 	// convert to master clock cycles and round up
 	m_subphoneme_period = (unsigned int)(ceil(period * (double)(m_master_clock_freq)));
+
 }
 
 //-------------------------------------------------
@@ -691,8 +698,9 @@ void sound_stream_update(int samples)
 
 			// fetch ROM data; note that the address lines come directly from
 			// counter_34 and not from the latches, which are 1 cycle delayed
+
+
 			unsigned char romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
-			//			printf("rom  %d",romdata);
 
 			// update the ROM data; ROM format is (upper nibble/lower nibble)
 			//  +00 = F1 parameter / 0
@@ -707,6 +715,7 @@ void sound_stream_update(int samples)
 			// latch a new value from ROM on phi2
 			unsigned char a = m_latch_72 & 7;
 			unsigned char romdata_swapped;
+			//			printf("a: %d rom  %d\n",a, romdata);
 			if (phi2_rising)
 			{
 				switch (a)
@@ -741,11 +750,27 @@ void sound_stream_update(int samples)
 						if (m_latch_80 != (romdata & 0x7f))
 						{
 							m_latch_80 = romdata & 0x7f;
-							//mame_printf_debug("[PH=%02X]\n", m_latch_80);
+							//							printf("[PH=%02X]\n", m_latch_80);
 							unsigned int old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
 							//????							m_phoneme_timer->adjust(attotime::zero);
+							// new phon ???
+														int data=welcome[counter];
+														/*			counter++;
+			if (counter==6) counter=0;
+			m_phoneme = data & 0x3f;
+			//			m_internal_request = CLEAR_LINE;
+			m_counter_84 = 0xf;
+
+	// not in the schematics, but necessary to fully reset the request latch
+			m_latch_92 = 0;
+
+	// clear the request signal
+			m_request_state = m_internal_request = CLEAR_LINE;
+														*/
+
+
 						}
 						break;
 				}
@@ -1132,7 +1157,7 @@ void sound_stream_update(int samples)
 
 		// output the current result
 		//		*dest++ = (unsigned int)(s4_out * 4000);
-		printf("%c",(unsigned int)((s4_out+2)*128));
+		//				printf("%d\n",(unsigned int)((s4_out+2)*128));
 		//		printf("%c",(unsigned int)(s4_out));
 		
 	}
@@ -1160,7 +1185,7 @@ void device_start()
   //	m_phoneme_timer = timer_alloc();
   //	m_rom = memregion("phoneme")->base();
 
-  m_master_clock_freq = 1280000; // 1.28MHZ
+  m_master_clock_freq = 500000; // 1.28MHZ ---> try 1700000
    // reset inputs
   m_inflection = 0;
   //  m_phoneme = 0x3f;
@@ -1331,30 +1356,48 @@ mame_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 */
 
 void main(void){
-
   // TESTING HOW?
   device_start();
   device_reset();
+  //  m_request_state = m_internal_request = CLEAR_LINE;
+
+  int data=welcome[counter];
+  counter=1;
+  m_phoneme = data & 0x3f;
 
   while(1){
 
   // try this!
     //  int data=rand()%0x3f;
-    int data=22;
-	m_phoneme = data & 0x3f;
 	// the STROBE signal resets the phoneme counter
-	m_counter_84 = 0xf;
+    //	m_counter_84 = 0xf;
 
 	// not in the schematics, but necessary to fully reset the request latch
-	m_latch_92 = 0;
+    //	m_latch_92 = 0;
 
 	// clear the request signal
-	m_request_state = m_internal_request = CLEAR_LINE;
-	//	m_phoneme_timer->adjust(attotime::zero);
+    
+    sound_stream_update(32000); // how many samples to complete
+	unsigned int clocks_until_request = 0;
+	if (m_counter_84 != 0)
+	{
+	  if (m_subphoneme_count < m_subphoneme_period)
+	    clocks_until_request += m_subphoneme_period - m_subphoneme_count;
+	  clocks_until_request += m_subphoneme_period * (m_counter_84 - 1);
+	}
 
+	// plus 1/2
+	clocks_until_request = MAX(clocks_until_request, (1 << P_CLOCK_BIT) / 2);
+	//	printf("CLOCK %d count %d period %d \n", clocks_until_request,m_subphoneme_count,m_subphoneme_period);
+	// but when do we trigger new phoneme?
+	// how long is phoneme in samples????????
 
-    //    m_internal_request = CLEAR_LINE;
-    //  device_reset();
-    sound_stream_update(1024);
-    }
+	/*	  int data=welcome[counter];
+	  counter++;
+	  if (counter==6) counter=0;
+	  m_phoneme = data & 0x3f;
+	  m_internal_request = ASSERT_LINE;
+	*/
+							  
+}
 }

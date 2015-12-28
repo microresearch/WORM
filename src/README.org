@@ -922,6 +922,8 @@ on, also how that change in glotPitch works with interpolation?
   transfer here), need tweaks for resonance (could be selz?) on X/Y
   filter, also ifdef switch for INPUT also in audio.c and maybe try other bandpass?
 
+- or SELZ for x/y filter can scale both formants for size of throat/voice
+
 - effect.c x/Y filter should be in parallel, amplification and varying Q for each? use of example vowels???
 
 how again to convert bandwidth to Q: 
@@ -1002,4 +1004,19 @@ NOTES:
 how/where we write data to SC01/votrax: WRITE8_MEMBER( votrax_sc01_device::write )
 
 - now test code seems to work // 0x3f = 63 // need to figure out speeds!
-  
+
+** 28/12
+
+- list of each mode and what needs to be done TODO!
+
+- votrax.c some sounds but timing is out - how do we know when new phoneme comes:
+
+sound_stream_update somehow with samples from m_stream->update();
+
+is how mame emulates timing but must be some shortcut:
+
+[[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound.c::void%20sound_stream::update()][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound.c::void sound_stream::update()]]
+
+and then number of samples is: (update_sampindex - m_output_sampindex)
+
+	// how long is phoneme in samples????????
