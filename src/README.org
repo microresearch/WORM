@@ -133,7 +133,7 @@ Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
 [4-Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
-[5-/afs/athena/astaff/project/phones/Speak emulates SPO256 - not really ]
+[5-/afs/athena/astaff/project/phones/Speak emulates SPO256 - not really - premade samples]
 
 [6-other: cantarino - /root/projects/ERD_modules/older/euro-modules/Talko/Software/Canto]
 
@@ -1020,3 +1020,15 @@ is how mame emulates timing but must be some shortcut:
 and then number of samples is: (update_sampindex - m_output_sampindex)
 
 	// how long is phoneme in samples????????
+
+also:
+
+[[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/sp0256.c::GI%20SP0256%20Narrator%20Speech%20Processor][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/sp0256.c::GI SP0256 Narrator Speech Processor]]
+
+and
+
+[[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220%20simulator][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220 simulator]]
+
+** 31/12
+
+- not much further with votrax.c - sounds produced but timing/length of phonemes from ROM doesn't match data sheet/unintelligble speech

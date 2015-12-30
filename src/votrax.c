@@ -1,14 +1,9 @@
-//TODO: compiles but no output, all doubles, ceil/sqrt/tan/fabs to tanf etc... float
-
-// no noise and nada even simulated
-// possibles: our clocks/timing is wrong, the rom image is incorrect or loaded/converted badly, the code doesn't work!
-
 
 /***************************************************************************
 
     votrax.c
 
-    Simple VOTRAX SC-01 simulator based on sample fragments.
+    le VOTRAX SC-01 simulator based on sample fragments.
 
 ****************************************************************************
 
@@ -42,7 +37,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
-
+#include "stdio.h"
 #include "math.h"
 #include "votrax.h"
 
@@ -58,7 +53,7 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 #define CLEAR_LINE	0	/* clear (a fired, held or pulsed) line */
 #define ASSERT_LINE 1 /* assert an interrupt immediately */
 #define BIT(x,n) (((x)>>(n))&1)
-#define SAMPLE 31250 // samle_freq = /clok/16???
+#define SAMPLE 32000 // samle_freq = /clok/16???
 #define TEMP_HACKS      (1)
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -69,6 +64,8 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 // device type definition
 //const device_type VOTRAX_SC01 = &device_creator<votrax_sc01_device>;
 
+// hash matches but duration doesn't match closely or at all
+
 // ROM definition for the Votrax phoneme ROM
 /*ROM_START( votrax_sc01 )
 	ROM_REGION( 0x200, "phoneme", 0 )
@@ -77,7 +74,14 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 
 // romdata m_rom
   int counter=0;
+FILE* fo;
 
+
+const unsigned char m_rom[512]={144, 128, 0, 176, 8, 254, 0, 108, 144, 128, 0, 176, 4, 254, 0, 104, 144, 128, 0, 176, 4, 246, 0, 89, 64, 96, 240, 200, 11, 6, 136, 112, 96, 176, 0, 176, 8, 246, 0, 104, 96, 176, 0, 176, 8, 250, 0, 94, 32, 176, 240, 224, 30, 30, 128, 98, 240, 48, 0, 176, 4, 150, 0, 104, 80, 160, 0, 192, 4, 242, 0, 109, 80, 160, 0, 192, 4, 250, 0, 101, 80, 160, 0, 192, 4, 250, 0, 89, 16, 48, 0, 144, 250, 166, 0, 94, 16, 128, 0, 208, 252, 198, 0, 101, 16, 48, 0, 200, 6, 250, 0, 104, 32, 48, 240, 144, 30, 30, 96, 104, 32, 176, 240, 224, 30, 14, 144, 104, 32, 176, 240, 224, 30, 12, 144, 89, 32, 48, 0, 208, 70, 26, 176, 104, 208, 32, 0, 160, 8, 188, 0, 81, 32, 192, 0, 176, 196, 204, 0, 89, 240, 48, 0, 176, 4, 146, 0, 81, 128, 32, 0, 160, 8, 250, 0, 94, 128, 32, 0, 160, 8, 242, 0, 69, 96, 32, 0, 240, 12, 174, 0, 94, 48, 160, 240, 136, 2, 8, 64, 101, 16, 160, 240, 224, 21, 28, 112, 112, 80, 128, 240, 144, 14, 12, 16, 104, 32, 160, 0, 136, 14, 246, 0, 104, 64, 48, 240, 144, 74, 4, 64, 94, 16, 144, 0, 232, 1, 241, 0, 109, 64, 112, 0, 192, 1, 4, 240, 98, 96, 176, 0, 176, 4, 242, 0, 69, 48, 224, 0, 224, 8, 254, 0, 106, 16, 208, 0, 208, 8, 134, 0, 101, 192, 48, 0, 176, 2, 238, 0, 112, 240, 48, 0, 176, 4, 146, 0, 51, 64, 32, 240, 136, 26, 4, 96, 94, 112, 16, 0, 176, 4, 242, 0, 69, 80, 160, 0, 192, 4, 242, 0, 69, 48, 16, 0, 160, 4, 242, 0, 69, 32, 224, 0, 208, 8, 198, 0, 94, 64, 96, 0, 200, 14, 4, 240, 104, 96, 64, 0, 48, 2, 206, 0, 98, 32, 224, 0, 224, 8, 252, 0, 69, 48, 0, 0, 144, 2, 249, 0, 101, 208, 144, 0, 176, 8, 188, 0, 69, 208, 144, 0, 176, 8, 188, 0, 94, 208, 32, 0, 160, 8, 182, 0, 98, 192, 48, 0, 176, 2, 238, 0, 104, 192, 48, 0, 176, 12, 230, 0, 94, 192, 48, 0, 176, 12, 234, 0, 69, 112, 16, 0, 176, 8, 250, 0, 101, 112, 16, 0, 160, 4, 242, 0, 89, 80, 64, 0, 128, 2, 249, 0, 108, 48, 16, 0, 160, 4, 250, 0, 98, 48, 112, 0, 192, 6, 18, 16, 101, 80, 128, 0, 160, 1, 8, 48, 104, 96, 64, 0, 48, 8, 242, 0, 81, 144, 128, 0, 176, 4, 250, 0, 69, 32, 224, 0, 224, 4, 250, 0, 89, 208, 32, 0, 160, 12, 186, 0, 51, 112, 144, 0, 200, 72, 8, 0, 112, 112, 144, 0, 192, 2, 2, 8, 69, 112, 144, 0, 192, 12, 12, 0, 112};
+
+// same as below
+
+/*
 const unsigned char m_rom[512]={0x90,0x80,0x0,0xb0,0x8,0xfe,0x0,0x6c,0x90,0x80,0x0,0xb0,0x4,0xfe,0x0,0x68,
 0x90,0x80,0x0,0xb0,0x4,0xf6,0x0,0x59,0x40,0x60,0xf0,0xc8,0xb,0x6,0x88,0x70,
 0x60,0xb0,0x0,0xb0,0x8,0xf6,0x0,0x68,0x60,0xb0,0x0,0xb0,0x8,0xfa,0x0,0x5e,
@@ -110,7 +114,7 @@ const unsigned char m_rom[512]={0x90,0x80,0x0,0xb0,0x8,0xfe,0x0,0x6c,0x90,0x80,0
 0x90,0x80,0x0,0xb0,0x4,0xfa,0x0,0x45,0x20,0xe0,0x0,0xe0,0x4,0xfa,0x0,0x59,
 0xd0,0x20,0x0,0xa0,0xc,0xba,0x0,0x33,0x70,0x90,0x0,0xc8,0x48,0x8,0x0,0x70,
 0x70,0x90,0x0,0xc0,0x2,0x2,0x8,0x45,0x70,0x90,0x0,0xc0,0xc,0xc,0x0,0x70};
-
+*/
 // other arrays
 
 // textual phoneme names for debugging
@@ -126,9 +130,101 @@ const char *const s_phoneme_table[64] =
 	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
 };
 
+const int PhonemeLengths[65] =
+{
+59, 71, 121, 47, 47, 71, 103, 90,
+71, 55, 80, 121, 103, 80, 71, 71,
+71, 121, 71, 146, 121, 146, 103, 185,
+103, 80, 47, 71, 71, 103, 55, 90,
+185, 65, 80, 47, 250, 103, 185, 185,
+185, 103, 71, 90, 185, 80, 185, 103,
+90, 71, 103, 185, 80, 121, 59, 90,
+80, 71, 146, 185, 121, 250, 185, 47,
+0
+};
+
 //To make the Votrax speak the word "welcome" you need to type these phonemes in the form: "W EH1 L K UH1 M"
 
 const unsigned char welcome[6] = {45, 2, 24, 25, 50,12};
+
+// define all the phonemes
+ 
+#define _EH3 0x00 // 59 MS ;JACKET
+#define _EH2 0x01 // 71 MS ;ENLIST
+#define _EH1 0x02 // 121MS ;HEAVY
+#define _PA0 0x03 // 47 MS ;NO SOUND
+#define _DT 0x04 // 47 MS ;BUTTER
+#define _A2 0x05 // 71 MS ;MADE
+#define _A1 0x06 // 103MS ;MADE
+#define _ZH  0x07 // 90 MS ;AZURE
+#define _AH2 0x08 // 71 MS ;HONEST -
+#define _I3  0x09 // 55 MS ;INHIBIT
+#define _I2  0x0A // 80 MS ;INHIBIT
+#define _I1  0x0B // 121MS ;INHIBIT
+#define _M  0x0C // 103MS ;MAT
+#define _N  0x0D // 80 MS ;SUN
+#define _B  0x0E // 71 MS ;BAG
+#define _V  0x0F // 71 MS ;VAN
+#define _CH  0x10 // 71 MS ;CHIP
+#define _SH  0x11 // 121MS ;SHOP
+#define _Z  0x12 // 71 MS ;ZOO
+#define _AW1 0x13 // 146MS ;LAWFUL
+#define _NG  0x14 // 121MS ;THING
+#define _AH1 0x15 // 146MS ;FATHER
+#define _OO1 0x16 // 103MS ;LOOKING
+#define _OO  0x17 // 185MS ;BOOK
+#define _L  0x18 // 103MS ;LAND
+#define _K  0x19 // 80 MS ;TRICK
+#define _J  0x1A // 47 MS ;JUDGE
+#define _H  0x1B // 71 MS ;HELLO
+#define _G  0x1C // 71 MS ;GET
+#define _F  0x1D // 103MS ;FAST
+#define _D  0x1E // 55 MS ;PAID
+#define _S  0x1F // 90 MS ;PASS
+#define _A  0x20 // 185MS ;DAY
+#define _AY  0x21 // 65 MS ;DAY
+#define _Y1  0x22 // 80 MS ;YARD
+#define _UH3 0x23 // 47 MS ;MISSION
+#define _AH  0x24 // 250MS ;MOP
+#define _P  0x25 // 103MS ;PAST
+#define _O  0x26 // 185MS ;COLD
+#define _I  0x27 // 185MS ;PIN
+#define _U  0x28 // 185MS ;MOVE
+#define _Y  0x29 // 103MS ;ANY
+#define _T  0x2A // 71 MS ;TAP
+#define _R  0x2B // 90 MS ;RED
+#define _E  0x2C // 185MS ;MEET
+#define _W  0x2D // 80 MS ;WIN
+#define _AE  0x2E // 185MS ;DAD
+#define _AE1 0x2F // 103MS ;AFTER
+#define _AW2 0x30 // 90 MS ;SALTY
+#define _UH2 0x31 // 71 MS ;ABOUT
+#define _UH1 0x32 // 103MS ;UNCLE
+#define _UH  0x33 // 185MS ;CUP
+#define _O2  0x34 // 80 MS ;FOR
+#define _O1  0x35 // 121MS ;ABOARD
+#define _IU  0x36 // 59 MS ;YOU
+#define _U1  0x37 // 90 MS ;YOU
+#define _THV 0x38 // 80 MS ;THE
+#define _TH  0x39 // 71 MS ;THIN
+#define _ER  0x3A // 146MS ;BIRD
+#define _EH  0x3B // 185MS ;GET
+#define _E1  0x3C // 121MS ;BE
+#define _AW  0x3D // 250MS ;CALL
+#define _PA1 0x3E // 185MS ;NO SOUND
+#define _STOP 0x3F // 47 MS ;NO SOUND
+
+unsigned char votrax[]={
+ 
+    _V,_O,_T,_R,_UH,_K,_S,_PA1,                     // Votrax
+    _EH1, _EH2, _S,_PA0,                     // S
+    _S, _E1, _Y,_PA0,                               // C
+    _Z,_AY,_I1,_R,_O1,_U1,_PA0,                     // Zero
+    _W,_UH1,_UH2,_N,_PA0,                           // One
+    _A,_AY,_Y,_PA1,                          // A
+    _S,_P,_E1,_Y,_T,_CH,_PA0,                       // Speech
+    _S,_I,_N,_T,_EH2,_S, _E,_Z,_ER,_PA0,     // Synthesizer
+    _R, _EH1, _EH3, _D, _Y,_STOP  };
 
 // this waveform is derived from measuring fig. 10 in the patent
 // it is only an approximation
@@ -209,6 +305,8 @@ WRITE8_MEMBER( inflection_w )
 //  period of the sub-phoneme clock, as a multiple
 //  of the master clock
 //-------------------------------------------------
+
+unsigned int ppp;
 
 void update_subphoneme_clock_period()
 {
@@ -302,9 +400,18 @@ void update_subphoneme_clock_period()
 	double rx = 1.0 / (p1_frequency * cx);
 	double period = 1000e-12 * (rx * (1.0 + 9e3 / 1e3) + 9e3);
 
-	// convert to master clock cycles and round up
-	m_subphoneme_period = (unsigned int)(ceil(period * (double)(m_master_clock_freq)));
 
+	// convert to master clock cycles and round up
+	 	m_subphoneme_period = (unsigned int)(ceil(period * (double)(m_master_clock_freq)));
+
+		// we have PhonemeLengths[m_phoneme] in ms so how many clocks is that
+		// ms * clock/1000
+		m_subphoneme_period =PhonemeLengths[m_phoneme]*(m_master_clock_freq/10000);
+
+	//	m_subphoneme_period=PhonemeLengths[m_phoneme];
+		ppp=(unsigned int)(ceil(period * (double)(m_master_clock_freq)));
+
+		printf("ms length %d calc_period %d new_calc %d",m_latch_80, ppp,m_subphoneme_period);
 }
 
 //-------------------------------------------------
@@ -515,7 +622,7 @@ void filter_s_to_z(const double *k, double fs, double *a, double *b)
 //-------------------------------------------------------------
 double apply_filter(const double *x, const double *y, const double *a, const double *b)
 {
-	return (x[0]*a[0] + x[1]*a[1] + x[2]*a[2] + x[3]*a[3] - y[0]*b[1] - y[1]*b[2] - y[2]*b[3]) / b[0];
+  	return (x[0]*a[0] + x[1]*a[1] + x[2]*a[2] + x[3]*a[3] - y[0]*b[1] - y[1]*b[2] - y[2]*b[3]) / b[0];
 }
 
 
@@ -655,8 +762,8 @@ void sound_stream_update(int samples)
 			unsigned char _125k_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 3);
 
 			// track subphoneme counter state
-			if (!(m_latch_42 | m_phi1))
-				m_subphoneme_count = 0;
+			if (!(m_latch_42 | m_phi1)){
+			  m_subphoneme_count = 0;}
 			else
 				m_subphoneme_count++;
 			if (p2_rising)
@@ -700,8 +807,9 @@ void sound_stream_update(int samples)
 			// counter_34 and not from the latches, which are 1 cycle delayed
 
 
+			//			unsigned char romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
 			unsigned char romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
-
+			//			romdata=rand()%256;
 			// update the ROM data; ROM format is (upper nibble/lower nibble)
 			//  +00 = F1 parameter / 0
 			//  +01 = F2 parameter / 0
@@ -727,15 +835,18 @@ void sound_stream_update(int samples)
 
 					// update CLD
 					case 4:
-						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
+					  romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
+					  //					  romdata_swapped=romdata;
 						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
 							m_srff_114 = 1;
 						break;
 
 					// update VD
 					case 5:
-						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
-						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
+					  romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
+					  //romdata_swapped=romdata;
+
+					  if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
 							m_srff_112 = 1;
 						break;
 
@@ -746,30 +857,15 @@ void sound_stream_update(int samples)
 
 					// update PH
 					case 7:
-					  //					  printf("MLTACHTIME %d\n",m_latch_80);
-						if (m_latch_80 != (romdata & 0x7f))
+					  //				if (m_latch_80 != (romdata & 0x7f))
+					  					  if (m_latch_80 != (PhonemeLengths[m_phoneme]))
 						{
-							m_latch_80 = romdata & 0x7f;
-							//							printf("[PH=%02X]\n", m_latch_80);
+						  //	   	m_latch_80 = romdata & 0x7f;
+						  		m_latch_80 = PhonemeLengths[m_phoneme];
+								printf("[PH=%d]\n", romdata & 0x7f);
 							unsigned int old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
-							//????							m_phoneme_timer->adjust(attotime::zero);
-							// new phon ???
-														int data=welcome[counter];
-														/*			counter++;
-			if (counter==6) counter=0;
-			m_phoneme = data & 0x3f;
-			//			m_internal_request = CLEAR_LINE;
-			m_counter_84 = 0xf;
-
-	// not in the schematics, but necessary to fully reset the request latch
-			m_latch_92 = 0;
-
-	// clear the request signal
-			m_request_state = m_internal_request = CLEAR_LINE;
-														*/
-
 
 						}
 						break;
@@ -1025,9 +1121,9 @@ void sound_stream_update(int samples)
 			//			printf("nnxx %d\n", noise_clock_rising);
 			// compute final noise out signal
 			noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
-			//			noise_out_digital = rand()%2;
-			//	printf("nn %d\n", noise_out_digital);
-		}
+			noise_out_digital = rand()%2;
+						//	printf("nn %d\n", noise_out_digital);
+		} // end of curclock
 
 		// TODO: cache the filters
 		// filter coefs
@@ -1156,10 +1252,15 @@ void sound_stream_update(int samples)
 		// TODO: apply closure circuit (undocumented)
 
 		// output the current result
-		//		*dest++ = (unsigned int)(s4_out * 4000);
-		//				printf("%d\n",(unsigned int)((s4_out+2)*128));
-		//		printf("%c",(unsigned int)(s4_out));
+		unsigned int s16 = (unsigned int)(s4_out * 4000);
+		//						printf("%d\n",(unsigned int)((s4_out+2)*128));
+		//		printf("%d %f\n",s16, s4_out);
 		
+		unsigned char c = (unsigned)s16 & 255;
+		fwrite(&c, 1, 1, fo);
+		c = ((unsigned)s16 / 256) & 255;
+		fwrite(&c, 1, 1, fo);
+
 	}
 }
 
@@ -1185,7 +1286,7 @@ void device_start()
   //	m_phoneme_timer = timer_alloc();
   //	m_rom = memregion("phoneme")->base();
 
-  m_master_clock_freq = 500000; // 1.28MHZ ---> try 1700000
+  m_master_clock_freq = 1280000; // 1.28MHZ ---> try 1700000
    // reset inputs
   m_inflection = 0;
   //  m_phoneme = 0x3f;
@@ -1356,29 +1457,52 @@ mame_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 */
 
 void main(void){
-  // TESTING HOW?
+  fo = fopen("testvotrax.pcm", "wb");
+
   device_start();
   device_reset();
   //  m_request_state = m_internal_request = CLEAR_LINE;
 
-  int data=welcome[counter];
-  counter=1;
-  m_phoneme = data & 0x3f;
 
-  while(1){
 
-  // try this!
-    //  int data=rand()%0x3f;
+    for (counter=0;counter<55;counter++){
+  //  while(1){
+
+          int data=votrax[counter];
+	  //	  data=counter;
+    //    data=rand()%255;
+	  //	          data=0;
+	  m_phoneme = data & 0x3f;
+
+	  const unsigned char *rom = m_rom + ((m_phoneme << 3));
+
+    //      printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
+
+
 	// the STROBE signal resets the phoneme counter
-    //	m_counter_84 = 0xf;
+      //  m_counter_84 = 0xf;
 
 	// not in the schematics, but necessary to fully reset the request latch
-    //	m_latch_92 = 0;
+  m_latch_92 = 0;
 
 	// clear the request signal
-    
-    sound_stream_update(32000); // how many samples to complete
-	unsigned int clocks_until_request = 0;
+  m_request_state = m_internal_request = CLEAR_LINE;
+
+	// clear the request signal
+  
+      // so 45 is length of W phoneme but how does this translate to samples?
+  //  printf("PPP %d\n",rom[7]*8);
+  //    m_latch_80=rom[7]&0x7f;
+
+    //    update_subphoneme_clock_period();
+    ppp=PhonemeLengths[m_phoneme];
+
+    sound_stream_update(ppp*32); // length is ms which is 32 samples per ms 
+
+    //- mean phoneme say 40ms=
+     //32000 samples per second 10ms=320 40ms=1280
+
+     /*	unsigned int clocks_until_request = 0;
 	if (m_counter_84 != 0)
 	{
 	  if (m_subphoneme_count < m_subphoneme_period)
@@ -1388,10 +1512,11 @@ void main(void){
 
 	// plus 1/2
 	clocks_until_request = MAX(clocks_until_request, (1 << P_CLOCK_BIT) / 2);
+     */
 	//	printf("CLOCK %d count %d period %d \n", clocks_until_request,m_subphoneme_count,m_subphoneme_period);
 	// but when do we trigger new phoneme?
 	// how long is phoneme in samples????????
-
+       
 	/*	  int data=welcome[counter];
 	  counter++;
 	  if (counter==6) counter=0;
@@ -1399,5 +1524,5 @@ void main(void){
 	  m_internal_request = ASSERT_LINE;
 	*/
 							  
-}
+  }
 }
