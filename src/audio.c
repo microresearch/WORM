@@ -184,6 +184,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // any excitation to fulfill?
 
   // how much speech data do we need to generate based on speed (in main.c)?
+  // max is 8xsz/2=8x32=256 samples 
   // generate based on mode, trigger and params // inline - takes care of where we are in phonemes etc.
   //
 

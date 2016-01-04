@@ -1,8 +1,47 @@
 * ERD/WORM dirty speech synth
 
-32k sample rate
+32k sample rate->48k?
 
-*we always need transition from previous phoneme for each mode (inc X/Y)!*
+*we always need transition from previous phoneme for each mode (inc X/Y)!* - this can also be faked/transition in phoneme itself
+
+* modes
+
+*MODE | IS? | FILES/DIR | BASED_ON | NOTES/TODO - to add to TODO from below*
+
+0-   | klatt single phoneme | klatt in rsynth | rsynth-2.0-port | single phoneme needs transition always to make sense
+
+but this can be done with transition/pitch etc. in each phoneme - what
+are these changing elements? make thus larger phoneme list
+
+1-   | klatt chain of phonemes | klatt |rsynth-2.0-port | 
+
+klatt always needs next phoneme so what to do if no next is signalled
+(repeat or loop through list as determined)?
+
+also updating klatt phoneme might cause glitch in audio if we do it in
+audio.c // so larger/main buffer=special case perhaps as mode 0
+
+2-   | SC-VOSIM | vosim.c | SC | one of these is free running???
+3-   | SC-VOSIM? | vosim.c  | SC | 
+4-   | MDA_VOCODER | mdavoc.c | MDA? | excitation is also there? 
+5-   | LADSPA VOCODER | vocode.c | ladspa | 
+6-   | SELX/Y FILTERS |  | | choose/check which bandpass
+7-   | doformantfilter-few vowels | effect.c | none | try different bandpass/move between vowels/more formants 
+8-   | formlet | effect.c | SC | 
+9-   | SAM | sam.c | sam.c??? |
+10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  
+11-  | SC formant | scformant.c  | SC | is sine working properly? 
+12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT?
+13-  | rendervosim | braidworm.c | braids - [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc]] | needs worming not to use straight 
+14-  | rendervowel | braidworm.c | braids | 
+15-  | rendervowelfof | braidworm.c | braids | 
+16-  | lpcanalyzer | lpcanalysiss.c  | SC | 
+17-  | voicform | voicform.c  | STK | 
+18-  | tubesim | tube.c | TRM | 
+
+towards maximum 32 modes! cut vocoders to basic/working with swopped excitation/voice input
+
+
 
 * worming
 
@@ -1103,26 +1142,3 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 
 - list modes/chips/files and notes/authors so far:
 
-MODE | IS? | FILES/DIR | BASED_ON | NOTES/TODO - to add to TODO from above
-
-0-   | klatt single phoneme | klatt in rsynth | rsynth-2.0-port | single phoneme needs transition always to make sense
-1-   | klatt chain of phonemes | klatt |rsynth-2.0-port | 
-2-   | SC-VOSIM | vosim.c | SC | one of these is free running???
-3-   | SC-VOSIM? | vosim.c  | SC | 
-4-   | MDA_VOCODER | mdavoc.c | MDA? | excitation is also there? 
-5-   | LADSPA VOCODER | vocode.c | ladspa | 
-6-   | SELX/Y FILTERS |  | | choose/check which bandpass
-7-   | doformantfilter-few vowels | effect.c | none | try different bandpass/move between vowels/more formants 
-8-   | formlet | effect.c | SC | 
-9-   | SAM | sam.c | sam.c??? |
-10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  
-11-  | SC formant | scformant.c  | SC | is sine working properly? 
-12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT?
-13-  | rendervosim | braidworm.c | braids - [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc]] | needs worming not to use straight 
-14-  | rendervowel | braidworm.c | braids | 
-15-  | rendervowelfof | braidworm.c | braids | 
-16-  | lpcanalyzer | lpcanalysiss.c  | SC | 
-17-  | voicform | voicform.c  | STK | 
-18-  | tubesim | tube.c | TRM | 
-
-towards maximum 32 modes! cut vocoders to basic/working with swopped excitation/voice input
