@@ -115,7 +115,7 @@ void Audio_Init(void)
 		    b2 = (1 - K / Q + K * K) * norm;
 
 		    coeffs[xx][x][0]=a0*mull[xx][x]; coeffs[xx][x][1]=a1*mull[xx][x]; coeffs[xx][x][2]=a2*mull[xx][x]; coeffs[xx][x][3]=-b1*mull[xx][x]; coeffs[xx][x][4]=-b2*mull[xx][x];
-		    /// can also just mult coeffs????
+		    /// can also just mult coeffs???? - TEST with and without TODO!
 		    state[xx][x] = (float*)malloc(4*sizeof(float));
 		    arm_biquad_cascade_df1_init_f32(&df[xx][x],1,coeffs[xx][x],state[xx][x]);
 		  }
@@ -168,11 +168,24 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   samplespeed=8.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
   //     samplespeed=1.0f;
 
-  // PROCESS incoming audio and activate master_triger
+  // older:PROCESS incoming audio and activate master_triger
   // TODO:read in audio and process for trigger
   // trigger will set samplepos=0.0f, writepos=0 and trigger=1
   // but readpos only after we have written?
- 
+  ////////////////////////////////////////////////////////////
+
+  // REDO this callback:
+
+  //
+  // what mode are we in/change of mode or parameters
+  // do we need to do anything to incoming audio //or// just store it 
+  // if we need trigger?
+
+  // any excitation to fulfill?
+
+  // how much speech data do we need to generate based on speed (in main.c)?
+  // generate based on mode, trigger and params // inline - takes care of where we are in phonemes etc.
+  //
 
   switch(mode){
   case 0: // rsynth/klatt-single phoneme
@@ -342,7 +355,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   case 15://braidworm-  void RenderVowelFof(
     RenderVowelFof(0,mono_buffer, 32,adc_buffer[SELX]<<3,adc_buffer[SELY]<<3,adc_buffer[SELZ]<<3); // what kinds of param are expected?
     break;
-  case 16: // braidworm- void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+  case 16: // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
     // convert in to float
     // exciter=indriver to float
         for (x=0;x<sz/2;x++){

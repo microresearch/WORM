@@ -857,12 +857,12 @@ void sound_stream_update(int samples)
 
 					// update PH
 					case 7:
-					  //				if (m_latch_80 != (romdata & 0x7f))
-					  					  if (m_latch_80 != (PhonemeLengths[m_phoneme]))
+					  				if (m_latch_80 != (romdata & 0x7f))
+					  //				  if (m_latch_80 != (PhonemeLengths[m_phoneme]))
 						{
-						  //	   	m_latch_80 = romdata & 0x7f;
-						  		m_latch_80 = PhonemeLengths[m_phoneme];
-								printf("[PH=%d]\n", romdata & 0x7f);
+						  	   	m_latch_80 = romdata & 0x7f;
+								//		m_latch_80 = PhonemeLengths[m_phoneme];
+								printf("\n[PH=%d]", romdata & 0x7f);
 							unsigned int old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
@@ -1469,14 +1469,14 @@ void main(void){
   //  while(1){
 
           int data=votrax[counter];
-	  //	  data=counter;
+	  //	  	  data=counter;
     //    data=rand()%255;
-	  //	          data=0;
+	  //		  data=0x1f;
 	  m_phoneme = data & 0x3f;
 
 	  const unsigned char *rom = m_rom + ((m_phoneme << 3));
 
-    //      printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
+          printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
 
 
 	// the STROBE signal resets the phoneme counter
@@ -1494,10 +1494,10 @@ void main(void){
   //  printf("PPP %d\n",rom[7]*8);
   //    m_latch_80=rom[7]&0x7f;
 
-    //    update_subphoneme_clock_period();
-    ppp=PhonemeLengths[m_phoneme];
+  //       update_subphoneme_clock_period();
+  //    ppp=PhonemeLengths[m_phoneme];
 
-    sound_stream_update(ppp*32); // length is ms which is 32 samples per ms 
+    sound_stream_update(ppp); // length is ms which is 32 samples per ms 
 
     //- mean phoneme say 40ms=
      //32000 samples per second 10ms=320 40ms=1280

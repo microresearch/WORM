@@ -123,13 +123,13 @@ raw//basic klatt parameters?
 
 [1- NON - as is too much timing based!  robo: arduino = 8 bit TTS:same as robo above]
 
-2- DONE sam - not TINYsss....
+2- DONE sam - not TINYsss....: at https://github.com/s-macke/SAM/tree/master/src ?
 sam: It is an adaption to C of the speech software SAM (Software Automatic Mouth) for the Commodore C64 - 8 bit and messy
 tinySAM.c: small SAM above - 8 bit
 SAMarduino: arduino of tinySAM above - 8 bit
 
 3-
-Talkie - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
+Talkie TI-99 DONE - LPCcode: :LPC - encode new words with QBoxPro/windows... TI99
 
 [4-Tiny Speech Synth: C code - TinySynth.h 16 bit -> tiny.c]
 
@@ -928,7 +928,7 @@ on, also how that change in glotPitch works with interpolation?
 
 how again to convert bandwidth to Q: 
 
-~bpOctavesToRq = { arg octaves; (pow(2, octaves) - 1) / pow(2, octaves).sqrt };
+~bpOctavesToRq = { arg octaves; (pow(2, octaves) - 1) / pow(2, octaves).sqrt }; // appears wrong way round!!
 
 say 130 hz for x, 70 hz for y?
 
@@ -1031,4 +1031,98 @@ and
 
 ** 31/12
 
-- not much further with votrax.c - sounds produced but timing/length of phonemes from ROM doesn't match data sheet/unintelligble speech
+- not much further with votrax.c - sounds produced but timing/length
+  of phonemes from ROM doesn't come close to match data
+  sheet/unintelligble speech
+
+and: https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
+
+- how to use what we have from votrax - break out parameters
+
+speech chips- ti99=talkie DONE?/ SP0256 by Joseph Zbiciak-above in MAME but not free/ TMS5200-above?/ VOTRAX SC01-????// speakjet?
+
+csound- vowgen:   // only find [[file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c]] which is like voices/voicform noted above
+
+and LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
+
+///
+
+** 4/12
+
+*** rethinking hardware design
+
+- check if noise is there on in/out which causes X/Y filter strangeness
+
+- maybe different solution for CV inputs?
+
+- hardware encoder for main mode?
+
+*** software and plan
+
+- 48k as new sample rate? or?
+
+- finish portings=nvaccess????///31/12 list above// run thru all in docs and discard
+
+- break down to excitation (buffer) // tract/processing/speech (buffer) // incoming (buffer)
+
+- test code different excitations - list here: pulses, vosim/decaying sines, square/triangle // what else?
+
+- collate all vowel/phoneme parameters and control parameters in one
+  place (and any conversions between these eg. Q and bandwidth, amp
+  and db): put in collated_forms.h - but we need to figure out
+  conversions, how we made these in the past, and also what works for bandpass:
+
+bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantfilter=arm_biquad (init only), 
+
+- do we need voiced/unvoiced and pitch detection... also incoming LPC
+
+- coherent modular solution for _all_ generation - howmuchneeded,
+  trigger generation and testing, all processing in audio.c, main for
+  changes
+
+- own worm speech synth algo...
+
+**** tweaks for each mode/generation
+
+- X/Y with different bandpass tests
+
+- pull klatt apart
+
+- LPC experiments
+
+- run through TODO for every mode (eg. X/Y we need scaling of
+  formants/vocal tract size
+
+- general mode tweaks and wormings for each mode
+
+- vocoder needs much work... what do we have so far? see also: http://gurzil.livejournal.com/15375.html and pvsvoc in csound code.
+
+** TODO
+
+- retest arm_biquad _without_ mult in co-efficients...
+
+- list modes/chips/files and notes/authors so far:
+
+MODE | IS? | FILES/DIR | BASED_ON | NOTES/TODO - to add to TODO from above
+
+0-   | klatt single phoneme | klatt in rsynth | rsynth-2.0-port | single phoneme needs transition always to make sense
+1-   | klatt chain of phonemes | klatt |rsynth-2.0-port | 
+2-   | SC-VOSIM | vosim.c | SC | one of these is free running???
+3-   | SC-VOSIM? | vosim.c  | SC | 
+4-   | MDA_VOCODER | mdavoc.c | MDA? | excitation is also there? 
+5-   | LADSPA VOCODER | vocode.c | ladspa | 
+6-   | SELX/Y FILTERS |  | | choose/check which bandpass
+7-   | doformantfilter-few vowels | effect.c | none | try different bandpass/move between vowels/more formants 
+8-   | formlet | effect.c | SC | 
+9-   | SAM | sam.c | sam.c??? |
+10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  
+11-  | SC formant | scformant.c  | SC | is sine working properly? 
+12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT?
+13-  | rendervosim | braidworm.c | braids - [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc]] | needs worming not to use straight 
+14-  | rendervowel | braidworm.c | braids | 
+15-  | rendervowelfof | braidworm.c | braids | 
+16-  | lpcanalyzer | lpcanalysiss.c  | SC | 
+17-  | voicform | voicform.c  | STK | 
+18-  | tubesim | tube.c | TRM | 
+
+towards maximum 32 modes! cut vocoders to basic/working with swopped excitation/voice input
