@@ -11,7 +11,14 @@
 0-   | klatt single phoneme | klatt in rsynth | rsynth-2.0-port | single phoneme needs transition always to make sense
 
 but this can be done with transition/pitch etc. in each phoneme - what
-are these changing elements? make thus larger phoneme list
+are these changing elements - write to parfile... make thus larger phoneme list
+
+collate klatt/holmes notes below which also mention this!
+
+again how long is each frame, how many frames per phoneme, how to
+simplify figuring out transitions and also calls to init...
+
+//at 32000 samples per sec 10ms=320 samples - in def_pars.c we have 8ms per frame = 256 samples//
 
 1-   | klatt chain of phonemes | klatt |rsynth-2.0-port | 
 
@@ -31,7 +38,7 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 9-   | SAM | sam.c | sam.c??? |
 10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  
 11-  | SC formant | scformant.c  | SC | is sine working properly? 
-12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT?
+12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT - do we serial conn. to check FFT?
 13-  | rendervosim | braidworm.c | braids - [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc]] | needs worming not to use straight 
 14-  | rendervowel | braidworm.c | braids | 
 15-  | rendervowelfof | braidworm.c | braids | 
@@ -41,6 +48,101 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 
 towards maximum 32 modes! cut vocoders to basic/working with swopped excitation/voice input
 
+cut other modes to focus on:
+
+- TRM/tubes
+- Klatt
+- LPC
+- vocoder
+
+** klatt notes
+
+*** working through rsynth-2.0 5/1/2016
+
+- "eh" is 18 frames = 180 mS (we have this with silence)...
+
+double mSec_per_frame = 10; 8000 is sample rate...
+
+- holmes is where frames are interpolated from phonemes/element list:
+
+nEparm is number of parameters in each frame
+
+holmes runs  parwave_init(&klatt_global) and        parwave(&klatt_global, &pars, samp) for each frame...
+
+parwave in nsynth.c ->    CONVERT FRAME OF PARAMETER DATA TO A WAVEFORM CHUNK
+
+for our single phonemes in code HERE we run:
+PhonemeToWaveData(phoneme,1, 0) -> say.c which is trimmed to take
+phoneme code and then run:
+
+wav_len = holmes(3, intern,max_samples, pWavBuffer	);
+
+which brings us back into single phoneme/transition issue - as will
+always transition to Q then END and both are null
+
+- what is first line of Elements.def for each phoneme eg...: {"DZ",  26, 1, 1,0x64,"d","d",alv|stp|vcd, ->
+
+typedef struct Elm_s
+ {
+  char *name;
+  char rk; - dominance of element
+  char du; - dur/
+  char ud; - dur/
+  unsigned char font; ???
+  char  *dict;
+  char  *ipa;
+  long  feat;
+  interp_t p[nEparm];
+ } Elm_t, *Elm_ptr;
+
+and then each parameter has list
+
+ {float stdy;
+  float fixd;
+  char  prop;
+  char  ed;
+  char  id;
+
+- stdy, fixd, prop// used for transitions /// ed=, id= ext or int times???
+
+- duration is 6 for example: ./say "eh" -v -l test.raw -p test.par - so 6 frames for E,Q-null,END-null
+
+- how would it sound if we have no transitions - klatt and pyklatt/klsyn: -> simpler klatt without interpolation
+
+- see klsyn (restrictions on commercial use) also for synthesis from
+  base parameters - also new parameters - to test this out but seems bit cumbersome...
+
+- for klatt we use: ./klatt -i example1.par -r 2 -s 8000 -o test.raw and:
+
+ play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
+
+with examples as list of parameters 
+
+figure out also how klatts and online parwave.c // latest rsynth also
+
+http://show.docjava.com/book/cgij/code/data/lectures/cr310/DSP/chapter%205/711/klatt/parwave.c
+
+http://homepages.wmich.edu/~hillenbr/klsyn/klsyn.txt
+
+- nvp.c half through porting is also a much simpler klatt...
+
+*** what are global varyings for klatt:
+
+- from command line options: flutter, base F0, tilt db, msec per
+  frame, number of formants in cascade - but default is parallel, impulse glottal source bool // holmes =
+  -S <d> [1] Speed (1.0 is 'normal') -K <lg> [1] Parameter filter
+  'fraction'
+
+- for example we can vary base (as top in holmes) dynamically, also values like duration we can alter
+
+*** other notes
+
+- in mage video - wheel for repeating phoneme loop selection to maybe implement
+
+- so klatt mode should just be that looping and maybe a stripped or
+  reduced klatt without transitions as a seperate mode with more changes in pitch and so on
+
+*** collated from below TODO
 
 
 * worming
@@ -82,10 +184,11 @@ runform in simforstacksansmem
 - basics of read/write head and speech integrationDONE
 - tests for each speech function/mode
 - vocoder 
-- integrate/test/new knob allocations when we have PCB
+- integrate/test/new knob allocations when we have PCB DONE
 
 ...///
 - port all speech algos 
+////
 - wormcode and klatt parameter limits
 - inverse filter/LPC??? for klatt
 - phoneme probabilities DONE
@@ -98,6 +201,7 @@ runform in simforstacksansmem
 #define SPEED 2 //0
 #define END 4 //4
 #define SELY 1 //1
+
 
 * modes so far imagined - say 32 total!
 
@@ -1104,7 +1208,7 @@ and LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpana
 
 - break down to excitation (buffer) // tract/processing/speech (buffer) // incoming (buffer)
 
-- test code different excitations - list here: pulses, vosim/decaying sines, square/triangle // what else?
+- test code different excitations - list here: white noise/gaussian etc, pulses, vosim/decaying sines, square/triangle // what else?
 
 - collate all vowel/phoneme parameters and control parameters in one
   place (and any conversions between these eg. Q and bandwidth, amp
@@ -1121,24 +1225,23 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 
 - own worm speech synth algo...
 
-**** tweaks for each mode/generation
-
-- X/Y with different bandpass tests
-
-- pull klatt apart
-
-- LPC experiments
-
-- run through TODO for every mode (eg. X/Y we need scaling of
-  formants/vocal tract size
-
-- general mode tweaks and wormings for each mode
-
 - vocoder needs much work... what do we have so far? see also: http://gurzil.livejournal.com/15375.html and pvsvoc in csound code.
 
 ** TODO
 
+- X/Y with different bandpass tests
+
 - retest arm_biquad _without_ mult in co-efficients...
 
-- list modes/chips/files and notes/authors so far:
+- debug messages in klatt for holmes/interpolation/stresses to figure
+  out how to manipulate single phonemes - but these are never single...
 
+- klatt question is always what is NEXT phoneme - if there isn't one (loop a list of phonemes) list->end then repeat
+
+** 5/12
+
+- modes at top of this doc, and structured working through of klatt/rsynth also above - porting of nvp.c to test
+
+- have a look at: [[file:~/projects/ERD_modules/worm/docs/mage/src/mage.cpp::/*%20This%20file%20is%20part%20of%20MAGE%20/%20pHTS(%20the%20performative%20HMM-based%20speech%20synthesis%20system%20)%20*/][file:~/projects/ERD_modules/worm/docs/mage/src/mage.cpp::/* This file is part of MAGE / pHTS( the performative HMM-based speech synthesis system ) */]]
+
+which also has vocoder code...

@@ -29,10 +29,17 @@ finish c port// need frame management?
 
 */
 
+unsigned int sampleRRate=32000;
+
 typedef unsigned char bool;
 
 #define false 0
 #define true 1
+
+inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
+	return oldVal+((newVal-oldVal)*curFadeRatio);
+}
+
 
 //#define _USE_MATH_DEFINES
 
@@ -42,6 +49,11 @@ typedef float speechPlayer_frameParam_t;
 
 typedef struct {
 	// voicing and cascaide
+
+  // most are covered from VoiceAmp to parallelbypass below
+  // and what of the rest????
+
+  //
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
@@ -68,17 +80,18 @@ const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speec
 
 const float PITWO=M_PI*2;
 
-float lastValue= 0.0;
+float lastValueOne= 0.0;
+float lastValueTwo= 0.0;
 
-float getNextNOISE() {
+float getNextNOISE(float lastValue) {
   lastValue=((float)rand()/RAND_MAX)+0.75*lastValue;
   return lastValue;
 };
 
-int sampleRRate=32000;
-float lastCyclePos=0.0;
+float lastCyclePosOne=0.0;
+float lastCyclePosTwo=0.0;
 
-float getNextFREQ(float frequency) {
+float getNextFREQ(float lastCyclePos, float frequency) {
   float cyclePos=fmodf((frequency/sampleRRate)+lastCyclePos,1);
   lastCyclePos=cyclePos;
   return cyclePos;
@@ -91,11 +104,11 @@ float getNextFREQ(float frequency) {
 bool glottisOpen;
 //VoiceGenerator(int sr): pitchGen(sr), vibratoGen(sr), aspirationGen(), glottisOpen(false) {};
 
-/*
+
 float getNextVOICE(const speechPlayer_frame_t* frame) {
-  float vibrato=(sin(vibratoGen.getNext(frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1;
-  float voice=pitchGen.getNext(frame->voicePitch*vibrato);
-  float aspiration=aspirationGen.getNext()*0.2;
+  float vibrato=(sinf(getNextFREQ(lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1; // but we need diff instances of getNExtFREQ
+  float voice=getNextFREQ(lastCyclePosTwo,frame->voicePitch*vibrato);
+  float aspiration=getNextNOISE(lastValueOne)*0.2; // again noise instancesDONE
   float turbulence=aspiration*frame->voiceTurbulenceAmplitude;
   glottisOpen=voice>=frame->glottalOpenQuotient;
   if(!glottisOpen) {
@@ -107,7 +120,7 @@ float getNextVOICE(const speechPlayer_frame_t* frame) {
   aspiration*=frame->aspirationAmplitude;
   return aspiration+voice;
 };
-*/
+
 
 typedef struct{
 float frequency;
@@ -171,28 +184,23 @@ reson *r1, *r2, *r3, *r4, *r5, *r6, *rN0, *rNP;
 	};
 
 
-/*
-class ParallelFormantGenerator { 
-	private:
-	Resonator r1, r2, r3, r4, r5, r6;
 
-	public:
-	ParallelFormantGenerator(int sr): sampleRRate(sr), r1(sr), r2(sr), r3(sr), r4(sr), r5(sr), r6(sr) {};
+reson *rr1, *rr2, *rr3, *rr4, *rr5, *rr6;
 
-	float getNext(const speechPlayer_frame_t* frame, float input) {
+
+	float getNextPARALLEL(const speechPlayer_frame_t* frame, float input) {
 		input/=2.0;
 		float output=0;
-		output+=(r1.resonate(input,frame->pf1,frame->pb1)-input)*frame->pa1;
-		output+=(r2.resonate(input,frame->pf2,frame->pb2)-input)*frame->pa2;
-		output+=(r3.resonate(input,frame->pf3,frame->pb3)-input)*frame->pa3;
-		output+=(r4.resonate(input,frame->pf4,frame->pb4)-input)*frame->pa4;
-		output+=(r5.resonate(input,frame->pf5,frame->pb5)-input)*frame->pa5;
-		output+=(r6.resonate(input,frame->pf6,frame->pb6)-input)*frame->pa6;
-		return calculateValueAtFadePosition(output,input,frame->parallelBypass);
-	}
-
+		output+=(resonateRES(rr1,input,frame->pf1,frame->pb1)-input)*frame->pa1;
+		output+=(resonateRES(rr2,input,frame->pf2,frame->pb2)-input)*frame->pa2;
+		output+=(resonateRES(rr3,input,frame->pf3,frame->pb3)-input)*frame->pa3;
+		output+=(resonateRES(rr4,input,frame->pf4,frame->pb4)-input)*frame->pa4;
+		output+=(resonateRES(rr5,input,frame->pf5,frame->pb5)-input)*frame->pa5;
+		output+=(resonateRES(rr6,input,frame->pf6,frame->pb6)-input)*frame->pa6;
+//		return calculateValueAtFadePosition(output,input,frame->parallelBypass);
 };
 
+/*
 class SpeechWaveGeneratorImpl: public SpeechWaveGenerator {
 	private:
 	int sampleRRate;
@@ -205,33 +213,52 @@ class SpeechWaveGeneratorImpl: public SpeechWaveGenerator {
 	public:
 	SpeechWaveGeneratorImpl(int sr): sampleRRate(sr), voiceGenerator(sr), fricGenerator(), cascade(sr), parallel(sr), frameManager(NULL) {
 	}
+*/
 
-	unsigned int generate(const unsigned int sampleCount, sample* sampleBuf) {
-		if(!frameManager) return 0; 
-		float val=0;
-		for(unsigned int i=0;i<sampleCount;++i) {
-			const speechPlayer_frame_t* frame=frameManager->getCurrentFrame();
-			if(frame) {
-				float voice=voiceGenerator.getNext(frame);
-				float cascadeOut=cascade.getNext(frame,voiceGenerator.glottisOpen,voice*frame->preFormantGain);
-				float fric=fricGenerator.getNext()*0.3*frame->fricationAmplitude;
-				float parallelOut=parallel.getNext(frame,fric*frame->preFormantGain);
-				float out=(cascadeOut+parallelOut)*frame->outputGain;
-				sampleBuf[i].value=(int)max(min(out*4000,32000),-32000);
-			} else {
-				return i;
-			}
-		}
-		return sampleCount;
-	}
+// TODO: init all generators res etc, how to handle frames and frame parameters
 
-	void setFrameManager(FrameManager* frameManager) {
-		frameManager=frameManager;
-	}
+void initSpeechWave(void){
+  /// memory allocation for resonators
+  reson r1;//rr1
+  // init a frame - global
 
 };
 
-*/
+
+void handleFrame(const speechPlayer_frame_t* frame){
+  // init frame with data - read in one test frame, and how long is frame in terms of sampleCount???? see frameManager?
+
+  // pass on to generateSpeechWave(const speechPlayer_frame_t* frame, const unsigned int sampleCount, u16* sampleBuf);
+
+};
+
+
+	unsigned int generateSpeechWave(const speechPlayer_frame_t* frame, const unsigned int sampleCount, u16* sampleBuf) {
+	  //		if(!frameManager) return 0; 
+		float val=0;
+		for(unsigned int i=0;i<sampleCount;++i) {
+		  //		const speechPlayer_frame_t* frame=frameManager->getCurrentFrame();
+		  //	if(frame) {
+
+
+				float voice=getNextVOICE(frame);
+				float cascadeOut=getNextCASC(frame,glottisOpen,voice*frame->preFormantGain);
+				float fric=getNextNOISE(lastValueTwo)*0.3*frame->fricationAmplitude;
+				float parallelOut=getNextPARALLEL(frame,fric*frame->preFormantGain);
+				float out=(cascadeOut+parallelOut)*frame->outputGain;
+				sampleBuf[i]=out*4000;
+				if (sampleBuf[i]>32767) sampleBuf[i]=32767;
+				if (sampleBuf[i]<-32767) sampleBuf[i]=-32767;
+				
+				//	} else {
+				//				return i;
+				//			}
+				//		}
+		return sampleCount;
+		}
+	};
+
+
 
 //SpeechWaveGenerator* SpeechWaveGenerator::create(int sampleRRate) {return new SpeechWaveGeneratorImpl(sampleRRate); }
 
