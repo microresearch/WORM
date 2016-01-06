@@ -1273,7 +1273,7 @@ and LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpana
 
 ///
 
-** 4/12
+** 4/1
 
 *** rethinking hardware design
 
@@ -1321,7 +1321,7 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 
 - klatt question is always what is NEXT phoneme - if there isn't one (loop a list of phonemes) list->end then repeat
 
-** 5/12
+** 5/1
 
 - modes at top of this doc, and structured working through of klatt/rsynth also above - porting of nvp.c to test
 
@@ -1329,7 +1329,7 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 
 which also has vocoder code...
 
-** 6/12 - 7/12
+** 6/1 - 7/1
 
 TODO: 
 
