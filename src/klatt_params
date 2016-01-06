@@ -98,6 +98,8 @@ HOLMES.c replace with our code
 
 - how does stdy,fixd and prop (ed/id?) work?
 
+- what is first line of Elements.def: {"DZ",  26, 1, 1,0x64,"d","d",alv|stp|vcd,
+
 {"DZ",  26, 1, 1,0x64,"d","d",alv|stp|vcd,
  {
   {   270,    135,  50,  0,  0}, /* fn       0 */

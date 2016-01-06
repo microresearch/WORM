@@ -23,6 +23,7 @@ LINEIN/OUTL-filter
 #include "braidworm.h"
 #include "voicform.h"
 #include "lpcansc.h"
+#include "parwave.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -96,6 +97,8 @@ void Audio_Init(void)
 	initbraidworm();
 	LPCAnalyzer_init();
 	initvoicform();
+	init_simpleklatt();
+
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
 		i = AUDIO_BUFSZ;
@@ -387,6 +390,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       if (readpos>=ending) samplepos=0.0f;    
     }
       break;
+  case 19: // tests for simpleklatt
+    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      samplepos+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+    }
+
+
 
   } // mode end
 

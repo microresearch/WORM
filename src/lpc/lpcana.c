@@ -14,7 +14,7 @@ int runlpcana(void)
    short int *x_in, *e;
    char *coeffs;
    int frame, n_frames, i, j, n, prev, next, *length=0;
-   float data[81], *xms, d[k+1], *c, *x_in_f, *lp;
+   float data[81], xms, d[k+1], *c, *x_in_f, *lp;
 
    //   x_in = signal_in(infile,length);
    n_frames = (*length)/80;

@@ -1333,13 +1333,17 @@ which also has vocoder code...
 
 TODO: 
 
-1/port simple klatt and add constraints (test first on laptop->see genparam.cDONE): simpleklatt.c
+1/port simple klatt and add constraints (test first on laptop->see genparam.cDONE): simpleklatt.c DONE- to test
 
 2/round phonemes for klatt in mainbuffer simply
 
 3/finish port and test nvp.c
 
 4/rest of mame porting
+
+*// but we need clearer idea of buffers  and scheduling... for now just test very basics...*
+
+*also to simplify - where is u16 and so on defined (from something in audio.h), clearer coding style for all underscores etc.*
 
 5/worm.c filled out with ideas
 

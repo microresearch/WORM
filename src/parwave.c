@@ -22,32 +22,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "audio.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <limits.h>
 #include "parwave.h"
 
-#ifdef _MSC_VER
 #define getrandom(min,max) ((rand()%(int)(((max)+1)-(min)))+(min))
-#else
-#define getrandom(min,max) ((rand()%(long)(((max)+1)-(min)))+(min))
-#endif
+
+extern signed int audio_buffer[32768];
+
 
 /* function prototypes for functions private to this file */
 
-static void flutter(klatt_global_ptr,klatt_frame_ptr);
-static float sampled_source(klatt_global_ptr);
-static float impulsive_source(klatt_global_ptr);
-static float natural_source(klatt_global_ptr);
-static void pitch_synch_par_reset(klatt_global_ptr,klatt_frame_ptr);
-static float gen_noise(klatt_global_ptr);
-static float DBtoLIN(long);
-static void frame_init(klatt_global_ptr,klatt_frame_ptr);
+static void flutter(klatt_global_ptrr,klatt_frame_ptrr);
+static float sampled_source(klatt_global_ptrr);
+static float impulsive_source(klatt_global_ptrr);
+static float natural_source(klatt_global_ptrr);
+static void pitch_synch_par_reset(klatt_global_ptrr,klatt_frame_ptrr);
+static float gen_noise(klatt_global_ptrr);
+static float DBtoLIN(u16);
+static void frame_init(klatt_global_ptrr,klatt_frame_ptrr);
 static float resonator(resonator_ptr, float);
 static float antiresonator(resonator_ptr, float);
-static void setabc(long,long,resonator_ptr,klatt_global_ptr);
-static void setzeroabc(long,long,resonator_ptr,klatt_global_ptr);
+static void setabc(u16,u16,resonator_ptr,klatt_global_ptrr);
+static void setzeroabc(u16,u16,resonator_ptr,klatt_global_ptrr);
 
 /** @brief A generic resonator.
   *
@@ -83,7 +82,7 @@ static float antiresonator(resonator_ptr r, float input)
   * Flutter is added by applying a quasi-random element constructed from three
   * slowly varying sine waves.
   */
-static void flutter(klatt_global_ptr globals, klatt_frame_ptr frame)
+static void flutter(klatt_global_ptrr globals, klatt_frame_ptrr frame)
 {
   static int time_count;
   double delta_f0;
@@ -95,13 +94,13 @@ static void flutter(klatt_global_ptr globals, klatt_frame_ptr frame)
   fld = sin(2*M_PI*7.1*time_count);
   fle = sin(2*M_PI*4.7*time_count);
   delta_f0 =  fla * flb * (flc + fld + fle) * 10;
-  frame->F0hz10 = frame->F0hz10 + (long) delta_f0;
+  frame->F0hz10 = frame->F0hz10 + (u16) delta_f0;
   time_count++;
 }
 
 /** @brief Allows the use of a glottal excitation waveform sampled from a real voice.
   */
-static float sampled_source(klatt_global_ptr globals)
+static float sampled_source(klatt_global_ptrr globals)
 {
   int itemp;
   float ftemp;
@@ -140,10 +139,11 @@ static float sampled_source(klatt_global_ptr globals)
 
 /** @brief Converts synthesis parameters to a waveform.
   */
-void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
+void simple_parwave(klatt_global_ptrr globals, klatt_frame_ptrr frame)
 {
   static float glotlast;
   static float vlast;
+  static unsigned int count;
 
   frame_init(globals,frame);  /* get parameters for next frame of speech */
 
@@ -156,7 +156,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
   for (globals->ns=0;globals->ns<globals->nspfr;globals->ns++) 
   {
     float noise;
-    long n4;
+    u16 n4;
     float out = 0.0;
     float frics;
     float glotout;
@@ -193,13 +193,13 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
     {
       switch(globals->glsource)
       {
-      case IMPULSIVE:
+      case 1:
 	voice = impulsive_source(globals);
 	break;
-      case NATURAL:
+      case 2:
 	voice = natural_source(globals);	
 	break;
-      case SAMPLED:
+      case 3:
 	voice = sampled_source(globals);
 	break;
       }
@@ -263,7 +263,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
     par_glotout += aspiration;
 
 
-    if(globals->synthesis_model != ALL_PARALLEL)
+    if(globals->synthesis_model != 1) // paralllel
     {
       /*
        * Cascade vocal tract, excited by laryngeal sources.
@@ -312,10 +312,12 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
 
     out = out * globals->amp_gain0;  /* Convert back to integer */
 
-    if (out < SHRT_MIN) out = SHRT_MIN;
-    if (out > SHRT_MAX) out = SHRT_MAX;
+    if (out < -32767) out = -32767;
+    if (out > 32767) out = 32767;
 
-    *output++ = (int)out;
+    audio_buffer[count] = (int)out;
+    count++;
+    if (count==32768) count=0;
   }
 }
 
@@ -323,7 +325,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, int *output)
   *
   * This sets resonator internal memory to zero.
   */
-void parwave_init(klatt_global_ptr globals)
+void simple_parwave_init(klatt_global_ptrr globals)
 {
   globals->FLPhz = (950 * globals->samrate) / 10000;
   globals->BLPhz = (630 * globals->samrate) / 10000;
@@ -378,7 +380,7 @@ void parwave_init(klatt_global_ptr globals)
 
 /** @brief Use parameters from the input frame to set up resonator coefficients.
   */
-static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
+static void frame_init(klatt_global_ptrr globals, klatt_frame_ptrr frame)
 {
   globals->original_f0 = frame->F0hz10 / 10;
 
@@ -452,7 +454,7 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
   
   /* output low-pass filter */
 
-  setabc((long)0.0,(long)(globals->samrate/2),&(globals->rout),globals);
+  setabc((u16)0.0,(u16)(globals->samrate/2),&(globals->rout),globals);
 }
 
 /** @brief Generate the glottal waveform from an impulse source.
@@ -462,7 +464,7 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
   * with a critically-damped second-order filter, time constant proportional
   * to Kopen.
   */
-static float impulsive_source(klatt_global_ptr globals)
+static float impulsive_source(klatt_global_ptrr globals)
 {
   static float doublet[] = {0.0,13000000.0,-13000000.0};
   static float vwave;
@@ -485,7 +487,7 @@ static float impulsive_source(klatt_global_ptr globals)
   * spectral zero around 800 Hz, magic constants a,b reset pitch
   * synchronously.
   */
-static float natural_source(klatt_global_ptr globals)
+static float natural_source(klatt_global_ptrr globals)
 {
   float lgtemp;
   static float vwave;
@@ -507,11 +509,11 @@ static float natural_source(klatt_global_ptr globals)
 
 /** @brief Reset selected parameters pitch-synchronously.
   */
-static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr frame)
+static void pitch_synch_par_reset(klatt_global_ptrr globals, klatt_frame_ptrr frame)
 {
-  long temp;
+  u16 temp;
   float temp1;
-  static long skew;
+  static u16 skew;
   /*
    * Constant B0 controls shape of glottal pulse as a function
    * of desired duration of open phase N0. (Note that N0 is
@@ -583,7 +585,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
     globals->nopen = 4 * frame->Kopen;
 
-    if ((globals->glsource == IMPULSIVE) && (globals->nopen > 263))    
+    if ((globals->glsource == 1) && (globals->nopen > 263))    
     {
       globals->nopen = 263;
     }
@@ -619,7 +621,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
     temp = globals->samrate / globals->nopen;
 
-    setabc((long)0,temp,&(globals->rgl),globals);
+    setabc((u16)0,temp,&(globals->rgl),globals);
 
     /* Make gain at F1 about constant */
 
@@ -693,7 +695,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
   * @param f   Frequency of resonator in Hz
   * @param bw  Frequency of resonator in Hz
   */
-static void setabc(long int f, long int bw, resonator_ptr rp, klatt_global_ptr globals)
+static void setabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr globals)
 {
  float r;
 
@@ -708,7 +710,7 @@ static void setabc(long int f, long int bw, resonator_ptr rp, klatt_global_ptr g
   * @param f   Frequency of resonator in Hz
   * @param bw  Frequency of resonator in Hz
   */
-static void setzeroabc(long int f, long int bw, resonator_ptr rp, klatt_global_ptr globals)
+static void setzeroabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr globals)
 {
  float r;
 
@@ -734,13 +736,13 @@ static void setzeroabc(long int f, long int bw, resonator_ptr rp, klatt_global_p
   * Noise spectrum is tilted down by soft low-pass filter having a pole near 
   * the origin in the z-plane, i.e. output = input + (0.75 * lastoutput) 
   */
-static float gen_noise(klatt_global_ptr globals)
+static float gen_noise(klatt_global_ptrr globals)
 {
-  long temp;
+  u16 temp;
   static float nlast;
 
-  temp = (long) getrandom(-8191,8191);
-  globals->nrand = (long) temp;
+  temp = (u16) getrandom(-8191,8191);
+  globals->nrand = (u16) temp;
 
   nlast = globals->nrand + (0.75 * nlast);
 
@@ -762,7 +764,7 @@ static float gen_noise(klatt_global_ptr globals)
   * is approximately 1 dB.  Thus all amplitudes are quantized to 1 dB
   * steps.
   */
-static float DBtoLIN(long dB)
+static float DBtoLIN(u16 dB)
 {
   float lgtemp;
   static float amptable[88] = 
