@@ -28,6 +28,8 @@ klatt always needs next phoneme so what to do if no next is signalled
 also updating klatt phoneme might cause glitch in audio if we do it in
 audio.c // so larger/main buffer=special case perhaps as mode 0
 
+- this becomes two modes: cycling phonemes and simplified klatt//wormed klatt
+
 2-   | SC-VOSIM | vosim.c | SC | one of these is free running???
 3-   | SC-VOSIM? | vosim.c  | SC | 
 4-   | MDA_VOCODER | mdavoc.c | MDA? | excitation is also there? 
@@ -118,13 +120,13 @@ and then each parameter has list
 
 with examples as list of parameters 
 
-figure out also how klatts and online parwave.c // latest rsynth also
+figure out also how klatts and online parwave.c differ from local klatt // latest rsynth also
 
 http://show.docjava.com/book/cgij/code/data/lectures/cr310/DSP/chapter%205/711/klatt/parwave.c
 
 http://homepages.wmich.edu/~hillenbr/klsyn/klsyn.txt
 
-- nvp.c half through porting is also a much simpler klatt...
+- nvp.c half through porting is also a much simpler klatt... tho ipa.py makes it a bit more complex
 
 *** what are global varyings for klatt:
 
@@ -135,15 +137,96 @@ http://homepages.wmich.edu/~hillenbr/klsyn/klsyn.txt
 
 - for example we can vary base (as top in holmes) dynamically, also values like duration we can alter
 
+- in rsynth: def_pars.c (what is pars.def for? - is default frame definition)
+
+long samp_rate = 32000;
+
+void init_synth(void)
+{
+	//double mSec_per_frame = 10;
+  float mSec_per_frame = 8; // 10?
+	//int impulse = 0;
+	int impulse = 1;
+	//int casc = 1;
+	int casc = 2;
+	klatt_global.samrate = samp_rate;
+	klatt_global.quiet_flag = TRUE;
+	klatt_global.glsource = NATURAL;// IMPULSIVE doesn't work - but is set below!
+	klatt_global.f0_flutter = 0;
+
+	//	klatt_global.quiet_flag, "Quiet - minimal messages",
+	//	impulse,                 "Impulse glottal source",
+	//	casc,                    "Number cascade formants",
+	//	klatt_global.f0_flutter, "F0 flutter",
+	//	mSec_per_frame,         "mSec per frame",
+	//	def_pars.TLTdb,          "Tilt dB",
+	//	def_pars.F0hz10,         "Base F0 in 0.1Hz",
+
+	if (casc > 0)
+	{
+		klatt_global.synthesis_model = CASCADE_PARALLEL;
+		klatt_global.nfcascade = casc;
+	}
+	else
+		klatt_global.synthesis_model = ALL_PARALLEL;
+
+	if (impulse)
+		klatt_global.glsource = IMPULSIVE;
+
+	klatt_global.nspfr = (klatt_global.samrate * mSec_per_frame) / 1000;
+}
+
+- and rsynth in docs:
+
+ double mSec_per_frame = 10;
+ int impulse = 0;
+ int casc = 0;
+ klatt_global.samrate = samp_rate;
+ klatt_global.quiet_flag = TRUE;
+ klatt_global.glsource = NATURAL;
+ klatt_global.f0_flutter = 0;
+
+- NATURAL changes impulses but in doc/klatt code we have natural
+  sampled source - but doesn't work - option is 2 - fixed as SAMPLE_FACTOR was very small - mult * 2.0
+
 *** other notes
 
-- in mage video - wheel for repeating phoneme loop selection to maybe implement
+- in mage video - wheel for repeating phoneme loop selection to maybe implement // how this could work?
 
 - so klatt mode should just be that looping and maybe a stripped or
   reduced klatt without transitions as a seperate mode with more changes in pitch and so on
 
+- TODO: nsp.c port - ipa.py questions, test generation of klsyn/klatt
+  parameters from simple code, does rsynth sound same on worm or do we
+  have samplerate issues - play also with various defines (see above)DONE/// port that simple klatt
+
+example1.par: 40 params
+
+1000 0 543 0 1324 0 2663 0 3681 0 4279 0 4000 0 0 0 200 40  0 40  0 20  0  0  0 52  0 57  0 72  0 67  0 80  0 80  0  0  0 70
+
+// see genparam.c - what are important ones, how they depend on each other esp. F0 and nopen/T0 timings:
+
+    /* T0 is 4* the number of samples in one pitch period */
+
+    globals->T0 = (40 * globals->samrate) / frame->F0hz10;
+
+and nopen (=4x Kopen in the frame) cannot be > T0
+
+// in our test case samrate is 8000 so x40=320,000 / F0hz which starts at 1000 = less than 320 /4 for kopen=80
+
+also case with Kskew to figure out... so need to implement these constraints
+
 *** collated from below TODO
 
+** own speech synth: worm.c
+
+- also what are differences between chips such as sp0256/votrax - (see patents)
+
+Following klatt:
+
+- excitation - voiced/unvoiced, changes in frequency of glottal pulses, white noise...
+- filtering - formants and zero poles (nasal), any tube modelling,
+  open and close of mouth - see latest book
 
 * worming
 
@@ -1245,3 +1328,19 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 - have a look at: [[file:~/projects/ERD_modules/worm/docs/mage/src/mage.cpp::/*%20This%20file%20is%20part%20of%20MAGE%20/%20pHTS(%20the%20performative%20HMM-based%20speech%20synthesis%20system%20)%20*/][file:~/projects/ERD_modules/worm/docs/mage/src/mage.cpp::/* This file is part of MAGE / pHTS( the performative HMM-based speech synthesis system ) */]]
 
 which also has vocoder code...
+
+** 6/12 - 7/12
+
+TODO: 
+
+1/port simple klatt and add constraints (test first on laptop->see genparam.cDONE): simpleklatt.c
+
+2/round phonemes for klatt in mainbuffer simply
+
+3/finish port and test nvp.c
+
+4/rest of mame porting
+
+5/worm.c filled out with ideas
+
+6/look into mage above// questions

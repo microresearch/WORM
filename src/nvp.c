@@ -47,18 +47,80 @@ typedef float speechPlayer_frameParam_t;
 
 /// the parameters - see below from python
 
+/*
+  
+  frame.preFormantGain=1.0
+  frame.outputGain=2.0
+
+vary these:
+frame.preFormantGain=1.0
+frame.vibratoPitchOffset=0.1
+frame.vibratoSpeed=5.5
+frame.voicePitch=150
+
+
+	_curPitch=118
+	_curVoice='Adam'
+	_curInflection=0.5
+	_curVolume=1.0 	   
+	_curRate=1.0
+
+voices={
+	'Adam':{
+		'cb1_mul':1.3,
+		'pa6_mul':1.3,
+		'fricationAmplitude_mul':0.85,
+	},
+		'Benjamin':{
+		'cf1_mul':1.01,
+		'cf2_mul':1.02,
+		#'cf3_mul':0.96,
+		'cf4':3770,
+		'cf5':4100,
+		'cf6':5000,
+		'cfNP_mul':0.9,
+		'cb1_mul':1.3,
+		'fricationAmplitude_mul':0.7,
+		'pa6_mul':1.3,
+	},
+	'Caleb ':{
+		'aspirationAmplitude':1,
+		'voiceAmplitude':0,
+	},
+	'David':{
+		'voicePitch_mul':0.75,
+		'endVoicePitch_mul':0.75,
+		'cf1_mul':0.75,
+		'cf2_mul':0.85,
+		'cf3_mul':0.85,
+	},
+}
+
+def applyVoiceToFrame(frame,voiceName):
+	v=voices[voiceName]
+	for paramName in (x[0] for x in frame._fields_):
+		absVal=v.get(paramName)
+		if absVal is not None:
+			setattr(frame,paramName,absVal)
+		mulVal=v.get('%s_mul'%paramName)
+		if mulVal is not None:
+			setattr(frame,paramName,getattr(frame,paramName)*mulVal)
+*/
+
 typedef struct {
 	// voicing and cascaide
 
   // most are covered from VoiceAmp to parallelbypass below
   // and what of the rest????
 
-  //
+  // varying globally depending on voice
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
 	speechPlayer_frameParam_t voiceTurbulenceAmplitude; // amplitude of voice breathiness from 0 to 1 
+  ////
 	speechPlayer_frameParam_t glottalOpenQuotient; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+  ////// here on is in phonem params:
 	speechPlayer_frameParam_t voiceAmplitude; // amplitude of voice (phonation) source between 0 and 1.
 	speechPlayer_frameParam_t aspirationAmplitude; // amplitude of aspiration (voiceless h, whisper) source between 0 and 1.
 	speechPlayer_frameParam_t cf1, cf2, cf3, cf4, cf5, cf6, cfN0, cfNP; // frequencies of standard cascaide formants, nasal (anti) 0 and nasal pole in hz
@@ -70,13 +132,15 @@ typedef struct {
 	speechPlayer_frameParam_t pb1, pb2, pb3, pb4, pb5, pb6; // parallel formant bandwidths in hz
 	speechPlayer_frameParam_t pa1, pa2, pa3, pa4, pa5, pa6; // amplitude of parallel formants between 0 and 1
 	speechPlayer_frameParam_t parallelBypass; // amount of signal which should bypass parallel resonators from 0 to 1
+  /// here
 	speechPlayer_frameParam_t preFormantGain; // amplitude from 0 to 1 of all vocal tract sound (voicing, frication) before entering formant resonators. Useful for stopping/starting speech
 	speechPlayer_frameParam_t outputGain; // amplitude from 0 to 1 of final output (master volume) 
-	speechPlayer_frameParam_t endVoicePitch; //  pitch of voice at the end of the frame length 
+	speechPlayer_frameParam_t endVoicePitch; //  pitch of voice at the end of the frame length  - see ipa.py
 } speechPlayer_frame_t;
 
 const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
 
+speechPlayer_frame_t* framerr;
 
 const float PITWO=M_PI*2;
 
@@ -219,8 +283,10 @@ class SpeechWaveGeneratorImpl: public SpeechWaveGenerator {
 
 void initSpeechWave(void){
   /// memory allocation for resonators
-  reson r1;//rr1
+  reson r1,r2,r3,r4,r5,r6;
+  reson rr1,rr2,rr3,rr4,rr5,rr6;
   // init a frame - global
+  speechPlayer_frame_t framerr;
 
 };
 

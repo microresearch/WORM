@@ -1,5 +1,9 @@
 /* formants and other vowel/phoneme tables
 
+ */
+
+/* see also klatt_params and ,,,,
+
 - how do we go from BW as hz, bw in octaves to Q and vice versa:
 
 - DB to float mul: mul= 10^(A/20)
