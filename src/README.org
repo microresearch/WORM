@@ -1329,22 +1329,56 @@ bandpass options: bandpassx/y(owl), bandpasses in SC=BBandPass/BPFSC, doformantf
 
 which also has vocoder code...
 
-** 6/1 - 7/1
+** 6/1 - 7/1 ++
 
 TODO: 
 
 1/port simple klatt and add constraints (test first on laptop->see genparam.cDONE): simpleklatt.c DONE- to test
 
-2/round phonemes for klatt in mainbuffer simply
+2/round phonemes for klatt in mainbuffer simply - x/y position/change - speed of revolution and end-length calc/hit end of
 
-3/finish port and test nvp.c
+3/finish port and test nvp.c: ipa.py calculates: phoneme times/duration->frameDuration,fadeDuration, pitch
+
+see also: test_midiSing.py and hannah:
+
+def queueFrame(self,frame,minFrameDuration,fadeDuration,userIndex=-1,purgeQueue=False):
+
+player.queueFrame(frame,//frame=120,fade=100)
+
+// how that translates to samplecount at samplerate=? test this and fade is fade across frame parameters?
+
+// other globals eg. 	_curPitch=118
+	_curVoice='Adam'
+	_curInflection=0.5
+	_curVolume=1.0
+	_curRate=1.0
+
+TODO: test generating a single frame (laptop?)
 
 4/rest of mame porting
 
 *// but we need clearer idea of buffers  and scheduling... for now just test very basics...*
 
-*also to simplify - where is u16 and so on defined (from something in audio.h), clearer coding style for all underscores etc.*
+should be blackbox/generator for each mode which fills buffer in
+audio.c (inside workings hidden inc. for klatt/mode 0 roundabout) -
+each as function pointer and if needs run in main as scheduler
+
+so we have function pointers eg.
+
+generate_simpleklatt(incoming, outgoing)
+
+first klatt runs round and round in audio_buffer (but only at full
+length of all phonemes) and we schedule updates (when/how - at speed of playback)
+
+*also to simplify - where is u16 and so on defined (from something in audio.h), clearer coding style for all underscores etc???*
 
 5/worm.c filled out with ideas
 
 6/look into mage above// questions
+
+** 13/1
+
+- nvp.c working on laptop with phonemes defined - possible here to
+  vary across short 32 sample frames: interpolation and length of
+  phoneme, pitch of phoneme, vibrato, gain and other globals TODO-
+  backport to ARM - inits etc.
