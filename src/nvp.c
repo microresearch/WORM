@@ -1,4 +1,5 @@
 /// testing first on laptop
+/*
 #include <errno.h>
 #include <math.h>
 #include <stdlib.h>
@@ -6,13 +7,13 @@
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <sys/unistd.h>
-//#include "stm32f4xx.h"
-//#include "audio.h"
+*/
+#include "stm32f4xx.h"
+#include "audio.h"
 
-typedef unsigned int u16;
+//typedef unsigned int u16;
 
-
-float data[48][37]={
+const float data[48][37]={
 { 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
 { 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
 { 650.0 , 1430.0 , 2500.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 116.6 , 76.5 , 178.0 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
@@ -383,17 +384,17 @@ void handleFrame(const speechPlayer_frame_t* frame){
 	       
 	};
 
+speechPlayer_frame_t *framerr;
 
-void main(void){
+void init_nvp(void){
   // set up frame, buffer, fill buffer and write as wav following other example votrax?
 
-  signed int framebuffer[1024]; int i;
 
-  FILE * fo;
+  //  FILE * fo;
 
   // open file to write
-  fo = fopen("testnvp.pcm", "wb");
-  speechPlayer_frame_t *framerr=&framer;
+  //  fo = fopen("testnvp.pcm", "wb");
+framerr=&framer;
 
   /// globals and sets of voices
   /// also start and end pitch
@@ -417,7 +418,14 @@ void main(void){
 
   // read in from array data[random][x]
 
-  while(1){
+
+}
+
+void runnvpframe(void){
+
+  signed int framebuffer[1024]; int i;
+
+
   INITRES(&r1,0);
   INITRES(&r2,0);
   INITRES(&r3,0);
@@ -475,10 +483,10 @@ framerr->fricationAmplitude=data[random][36];
 
  framerr->voiceAmplitude=1.0;
   // call generatespeechwave
-  generateSpeechWave(framerr,1000,framebuffer);
+   generateSpeechWave(framerr,1000,framebuffer);
 
 
-  for (i=0;i<1000;i++){
+  /*  for (i=0;i<1000;i++){
     int s16=framebuffer[i];
     //    printf("%d\n",framebuffer[i]);
 
@@ -486,6 +494,7 @@ framerr->fricationAmplitude=data[random][36];
     fwrite(&c, 1, 1, fo);
     c = ((unsigned)s16 / 256) & 255;
     fwrite(&c, 1, 1, fo);
-  }
-}
+    }*/
+
+
 }

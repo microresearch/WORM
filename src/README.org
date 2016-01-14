@@ -1379,6 +1379,12 @@ length of all phonemes) and we schedule updates (when/how - at speed of playback
 ** 13/1
 
 - nvp.c working on laptop with phonemes defined - possible here to
-  vary across short 32 sample frames: interpolation and length of
+  vary across short 32/100 sample frames: interpolation and length of
   phoneme, pitch of phoneme, vibrato, gain and other globals TODO-
   backport to ARM - inits etc.
+
+- also above variations for own worm voice synthesis
+
+** 14/1
+
+- ported back nvp.c but still needs fix for buffer
