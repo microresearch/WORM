@@ -1,4 +1,4 @@
-/// testing first on laptop
+/// testing first on laptop - works and now compiling for ARM!
 /*
 #include <errno.h>
 #include <math.h>
@@ -12,6 +12,8 @@
 #include "audio.h"
 
 //typedef unsigned int u16;
+
+/// below is from data.py 
 
 const float data[48][37]={
 { 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
@@ -396,15 +398,6 @@ void init_nvp(void){
   //  fo = fopen("testnvp.pcm", "wb");
 framerr=&framer;
 
-  /// globals and sets of voices
-  /// also start and end pitch
-  framerr->preFormantGain=1.0;
-  framerr->vibratoPitchOffset=0.1;
-  framerr->vibratoSpeed=5.5;
-  framerr->voicePitch=150;
-
-  framerr->outputGain=1.0;
-  framerr->endVoicePitch=200;
 
   /*	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
@@ -417,14 +410,46 @@ framerr=&framer;
   */
 
   // read in from array data[random][x]
-
-
 }
 
-void runnvpframe(void){
+void change_nvpparams(float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp){
 
-  signed int framebuffer[1024]; int i;
+  /// globals and sets of voices
+  /// also start and end pitch
 
+  //// but where do we get these settings from as voices just have mults?
+
+  // constants are for singing:
+
+  /*
+frame.preFormantGain=2.0 or 1.0 for not singing
+frame.voiceAmplitude=1.0
+frame.vibratoPitchOffset=0.125 - change this - maybe singing and voice modes and worm mode TODO!
+frame.vibratoSpeed=5.5 - above
+
+pitch is fundamental and endpitch is used to get voicepitchinc as in: 
+
+newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
+
+frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
+
+outputgain: frame.outputGain=2.0 unless we need silence!
+
+  */
+  framerr->glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+  framerr->preFormantGain=prefgain;
+  framerr->vibratoPitchOffset=vpoffset;
+  framerr->vibratoSpeed=vspeed;
+  framerr->voicePitch=vpitch;
+
+  framerr->outputGain=outgain;
+  framerr->endVoicePitch=envpitch;
+  framerr->voiceAmplitude=voiceamp;
+}
+
+void run_nvpframe(u16 size){
+
+  signed int framebuffer[320]; int i;
 
   INITRES(&r1,0);
   INITRES(&r2,0);
@@ -439,6 +464,8 @@ void runnvpframe(void){
   INITRES(&rr4,0);
   INITRES(&rr5,0);
   INITRES(&rr6,0);
+
+  /// select phoneme
 
   unsigned char random=rand()%48; 
 
@@ -480,10 +507,38 @@ framerr->pa6=data[random][34];
 framerr->parallelBypass=data[random][35];
 framerr->fricationAmplitude=data[random][36];
 
+/// apply mults from voices eg.:
 
- framerr->voiceAmplitude=1.0;
+/*
+		'Benjamin':{
+		'cf1_mul':1.01,
+		'cf2_mul':1.02,
+		#'cf3_mul':0.96,
+		'cf4':3770,
+		'cf5':4100,
+		'cf6':5000,
+		'cfNP_mul':0.9,
+		'cb1_mul':1.3,
+		'fricationAmplitude_mul':0.7,
+		'pa6_mul':1.3,
+ */
+
+// question of interpolation - still q of samplecounter and size of frame?
+
+/* 
+ double curFadeRatio=(double)sampleCounter/(newFrameRequest->numFadeSamples);
+ for(int i=0;i<speechPlayer_frame_numParams;++i) {
+   ((speechPlayer_frameParam_t*)&curFrame)[i]=calculateValueAtFadePosition(((speechPlayer_frameParam_t*)&(oldFrameRequest->frame))[i],((speechPlayer_frameParam_t*)&(newFrameRequest->frame))[i],curFadeRatio);
+ }
+}
+*/
+
+//still question of length of phoneme/number of frames/samples?
+
+// in ipa.py def calculatePhonemeTimes(phonemeList,baseSpeed) speed also to vary which is 1;;; or we use phonemetime as variable
+
   // call generatespeechwave
-   generateSpeechWave(framerr,1000,framebuffer);
+   generateSpeechWave(framerr,size,framebuffer);
 
 
   /*  for (i=0;i<1000;i++){

@@ -1353,7 +1353,7 @@ player.queueFrame(frame,//frame=120,fade=100)
 	_curVolume=1.0
 	_curRate=1.0
 
-TODO: test generating a single frame (laptop?)
+TODO: test generating a single frame (laptop?) DONE
 
 4/rest of mame porting
 
@@ -1370,7 +1370,6 @@ generate_simpleklatt(incoming, outgoing)
 first klatt runs round and round in audio_buffer (but only at full
 length of all phonemes) and we schedule updates (when/how - at speed of playback)
 
-*also to simplify - where is u16 and so on defined (from something in audio.h), clearer coding style for all underscores etc???*
 
 5/worm.c filled out with ideas
 
@@ -1381,10 +1380,52 @@ length of all phonemes) and we schedule updates (when/how - at speed of playback
 - nvp.c working on laptop with phonemes defined - possible here to
   vary across short 32/100 sample frames: interpolation and length of
   phoneme, pitch of phoneme, vibrato, gain and other globals TODO-
-  backport to ARM - inits etc.
+  backport to ARM - inits etc. DONE
 
-- also above variations for own worm voice synthesis
+- also above variations for own worm voice synthesis in worm.c
 
-** 14/1
+** 14/1 - 15/1
 
-- ported back nvp.c but still needs fix for buffer
+*also to simplify - where is u16 and so on defined (from something in audio.h), clearer coding style for all underscores etc???*
+
+- ported back nvp.c but still needs fix for buffer, and any
+  interpolations between frame parameters
+
+- we need a naming scheme to fix on: eg. for nvp algo:
+
+init_nvp(void)
+
+settings_changed_nvp(selx,sely,selz,struct of generic settings) - but
+what are these settings for each? again wrap this/this is wrapper...
+
+runframe_nvp(size)
+
+generate_nvp(incoming,outgoing) is wrapper
+
++ generic struct for keeping track of wrapper
+
+- also generic scheme for worming through parameter lists: worm simulation, length of param list
+
+wormsim: see http://gamedev.stackexchange.com/questions/12059/why-do-objects-interpenetrate-in-this-simple-collision-solver
+
+mass, velocity, size and direction ???
+
+and: http://www.openprocessing.org/sketch/10781
+
+RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3482666/
+
+- nvp.c what is the full list of global and frame variables?
+
+*TODO:*
+
+- finish basic tests on ARM and ports above form TODO: nvp, klatt_simple, mame stuff, look at mage
+
+- re-organise namings with wrappers for generate, all_changes_to_params and so on, check globals, all a bit more organised
+
+- worming scheme/simulation, own worm tube/hybrid models
+
+- excitation quetsions, LPC research, TRM, klatt all done
+
+- vocoder to finalise
+
+- wrap up, tweak and test
