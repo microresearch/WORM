@@ -399,6 +399,21 @@ void init_nvp(void){
 framerr=&framer;
 
 
+  INITRES(&r1,0);
+  INITRES(&r2,0);
+  INITRES(&r3,0);
+  INITRES(&r4,0);
+  INITRES(&r5,0);
+  INITRES(&r6,0);
+  INITRES(&rN0,0);
+  INITRES(&rr1,0);
+  INITRES(&rr2,0);
+  INITRES(&rr3,0);
+  INITRES(&rr4,0);
+  INITRES(&rr5,0);
+  INITRES(&rr6,0);
+
+
   /*	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
@@ -451,19 +466,7 @@ void run_nvpframe(u16 size){
 
   signed int framebuffer[320]; int i;
 
-  INITRES(&r1,0);
-  INITRES(&r2,0);
-  INITRES(&r3,0);
-  INITRES(&r4,0);
-  INITRES(&r5,0);
-  INITRES(&r6,0);
-  INITRES(&rN0,0);
-  INITRES(&rr1,0);
-  INITRES(&rr2,0);
-  INITRES(&rr3,0);
-  INITRES(&rr4,0);
-  INITRES(&rr5,0);
-  INITRES(&rr6,0);
+  // do we need to INITRES above or just reset freq and bandwidth as we do below anyways
 
   /// select phoneme
 
@@ -534,6 +537,8 @@ framerr->fricationAmplitude=data[random][36];
 */
 
 //still question of length of phoneme/number of frames/samples?
+
+// what are limits for phoneme length?
 
 // in ipa.py def calculatePhonemeTimes(phonemeList,baseSpeed) speed also to vary which is 1;;; or we use phonemetime as variable
 

@@ -1285,7 +1285,7 @@ and LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpana
 
 *** software and plan
 
-- 48k as new sample rate? or?
+- 48k as new sample rate? or? stick on 32k!
 
 - finish portings=nvaccess????///31/12 list above// run thru all in docs and discard
 
@@ -1370,7 +1370,6 @@ generate_simpleklatt(incoming, outgoing)
 first klatt runs round and round in audio_buffer (but only at full
 length of all phonemes) and we schedule updates (when/how - at speed of playback)
 
-
 5/worm.c filled out with ideas
 
 6/look into mage above// questions
@@ -1418,14 +1417,46 @@ RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.n
 
 *TODO:*
 
-- finish basic tests on ARM and ports above form TODO: nvp, klatt_simple, mame stuff, look at mage
+- finish basic tests on ARM and ports above from TODO: nvp,
+  klatt_simple, mame stuff=SP0256 by Joseph Zbiciak-above in MAME but
+  not free/ TMS5200, look at mage,
+  voicform=file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c
+  (check differences)
+
+- what works well which we have so far?
 
 - re-organise namings with wrappers for generate, all_changes_to_params and so on, check globals, all a bit more organised
 
 - worming scheme/simulation, own worm tube/hybrid models
+
+- record ravens - how to process? LPC?
 
 - excitation quetsions, LPC research, TRM, klatt all done
 
 - vocoder to finalise
 
 - wrap up, tweak and test
+
+** 18/1 
+
+- see also vtsynth and vtcalcs/src (how matlab code relates - mex?) for vocal tract modelling - perhaps leave these for next stage!
+
+vtsynth relates to vtcalcs(matlab?): 
+
+VTCalcs is a vocal tract model written by Dr. Shinji Maeda. It was
+originally available for DOS only. This Matlab version can be compiled
+and run on any platform supported by Mathworks. In addition, a newer
+version of the synthesizer is available (VTsynth). This synthesizer is
+used in VTCalcs, but has to be compiled separately from the mex files
+in VTcalcs.
+
+** 19/1
+
+- what needs testing/changing - nvp, klatt round robin and scheduling, simpleklatt:
+
+nvp: phoneme length from ipa.py 0 from 6 to 60, 50 to 100 in
+midi_sing... as param // so list all params...
+
+klatt round robin: array of phoneme lengths!
+
+- wrapping eg. generate
