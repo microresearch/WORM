@@ -1476,13 +1476,26 @@ klatt round robin: array of phoneme lengths!
 
 ** 20/1
 
+- for all question of large number of parameters to change: worm
+  through, vectors of transformation, presets such as voices/phonemes
+  to select and transition between if necessary
+
 - for crow or raven voice use LPC and also try inverse filter/lpc
   thing for KLATT as source (??) - do this when we do all LPC tests
+
+- praat installed for analysis
 
 NVP:
 
 - nvp_pc.c for pc version testings - interpolation, voice over-ride
-  and muls, all params and length varying
+  and mulsDONE, all params and length varying
+
+// basic voice and null voice in place but we need a phrase for it to say for testing->DONE
+
+// still question of length of frame as seems short at 320 here - 880
+is more like size (from 120 odd in say_hannah???) - but 550 in playVowel...
+
+// other voices DONE - but should create our own based on klatt parameters
 
 SELX- phoneme and its length?
 
@@ -1492,3 +1505,12 @@ SELZ- pitch
 
 also wormings///
 
+///////TODO:
+
+// interpolation/fade is for first fade samples of new frame... DONE but messy with pointers so try to clean up
+
+// also pitch shift - see notes
+
+//fixed bugs in initres, other bugs and new data.py, TODO- port ALL back to ARM
+
+// use nvp model of running -> larger buffer and schedule frame updates in round style again
