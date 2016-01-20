@@ -1468,7 +1468,7 @@ in VTcalcs.
 nvp: phoneme length from ipa.py 0 from 6 to 60, 50 to 100 in
 midi_sing... as param // so list all params:
 
-also multipliers and frame param over-rides for different voices
+also multipliers and frame param over-rides for different voicesDONE
 
 klatt round robin: array of phoneme lengths!
 
@@ -1507,10 +1507,12 @@ also wormings///
 
 ///////TODO:
 
+//fixed bugs in initres, other bugs and new data.py, TODO- port ALL back to ARM
+
 // interpolation/fade is for first fade samples of new frame... DONE but messy with pointers so try to clean up
 
 // also pitch shift - see notes
 
-//fixed bugs in initres, other bugs and new data.py, TODO- port ALL back to ARM
+// use nvp model of running -> larger buffer and schedule frame updates in round style again as in klatt
 
-// use nvp model of running -> larger buffer and schedule frame updates in round style again
+// variables=pitch, length, voice, phoneme

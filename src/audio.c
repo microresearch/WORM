@@ -401,9 +401,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     }
     break;
   case 20: // tests for nvp.c
-    // just use 32 sized phoneme for tests now - but what of buffering there
-    run_nvpframe(sz/2,mono_buffer);
-    break;
+x    break;
 
   } // mode end
 

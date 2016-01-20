@@ -1,71 +1,4 @@
-/// testing first on laptop - works and now compiling for ARM!
-/*
-#include <errno.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <sys/times.h>
-#include <sys/unistd.h>
-*/
-#include "stm32f4xx.h"
-#include "audio.h"
-
-//typedef unsigned int u16;
-
-/// below is from data.py 
-
-const float data[48][37]={
-{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
-{ 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 650.0 , 1430.0 , 2500.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 116.6 , 76.5 , 178.0 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 530 , 1310 , 2400 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 80 , 50 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 620.0 , 1100.0 , 2520.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 115.5 , 52.5 , 86.25 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 450 , 870 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 99.0 , 75.0 , 60.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 600 , 990 , 2570 , 3300 , 3750 , 4900 , 90 , 100 , 80 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 45.0 , 82.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 100 , 60 , 110 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 200 , 1100 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 75.0 , 97.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1100 , 2150 , 3300 , 3750 , 4900 , 60 , 100 , 130 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.05 , 1.0 },
-{ 200 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 75.0 , 127.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1600 , 2600 , 3300 , 3750 , 4900 , 60 , 100 , 170 , 250 , 200 , 1000 , 0 , 0.333333333333 , 0.333333333333 , 0.0 , 0.0 , 0.833333333333 , 0.0 , 1.0 },
-{ 340 , 1100 , 2080 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 90.0 , 112.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 340 , 1100 , 2080 , 3300 , 3750 , 4900 , 200 , 120 , 150 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.95 , 1.0 },
-{ 360 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 200 , 90 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.366666666667 , 0.5 , 0.433333333333 , 0.433333333333 , 0.0 , 1.0 },
-{ 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 50 , 100 , 280 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 280 , 1700 , 2740 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1340 , 2470 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 112.5 , 165.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 300 , 150 , 220 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.1 , 1.0 },
-{ 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 90.0 , 187.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 300 , 120 , 250 , 250 , 200 , 1000 , 0 , 0.416666666667 , 0.416666666667 , 0.0 , 0.0 , 1.0 , 0.0 , 1.0 },
-{ 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 90.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 60 , 90 , 120 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.95 , 1.0 },
-{ 240 , 1390 , 2530 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 135.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 240 , 1390 , 2530 , 3300 , 3750 , 4900 , 70 , 60 , 180 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.866666666667 , 0.0 , 1.0 },
-{ 300 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 176.0 , 82.5 , 157.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1600 , 2600 , 3300 , 3750 , 4900 , 160 , 110 , 210 , 250 , 200 , 1000 , 0 , 0.0 , 0.316666666667 , 0.433333333333 , 0.5 , 0.516666666667 , 0.0 , 1.0 },
-{ 260 , 2070 , 3020 , 3300 , 3750 , 4900 , 250 , 200.0 , 44.0 , 187.5 , 375.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 260 , 2070 , 3020 , 3300 , 3750 , 4900 , 40 , 250 , 500 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 405 , 900 , 2420 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 75.0 , 60.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 450 , 1100 , 2350 , 3300 , 3750 , 4900 , 80 , 100 , 80 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 80 , 50 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 70 , 60 , 280 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
-{ 550 , 960 , 2400 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 97.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 550 , 960 , 2400 , 3300 , 3750 , 4900 , 80 , 50 , 130 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 100 , 150 , 200 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 90.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 100 , 150 , 200 , 3300 , 3750 , 4900 , 60 , 90 , 120 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
-{ 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 200 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 },
-{ 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 80 , 70 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 },
-{ 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 143.0 , 52.5 , 120.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 45.0 , 82.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 100 , 60 , 110 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 60 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 660 , 1200 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 52.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 660 , 1200 , 2550 , 3300 , 3750 , 4900 , 100 , 70 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 112.5 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 60 , 150 , 280 , 250 , 200 , 1000 , 0 , 0.5 , 0.45 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 },
-{ 480 , 1720 , 2520 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 75.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 480 , 1720 , 2520 , 3300 , 3750 , 4900 , 70 , 100 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 112.5 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1990 , 2650 , 3300 , 3750 , 4900 , 60 , 150 , 200 , 250 , 200 , 1000 , 0 , 0.8 , 0.65 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 },
-{ 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 112.5 , 240.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 70 , 150 , 320 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 250 , 200.0 , 49.5 , 150.0 , 300.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 45 , 200 , 400 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 300 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 275.0 , 120.0 , 247.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1990 , 2650 , 3300 , 3750 , 4900 , 250 , 130 , 200 , 250 , 200 , 1000 , 0 , 0.8 , 0.633333333333 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 },
-{ 472 , 1100 , 2130 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 150.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1270 , 2130 , 3300 , 3750 , 4900 , 40 , 200 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 52.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 80 , 70 , 70 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 60.0 , 127.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 60 , 80 , 170 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 },
-{ 320 , 1390 , 2530 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 60.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1390 , 2530 , 3300 , 3750 , 5250 , 200 , 80 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.866666666667 , 0.0 , 1.0 },
-{ 290 , 1350 , 2280 , 3300 , 3750 , 4900 , 250 , 200.0 , 71.5 , 82.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 350 , 1250 , 2200 , 3300 , 3750 , 4900 , 65 , 110 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 },
-{ 310 , 1050 , 1350 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 75.0 , 112.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2050 , 3300 , 3750 , 4900 , 70 , 100 , 150 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 }
-};
-
+/// ARM revert
 
 /*
 This file is a part of the NV Speech Player project. 
@@ -85,118 +18,96 @@ http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 */
 
-/*
-finish c port// need frame management?
+#include "stm32f4xx.h"
+#include "audio.h"
 
-*/
+/// below is from data.py in no particular order output by print.py
 
-unsigned int sampleRRate=32000;
+// 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
+
+
+const float data[48][39]={
+{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
+{ 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 0 , 0.75 },
+{ 650.0 , 1430.0 , 2500.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 116.6 , 76.5 , 178.0 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 530 , 1310 , 2400 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 80 , 50 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 620.0 , 1100.0 , 2520.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 115.5 , 52.5 , 86.25 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 450 , 870 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 99.0 , 75.0 , 60.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 600 , 990 , 2570 , 3300 , 3750 , 4900 , 90 , 100 , 80 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 45.0 , 82.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 100 , 60 , 110 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 200 , 1100 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 75.0 , 97.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1100 , 2150 , 3300 , 3750 , 4900 , 60 , 100 , 130 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.05 , 1.0 , 1.0 , 0.0 },
+{ 200 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 75.0 , 127.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1600 , 2600 , 3300 , 3750 , 4900 , 60 , 100 , 170 , 250 , 200 , 1000 , 0 , 0.333333333333 , 0.333333333333 , 0.0 , 0.0 , 0.833333333333 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 340 , 1100 , 2080 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 90.0 , 112.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 340 , 1100 , 2080 , 3300 , 3750 , 4900 , 200 , 120 , 150 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.95 , 1.0 , 0 , 0.0 },
+{ 360 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 200 , 90 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.366666666667 , 0.5 , 0.433333333333 , 0.433333333333 , 0.0 , 1.0 , 0 , 0.0 },
+{ 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 50 , 100 , 280 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 280 , 1700 , 2740 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1340 , 2470 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 112.5 , 165.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 300 , 150 , 220 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.1 , 1.0 , 0 , 0.0 },
+{ 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 90.0 , 187.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 300 , 120 , 250 , 250 , 200 , 1000 , 0 , 0.416666666667 , 0.416666666667 , 0.0 , 0.0 , 1.0 , 0.0 , 1.0 , 0 , 0.0 },
+{ 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 90.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 60 , 90 , 120 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.95 , 1.0 , 1.0 , 0.0 },
+{ 240 , 1390 , 2530 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 135.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 240 , 1390 , 2530 , 3300 , 3750 , 4900 , 70 , 60 , 180 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.866666666667 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 300 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 176.0 , 82.5 , 157.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1600 , 2600 , 3300 , 3750 , 4900 , 160 , 110 , 210 , 250 , 200 , 1000 , 0 , 0.0 , 0.316666666667 , 0.433333333333 , 0.5 , 0.516666666667 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 260 , 2070 , 3020 , 3300 , 3750 , 4900 , 250 , 200.0 , 44.0 , 187.5 , 375.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 260 , 2070 , 3020 , 3300 , 3750 , 4900 , 40 , 250 , 500 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 405 , 900 , 2420 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 75.0 , 60.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 450 , 1100 , 2350 , 3300 , 3750 , 4900 , 80 , 100 , 80 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1220 , 2550 , 3300 , 3750 , 4900 , 80 , 50 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 70 , 60 , 280 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 550 , 960 , 2400 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 37.5 , 97.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 550 , 960 , 2400 , 3300 , 3750 , 4900 , 80 , 50 , 130 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 100 , 150 , 200 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 90.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 100 , 150 , 200 , 3300 , 3750 , 4900 , 60 , 90 , 120 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 0 , 0.75 },
+{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 45.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 200 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 , 0 , 0.0 },
+{ 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 80 , 70 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
+{ 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 143.0 , 52.5 , 120.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 45.0 , 82.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 100 , 60 , 110 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 60 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 660 , 1200 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 52.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 660 , 1200 , 2550 , 3300 , 3750 , 4900 , 100 , 70 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 112.5 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 60 , 150 , 280 , 250 , 200 , 1000 , 0 , 0.5 , 0.45 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 480 , 1720 , 2520 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 75.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 480 , 1720 , 2520 , 3300 , 3750 , 4900 , 70 , 100 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 200 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 112.5 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 200 , 1990 , 2650 , 3300 , 3750 , 4900 , 60 , 150 , 200 , 250 , 200 , 1000 , 0 , 0.8 , 0.65 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 , 1.0 , 0.0 },
+{ 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 112.5 , 240.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 70 , 150 , 320 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 250 , 200.0 , 49.5 , 150.0 , 300.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 45 , 200 , 400 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 300 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 275.0 , 120.0 , 247.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1990 , 2650 , 3300 , 3750 , 4900 , 250 , 130 , 200 , 250 , 200 , 1000 , 0 , 0.8 , 0.633333333333 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
+{ 472 , 1100 , 2130 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 150.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1270 , 2130 , 3300 , 3750 , 4900 , 40 , 200 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 52.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 80 , 70 , 70 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 60.0 , 127.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 60 , 80 , 170 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 , 1.0 , 0.0 },
+{ 320 , 1390 , 2530 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 60.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1390 , 2530 , 3300 , 3750 , 5250 , 200 , 80 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.866666666667 , 0.0 , 1.0 , 0 , 0.0 },
+{ 290 , 1350 , 2280 , 3300 , 3750 , 4900 , 250 , 200.0 , 71.5 , 82.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 350 , 1250 , 2200 , 3300 , 3750 , 4900 , 65 , 110 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 310 , 1050 , 1350 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 75.0 , 112.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2050 , 3300 , 3750 , 4900 , 70 , 100 , 150 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 }
+};
+
+unsigned int sampleRRate=16000;
 
 typedef unsigned char bool;
 
 #define false 0
 #define true 1
 
-
-
 inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
 	return oldVal+((newVal-oldVal)*curFadeRatio);
 }
 
-
-//#define _USE_MATH_DEFINES
-
 typedef float speechPlayer_frameParam_t;
 
-/// the parameters - see below from python
-
-/*
-
-voices can vary: but what of when is not a mul?
-
-'cf1_mul':1.01,
-'cf2_mul':1.02,
-'cf3_mul':0.96,
-'cf4':3770,
-'cf5':4100,
-'cf6':5000,
-'cfNP_mul':0.9,
-'cb1_mul':1.3,
-'pa6_mul':1.3,
-'fricationAmplitude_mul':0.85,
-'aspirationAmplitude':1,
-'voiceAmplitude':0,
-'voicePitch_mul':0.75,
-'endVoicePitch_mul':0.75,
-
-////
-
-  
-frame.preFormantGain=1.0
-frame.outputGain=2.0
-
-vary these:
-frame.preFormantGain=1.0
-frame.vibratoPitchOffset=0.1
-frame.vibratoSpeed=5.5
-frame.voicePitch=150
-
-
-	_curPitch=118
-	_curVoice='Adam'
-	_curInflection=0.5
-	_curVolume=1.0 	   
-	_curRate=1.0
-
-voices={
-	'Adam':{
-		'cb1_mul':1.3,
-		'pa6_mul':1.3,
-		'fricationAmplitude_mul':0.85,
-	},
-		'Benjamin':{
-		'cf1_mul':1.01,
-		'cf2_mul':1.02,
-		#'cf3_mul':0.96,
-		'cf4':3770,
-		'cf5':4100,
-		'cf6':5000,
-		'cfNP_mul':0.9,
-		'cb1_mul':1.3,
-		'fricationAmplitude_mul':0.7,
-		'pa6_mul':1.3,
-	},
-	'Caleb ':{
-		'aspirationAmplitude':1,
-		'voiceAmplitude':0,
-	},
-	'David':{
-		'voicePitch_mul':0.75,
-		'endVoicePitch_mul':0.75,
-		'cf1_mul':0.75,
-		'cf2_mul':0.85,
-		'cf3_mul':0.85,
-	},
-}
-
-def applyVoiceToFrame(frame,voiceName):
-	v=voices[voiceName]
-	for paramName in (x[0] for x in frame._fields_):
-		absVal=v.get(paramName)
-		if absVal is not None:
-			setattr(frame,paramName,absVal)
-		mulVal=v.get('%s_mul'%paramName)
-		if mulVal is not None:
-			setattr(frame,paramName,getattr(frame,paramName)*mulVal)
-*/
+typedef struct {
+  unsigned char index;
+  float value;
+  bool override;
+} voicer;
 
 typedef struct {
-	// voicing and cascaide
+  unsigned char howmany;
+  voicer voices[10];
+} voice;
 
-  // most are covered from VoiceAmp to parallelbypass below
-  // and what of the rest????
+voice benjie= { 9,{ {0,1.01,0},{1,1.02,0},{2,3770,1},{3,4110,1},{4,5000,1},{7,0.9,0},{8,1.3,0},{36,0.7,0},{34,1.3,0}}};
+voice nullie= { 0,{ {0,1.01,0},{1,1.02,0},{2,3770,1},{3,4110,1},{4,5000,1},{7,0.9,0},{8,1.3,0},{36,0.7,0},{34,1.3,0}}};
+voice adam= {3,{ {8,1.3,0},{34,1.3,0},{36,0.85,0}}};
+voice caleb= {2,{ {38,1,1}, {37,0,1}}};
 
-  // varying globally depending on voice
+typedef struct {
+  // varying globally depending on voice - but we still need to interpolate 
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
@@ -223,42 +134,36 @@ typedef struct {
 
 const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
 
-speechPlayer_frame_t framer;
+speechPlayer_frame_t framer,oldframer, tempframer;
 
 const float PITWO=M_PI*2;
 
 float lastValueOne= 0.0;
 float lastValueTwo= 0.0;
 
-float getNextNOISE(float lastValue) {
-  lastValue=((float)rand()/RAND_MAX)+0.75*lastValue;
-  return lastValue;
+float getNextNOISE(float* lastValue) {
+  *lastValue=((float)rand()/RAND_MAX)+0.75* *lastValue;
+  return *lastValue;
 };
 
 float lastCyclePosOne=0.0;
 float lastCyclePosTwo=0.0;
 
-float getNextFREQ(float lastCyclePos, float frequency) {
-  float cyclePos=fmodf((frequency/sampleRRate)+lastCyclePos,1);
-  lastCyclePos=cyclePos;
+float getNextFREQ(float* lastCyclePos, float frequency) {
+  float cyclePos=fmodf((frequency/sampleRRate)+*lastCyclePos,1);
+  *lastCyclePos=cyclePos;
   return cyclePos;
 };
 
-//FrequencyGenerator pitchGen;
-//FrequencyGenerator vibratoGen;
-//NoiseGenerator aspirationGen;
-
 bool glottisOpen;
-//VoiceGenerator(int sr): pitchGen(sr), vibratoGen(sr), aspirationGen(), glottisOpen(false) {};
-
 
 float getNextVOICE(const speechPlayer_frame_t* frame) {
-  float vibrato=(sinf(getNextFREQ(lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1; // but we need diff instances of getNExtFREQ - DONE
-  float voice=getNextFREQ(lastCyclePosTwo,frame->voicePitch*vibrato);
-  float aspiration=getNextNOISE(lastValueOne)*0.2; // again noise instancesDONE
+  float vibrato=(sinf(getNextFREQ(&lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1; // but we need diff instances of getNExtFREQ - DONE
+  float voice=getNextFREQ(&lastCyclePosTwo,frame->voicePitch*vibrato);
+  float aspiration=getNextNOISE(&lastValueOne)*0.2; // again noise instancesDONE
   float turbulence=aspiration*frame->voiceTurbulenceAmplitude;
   glottisOpen=voice>=frame->glottalOpenQuotient;
-  if(!glottisOpen) {
+  if(glottisOpen) {
     turbulence*=0.01;
   }
   voice=(voice*2)-1;
@@ -279,8 +184,8 @@ float a, b, c;
 }reson;
 
 
-reson r1,r2,r3,r4,r5,r6,rN0;
-  reson rr1,rr2,rr3,rr4,rr5,rr6;
+reson r1,r2,r3,r4,r5,r6,rN0,rNP;
+reson rr1,rr2,rr3,rr4,rr5,rr6;
 
 
 void INITRES(reson *res, bool anti) {
@@ -315,16 +220,12 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 		return out;
 };
 
-//class CascadeFormantGenerator { 
-
-//	public:
-//	CascadeFormantGenerator(int sr): sampleRRate(sr), r1(sr), r2(sr), r3(sr), r4(sr), r5(sr), r6(sr), rN0(sr,true), rNP(sr) {};
-
-	float getNextCASC(const speechPlayer_frame_t* frame, bool glottisOpen, float input) {
+	float getNextCASC(const speechPlayer_frame_t* frame, float input) {
 		input/=2.0;
 		float n0Output=resonateRES(&rN0,input,frame->cfN0,frame->cbN0);
 		float output;
-		//TODO		//		float output=calculateValueAtFadePosition(input,rNP.resonate(n0Output,frame->cfNP,frame->cbNP),frame->caNP);
+		output=calculateValueAtFadePosition(input,resonateRES(&rNP,n0Output,frame->cfNP,frame->cbNP),frame->caNP);
+		//		output=resonateRES(&rNP,n0Output,frame->cfNP,frame->cbNP);
 		    output=resonateRES(&r6,output,frame->cf6,frame->cb6);
 		    output=resonateRES(&r5,output,frame->cf5,frame->cb5);
 		    output=resonateRES(&r4,output,frame->cf4,frame->cb4);
@@ -333,10 +234,6 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 		    output=resonateRES(&r1,output,frame->cf1,frame->cb1);
 		return output;
 	};
-
-
-
-
 
 	float getNextPARALLEL(const speechPlayer_frame_t* frame, float input) {
 		input/=2.0;
@@ -347,79 +244,52 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 		output+=(resonateRES(&rr4,input,frame->pf4,frame->pb4)-input)*frame->pa4;
 		output+=(resonateRES(&rr5,input,frame->pf5,frame->pb5)-input)*frame->pa5;
 		output+=(resonateRES(&rr6,input,frame->pf6,frame->pb6)-input)*frame->pa6;
-//		return calculateValueAtFadePosition(output,input,frame->parallelBypass);
-		return output;
+		return calculateValueAtFadePosition(output,input,frame->parallelBypass);
 };
 
-/*
-class SpeechWaveGeneratorImpl: public SpeechWaveGenerator {
-	private:
-	int sampleRRate;
-	VoiceGenerator voiceGenerator;
-	NoiseGenerator fricGenerator;
-	CascadeFormantGenerator cascade;
-	ParallelFormantGenerator parallel;
-	FrameManager* frameManager;
+speechPlayer_frame_t *framerr,*oldframerr, *tempframe;
 
-	public:
-	SpeechWaveGeneratorImpl(int sr): sampleRRate(sr), voiceGenerator(sr), fricGenerator(), cascade(sr), parallel(sr), frameManager(NULL) {
-	}
-*/
+unsigned int generateSpeechWave(const speechPlayer_frame_t* frame, u16 sampleCount,u16 interpol, int16_t* sampleBuf) {
 
-// TODO: init all generators res etc, how to handle frames and frame parameters
-
-
-void handleFrame(const speechPlayer_frame_t* frame){
-  // init frame with data - read in one test frame, and how long is frame in terms of sampleCount???? see frameManager?
-
-  // pass on to generateSpeechWave(const speechPlayer_frame_t* frame, const unsigned int sampleCount, u16* sampleBuf);
-
-};
-
-
-	unsigned int generateSpeechWave(const speechPlayer_frame_t* frame, const u16 sampleCount,int16_t* sampleBuf) {
-	  //		if(!frameManager) return 0; 
+  // TODO: samplecounternew as static and then get next frame from array when we hit length (which might change) and write to audio_buffer
+  // so length needs to be defined - but not interpolated
 		float val=0;
-		unsigned int i;
-		for(i=0;i<sampleCount;++i) {
-		  //		const speechPlayer_frame_t* frame=frameManager->getCurrentFrame();
-		  //	if(frame) {
+		unsigned int i,j;
+		for(i=0;i<sampleCount;i++) {		  
 
+		  if (i<interpol){
+		    float curFadeRatio=(float)i/(interpol);
+		    for(j=0;j<speechPlayer_frame_numParams;++j) {
+		      ((float*)tempframe)[j]=calculateValueAtFadePosition(((float*)oldframerr)[j],((float*)frame)[j],curFadeRatio); 
+			      }
+ }
 
-				float voice=getNextVOICE(frame);
-				float cascadeOut=getNextCASC(frame,glottisOpen,voice*frame->preFormantGain);
-				float fric=getNextNOISE(lastValueTwo)*0.3*frame->fricationAmplitude;
-				float parallelOut=getNextPARALLEL(frame,fric*frame->preFormantGain);
-				float out=(cascadeOut+parallelOut)*frame->outputGain;
+		  // for pitch interpolates:
+
+		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
+		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
+		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
+		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
+
+				float voice=getNextVOICE(tempframe);
+				float cascadeOut=getNextCASC(tempframe,voice*tempframe->preFormantGain);
+				float fric=getNextNOISE(&lastValueTwo)*0.3*tempframe->fricationAmplitude;
+				float parallelOut=getNextPARALLEL(tempframe,fric*tempframe->preFormantGain);
+				float out=(cascadeOut+parallelOut)*tempframe->outputGain;
 				//				printf("%f\n",out);
 				sampleBuf[i]=out*4000;
 				
 				if (sampleBuf[i]>32767) sampleBuf[i]=32767;
 				if (sampleBuf[i]<-32767) sampleBuf[i]=-32767;
-				//								printf("%d\n",sampleBuf[i]);
-				//	} else {
-				//				return i;
-				//			}
-				//		}
 		}
 		return sampleCount;
-	       
 	};
 
-speechPlayer_frame_t *framerr;
 
 void change_nvpparams(float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
 void init_nvp(void){
   // set up frame, buffer, fill buffer and write as wav following other example votrax?
-
-
-  //  FILE * fo;
-
-  // open file to write
-  //  fo = fopen("testnvp.pcm", "wb");
-framerr=&framer;
-
 
   INITRES(&r1,0);
   INITRES(&r2,0);
@@ -428,6 +298,7 @@ framerr=&framer;
   INITRES(&r5,0);
   INITRES(&r6,0);
   INITRES(&rN0,0);
+  INITRES(&rNP,0);
   INITRES(&rr1,0);
   INITRES(&rr2,0);
   INITRES(&rr3,0);
@@ -435,28 +306,14 @@ framerr=&framer;
   INITRES(&rr5,0);
   INITRES(&rr6,0);
 
-
-  /*	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
-	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
-	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
-	speechPlayer_frameParam_t voiceTurbulenceAmplitude; // amplitude of voice breathiness from 0 to 1 
-
-	speechPlayer_frameParam_t preFormantGain; // amplitude from 0 to 1 of all vocal tract sound (voicing, frication) before entering formant resonators. Useful for stopping/starting speech
-	speechPlayer_frameParam_t outputGain; // amplitude from 0 to 1 of final output (master volume) 
-	speechPlayer_frameParam_t endVoicePitch; //  pitch of voice at the end of the frame length  - see ipa.py so not used here?
-  */
-
-  change_nvpparams(0.5,1.0, 0.125, 5.5,500.0, 2.0,0, 1.0,0); // envpitch=endVoicePitch is unused, 
-
+  //change_nvpparams(1.0, 1.0, 0.125, 5.5, 250.0, 2.0, 0, 1.0, 0); // envpitch=endVoicePitch is unused, 
+  change_nvpparams(1.0, 1.0, 0, 0, 250.0, 1.0, 0, 1.0, 1.0); // envpitch=endVoicePitch is unused, 
 }
 
 void change_nvpparams(float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby){
 
   /// globals and sets of voices
   /// also start and end pitch
-
-  //// but where do we get these settings from as voices mostly just have mults?
-
   // constants are for singing:
 
   /*
@@ -474,92 +331,72 @@ frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameReques
 outputgain: frame.outputGain=2.0 unless we need silence!
 
   */
+
   framerr->glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
   framerr->voiceTurbulenceAmplitude=turby;
   framerr->preFormantGain=prefgain;
   framerr->vibratoPitchOffset=vpoffset;
   framerr->vibratoSpeed=vspeed;
   framerr->voicePitch=vpitch;
-
   framerr->outputGain=outgain;
   framerr->endVoicePitch=envpitch;
-  framerr->voiceAmplitude=voiceamp;
 }
 
-void run_nvpframe(u16 size, int16_t* inbb){
+void run_nvpframe(void){ // TODO: scheduling so most of this in generate above
 
-  //signed int framebuffer[320]; 
+  int16_t framebuffer[1024]; 
   int i;
+  //  fo = fopen("testnvp.pcm", "wb");
+  framerr=&framer;
+  oldframerr=&oldframer;
+  tempframe=&tempframer;
 
-  // do we need to INITRES above or just reset freq and bandwidth as we do below anyways
+  // TODO: this is init
+  
+   float *indexy[39]={&framerr->cf1, &framerr->cf2, &framerr->cf3, &framerr->cf4, &framerr->cf5, &framerr->cf6, &framerr->cfN0, &framerr->cfNP,  &framerr->cb1, &framerr->cb2, &framerr->cb3, &framerr->cb4, &framerr->cb5, &framerr->cb6, &framerr->cbN0, &framerr->caNP, &framerr->caNP, &framerr->pf1, &framerr->pf2, &framerr->pf3, &framerr->pf4, &framerr->pf5, &framerr->pf6, &framerr->pb1, &framerr->pb2, &framerr->pb3, &framerr->pb4, &framerr->pb5, &framerr->pb6, &framerr->pa1, &framerr->pa2, &framerr->pa3, &framerr->pa4, &framerr->pa5, &framerr->pa6, &framerr->parallelBypass, &framerr->fricationAmplitude, &framerr->voiceAmplitude, &framerr->aspirationAmplitude}; 
 
-  /// select phoneme
+   // test for one phrase TODO: remove
+  int c=0;
+  unsigned char sayhan[5]={38,38,13,31,31};
 
-  unsigned char random=rand()%48; 
+    framerr->preFormantGain=1.0;
+    framerr->vibratoPitchOffset=0.1;
+    framerr->vibratoSpeed=5.5;
+    framerr->voicePitch=150;
 
-framerr->cf1=data[random][0];
-framerr->cf2=data[random][1];
-framerr->cf3=data[random][2];
-framerr->cf4=data[random][3];
-framerr->cf5=data[random][4];
-framerr->cf6=data[random][5];
-framerr->cfN0=data[random][6];
-framerr->cfNP=data[random][7];
-framerr->cb1=data[random][8];
-framerr->cb2=data[random][9];
- framerr->cb3=data[random][10];
- framerr->cb4=data[random][11];
- framerr->cb5=data[random][12];
- framerr->cb6=data[random][13];
- framerr->cbN0=data[random][14];
-framerr->cbNP=data[random][15];
-framerr->caNP=data[random][16];
-framerr->pf1=data[random][17];
-framerr->pf2=data[random][18];
-framerr->pf3=data[random][19];
-framerr->pf4=data[random][20];
-framerr->pf5=data[random][21];
-framerr->pf6=data[random][22];
-framerr->pb1=data[random][23];
-framerr->pb2=data[random][24];
-framerr->pb3=data[random][25];
-framerr->pb4=data[random][26];
-framerr->pb5=data[random][27];
-framerr->pb6=data[random][28];
-framerr->pa1=data[random][29];
-framerr->pa2=data[random][30];
-framerr->pa3=data[random][31];
-framerr->pa4=data[random][32];
-framerr->pa5=data[random][33];
-framerr->pa6=data[random][34];
-framerr->parallelBypass=data[random][35];
-framerr->fricationAmplitude=data[random][36];
+    while(c<5){
 
-/// apply mults from voices eg.:
+      unsigned char random=rand()%48; 
+    
+    random=sayhan[c];
+    if (c==0) *indexy[37]=0;
+    else *indexy[37]=1;
+    if (c==2) framerr->voicePitch=100;
+    if (c==3) framerr->voicePitch=90;
+    if (c==4) framerr->preFormantGain=0;
 
-/*
-		'Benjamin':{
-		'cf1_mul':1.01,
-		'cf2_mul':1.02,
-		#'cf3_mul':0.96,
-		'cf4':3770,
-		'cf5':4100,
-		'cf6':5000,
-		'cfNP_mul':0.9,
-		'cb1_mul':1.3,
-		'fricationAmplitude_mul':0.7,
-		'pa6_mul':1.3,
- */
 
-// question of interpolation - still q of samplecounter and size of frame?
+  for (i=0;i<39;i++){
+    *indexy[i]=data[random][i];
+  }
 
-/* 
- double curFadeRatio=(double)sampleCounter/(newFrameRequest->numFadeSamples);
- for(int i=0;i<speechPlayer_frame_numParams;++i) {
-   ((speechPlayer_frameParam_t*)&curFrame)[i]=calculateValueAtFadePosition(((speechPlayer_frameParam_t*)&(oldFrameRequest->frame))[i],((speechPlayer_frameParam_t*)&(newFrameRequest->frame))[i],curFadeRatio);
+
+// voice* voicey= &benjie;
+ voice* voicey= &nullie;
+ //  voice* voicey= &adam;
+
+ for (i=0;i<voicey->howmany;i++){
+      if (voicey->voices[i].override) *indexy[voicey->voices[i].index]=voicey->voices[i].value;
+      else *indexy[voicey->voices[i].index]*=voicey->voices[i].value;
  }
-}
-*/
+
+ if (c==0)   {
+   memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); 
+   framerr->preFormantGain=0;
+ }
+ else     framerr->preFormantGain=1.0;
+
+    c++;
 
 //still question of length of phoneme/number of frames/samples?
 
@@ -567,19 +404,9 @@ framerr->fricationAmplitude=data[random][36];
 
 // in ipa.py def calculatePhonemeTimes(phonemeList,baseSpeed) speed also to vary which is 1;;; or we use phonemetime as variable
 
-  // call generatespeechwave
-   generateSpeechWave(framerr,size,inbb);
+ generateSpeechWave(framerr,880,400,framebuffer);
 
-
-  /*  for (i=0;i<1000;i++){
-    int s16=framebuffer[i];
-    //    printf("%d\n",framebuffer[i]);
-
-    unsigned char c = (unsigned)s16 & 255;
-    fwrite(&c, 1, 1, fo);
-    c = ((unsigned)s16 / 256) & 255;
-    fwrite(&c, 1, 1, fo);
-    }*/
-
-
+ memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); 
+    }
+   
 }
