@@ -24,6 +24,7 @@ LINEIN/OUTL-filter
 #include "voicform.h"
 #include "lpcansc.h"
 #include "parwave.h"
+#include "nvp.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -98,6 +99,7 @@ void Audio_Init(void)
 	LPCAnalyzer_init();
 	initvoicform();
 	init_simpleklatt();
+	init_nvp();
 
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
@@ -397,8 +399,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       samplepos+=samplespeed;
       if (readpos>=ending) samplepos=0.0f;    
     }
-
-
+    break;
+  case 20: // tests for nvp.c
+    // just use 32 sized phoneme for tests now - but what of buffering there
+    run_nvpframe(sz/2,mono_buffer);
+    break;
 
   } // mode end
 

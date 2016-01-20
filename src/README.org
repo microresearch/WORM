@@ -4,6 +4,17 @@
 
 *we always need transition from previous phoneme for each mode (inc X/Y)!* - this can also be faked/transition in phoneme itself
 
+* TODO:
+
+- generate - wrapper and structure and pointer to function calls...
+
+- clear naming scheme eg. for nvp algo:
+
+init_nvp(void)
+
+generate_nvp(generator* nvp_generator, u16 size, int16_t* incoming, int16_t* outgoing)
+
+
 * modes
 
 *MODE | IS? | FILES/DIR | BASED_ON | NOTES/TODO - to add to TODO from below*
@@ -1365,7 +1376,7 @@ each as function pointer and if needs run in main as scheduler
 
 so we have function pointers eg.
 
-generate_simpleklatt(incoming, outgoing)
+generate_simpleklatt(generator, size, incoming, outgoing)
 
 first klatt runs round and round in audio_buffer (but only at full
 length of all phonemes) and we schedule updates (when/how - at speed of playback)
@@ -1431,7 +1442,7 @@ RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.n
 
 - record ravens - how to process? LPC?
 
-- excitation quetsions, LPC research, TRM, klatt all done
+- excitation questions, LPC research, TRM, klatt all done
 
 - vocoder to finalise
 
@@ -1439,7 +1450,7 @@ RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.n
 
 ** 18/1 
 
-- see also vtsynth and vtcalcs/src (how matlab code relates - mex?) for vocal tract modelling - perhaps leave these for next stage!
+- see also vtsynth and vtcalcs/src (how matlab code relates - mex?) for vocal tract modelling - *perhaps leave these for next stage!*
 
 vtsynth relates to vtcalcs(matlab?): 
 
@@ -1455,8 +1466,29 @@ in VTcalcs.
 - what needs testing/changing - nvp, klatt round robin and scheduling, simpleklatt:
 
 nvp: phoneme length from ipa.py 0 from 6 to 60, 50 to 100 in
-midi_sing... as param // so list all params...
+midi_sing... as param // so list all params:
+
+also multipliers and frame param over-rides for different voices
 
 klatt round robin: array of phoneme lengths!
 
-- wrapping eg. generate
+- wrapping eg. generate - see TODO at top here (also naming schemes)
+
+** 20/1
+
+- for crow or raven voice use LPC and also try inverse filter/lpc
+  thing for KLATT as source (??) - do this when we do all LPC tests
+
+NVP:
+
+- nvp_pc.c for pc version testings - interpolation, voice over-ride
+  and muls, all params and length varying
+
+SELX- phoneme and its length?
+
+SELY- voice?
+
+SELZ- pitch
+
+also wormings///
+

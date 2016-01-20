@@ -1,5 +1,6 @@
-/// testing first on laptop - works and now compiling for ARM!
-/*
+/// PC revert
+
+
 #include <errno.h>
 #include <math.h>
 #include <stdlib.h>
@@ -7,11 +8,8 @@
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <sys/unistd.h>
-*/
-#include "stm32f4xx.h"
-#include "audio.h"
 
-//typedef unsigned int u16;
+typedef unsigned int u16;
 
 /// below is from data.py 
 
@@ -410,15 +408,17 @@ speechPlayer_frame_t *framerr;
 
 void change_nvpparams(float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
+  FILE * fo;
+
+
 void init_nvp(void){
   // set up frame, buffer, fill buffer and write as wav following other example votrax?
 
 
-  //  FILE * fo;
 
   // open file to write
-  //  fo = fopen("testnvp.pcm", "wb");
-framerr=&framer;
+  fo = fopen("testnvp.pcm", "wb");
+  framerr=&framer;
 
 
   INITRES(&r1,0);
@@ -486,14 +486,16 @@ outputgain: frame.outputGain=2.0 unless we need silence!
   framerr->voiceAmplitude=voiceamp;
 }
 
-void run_nvpframe(u16 size, int16_t* inbb){
+void main(void){
 
-  //signed int framebuffer[320]; 
+  int16_t framebuffer[320]; 
   int i;
 
   // do we need to INITRES above or just reset freq and bandwidth as we do below anyways
-
+  init_nvp();
   /// select phoneme
+
+  while(1){
 
   unsigned char random=rand()%48; 
 
@@ -568,10 +570,10 @@ framerr->fricationAmplitude=data[random][36];
 // in ipa.py def calculatePhonemeTimes(phonemeList,baseSpeed) speed also to vary which is 1;;; or we use phonemetime as variable
 
   // call generatespeechwave
-   generateSpeechWave(framerr,size,inbb);
+   generateSpeechWave(framerr,320,framebuffer);
 
 
-  /*  for (i=0;i<1000;i++){
+    for (i=0;i<320;i++){
     int s16=framebuffer[i];
     //    printf("%d\n",framebuffer[i]);
 
@@ -579,7 +581,7 @@ framerr->fricationAmplitude=data[random][36];
     fwrite(&c, 1, 1, fo);
     c = ((unsigned)s16 / 256) & 255;
     fwrite(&c, 1, 1, fo);
-    }*/
-
+    }
+  }
 
 }
