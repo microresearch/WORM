@@ -105,7 +105,7 @@ extern int16_t audio_buffer[AUDIO_BUFSZ];
 void lpc_running(){  // write into audio buffer
   //  lpc_get_sample();
   static u16 counterrr=0;
-  int16_t samplel=(lpc_get_sample()<<6)-32768;
+  int16_t samplel=(lpc_get_sample()<<6)-32768; // TODO or scale samples/speed???
   audio_buffer[counterrr++]=samplel;
   if (counterrr>AUDIO_BUFSZ) counterrr=0;
   audio_buffer[counterrr++]=samplel;

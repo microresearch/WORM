@@ -49,16 +49,54 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 7-   | doformantfilter-few vowels | effect.c | none | try different bandpass/move between vowels/more formants 
 8-   | formlet | effect.c | SC | 
 9-   | SAM | sam.c | sam.c??? |
-10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  
+10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  // = TMS5220
+
+vocab from: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/TalkoVCO/TalkoVCO.ino]]
+
+from where else? arcade games/roms
+
+compare Talkie to MAME code...
+
+calculating:
+
+http://www.angelfire.com/electronic2/speechproject/speech_param.htm
+
+- using encoder - calc.m and romgen from talkie with freemat and online convertor - use 8 KHz 16 bit mono recordings to encode words for lpc.c
+
+see also: http://www.vectorlist.org/Vectorlist/2012/05/0062.html, unianal (bit not for TMS5220), qboxpro doesn't run on our WINE
+
+http://www.polaxis.be/category/talkie/
+
+https://github.com/going-digital/Talkie/issues/4
+
+https://github.com/going-digital/Talkie/issues/6 - question of speed/sample speed... and voice/settings
+
+http://www.stefan-uhlmann.de/cbm/MVM/Magictalkie/
+
 11-  | SC formant | scformant.c  | SC | is sine working properly? 
 12-  | borboom vocoder | vocoder/vocode.c | borboom | try with ARM FFT - do we serial conn. to check FFT?
 13-  | rendervosim | braidworm.c | braids - [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc]] | needs worming not to use straight 
 14-  | rendervowel | braidworm.c | braids | 
 15-  | rendervowelfof | braidworm.c | braids | 
 16-  | lpcanalyzer | lpcanalysiss.c  | SC | 
+
+Linear predictive coding analysis on any arbitrary input signal. The
+spectrum of the input signal is modeled, and used to filter the
+source. This works most successfully if the source is spectrally flat
+to begin with, ie, an impulse train ( Impulse UGen ) or white noise (
+WhiteNoise UGen ).
+
+- need more exciters...
+
 17-  | voicform | voicform.c  | STK | 
 18-  | tubesim | tube.c | TRM | 
+---in progress
+19-  | simpleklatt | simpleklatt.c | klatt | 
+20-  | nvp | nvp.c | nv speechplayer | klatt also |
 
+but we still need to test this or?
+
+////
 towards maximum 32 modes! cut vocoders to basic/working with swopped excitation/voice input
 
 cut other modes to focus on:
@@ -1147,11 +1185,11 @@ on, also how that change in glotPitch works with interpolation?
 
 - votrax?
   https://github.com/OpenEmu/UME-Core/blob/master/mame/src/emu/sound/votrax.c
-   - see UMECORE under sound in docs - also some other speech chip emulations eg.  TSI S14001A, TMS 5110/5220A (speek and spell)-LPC
+   - see UMECORE under sound in docs - also some other speech chip emulations eg.  TSI S14001A, [TMS 5110/5220A (speek and spell)-LPC=TALKIE!!]
 
 [[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/votrax.c::Simple%20VOTRAX%20SC-01%20simulator%20based%20on%20sample%20fragments.][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/votrax.c::Simple VOTRAX SC-01 simulator based on sample fragments.]]
 
-- TODO: port VOTRAX and TMS>????
+- TODO: port VOTRAX DONE but not working
 
 ** 18/12
 
@@ -1262,9 +1300,6 @@ also:
 
 [[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/sp0256.c::GI%20SP0256%20Narrator%20Speech%20Processor][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/sp0256.c::GI SP0256 Narrator Speech Processor]]
 
-and
-
-[[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220%20simulator][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220 simulator]]
 
 ** 31/12
 
@@ -1276,7 +1311,7 @@ and: https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
 
 - how to use what we have from votrax - break out parameters
 
-speech chips- ti99=talkie DONE?/ SP0256 by Joseph Zbiciak-above in MAME but not free/ TMS5200-above?/ VOTRAX SC01-????// speakjet?
+speech chips- ti99=talkie DONE?/ SP0256 by Joseph Zbiciak-above in MAME but not free/ VOTRAX SC01-????
 
 csound- vowgen:   // only find [[file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c]] which is like voices/voicform noted above
 
@@ -1430,7 +1465,7 @@ RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.n
 
 - finish basic tests on ARM and ports above from TODO: nvp,
   klatt_simple, mame stuff=SP0256 by Joseph Zbiciak-above in MAME but
-  not free/ TMS5200, look at mage,
+  not free, look at mage,
   voicform=file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c
   (check differences)
 
@@ -1516,3 +1551,97 @@ also wormings///
 // use nvp model of running -> larger buffer and schedule frame updates in round style again as in klatt
 
 // variables=pitch, length, voice, phoneme
+
+** 3/2->
+
+vocal fry / crows / syrinx: 
+
+klsyn: The variable 'sk', "skew to alternate periods", is the number
+        of 25 microsecond increments to be added to and subtracted
+        from successive fundamental period durations in order to
+        simulate one aspect of vocal fry, the tendency for alternate
+        periods to be more similar in duration than adjacent periods.
+
+crows have single ? tube ?
+
+what are the potential models for crow/raven vocalisation simulation:
+
+- LPC from recordings (collected) or HMM? - base excitation - wavetable excitation
+- formant model (excitation source and frequencies?)
+- tube/physical models listed: also useful for other work:
+
+1. Kelly-Lochbaum model: https://ccrma.stanford.edu/~jos/pasp/Singing_Kelly_Lochbaum_Vocal_Tract.html -> Perry Cook (refs/code? PRCThesis.pdf)
+2. tube resonance model - TRM - see tube.c
+3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis ponly
+4. waveguide model - transmission line? - perry cook/ lochbaum??? .. tube?
+5. APEX model = 2-D vocal tract articulation
+
+how these do differ? see book
+
+/////
+
+generate_xxx(incoming,outgoing,speed,howmany) - as before bug in speed could read overlap////
+
+transition as essential --- SELX/Y/Z - speed of transitions, phoneme point, pitch, shift of formants, specific parameters
+
+** 8/2 work week plan///
+
+- scheduling and generic generator functions - global? how we know where reader in audio.c is for sync, speed also
+- breakdown all models and work so far // tests...
+- TODOs elaborated eg. test (poss hardware-related) noise on different platforms
+- where are we up to with nvp?
+- futures: 
+
+articulatory models: APEX?(VocalTractExample?): based on KLvocaltract based on http://doc.sccode.org/Classes/NTube.html
+
+/// [[file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void%20NTube_next(NTube%20*unit,%20int%20inNumSamples)%20{][file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void NTube_next(NTube *unit, int inNumSamples) {]]
+
+see DAFx-15_submission_32.pdf for differences
+
+= see also  tube.c, vtcalcs/synth
+
+portings/finish/progress?: NVP, voicform in our code comp to/vowgen, simpleklatt, sp0256 - what else from MAME? TSI: [[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/s14001a.c::TSI%20S14001A%20emulator%20v1.32][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/s14001a.c::TSI S14001A emulator v1.32]]
+
+//voicform=file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c (check differences)
+
+vocoder: basic model with ARM FFT, warps
+
+research: HMM->HTK//mage
+
+praat workings
+
+- LPC raven tests as base for LPC acquaintance:
+
+*** first LPC breakdown (also in first section on modes above)
+
+// work on laptop LPC test
+
+- talkie is LPC: notes // LPC/lpc.c
+
+- lpcanalyzer | lpcanalysiss.c :
+
+Linear predictive coding analysis on any arbitrary input signal. The
+spectrum of the input signal is modeled, and used to filter the
+source. This works most successfully if the source is spectrally flat
+to begin with, ie, an impulse train ( Impulse UGen ) or white noise (
+WhiteNoise UGen ).
+
+[[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]] is there  and LPCsynth: 
+
+[[file:~/sc3-plugins/source/JoshUGens/JoshUGens.cpp::void%20LPCSynth_next_k(LPCSynth%20*unit,%20int%20inNumSamples)][file:~/sc3-plugins/source/JoshUGens/JoshUGens.cpp::void LPCSynth_next_k(LPCSynth *unit, int inNumSamples)]]
+
+- LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
+
+- lpc dir from SLP book - TODO: run commandline tests from docs/SLP, fix mallocs, work in
+
+- https://github.com/freedv/codec2/blob/master/src/lpc.c
+
+- JAN/UNIANAL
+
+** 10/2
+
+- lpcana and lpcsyn in: docs/SLP - one small pointer fix and reconstruction is good -> TODO: reduce number of coeffs per frame and subs excitation
+
+tested with var excitations but no luck
+
+

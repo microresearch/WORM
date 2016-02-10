@@ -401,7 +401,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     }
     break;
   case 20: // tests for nvp.c
-x    break;
+    break;
 
   } // mode end
 
