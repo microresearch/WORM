@@ -51,11 +51,15 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 9-   | SAM | sam.c | sam.c??? |
 10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  // = TMS5220
 
-vocab from: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/TalkoVCO/TalkoVCO.ino]]
+add vocab from: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/TalkoVCO/TalkoVCO.ino]]
+
+have speed of samples change!
 
 from where else? arcade games/roms
 
-compare Talkie to MAME code...
+compare Talkie to LPC to MAME code which is: [[file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220%20simulator][file:~/projects/ERD_modules/worm/docs/UME-Core/mame/src/emu/sound/tms5220.c::TMS5200/5220 simulator]]
+
+(also pd tms code)
 
 calculating:
 
@@ -1572,7 +1576,7 @@ what are the potential models for crow/raven vocalisation simulation:
 
 1. Kelly-Lochbaum model: https://ccrma.stanford.edu/~jos/pasp/Singing_Kelly_Lochbaum_Vocal_Tract.html -> Perry Cook (refs/code? PRCThesis.pdf)
 2. tube resonance model - TRM - see tube.c
-3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis ponly
+3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis only
 4. waveguide model - transmission line? - perry cook/ lochbaum??? .. tube?
 5. APEX model = 2-D vocal tract articulation
 
@@ -1592,7 +1596,7 @@ transition as essential --- SELX/Y/Z - speed of transitions, phoneme point, pitc
 - where are we up to with nvp?
 - futures: 
 
-articulatory models: APEX?(VocalTractExample?): based on KLvocaltract based on http://doc.sccode.org/Classes/NTube.html
+articulatory models: APEX?(VocalTractExample? - is all praat - Kelly-Lochbaum): based on KLvocaltract based on http://doc.sccode.org/Classes/NTube.html
 
 /// [[file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void%20NTube_next(NTube%20*unit,%20int%20inNumSamples)%20{][file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void NTube_next(NTube *unit, int inNumSamples) {]]
 
@@ -1632,16 +1636,133 @@ WhiteNoise UGen ).
 
 - LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
 
-- lpc dir from SLP book - TODO: run commandline tests from docs/SLP, fix mallocs, work in
+- lpc dir from SLP book - TODO: run commandline tests from docs/SLP,
+  fix mallocs, work in or probably discard as would need lots more
+  work
 
 - https://github.com/freedv/codec2/blob/master/src/lpc.c
 
 - JAN/UNIANAL
 
+- docs/lpc-1.0
+
 ** 10/2
 
 - lpcana and lpcsyn in: docs/SLP - one small pointer fix and reconstruction is good -> TODO: reduce number of coeffs per frame and subs excitation
 
-tested with var excitations but no luck
+tested with var excitations but no luck as we probably need pitch and unvoiced/voiced
 
+** 12/2
+
+- testing lpcana and lpcsyn with diff inputs, some changes ..
+
+: sox joe_noise.wav -b 16 -t raw nn gain -10 rate 16000
+
+
+- what is history of tube.c - from TRM - where? relation to MONET/gnuspeech: http://pages.cpsc.ucalgary.ca/~hill/papers/synthesizer/body.html
+
+gnuspeech is articulatory and tube.c is from softwareTRM by Manzara
+
+see also: [[file:~/projects/ERD_modules/worm/docs/gnuspeech-0.9/Frameworks/Tube/README::#]]
+
+** 17/2
+
+APEX: [[file:~/projects/ERD_modules/worm/docs/APEX-SC-DAFx/UGens]]
+
+for porting ugens are:  (VocaltractArea.cpp - just calcs area for?) === KLVocalTract.cpp
+
+- and how this code relates to tube.c, Ntube sc code, Kelly-Lochbaum?
+
+- *KL code is same as Ntube:* /// [[file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void%20NTube_next(NTube%20*unit,%20int%20inNumSamples)%20{][file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void NTube_next(NTube *unit, int inNumSamples) {]]
+
+with 44 tubes specified in: DAFx15.sc
+
+//and from NTube.schelp:
+
+//Loy p347, p358, Kelly Lochbaum junctions used in TubeN
+//k= (Z1-Z0)/(Z1+Z0); //Z inversely proportional to A 
+//k= ((A0-A1)/(A0A1))/((A0+A1)/(A0A1)) ie similar relation for Z 
+
+difference in perry cook is with nose or?, DRM (Distinctive Region Model)=8 tube sections matching 3 formants
+
+trm-writeup in docs
+
+http://pages.cpsc.ucalgary.ca/~hill/papers/synthesizer/body.html 
+
+//Check further articulatory models:
+
+- other refs: Rosen/DAVO synthesizer (analogue), Liljencrants(1985):  http://www.ee.ic.ac.uk/hp/staff/dmb/voicebox/doc/voicebox/glotlf.html
+- Flanagan(1975)- example 12 on http://www.festvox.org/history/klatt.html 
+
+not articulatory - Rodet 1984 singing/sines - CMJ_1984 in docs > see also FOF and CHANT
+
+and:
+
+Here is a FOF instrument based loosely on fof.c of Perry Cook and the article "Synthesis of the Singing Voice" by Bennett and Rodet in "Current Directions in Computer Music Research".
+
+(definstrument fofins (beg dur frq amp vib f0 a0 f1 a1 f2 a2 &optional ve ae)
+  (let* ((start (floor (* beg *srate*)))
+         (end (+ start (floor (* dur *srate*))))
+         (ampf (make-env (or ae (list 0 0 25 1 75 1 100 0)) :scaler amp :duration dur))
+         (frq0 (hz->radians f0))
+         (frq1 (hz->radians f1))
+         (frq2 (hz->radians f2))
+         (foflen (if (= *srate* 22050) 100 200))
+         (vibr (make-oscil 6))
+	 (vibenv (make-env (or ve (list 0 1 100 1)) :scaler vib :duration dur))
+         (win-freq (/ two-pi foflen))
+         (foftab (make-double-float-array foflen))
+         (wt0 (make-wave-train :wave foftab :frequency frq)))
+    (loop for i from 0 below foflen do
+      (setf (aref foftab i) (double-float      
+        ;; this is not the pulse shape used by B&R
+            (* (+ (* a0 (sin (* i frq0))) 
+                  (* a1 (sin (* i frq1))) 
+                  (* a2 (sin (* i frq2)))) 
+               .5 (- 1.0 (cos (* i win-freq)))))))
+    (run
+     (loop for i from start below end do
+       (outa i (* (env ampf) (wave-train wt0 (* (env vibenv) (oscil vibr)))))))))
+
+(with-sound () (fofins 0 1 270 .2 .001 730 .6 1090 .3 2440 .1)) ; "Ahh"
+
+(with-sound () 
+  (fofins 0 4 270 .2 0.005 730 .6 1090 .3 2440 .1 '(0 0 40 0 75 .2 100 1) 
+          '(0 0 .5 1 3 .5 10 .2 20 .1 50 .1 60 .2 85 1 100 0))
+  (fofins 0 4 (* 6/5 540) .2 0.005 730 .6 1090 .3 2440 .1 '(0 0 40 0 75 .2 100 1) 
+          '(0 0 .5 .5 3 .25 6 .1 10 .1 50 .1 60 .2 85 1 100 0))
+  (fofins 0 4 135 .2 0.005 730 .6 1090 .3 2440 .1 '(0 0 40 0 75 .2 100 1) 
+          '(0 0 1 3 3 1 6 .2 10 .1 50 .1 60 .2 85 1 100 0)))
+
+** TODO: 
+
+- SPASM - tract stuff in [[file:~/projects/ERD_modules/worm/docs/Lua2SC/lua2SC/lua/num]] :
+
+The model works with Kelly Lochbaum juntions representing vocal tract and
+nose areas as previously done in Perry Cook´s SPASM for example.
+Glottal excitation is done with a simplified LF-model. (Fant et al)
+Model data from "Vocal tract area functions from magnetic resonance imaging"
+by Titze et al. 
+
+singer.scm, singer.ins (clm):
+
+[[file:~/collected/fm01/fm01lisp/clm-3/singer.ins::(definstrument%20singer%20(beg%20amp%20data)][file:~/collected/fm01/fm01lisp/clm-3/singer.ins::(definstrument singer (beg amp data)]]
+
+http://apt-browse.org/browse/debian/wheezy/main/all/snd/11.7-2/file/usr/share/snd/singer.scm
+
+clm bird and animals
+
+- how SPASM/singer.ins squares with APEX=ntube/tube/lua/what else?
+
+- voicform? and tables we have in collated_forms
+
+- compile and test APEX/and/or/ntube? where are ntube/sc examples?
+
+[[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp]]
+
+- how to proceed with articulatory crow/worm models -> LPC, tube, formants
+
+= starting with crow source/wavetable as glottal excitation?
+
+= what we can do with praat and crow voice analysis/simulation?
 
