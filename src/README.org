@@ -1654,9 +1654,9 @@ tested with var excitations but no luck as we probably need pitch and unvoiced/v
 
 ** 12/2
 
-- testing lpcana and lpcsyn with diff inputs, some changes ..
+- testing lpcana and lpcsyn (in SLP directory) with diff inputs, some changes ..
 
-: sox joe_noise.wav -b 16 -t raw nn gain -10 rate 16000
+eg with : sox joe_noise.wav -b 16 -t raw nn gain -32 rate 16000 - as excitation
 
 
 - what is history of tube.c - from TRM - where? relation to MONET/gnuspeech: http://pages.cpsc.ucalgary.ca/~hill/papers/synthesizer/body.html
@@ -1748,21 +1748,120 @@ singer.scm, singer.ins (clm):
 
 [[file:~/collected/fm01/fm01lisp/clm-3/singer.ins::(definstrument%20singer%20(beg%20amp%20data)][file:~/collected/fm01/fm01lisp/clm-3/singer.ins::(definstrument singer (beg amp data)]]
 
-http://apt-browse.org/browse/debian/wheezy/main/all/snd/11.7-2/file/usr/share/snd/singer.scm
+[[file:~/projects/ERD_modules/worm/docs/singer.scm::%3B%3B%3B%20Perry%20Cook's%20physical%20model%20of%20the%20vocal%20tract%20as%20described%20in:][file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]]
 
-clm bird and animals
+clm bird and animals:
 
-- how SPASM/singer.ins squares with APEX=ntube/tube/lua/what else?
+[[file:~/collected/fm01/fm01lisp/clm-3/bigbird.ins]]
+
+// (locsig loc i (one-pole fil (* (env amp-env) (oscil s (env gls-env))))))))))
+
+so this is locsig=reverb of one pole (1.0) of amplitude-env of oscil at freq-env
+
+
+- how SPASM/singer.ins squares with APEX=ntube/tube/lua/what else? - vtsynth/vtcalc
+
+*it is closest to tube.c as ntube/vt... ? are more generic waveguide!*
+
+and lua code: this code is incomplete as doesn't have LF (Liljen/Fant)
+glottal stuff nor tract model, but maybe we can make sense of some parameters for our tube.c
 
 - voicform? and tables we have in collated_forms
 
-- compile and test APEX/and/or/ntube? where are ntube/sc examples?
+- compile and test APEX/and/or/ntube? 
 
-[[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp]]
+ntube/sc examples? [[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp]] working...
+
+start to port!
 
 - how to proceed with articulatory crow/worm models -> LPC, tube, formants
 
 = starting with crow source/wavetable as glottal excitation?
 
+Fletcher (1988) - quantitative model... also mentions 200 Hz
+fundamental (syrinx frequency), 70 mm elliptical trachea, 6mm to 8mm
+diameter, formants 1.4, 2.3, 3.7 and 5 KHz. 
+
 = what we can do with praat and crow voice analysis/simulation?
 
+playing with LPC and tract models extracted from recordings/LPC
+
+can we use LPC co-effecients in lpcsyn?
+
+praat source code for LPC/tube/tract etc.
+
+** 18/2+ TODO:
+
+- looking at LPC:
+
+SLP example are too primitive but good for basics -> try with singlecrow to compare////DONE
+
+lpc55 in lpc-1.0 doesn't compile
+
+UNIANAL in JAN seems to work well - need to dig further in eg. how many frames, size of frame, what is residual energy, excitation:
+
+/* --- LPC analysis defaults --- */
+
+#define DFT_LSEG	160
+#define DFT_RSEG	80
+#define DFT_WINDOW	1
+#define DFT_PREACCENT	9500
+#define DFT_LPC_ORDER	10
+#define DFT_CENTER	1
+#define DFT_MIN_PITCH_SAMPLES	20	/* 400 Hz for Fe=8kHz */
+#define DFT_MAX_PITCH_SAMPLES   160	/* 50 Hz for Fe=8kHz */
+#define DFT_PITCH_FRAME  320		/* frame length for pitch detection */
+
+residual energy is for whole frame?
+
+excitation: [[file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::void%20GeneratePulses%20(float%20fEnergy,%20short%20swPitch,%20short%20swSamplesToDo,][file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::void GeneratePulses (float fEnergy, short swPitch, short swSamplesToDo,]]
+
+*- HMM look at - HTK// mage*
+
+*- warps vocoder.*
+
+- elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
+
+** 22/2 notes etc...
+
+- collect and clarify models on paper/from papers
+
+- single excitation-wavetable/noise/envelope/reverb/filter and so on functions in our code so can easily replicate
+
+- 2 mass model is important for bird song - see praat/speaker -> artsynth (but how much we can modify?)
+
+VOICEBOX is a MATLAB toolbox for speech processing. -> Liljencrants/Fant (LF) vocal source/glottis model - glotlf/gfm_spec_lf
+
+glotlf model working in octave... -> but for our c:
+
+from APEX->LF model ApexSource01 {
+	*ar { arg fo=100, invQ=0.1, scale=1.4, mul=1;
+		var flow;
+		flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo); // resonant low pass of BLIP: Band Limited ImPulse generator.
+		^HPZ1.ar(flow, mul);   // +6 dB/octave // high pass?
+	}
+}
+
+- what vis two tube SC in SLUgens about?
+
+Physical model; two tube sections with scattering junction inbetween; their relative areas determine k. 
+
+http://doc.sccode.org/Classes/TwoTube.html
+
+- glottal source in tube.c
+
+-   /root/pybombs/src/gr-as/gr36/gr-vocoder/lib/codec2: ???
+
+- whether we need to rethink incoming excitation _and_ voice - look at past notes!
+
+LIST // excitation models? // resonance/tube models
+
+collect code/// and worm.c and parameters in collated_forms and all TODOs
+
+** 23/2
+
+- collect excitation and resonance/tube code
+
+- collate notes here and from pdfs
+
+- esp. glottal sources, LF model !
