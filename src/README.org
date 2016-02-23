@@ -1736,8 +1736,8 @@ Here is a FOF instrument based loosely on fof.c of Perry Cook and the article "S
 
 ** TODO: 
 
-- SPASM - tract stuff in [[file:~/projects/ERD_modules/worm/docs/Lua2SC/lua2SC/lua/num]] :
-
+- SPASM - tract stuff in [[file:~/projects/ERD_modules/worm/docs/Lua2SC/lua2SC/lua/num]] : MISSING key code
+ 
 The model works with Kelly Lochbaum juntions representing vocal tract and
 nose areas as previously done in Perry Cook´s SPASM for example.
 Glottal excitation is done with a simplified LF-model. (Fant et al)
@@ -1757,7 +1757,6 @@ clm bird and animals:
 // (locsig loc i (one-pole fil (* (env amp-env) (oscil s (env gls-env))))))))))
 
 so this is locsig=reverb of one pole (1.0) of amplitude-env of oscil at freq-env
-
 
 - how SPASM/singer.ins squares with APEX=ntube/tube/lua/what else? - vtsynth/vtcalc
 
@@ -1854,7 +1853,9 @@ http://doc.sccode.org/Classes/TwoTube.html
 
 - whether we need to rethink incoming excitation _and_ voice - look at past notes!
 
-LIST // excitation models? // resonance/tube models
+what modes make sense with both? vocoder, lpcanalysis, otherwise just excitation only
+
+- LIST // excitation models? // resonance/tube models
 
 collect code/// and worm.c and parameters in collated_forms and all TODOs
 
@@ -1862,6 +1863,63 @@ collect code/// and worm.c and parameters in collated_forms and all TODOs
 
 - collect excitation and resonance/tube code
 
+esp. glottal sources: vtsynth, tube.c, SC model above is what?, wavetable, LPC, WHAT ELSE-mass model - where?, LF model !
+
+vtsynth: excitation/whole model seems quite complex
+
+tube.c: simple glottal pulse _or_ sine
+
+SC: BLIP and LPF
+
+- where is LF model: lfgen.c working on - still not working?NOW as comples 
+
+lfgen.m runs and plots (only when we do run lfgen.m from octave) but why is different for lfgen.c
+
+cross compare epsilon and so on! 
+
+now working with clog (complex) but does this work form ARM?
+
+.... to compile//COMPILES
+
+- where is mass model (praat but is not simple): [[file:~/projects/ERD_modules/worm/docs/praat/artsynth/Speaker_to_Delta.cpp::*%20This%20corresponds%20to%20a%20two-mass%20model%20of%20the%20vocal%20cords%20without%20shunt.][file:~/projects/ERD_modules/worm/docs/praat/artsynth/Speaker_to_Delta.cpp::* This corresponds to a two-mass model of the vocal cords without shunt.]]
+
 - collate notes here and from pdfs
 
-- esp. glottal sources, LF model !
+- Klatt derivative glottal wave? KLGLOT88, other glottal models in klsyn?
+
+- Rosenberg matlab code:
+
+%Rosenberg Pulse
+%this function accepts fundamental frequency of the glottal signal and 
+%the sampling frequency in hertz as input and returns one period of 
+%the rosenberg pulse at the specified frequency.
+%N2 is duty cycle of the pulse, from 0 to 1.
+%N1 is the duration of the glottal opening as a fraction of the 
+%total pulse, from 0 to 1.
+function[gn]=rosenberg(N1,N2,f0,fs)
+T=1/f0;     %period in seconds
+pulselength=floor(T*fs);    %length of one period of pulse
+%select N1 and N2 for duty cycle
+N2=floor(pulselength*N2);
+N1=floor(N1*N2);
+gn=zeros(1,N2);
+%calculate pulse samples
+for n=1:N1-1
+    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
+end
+for n=N1:N2
+    gn(n)=cos(pi*(n-N1)/(N2-N1)/2);
+end
+gn=[gn zeros(1,(pulselength-N2))];
+
+and:
+
+http://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/45317/versions/5/previews/Callbacks_ideal_vocal_tract_GUI25.m/index.html
+
+http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py.html (also FEM code there)
+
+- chuck?
+
+- compile of lpc/lpcana has issues but we won;t use this anyways
+
+
