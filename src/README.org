@@ -1825,7 +1825,7 @@ excitation: [[file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::voi
 
 - collect and clarify models on paper/from papers
 
-- single excitation-wavetable/noise/envelope/reverb/filter and so on functions in our code so can easily replicate
+- single excitation-wavetable/noise/envelope/reverb/filter/LPF and so on functions in our code so can easily replicate
 
 - 2 mass model is important for bird song - see praat/speaker -> artsynth (but how much we can modify?)
 
@@ -1841,7 +1841,7 @@ from APEX->LF model ApexSource01 {
 	}
 }
 
-- what vis two tube SC in SLUgens about?
+- what is two tube SC in SLUgens about?
 
 Physical model; two tube sections with scattering junction inbetween; their relative areas determine k. 
 
@@ -1849,7 +1849,7 @@ http://doc.sccode.org/Classes/TwoTube.html
 
 - glottal source in tube.c
 
--   /root/pybombs/src/gr-as/gr36/gr-vocoder/lib/codec2: ???
+-  /root/pybombs/src/gr-as/gr36/gr-vocoder/lib/codec2: ???
 
 - whether we need to rethink incoming excitation _and_ voice - look at past notes!
 
@@ -1877,9 +1877,11 @@ lfgen.m runs and plots (only when we do run lfgen.m from octave) but why is diff
 
 cross compare epsilon and so on! 
 
-now working with clog (complex) but does this work form ARM?
+now working with clog (complex) but does this work for ARM?
 
-.... to compile//COMPILES
+.... to compile//COMPILES now
+
+*TODO* - pre-calc and test different glottal models, plague algo glottal model
 
 - where is mass model (praat but is not simple): [[file:~/projects/ERD_modules/worm/docs/praat/artsynth/Speaker_to_Delta.cpp::*%20This%20corresponds%20to%20a%20two-mass%20model%20of%20the%20vocal%20cords%20without%20shunt.][file:~/projects/ERD_modules/worm/docs/praat/artsynth/Speaker_to_Delta.cpp::* This corresponds to a two-mass model of the vocal cords without shunt.]]
 
@@ -1918,8 +1920,140 @@ http://www.mathworks.com/matlabcentral/mlc-downloads/downloads/submissions/45317
 
 http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py.html (also FEM code there)
 
-- chuck?
-
 - compile of lpc/lpcana has issues but we won;t use this anyways
 
+** 24/2
+
+- N.H.Fletcher Bird song- a quantitative model. J. Theo. Biology, 135:455–481, 1988 specifically raven model
+
+[- return to Hitchcock/trautonium notes]
+
+- find and condense crow voice pdf and others
+
+- run through all models noted above// code bases:
+
+impulse/excitation: klattsyn/klglot88(?), praat, lfgen to fix and
+parametrise, singer/SPASM based on what we have (which
+is?-singer.ins/scm), SC example above, LPC, vtsynth(can we re-code?)
+
+// abstract models: 1or2 mass model, LF, impulses/oscillators, wavetable, LPC inverse filtered, Rosenberg-C, R++/Veldhuis
+
+tract/tube/formant: klatt, praat, tube.c/TRM, ntube/sc, lots of formant/bandpass options, LPC, singer/SPASM see above
+
+// models: formant, tube/waveguide/mesh/transmission line, LPC
+
+- Synthesis of Voiced Sounds From a Two-Mass Model of the Vocal Cords ???
+
+- tested: snd ~/projects/ERD_modules/worm/docs/singer.scm but have to save as wav to play later
+
+** 25/2
+
+- is klglott in klsyn?
+
+/*  Vwave is the differentiated glottal flow waveform, there is a weak
+    spectral zero around 800 Hz, magic constants a,b reset pitch-synch */
+
+KLGLOT88 is based on LF and is in KLSYN88 (which nvp is based on apparently)...
+
+and there is flutter in this parwave but also in the klatt/parwave we use:
+
+[[file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file:%20PARWAVE.CPP][file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file: PARWAVE.CPP]]
+
+// g(t) = at2 - bf , for 0 < t < On T0 = 0 , for O<y ^ < t < Tn
+
+so maybe just to extract glottal excitation from parwave and use ... 
+
+- Rosenberg-C, R++/Veldhuis:
+
+Rosenberg: glotros, http://rabbit.eng.miami.edu/students/mfreeman/Digital%20Speech%20Processing/Project2/B_MATLAB.html
+ and http://www.cnel.ufl.edu/~xcguo/EEL6586/hw1/Part_B3.html
+
+R++/Veldhuis: ??
+
+- lfgen reverted to pc test code -> write to wav and test different parameters
+
+and write out // parameters from LFinput are: alpham, epsilon - wg and datalength are simple calculations // for use on ARM
+
+but these parameters change with F0 fundamental freq (eg. for vocal fry is 52 < f0 < 94)
+
+or we have lookups for a small range of F0? test this out with lfgen and floats?
+
+** 28/2
+
+??? https://github.com/084/glottis/blob/master/ho2011.m
+
+** 8/3
+
+overviewing - glottal flow models above... 
+
+KLGLOTT88 model (Klatt): the glottal flow is modeled by a third order
+polynomial which is possibly smoothed using the low-pass filter
+method. There are 4 parameters: A_v, T_0, O_q and TL which is the
+attenuation in dB of the low-pass filter at 3000 Hz. Notice that the
+asymmetry of the flow cannot be changed and is always: \alpha_m=2/3
+
+from: https://rs2007.limsi.fr/PS_Page_2.html
+
+- where we can find mass model? praat - compile all notes on these
+  models with working code for each to test
+
+- where are we at with lfgen? vocal fry settings hang - but not if we
+  use double - but how to get round this? revert to lookups as above and test this-partTESTED!
+
+also add noise in lfgen.c - from thesis - also maybe test tract model there to see how sounds?
+
+but why lfgen.m plots look different to thesis? try different parameters
+
+** 9/3
+
+*** ORDERING and work plan: also as one side is new raven work and other is WORM speech synth but both obviously coincide
+
+- py-trm has wavetable: [[file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/%20Calculates%20the%20initial%20glottal%20pulse%20and%20stores%20it%20in%20the%20wavetable,%20for%20use%20in%20the%20oscillator.][file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/ Calculates the initial glottal pulse and stores it in the wavetable, for use in the oscillator.]]
+
+but we have this in our tube.c also here! IGNORE
+
+- lfgen.c - generates something but waveform looks strange/noisy -
+  now as little endian and changed way saved now so is unsigned int but still most of wave is negative... WHY?
+
+*** GLOTTAL (or excitation) MODELS:
+
+- Klatt / klsyn - which one and where to look? check nvp also
+- tube.c wavetable model
+- praat - mass model
+
+- lfgen in progress
+
+- flowgen_shimmer in voice_synth in docs - Fant model
+
+- http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
+
+now as glottalair.py and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c)
+
+- others: wavetable, formants a la SINGER/SPASM -> where? check VOICFORM again, LPC
+
+*** TRACHEA MODELS:
+
+- formants/artificial filtering (Klatt)
+- tube.c
+- praat
+
+*** other approaches completely
+
+- FOF/CHANT etc...
+- VOSIM
+
+*** ///////
+
+
+find synsrc for LF and Rosenberg - can't find
+
+http://www.mattmontag.com/projects-page/academic/speech
+
+http://www.mattmontag.com/projects/speech/speechproduction.m
+
+*** /////
+
+how we can work with these models towards crow voice. pointers:
+
+papers: Fletcher(1988), Smyth and Smith (2002)
 
