@@ -1,0 +1,112 @@
+* notes specific to raven and worm voices
+
+** README.org notes
+
+** paper notes
+
+- tube model is not so important
+
+** references/links
+
+*** Fletcher (1988): Bird Song .... Corvus mellori... raven
+
+200Hz fundamental syrinx, 70mm trachea
+
+Formants are 1.4/2/3/3.7 and 5 KHz - see also animals.scm below
+
+** PLAN
+
+approaches are: 
+
+- papers and glottal models towards crow voice - tubes are not so important as modelling source. what are models?
+
+2 mass model? Ishizaka and Flanagan: IF_C = hellostkx and IF_final.m 
+
+model in Fletcher? and in Smyth and Smith: Bernoulli and waveguide
+
+is  /root/sc3-plugins/source/MembraneUGens/sc useful here? or spring class? // pmsc/pmpd - physical modelling // flauta...
+
+- LPC/ UNIANAL
+
+- fake it. trautonium. noise, vibrato and envelopes - see CLM:
+  bird.clm, bigbird.ins (to test), bird.scm, animals.scm - also
+  muffwiggler thread and notes from that
+
+- plague modelling as glottal model: DarkInt and Blackdeath code bases/simulation
+
+/root/collected/blackdeath/code/simulations
+
+[[file:~/dark-interpreter/darkintv2may2015/simulation.c]]
+
+** 9/3/2016
+
+snd: to work with we use save as - wave header and ubyte
+
+and from animals.scm we have
+
+;;; American crow
+
+(define (nrcos->polywave n r scl)
+  (if (and (positive? n)
+	   (< n 8192))
+      (let ((lst ())
+	    (total (polynomial (make-float-vector n 1.0) r)))
+	(set! scl (/ scl total))
+	(do ((i 0 (+ i 1)))
+	    ((= i n) (reverse lst))
+	  (set! lst (cons (* scl (expt r i)) (cons (+ i 1) lst)))))
+      (error 'out-of-range "nrcos->polywave: too many partials")))
+
+(defanimal (american-crow beg amp)
+  (let ((dur 0.27))
+    (let ((start (seconds->samples beg))
+	  (stop (seconds->samples (+ beg dur)))
+	  (ampf (make-env '(0.000 0.000 .02 .1  .04 .01 .06 0.056 0.110 0.700 0.258 1.000  0.344 0.970  0.369 0.677 .7 .3  1.000 0.000)
+			  :duration dur :scaler (* 2 amp)))
+	  (frqf (make-env '(0.000 0.360 0.038 0.362 0.052 0.396 0.076 0.403 0.095 0.445 0.129 0.445 0.153 0.493 
+				  0.201 0.495 0.231 0.501 0.260 0.490 0.297 0.503 0.317 0.499 0.346 0.473 0.407 0.473 
+				  0.435 0.424 0.495 0.439 0.528 0.392 0.589 0.405 0.621 0.362 0.677 0.373 0.704 0.332 
+				  0.767 0.325 0.791 0.281 0.832 0.278 0.859 0.251 0.890 0.225 0.912 0.255 0.950 0.263 1.000 0.26)
+			  :duration dur :scaler (hz->radians 1250.0)))
+	  (frm1 (make-formant 1400 .995))
+	  (frm2 (make-formant 5500 .98))
+	  (frm3 (make-formant 3800 .98))
+	  
+	  (fr1 (* 2 20 (sin (hz->radians 1400))))
+	  (fr2 (* 2 (sin (hz->radians 5500))))
+	  (fr3 (* 2 2 (sin (hz->radians 3800))))
+	  
+	  (gen (make-polywave 0.0 (nrcos->polywave 15 .75 1.0)))
+	  (rnd (make-rand-interp 5000 .007)))
+
+      (let ((fb (vector frm1 frm2 frm3))
+	    (fs (float-vector fr1 fr2 fr3)))
+	(set! fb (make-formant-bank fb fs))
+
+	(do ((i start (+ i 1)))
+	    ((= i stop))
+	  (outa i (formant-bank fb (* (env ampf)
+				      (polywave gen (+ (env frqf)
+						       (rand-interp rnd)))))))))))
+
+;; (with-sound (:play #t) (american-crow 0 .5))
+
+** 10/3
+
+- we need to concentrate on working implementations of one and two mass models (refs: Fletcher, Rodet, Ishizaka and Flanagan)
+
+implemented in praat (as part of artic. model), balloon1.cpp=IF_final.m which is documented in 614_final_report.pdf, any-where else?
+
+- that worms can also be modelled as masses moving in a tract?
+
+praat where: see praat/speaker -> artsynth (but how much we can modify?)
+
+[[file:~/projects/ERD_modules/worm/docs/praat/artsynth/Artword_Speaker_to_Sound.cpp::autoSound%20Artword_Speaker_to_Sound%20(Artword%20artword,%20Speaker%20speaker,][file:~/projects/ERD_modules/worm/docs/praat/artsynth/Artword_Speaker_to_Sound.cpp::autoSound Artword_Speaker_to_Sound (Artword artword, Speaker speaker,]]
+
+*** notes
+
+IF_final.m plots fine... testing now with wavwrite in octave: wavwrite(out, 32000, "test.wav"); but NO LUCK!!
+
+balloon1.cpp ported to balloon. stkfloat is double!!! produces something but faint and noisy
+
+TODO: examine parameters - see what we can fit here from Fletcher and co!

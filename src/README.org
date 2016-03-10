@@ -14,6 +14,18 @@ init_nvp(void)
 
 generate_nvp(generator* nvp_generator, u16 size, int16_t* incoming, int16_t* outgoing)
 
+- satisfactory vocoder
+
+- re-think how all works with excitation and resonance/process - what
+  models don't work in this way (more classical speech synth), and
+  how that could work with vocoder - how we can vary excitation such
+  as white noise. list excitations
+
+- HW_DESIGN: check noise in filters, new panel/logo - see notes.org,
+  jitter tests on all CV/pois, other Qs: - maybe different solution
+  for CV inputs? hardware encoder for main mode?
+
+- wormings algorithms. control over degree of randomness of movements
 
 * modes
 
@@ -1578,7 +1590,7 @@ what are the potential models for crow/raven vocalisation simulation:
 2. tube resonance model - TRM - see tube.c
 3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis only
 4. waveguide model - transmission line? - perry cook/ lochbaum??? .. tube?
-5. APEX model = 2-D vocal tract articulation
+5. APEX model = 2-D vocal tract articulation... same as SC ntube!
 
 how these do differ? see book
 
@@ -1871,7 +1883,7 @@ tube.c: simple glottal pulse _or_ sine
 
 SC: BLIP and LPF
 
-- where is LF model: lfgen.c working on - still not working?NOW as comples 
+- where is LF model: lfgen.c working on - still not working?NOW as compiles 
 
 lfgen.m runs and plots (only when we do run lfgen.m from octave) but why is different for lfgen.c
 
@@ -1942,7 +1954,8 @@ tract/tube/formant: klatt, praat, tube.c/TRM, ntube/sc, lots of formant/bandpass
 
 // models: formant, tube/waveguide/mesh/transmission line, LPC
 
-- Synthesis of Voiced Sounds From a Two-Mass Model of the Vocal Cords ???
+- Synthesis of Voiced Sounds From a Two-Mass Model of the Vocal
+  Cords - Ishizaka and Flanagan
 
 - tested: snd ~/projects/ERD_modules/worm/docs/singer.scm but have to save as wav to play later
 
@@ -2008,6 +2021,8 @@ but why lfgen.m plots look different to thesis? try different parameters
 
 *** ORDERING and work plan: also as one side is new raven work and other is WORM speech synth but both obviously coincide
 
+maybe start raven.org here -> TODO: transfer some of notes and also organise here a bit better
+
 - py-trm has wavetable: [[file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/%20Calculates%20the%20initial%20glottal%20pulse%20and%20stores%20it%20in%20the%20wavetable,%20for%20use%20in%20the%20oscillator.][file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/ Calculates the initial glottal pulse and stores it in the wavetable, for use in the oscillator.]]
 
 but we have this in our tube.c also here! IGNORE
@@ -2021,29 +2036,44 @@ but we have this in our tube.c also here! IGNORE
 - tube.c wavetable model
 - praat - mass model
 
-- lfgen in progress
+- lfgen in progress - still to fix?
 
 - flowgen_shimmer in voice_synth in docs - Fant model
 
 - http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
 
-now as glottalair.py and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c)
+now as *glottalair.py* and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c are working)
 
-- others: wavetable, formants a la SINGER/SPASM -> where? check VOICFORM again, LPC
+- others: wavetable, formants a la SINGER/SPASM with two glottal
+  oscillators and vibrato -> where? check VOICFORM again, LPC
+
+- plague model (where we find clean code?)
 
 *** TRACHEA MODELS:
 
 - formants/artificial filtering (Klatt)
-- tube.c
-- praat
+- vocoder style fixed channels
+- tube.c - articulatory
+- praat - ??where??
+- ntube.c from SC TODO (see also twotube model there)
+
+- Perry Cook/SPASM - digital waveguide ladder filter
+
+[[file:~/projects/ERD_modules/worm/docs/singer.scm::%3B%3B%3B%20Perry%20Cook's%20physical%20model%20of%20the%20vocal%20tract%20as%20described%20in:][file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]]
+
+- Coker - digital transmission line
+
+- elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
+
 
 *** other approaches completely
 
 - FOF/CHANT etc...
 - VOSIM
+- LPC
+- HMM?
 
 *** ///////
-
 
 find synsrc for LF and Rosenberg - can't find
 

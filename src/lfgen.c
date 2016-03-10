@@ -134,28 +134,40 @@ createLFInput();
 FILE* fo = fopen("testlfgen.pcm", "wb");
 
 
-for (x=0;x<32000;x++){
+for (x=0;x<320;x++){
 
   /*if (k>dataLength) {
 k = k - dataLength;
 }*/
 
 // ROSENBERG:
-
+  signed int s16;
+  float sample;
  float T=1/120.0;
  float fs=32000;
  float pulselength=T*fs;
  float N2=pulselength*0.5;
  float N1=0.5*N2;
  int kkk;
- for (kkk=0;kkk<N1;kkk++;){
+ for (kkk=0;kkk<N1;kkk++){
    //    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
+   LFcurrentSample1=0.5*(1-cos(MY_PI*(kkk-1)/N1));
+   s16=(signed int)(LFcurrentSample1*32000.0);
+   //   printf("%d\n",s16);
+   fwrite(&s16,2,1,fo);
  }
- for (kkk=N1;kkk<N2;kkk++;){
+ for (kkk=N1;kkk<N2;kkk++){
    //    gn(n)=cos(pi*(n-N1)/(N2-N1)/2);
+   LFcurrentSample1=cos(MY_PI*(kkk-N1)/(N2-N1)/2);
+   s16=(signed int)(LFcurrentSample1*32000.0);
+   //   printf("%d\n",s16);
+   fwrite(&s16,2,1,fo);
  }
- for (kkk=N1;kkk<N2;kkk++;){
-   // =0.0
+ for (kkk=N1;kkk<N2;kkk++){
+   LFcurrentSample1==0.0;
+   s16=(signed int)(LFcurrentSample1*10.0);
+   //   printf("%d\n",s16);
+   fwrite(&s16,2,1,fo);
  }
 
 
@@ -244,17 +256,15 @@ LFcurrentSample1 = LFcurrentSample;
 // if (LFcurrentSample>32768.0) LFcurrentSample=32768.0;
 // if (LFcurrentSample<-32768.0) LFcurrentSample=-32768.0;
 
-signed int s16=(signed int)(LFcurrentSample1*10.0);
-   printf("%d\n",s16);
+//   printf("%d\n",s16);
 /* unsigned int s16=(unsigned int)(LFcurrentSample1*1.0);
  unsigned char c = (unsigned)s16 & 255;
  fwrite(&c, 1, 1, fo);
  c = ((unsigned)s16 / 256) & 255;
  fwrite(&c, 1, 1, fo);*/
- fwrite(&s16,2,1,fo);
  
-k += 1;
- }
+ //k += 1;
+  }
 
 
 }
