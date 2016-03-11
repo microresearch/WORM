@@ -1,18 +1,14 @@
 /*
- *  balloon1.cpp
- *  balloon1
- *  Implements Ishizaka & Flanagan two mass model of the vocal folds
- *	Uses backward finite difference approximation as well as many others
- *	Output is the flow (u)
- *  Created by Avrum Hollinger on 11/12/06.
- *  Copyright 2006. All rights reserved.
- *
+ *  based on balloon1.cpp
+
+See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf
+
  */
 #include <stdio.h>
 #include "math.h"
 
 double computeSample(double pressure_in);
-
+void clearOld();
 
 double ps;		//subglottal pressure
 double r1;		//damping factor
@@ -41,6 +37,105 @@ double Fs;		//calculation sampling rate, not actual audio output sample rate
 
 
 void init(){
+
+  // adapt these settings for potential raven voice
+
+  // from MATLAB code: also there is pressure envelope there
+
+  /*
+
+p=0;        %relative output pressure, 
+rho = 1.14; %kg/m^3 mass density
+v = 1.85e-5; %N*s/m^2 greek new: air shear viscosity
+lg = 1.63e-2; %m glottal length
+
+twod = 3e-5; %m, glottal width 2d1
+d1=twod/2; %1.5000e-005
+d2=d1;
+m = 4.4e-5/90; %kg, glottal mass // why /90 - otherwise accords for human glottis
+m1=m; %4.8889e-007
+m2=m;
+k12=0.04; %coupling spring constant
+k = 0.09; %N/m, spring constant
+k1=k;
+k2=k1;
+aida=1000000.01; %non-linearity factor
+r = 0.0001*sqrt(m*k); %damper constant, N*s/m
+r1=r*1;
+r2=r1; %2.0976e-008
+%Ag0 = 5e-6; %m^2 glottal area at rest = 5mm^2=5e-6
+Ag0 = 5e-9; %m^2 glottal area at rest
+S = 5e-5; %m^2 output area (vocal tract end)
+%S = 5e-4; %m^2 output area (vocal tract end)
+
+  */
+
+  /* raven details (see kahrs.pdf and zacarelli)
+
+kahrs: 
+
+from zacarelli we have:
+
+stiffness (g ms−2)	k1, k2	22.0×10−3
+damping constant (g ms−1)	r1, r2	1.2×10−3
+coupling constant (g ms−2)	kc	6.0×10−3
+
+but not sure how to convert between????
+
+m1/m2=glottal mass - 3.848451000647498e-6 - 0.00000384 /90
+
+k1/k2-spring constant N/m - 3.11 ???
+k12=coupling spring constant ???
+
+d1/d2=glottal width 2dl /2??? diameter is 7mm  say 2mm now or is this *thickness?* 1e-4 - from fletcher is 100 micrometer
+r1/r2 = 0.0001*sqrt(m*k); %damper constant, N*s/m - 1.386e-7 // but depends on K spring constant can vary 0.0001
+
+Ag0 = 5e-9; %m^2 glottal area at rest - 2mm say at rest= 3.14mm 3.14e-6
+S = 5e-5; %m^2 output area (vocal tract end) - 20mm diameter BEAK 314mm = 0.000314
+
+lg= 1.63e-2; %m glottal length - say 7mm=7e-3
+
+   */
+
+//	r1 =2.0976e-8;
+	r1 =1.2e-3;
+//	r2 =2.0976e-8;
+	r2 =1.2e-3;
+	m1=3.848e-6;
+//	m1 =5.8889e-6;
+	m2 =3.848e-6;
+
+	k1 =0.1;
+	k2 =0.1;
+	//	k2 =0.5;
+//	k12=0.04;
+	k12=0.04;
+	//	aida =10000000.0;
+	aida =0.000001;
+//	d1 =1.5e-5;
+	d1 =0.00005;
+	d2 =0.00005;
+
+	lg =0.007;
+	gain=1000.0;
+	S=0.000314;
+	Ag01=3.14e-6;
+	Ag02=3.14e-6; 
+
+
+	x1Prev=0.0;
+	x1PrevPrev=0.0;
+	x2Prev=0.0;
+	x2PrevPrev=0.0;
+	pm1Prev=0.0;
+	pm2Prev=0.0;
+	uPrev=0.0;
+	ps=0.0;
+	Fs=32000.0;
+
+  /// ballon
+
+  /*
 //	r1 =2.0976e-8;
 	r1 =2.0976e-8;
 //	r2 =2.0976e-8;
@@ -60,7 +155,7 @@ void init(){
 	d1 =1.5e-5;
 	d2 =1.5e-5;
 	lg =0.0163;
-	gain=10.0;
+	gain=1000.0;
 	S=5e-5;
 	Ag01=5e-9;
 	Ag02=5e-9;
@@ -72,7 +167,8 @@ void init(){
 	pm2Prev=0.0;
 	uPrev=0.0;
 	ps=0.0;
-	Fs=32000.0;
+	Fs=48000.0;
+  */
 }
 
 FILE *fo;
@@ -97,15 +193,44 @@ int rtick(double *buffer, int bufferSize, double pressureIn) {
 	bsynth->setGain((double)[(id)dataPointer gainIn]);
 	bsynth->setFs((double)[(id)dataPointer FsIn]);
 */
-	int i;
+
+/* pressure waveform:
+
+%Set pressure waveform envelope
+for n=1:N
+if n<5
+%ps(n)=MAXps;
+ps(n)=0;
+elseif n<7
+ps(n)=0;
+%ps(n)=MAXps;
+elseif n<T1 // T1 is N/90 - N is number of iterations/samples
+ps(n)=ps(n-1)+MAXps/T1; // MAXps is 400
+elseif n<=T2 // T2 is N/80 
+    ps(n)=ps(n-1);
+else
+    ps(n)=ps(n-1)+(MINps-MAXps)/(N-T2); // MINps is 30
+*/
+
+	int i; double lastp;
 	for (i=0; i<bufferSize; i++ ) {
 	  //	  *samples++ = computeSample(pressureIn);
 	  //	  printf("%f  ",computeSample(pressureIn));
 
+	  /*	 	  if (i<5) pressureIn=0;
+	  else if (i< (32000/90)) pressureIn=lastp+ 400/(32000/90);
+	  else if (i<= (32000/80)) pressureIn=lastp;
+	  else pressureIn=lastp+(30-400)/(32000-(32000/80));
+
+	  */
+
+	  // constant pressure
+	  pressureIn=300; // 0.3 kPa after Fletcher
+
    signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
    //   printf("%d\n",s16);
    fwrite(&s16,2,1,fo);
-
+   lastp=pressureIn;
 		//*samples++ = [(id)dataPointer amp] * bsynth->tick();
 	}
 
@@ -113,21 +238,35 @@ int rtick(double *buffer, int bufferSize, double pressureIn) {
 };
 
 void main(void){
+  int x;
   fo = fopen("testball.pcm", "wb");
 
   init();
-  double buffer[48000];
-  rtick(buffer, 48000, 300.0);
+  double buffer[32000];  // try now varying some parameters each second:
 
+  for (x=0;x<100;x++){
+  rtick(buffer, 32000, 300.0);
+  //        k1=k1+0.01;
+  //    m1=m1+0.00001;
+  //	k2=k1;
+	//    m2=m1;
+    r1=0.0001*sqrt(m1*k1);
+    r2=r1;
+
+    d1+=0.00001;
+    d2=d1;
+
+    clearOld();
+  }
 }
 
 double tick(){
   double pressure_in=ps;
   double T=1/Fs;
-  double rho = 1.14; 
-  double rhosn = rho*0.69;
+  double rho = 1.14; // air density p
+  double rhosn = rho*0.69; // 
   double hfrho=rho/2;
-  double v = 1.85e-5;
+  double v = 1.85e-5; // air shear viscosity
   double twvd1lg=12*v*d1*lg*lg;
   double twvd2lg=12*v*d2*lg*lg;
   double Ag012lg=Ag01/2/lg;
@@ -483,70 +622,4 @@ pm1Prev=0;
 pm2Prev=0;
 uPrev=0;
 ps=0;
-}
-
-void setR1 (double r1_in){
-  r1=r1_in;
-}
-	
-void  setR2 (double r2_in){
-  r2=r2_in;
-}
-void  setK1 (double k1_in){
-  k1=k1_in;
-}
-		
-void  setK2 (double k2_in){
-  k2=k2_in;
-}
-	
-void setK12 (double k12_in){
-  k12 = k12_in;
-}
-	
-void  setM1 (double m1_in){
-  m1=m1_in;
-}
-	
-void  setM2 (double m2_in){
-  m2=m2_in;
-}
-	
-void  setD1 (double d1_in){
-  d1=d1_in;
-}
-void  setD2 (double d2_in){
-  d2=d2_in;
-}
-	
-void  setLg (double lg_in){
-  lg=lg_in;
-}
-	
-void  setAida (double aida_in){
-  aida=aida_in;
-}
-	
-void  setS (double S_in){
-  S=S_in;
-}
-	
-void  setAg01 (double Ag01_in){
-  Ag01=Ag01_in;
-}
-	
-void  setAg02 (double Ag02_in){
-  Ag02=Ag02_in;
-}
-	
-void  setGain (double gain_in){
-  gain=gain_in;
-}
-	
-void  setPs (double pressure_in){
-  ps=pressure_in;
-}
-	
-void  setFs (double Fs_in){
-  Fs=Fs_in;
 }

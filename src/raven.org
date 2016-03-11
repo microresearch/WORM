@@ -91,7 +91,7 @@ and from animals.scm we have
 
 ;; (with-sound (:play #t) (american-crow 0 .5))
 
-** 10/3
+** 10/3 DOUBLE ISSUE! how do we solve - with new gcc-arm?
 
 - we need to concentrate on working implementations of one and two mass models (refs: Fletcher, Rodet, Ishizaka and Flanagan)
 
@@ -107,6 +107,42 @@ praat where: see praat/speaker -> artsynth (but how much we can modify?)
 
 IF_final.m plots fine... testing now with wavwrite in octave: wavwrite(out, 32000, "test.wav"); but NO LUCK!!
 
-balloon1.cpp ported to balloon. stkfloat is double!!! produces something but faint and noisy
+balloon1.cpp ported to balloon. stkfloat is double!!! produces something but faint and need to amp it by 1000.0 GAIN?
 
-TODO: examine parameters - see what we can fit here from Fletcher and co!
+TODO: examine parameters - see what we can fit here from Fletcher and co! see kahrs.pdf but is all quite vague
+
+/// also we need to vary sub-glottal pressure regularly as in: Synthesis_of_voiced_sounds_using_low-dim.pdf - TESTING
+
+/// play -t raw --bits 16 --channels 1 --encoding unsigned-integer --rate 32000 testball.pcm repeat 9999
+
+so far parameters we have make no sound or just onset click - try in
+matlab/octave - same result of just one start impulse even if vary k/spring constant!
+
+- doubles also in praat /// and with make doesn't compile.. q if to abstract out
+
+** 11/3 ignore double issues and just explore code and simulations
+
+- concentrate on balloon.c - running through parameters to see what
+  makes sense - increasing k/springiness seems to work, should damping be independent or?
+
+see http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf for human parameters
+
+- K spring constant (and mass for clickiness) is important for frequency but can't seem now to
+  raise higher (unless leave out reset old values)
+
+Ag01 can't seem vary at all without silence, S doesn;t do much,,,, try vary d1 glottal width/thickness which makes it more bitty/screechy
+
+note SQ (speed quotient in avanzini) in relation to vocal fry - also more studies on vocal fry towards raven voice
+
+- try coupling tube to this model???? in fletcher etc. how was this
+  done? model acoustic waves in trachea // reflected wave from open
+  beak ... length of trachea is 70mm, diameter is 7mm
+
+port twotube to become one tube - redo balloon as raven.c
+
+*** pdf summary/lists
+
+*** misc
+
+[[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief%20STK%20flute%20physical%20model%20class.][file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief STK flute physical model class.]]
+

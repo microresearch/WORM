@@ -2087,3 +2087,9 @@ how we can work with these models towards crow voice. pointers:
 
 papers: Fletcher(1988), Smyth and Smith (2002)
 
+** 10/3
+
+thinking on double for raven code and above: -Ofast also
+
+we need gcc 4.9 for doubles to solve bug and this means not using
+floating point? arm-eabi...
