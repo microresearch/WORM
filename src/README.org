@@ -14,6 +14,8 @@ init_nvp(void)
 
 generate_nvp(generator* nvp_generator, u16 size, int16_t* incoming, int16_t* outgoing)
 
+but generator* should be void and cast
+
 - satisfactory vocoder
 
 - re-think how all works with excitation and resonance/process - what
@@ -2038,7 +2040,7 @@ but we have this in our tube.c also here! IGNORE
 
 - lfgen in progress - still to fix?
 
-- flowgen_shimmer in voice_synth in docs - Fant model
+- flowgen_shimmer in voice_synth in docs - Fant model WORKING
 
 - http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
 
@@ -2059,7 +2061,7 @@ now as *glottalair.py* and writing wav file - seems working -> port to C (also R
 
 - Perry Cook/SPASM - digital waveguide ladder filter
 
-[[file:~/projects/ERD_modules/worm/docs/singer.scm::%3B%3B%3B%20Perry%20Cook's%20physical%20model%20of%20the%20vocal%20tract%20as%20described%20in:][file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]]
+[[file:~/projects/ERD_modules/worm/docs/singer.scm::%3B%3B%3B%20Perry%20Cook's%20physical%20model%20of%20the%20vocal%20tract%20as%20described%20in:][file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]] 
 
 - Coker - digital transmission line
 
@@ -2093,3 +2095,13 @@ thinking on double for raven code and above: -Ofast also
 
 we need gcc 4.9 for doubles to solve bug and this means not using
 floating point? arm-eabi...
+
+** 11/3
+
+see raven.org for these days as focus on raven voice
+
+in mage code is hts as main thing - find refs but not for now HTS!
+
+tests on - flowgen_shimmer in shimmer in docs - Fant model WORKING -
+see raven/also vowel there is okay filter-wise!
+
