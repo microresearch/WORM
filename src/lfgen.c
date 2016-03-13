@@ -143,11 +143,17 @@ k = k - dataLength;
 // ROSENBERG:
   signed int s16;
   float sample;
- float T=1/120.0;
+ float T=1/200.0;
  float fs=32000;
  float pulselength=T*fs;
- float N2=pulselength*0.5;
- float N1=0.5*N2;
+
+ // %N2 is duty cycle of the pulse, from 0 to 1.
+ //%N1 is the duration of the glottal opening as a fraction of the 
+ //%total pulse, from 0 to 1.
+
+
+ float N2=pulselength*0.1;
+ float N1=0.9*N2;
  int kkk;
  for (kkk=0;kkk<N1;kkk++){
    //    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
@@ -163,7 +169,7 @@ k = k - dataLength;
    //   printf("%d\n",s16);
    fwrite(&s16,2,1,fo);
  }
- for (kkk=N1;kkk<N2;kkk++){
+ for (kkk=N2;kkk<pulselength;kkk++){
    LFcurrentSample1==0.0;
    s16=(signed int)(LFcurrentSample1*10.0);
    //   printf("%d\n",s16);

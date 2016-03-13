@@ -24,7 +24,7 @@ approaches are:
 
 model in Fletcher? and in Smyth and Smith: Bernoulli and waveguide
 
-is  /root/sc3-plugins/source/MembraneUGens/sc useful here? or spring class? // pmsc/pmpd - physical modelling // flauta...
+is  /root/sc3-plugins/source/MembraneUGens/sc useful here? or spring class? // pmsc/pmpd - physical modelling // flauta -> below
 
 - LPC/ UNIANAL
 
@@ -132,8 +132,6 @@ see http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.
 
 Ag01 can't seem vary at all without silence, S doesn;t do much,,,, try vary d1 glottal width/thickness which makes it more bitty/screechy
 
-note SQ (speed quotient in avanzini) in relation to vocal fry - also more studies on vocal fry towards raven voice
-
 - try coupling tube to this model???? in fletcher etc. how was this
   done? model acoustic waves in trachea // reflected wave from open
   beak ... length of trachea is 70mm, diameter is 7mm
@@ -164,7 +162,7 @@ note SQ (speed quotient in avanzini) in relation to vocal fry - also more studie
 
 *** misc
 
-[[file:~/projects/ERD_modules/worm/docs/flauta/orig/modules/Excitation.cpp]] - note also bernoulli there
+[[file:~/projects/ERD_modules/worm/docs/flauta/orig/modules/Excitation.cpp]] - note also bernoulli there - compiles and tests but all floats...
 
 [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief%20STK%20flute%20physical%20model%20class.][file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief STK flute physical model class.]]
 
@@ -240,15 +238,6 @@ TwoTube.ar(source,MouseX.kr(-1,1),0.99,delay1,delay2);
 
 )
 
-////SC notes:
-
-http://swiki.hfbk-hamburg.de/MusicTechnology/848.diff?id=30
-
-M-x sclang-start
-M-x sclang-server-boot
-C-x C-e eval
-C-c C-s STOP!
-
 ** 13/3
 
 - where we are with all glottal sources before start on tube/waveguide models
@@ -261,15 +250,15 @@ void TwoTube_next(TwoTube *unit, int inNumSamples) {
 
 IN and OUT pointers we can put in next, how we work with function pointers for each generate/next is question
 
-*** LIST GLOTTAL SOURCES and progress so far
+*** LIST GLOTTAL SOURCES and progress so far - TEST all we have before more work/research
 
 Liljencraants/Fant: lfgen.c
 
-Rosenberg in lfgen.c
+Rosenberg in lfgen.c (fixed one bug) WORKING
 
 IF model - two mass model Ishizaka: raven.c
 
-plague oscillation (where and how is reset?):
+plague oscillation (where and how is reset?): TODO!
 
 **** others:
 
@@ -283,25 +272,28 @@ square, noise, vibrato, pulse train (in STK VoicForm.h is looping sample/vibrato
 
 flowgen_shimmer: Fant airflow
 
-FOF (not strictly excitation) -> see Cook: 
-
 all animal refs above
 
 what is excitation in praat?
 
 - http://www.dei.unipd.it/~avanzini/phdthesis/th_download.html has mass models and reed thing!
 
-- CDROM Perry Cook code and book - also for tubes and FOF
+- FOF - CDROM Perry Cook code and book//but most is STK stuff: [[file:~/projects/ERD_modules/worm/docs/CDROM/Code/Other/fofs.c::/*%20FOF%20synthesis%20of%20ahh,%20eee,%20ooo%20*/][file:~/projects/ERD_modules/worm/docs/CDROM/Code/Other/fofs.c::/* FOF synthesis of ahh, eee, ooo */]]
 
 [[file:~/projects/ERD_modules/worm/docs/flauta/orig/modules/Excitation.cpp]] - note also bernoulli there
 
 [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief%20STK%20flute%20physical%20model%20class.][file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief STK flute physical model class.]]
 
-SPASM two glottal oscillators: file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]] 
+SPASM two glottal oscillators: file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's
+physical model of the vocal tract as described in: PRCThesis.pdf
 
 - http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
 
-now as *glottalair.py* and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c are working)
+now as *glottalair.py* and writing wav file - seems working -> port KLGLOTT88 to C (also Rosenberg tests in lfgen.c are working)
+
+FMVoices.h
+
+VT: [[file:~/projects/ERD_modules/worm/docs/vtcalcs/src/vsyn_lib.c::void%20vowel_synthesis%20(%20FILE%20*sig_file,%20FILE%20*glt_file,%20int%20buflen%20)][file:~/projects/ERD_modules/worm/docs/vtcalcs/src/vsyn_lib.c::void vowel_synthesis ( FILE *sig_file, FILE *glt_file, int buflen )]]
 
 **** Klatt/klsyn/nvp
 
@@ -331,6 +323,10 @@ https://github.com/freedv/codec2/blob/master/src/lpc.c
 
 **** Blip from SC from APEX/voiceosurces.sc
 
+[[file:~/SuperCollider-Source/server/plugins/OscUGens.cpp~::void%20Blip_Ctor(Blip%20*unit)][file:~/SuperCollider-Source/server/plugins/OscUGens.cpp~::void Blip_Ctor(Blip *unit)]]
+
+(also pulse is there)
+
 ApexSource01 {
 	*ar { arg fo=100, invQ=0.1, scale=1.4, mul=1;
 		var flow;
@@ -340,11 +336,12 @@ ApexSource01 {
 }
 
 
+
 *** TUBE/waveguide models and notes
 
 - tube.c from gnuspeech
 
-- twotube and ntube from SC
+- twotube and ntube from SC - also APEX note: how APEX makes table of losses etc. for ntube (tables are also in NTube.schelp)
 
 - praat
 
@@ -354,10 +351,59 @@ file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical mode
 
 Klatt formants
 
-fixed vocoder style channels - what was ref?
+- fixed vocoder style channels - Dudley's VODER!
 
 4-dynklank resonators - save coeffs as table first
 
 regular BPF etc. vowel in flowgen_shimmer
 
 
+*** vocal fry notes
+
+small pulse width
+
+In vocal fry register, the vocal fold vibratory pattern is
+characterized by a low frequency, small lateral excursions, and a long
+closed glottal phase [Hollien, 1974] .
+
+note SQ (speed quotient in avanzini) in relation to vocal fry - also more studies on vocal fry towards raven voice
+
+SQ: speed quotient (ratio of rising pulse duration to falling pulse duration) - is this same as klatt's skew above?
+
+very low F0, thick and heavy vocal folds, low sub-glottal pressure,
+low mean flow
+
+vocal fold length is short?
+
+Childers and Ahn [32] show that the speed quotient ranges from about 1.6
+to 3 when the voice quality changes from breathy voice to vocal fry and finally to modal
+
+sing phase (Hollien, 1974; Monsen and Engebretson, 1977).  Vocal fry
+is characterized by a glot- tal area function that has sharp, short
+pulses followed by a long closed glottal interval.  The glottal
+opening phase may 2394 J.  Acoust.  Soc.  Am.  90 (5), November 1991
+0001-4966/91/112394-17500.80 ̧ 1991 Acoustical Society of America 2394
+have one, two, or three opening/closing pulses (Moore and yon Leden,
+1958; Timeke etal., 1959; Hollien, 1974; Monsen and Engebretson, 1977;
+Hollien etaL, 1977; Whitehead et al., 198
+
+For all the voice types examined (i.e., modal, vocal fry, and breathy
+voices), the closing phase exhibits a steeper change of slopes than
+the opening phase. Thus the glottal flow waveforms are skewed to the
+right. Glottal pulse skewness varies with voice type.  For modal and
+vocal fry phonations the skewing is more apparent than for breathy
+phonations. Most of the modal and vocal fry voices show very distinct
+closed phases. The closed phase is not always apparent for breathy
+voices, and in addition the glottal flow waveforms are somewhat
+sinusoidal. The glottal closure is relatively steep for modal and
+vocal fry voices, but progressive for breathy voices .
+
+the amount of turbulent noise is relatively small for 
+modal and vocal fry voices,
+
+the vocal fry glottal 
+waves show relatively strong harmonics
+
+https://ia801303.us.archive.org/26/items/studyofvoicetype00ahnc/studyofvoicetype00ahnc.pdf
+
+and also thesis we take for lfgen: MScThesis-Final-10-03-15.pdf

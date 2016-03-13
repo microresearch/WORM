@@ -327,8 +327,66 @@ SCcode=PV_SpectralMap, borsboom, snokoder]
 runform in simforstacksansmem 
 
 - what effects we implement in DI: mdavoc, pvvoc
+  
 
-* TODO
+
+* using SC notes
+
+http://swiki.hfbk-hamburg.de/MusicTechnology/848.diff?id=30
+
+M-x sclang-start
+M-x sclang-server-boot
+(C-x C-e eval)
+C-c C-s STOP!
+
+C-c C-c eval line or region
+
+C-c C-h searches for a help file 
+C-M-h switches to the Help browser 
+
+E copies the buffer, puts it in text mode and sclang-minor-mode, to
+enable you to edit the code parts to try out variations of the
+provided code in the help file. With C-M-h you can then return to the
+Help browser and browse further from the Help file.
+
+putting sc class files in /usr/local/share/SuperCollider/Extensions
+
+** problems
+
+problem is help only seems to access html and not schelp????
+
+stk stuff doesn't work
+
+** snippets
+
+x = Synth(\voicform);
+x.set(\sweepRate, 0.5);
+i=0;
+
+(
+    i = i+1;
+    a = Phonemes.parameter(i).flop;
+    b = Phonemes.gain(i);
+    Phonemes.string(i).postln;
+    x.setn(\ffreq, a[0]);
+    x.setn(\bw, 1-a[1]);
+    x.setn(\gain, a[2].dbamp);
+    x.set(\voiceGain, b[0]);
+    x.set(\noiseGain, b[1]);
+    x.set(\freq, exprand(200, 800) );
+)
+
+x.play;
+
+
+*  Matlab/octave notes
+
+use wavwrite but always problems with:
+
+error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
+
+
+* TODO OLD!!!!
 
 - sort out memory allocationsDONE
 - basics of read/write head and speech integrationDONE
@@ -2080,6 +2138,23 @@ now as *glottalair.py* and writing wav file - seems working -> port to C (also R
 find synsrc for LF and Rosenberg - can't find
 
 http://www.mattmontag.com/projects-page/academic/speech
+
+NOTES:
+
+    First, the glottal pulse is perturbed with noise to simulate air
+    turbulence ("breathiness") at the glottis. Importantly, this noise
+    is not applied to the entire glottal signal, but only in the
+    positive region where the glottis is open and air flow is present.
+    Second, the pitch and amplitude envelope for the speech was
+    manipulated to add a small random inflection and natural energy
+    decay at the release of vocal stress.  Third, two or three sharp,
+    quiet "startup pulses" are inserted at the beginning of the
+    glottal pulse train, which represents a subtle glottal fricative
+    at the onset of the vowel. This aids in the realism of the vocal
+    attack.  Fourth, the signal was low passed with a zero at nyquist
+    to reduce high frequency ringing.
+
+
 
 http://www.mattmontag.com/projects/speech/speechproduction.m
 
