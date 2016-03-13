@@ -1,10 +1,14 @@
 * TODO
 
-- redo panel and order - not as prototype as no silkscreen
-- swap potis/CVs if do new design and think on wired swops DONE
+
+TODO: RECHECK front panel and replace dee logo with theatrum frontispiece with snake/worm frog and raven!
 
 //////
 DONE
+
+- swap potis/CVs if do new design and think on wired swops DONE
+
+- redo panel DONE and order - not as prototype as no silkscreen
 
 - double check schematic - CHECK!, check footprints, do panel first then match to schematicDONE
 

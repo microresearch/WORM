@@ -30,7 +30,7 @@ is  /root/sc3-plugins/source/MembraneUGens/sc useful here? or spring class? // p
 
 - fake it. trautonium. noise, vibrato and envelopes - see CLM:
   bird.clm, bigbird.ins (to test), bird.scm, animals.scm - also
-  muffwiggler thread and notes from that
+  muffwiggler thread and notes from that - //summarise//
 
 - plague modelling as glottal model: DarkInt and Blackdeath code bases/simulation
 
@@ -138,11 +138,226 @@ note SQ (speed quotient in avanzini) in relation to vocal fry - also more studie
   done? model acoustic waves in trachea // reflected wave from open
   beak ... length of trachea is 70mm, diameter is 7mm
 
-port twotube to become one tube - redo balloon as raven.c
-
 *** pdf summary/lists
+
+**** 2003 Elemans etal AnimBiol.pdf - overview
+
+- reed model is possible. what do we have as tests?
+
+- describes Fletcher well and links of other models to Ish/two mass: eg. Gardner, Fry, Laje and Mindlin, Laje
+
+- American crow also in Goller and Larsen 1997
+
+- mentions Brittan-Powell (1997) physical model -> this is JAS00578.pdf
+
+**** p0244-p0252.pdf
+
+- syringeal anatomy in crow
+
+**** Synthasaurus.pdf
+
+- basic animal sounds using Perry Cook-like model
+
+- look at how glottal excitation is produced
+
+**** 2006 Zaccarelli etal ActaAcustica.pdf
 
 *** misc
 
+[[file:~/projects/ERD_modules/worm/docs/flauta/orig/modules/Excitation.cpp]] - note also bernoulli there
+
 [[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief%20STK%20flute%20physical%20model%20class.][file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief STK flute physical model class.]]
+
+
+from flowgen_shimmer ... how raven approximates to closed quotient, speed etc. (vocal fry?) - re-check lfgen
+
+  printf(" Simulated airflow based on Fant (1979),\n");
+  printf(" Glottal Source and Excitation Analysis,\n");
+  printf(" STL-QPSR 1/1979, pp. 85-107\n\n");
+  printf("usage:\n");
+  printf("%s -o file [-args {description (defaults <range>)}]\n\n",
+							   "voicegen");
+  printf("-o x {Output file (.wav, pcm, 16 bits/sample)}\n");
+  printf("-r x {sampling Rate (22050 Hz <44100, 22050, or 11025>)}\n");
+  printf("-d x {Duration (> 0.5 seconds)}\n");
+  printf("-j x {jitter (0% <0-10%>)}\n");
+  printf("-c x {closed quotient (.55 <0-1>)}\n");
+  printf("-f x {Fundamental frequency, F0, 120 Hz }\n");
+  printf("-g x {Glottal formant, Fg > F0, in Fant's (1979) model, 125 Hz }\n");
+  printf("-k x {Speed of closure, K, in Fant's (1979) model 0.65 <0.55-1.00>}\n");
+  printf("-z x {Variation of speed of closure (0.0 <0-1.0>))}\n");
+  printf("-s x {shimmer (0.0 <0-10%>))}\n");
+  printf("-n x {cycle-to-cycle SNR (0 dB  <0-50>) \n");
+  printf("      aditive noise, uniforme distribution, closed phase}\n");
+  printf("-a x {maximum amplitude (12000 <0-32767>)}\n");
+  printf("-l x {DC flow, proportion of max amplitude (0.0 <0-0.30>))}\n");
+
+*** TODO
+
+- reed model is possible. what do we have? reedtable in stk (clarinet/blowhole - how does it work?), SC- spring, membrane?
+
+- port twotube to become one tube in raven.c // or keep as two tubes?
+
+- review models. what we don't have: one mass model, fletcher 1988 model, gardner, fry (exact refs)
+
+- look at new refs. also Herzel/Titze
+
+- FOF and other approach
+
+- elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple? - granular/wave???
+
+- http://www.dei.unipd.it/~avanzini/phdthesis/th_download.html has mass models and reed thing!
+
+- CDROM Perry Cook code and book!
+
+** 12/3
+
+raven.c compiles with tube code - to test - tube doesn't seem make
+much difference... (reverted now to 2 tube code just to check... and can hear some differences but need test with better source)
+
+is tube code inc reflection of open end tube as in JOS article?
+
+- also maybe is good to coax IF model parameters here towards crow/200 Hz fundamental?
+
+- re-test tube code with simple square wave oscillator - code simply all excitations so they can easily be ported to WORM!
+
+- try SC examples: stringy, modify sources???
+
+(
+{
+var delay1, delay2, source; 
+
+//k from -1 to 1
+
+//in samples
+delay1= 100; 
+delay2= 40;
+
+source= WhiteNoise.ar(0.5)*EnvGen.ar(Env([1,1,0],[(delay1+delay2)/SampleRate.ir,0.0]), Impulse.kr(MouseY.kr(1,4)));
+
+TwoTube.ar(source,MouseX.kr(-1,1),0.99,delay1,delay2); 
+}.play
+
+)
+
+////SC notes:
+
+http://swiki.hfbk-hamburg.de/MusicTechnology/848.diff?id=30
+
+M-x sclang-start
+M-x sclang-server-boot
+C-x C-e eval
+C-c C-s STOP!
+
+** 13/3
+
+- where we are with all glottal sources before start on tube/waveguide models
+
+*** clear functions - follow SC model
+
+void TwoTube_Ctor(TwoTube* unit) { -> init, allocs memory
+
+void TwoTube_next(TwoTube *unit, int inNumSamples) {
+
+IN and OUT pointers we can put in next, how we work with function pointers for each generate/next is question
+
+*** LIST GLOTTAL SOURCES and progress so far
+
+Liljencraants/Fant: lfgen.c
+
+Rosenberg in lfgen.c
+
+IF model - two mass model Ishizaka: raven.c
+
+plague oscillation (where and how is reset?):
+
+**** others:
+
+[[file:~/projects/ERD_modules/older/eurorack/elements/dsp/exciter.cc::/%20Exciter.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/exciter.cc::/ Exciter.]]
+
+tube.c has glottal wavetable calculations
+
+wavetable from raven voice - how does it work with interpolation? examples?
+
+square, noise, vibrato, pulse train (in STK VoicForm.h is looping sample/vibrato)
+
+flowgen_shimmer: Fant airflow
+
+FOF (not strictly excitation) -> see Cook: 
+
+all animal refs above
+
+what is excitation in praat?
+
+- http://www.dei.unipd.it/~avanzini/phdthesis/th_download.html has mass models and reed thing!
+
+- CDROM Perry Cook code and book - also for tubes and FOF
+
+[[file:~/projects/ERD_modules/worm/docs/flauta/orig/modules/Excitation.cpp]] - note also bernoulli there
+
+[[file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief%20STK%20flute%20physical%20model%20class.][file:~/sc3-plugins/source/StkUGens/stk-4.4.2/src/Flute.cpp::\brief STK flute physical model class.]]
+
+SPASM two glottal oscillators: file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]] 
+
+- http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
+
+now as *glottalair.py* and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c are working)
+
+**** Klatt/klsyn/nvp
+
+klatt/klsyn - extractions from these and which exact code to use - nvp?
+
+in nvp there is no skew but is in klsyn:
+
+klsyn: The variable 'sk', "skew to alternate periods", is the number
+        of 25 microsecond increments to be added to and subtracted
+        from successive fundamental period durations in order to
+        simulate one aspect of vocal fry, the tendency for alternate
+        periods to be more similar in duration than adjacent periods.
+
+
+**** LPC inverse filter:
+
+This is accomplished by inverse-filtering the signal with the LPC, raising the parts of the spectrum which the LPC says are low, and lowering the parts which the LPC says are high. The end result, ideally, will be the source signal as if the person had no vocal tract at all.
+
+http://doc.sccode.org/Classes/LPCAnalyzer.html
+
+but inverse filter?
+
+https://github.com/freedv/codec2/blob/master/src/lpc.c
+
+[[file:~/projects/ERD_modules/worm/lpc.c::FILE........:%20lpc.c][file:~/projects/ERD_modules/worm/lpc.c::FILE........: lpc.c]]
+
+
+**** Blip from SC from APEX/voiceosurces.sc
+
+ApexSource01 {
+	*ar { arg fo=100, invQ=0.1, scale=1.4, mul=1;
+		var flow;
+		flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo);
+		^HPZ1.ar(flow, mul);   // +6 dB/octave
+	}
+}
+
+
+*** TUBE/waveguide models and notes
+
+- tube.c from gnuspeech
+
+- twotube and ntube from SC
+
+- praat
+
+- LFgen waveguide
+
+file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]] 
+
+Klatt formants
+
+fixed vocoder style channels - what was ref?
+
+4-dynklank resonators - save coeffs as table first
+
+regular BPF etc. vowel in flowgen_shimmer
+
 
