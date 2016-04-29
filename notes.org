@@ -1,7 +1,17 @@
 * TODO
 
-
 TODO: RECHECK front panel and replace dee logo with theatrum frontispiece with snake/worm frog and raven!
+
+we have this now as wormlogo -> wormkicadlogocomplete.mod
+
+poss 24 encoder for WORM?>????? a la STEC12E - Bourns PEC12R
+
+- what interface, what size is hole and what is footprint - (see
+  braids also for code - ENC_A, ENC_B, ENC_CLICK on PC13,14,15)
+
+hole is 7.5mm, footprint in braids newkicad mod - alps EC12E
+
+question is if we want 5 parameters AND encoder or encoder replaces one???
 
 //////
 DONE

@@ -2166,7 +2166,7 @@ papers: Fletcher(1988), Smyth and Smith (2002)
 
 ** 10/3
 
-thinking on double for raven code and above: -Ofast also
+thinking on double for raven code and above: -Ofast also as flag
 
 we need gcc 4.9 for doubles to solve bug and this means not using
 floating point? arm-eabi...
@@ -2180,3 +2180,20 @@ in mage code is hts as main thing - find refs but not for now HTS!
 tests on - flowgen_shimmer in shimmer in docs - Fant model WORKING -
 see raven/also vowel there is okay filter-wise!
 
+** 14/3
+
+- warps freq shift to look at
+
+shift: [[file:~/projects/ERD_modules/older/eurorack/warps/dsp/modulator.cc::void%20Modulator::ProcessEasterEgg(][file:~/projects/ERD_modules/older/eurorack/warps/dsp/modulator.cc::void Modulator::ProcessEasterEgg(]]
+
+** 29/4
+
+- new notes to fill in here esp. on raven/LPC merge - raven wavetable (see braids:
+
+[[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWavetables(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWavetables(]] )
+
+excitation is raven wavetable with incoming (eg. voice) as LPC filter to apply
+
+(also inverse filtering to output residual could be done seperately)
+
+TODO: LPC tests, wavetable and excitation inputs across modes, just clean up for PARIS thing so works to some degree...

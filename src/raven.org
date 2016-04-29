@@ -266,11 +266,13 @@ plague oscillation (where and how is reset?): TODO!
 
 tube.c has glottal wavetable calculations
 
-wavetable from raven voice - how does it work with interpolation? examples?
+- wavetable from raven voice - how does it work with interpolation? examples? 
 
-square, noise, vibrato, pulse train (in STK VoicForm.h is looping sample/vibrato)
+table lookup phase increment oscillator (maybe see stk)
 
-flowgen_shimmer: Fant airflow
+- square, noise, vibrato, pulse train (in STK VoicForm.h is looping sample/vibrato)
+
+- flowgen_shimmer: Fant airflow
 
 all animal refs above
 
@@ -343,6 +345,8 @@ ApexSource01 {
 
 - twotube and ntube from SC - also APEX note: how APEX makes table of losses etc. for ntube (tables are also in NTube.schelp)
 
+how we port for one tube - note that k=scattering is from -1 to 1 (so can invert)
+
 - praat
 
 - LFgen waveguide
@@ -407,3 +411,127 @@ waves show relatively strong harmonics
 https://ia801303.us.archive.org/26/items/studyofvoicetype00ahnc/studyofvoicetype00ahnc.pdf
 
 and also thesis we take for lfgen: MScThesis-Final-10-03-15.pdf
+
+
+** 15/3 +
+
+TODO 
+
+- fix single tube code and understand D WG digital wave guide: https://ccrma.stanford.edu/~jos/pmudw/pmudw.pdf
+
+*- where we are at so far / code summary*
+
+- how we make wavetable and other excitations to test
+
+- maybe in/out files with tube processing etc. for all excitations to
+test!
+
+*** how to arrive at scattering for tubes (loss is fixed) - in NTube example:
+
+//1-D vocal tract model: data for Ah sound for cross-sectional areas of vocal tract (see http://www-users.york.ac.uk/~dtm3/vocaltract.html and associated publications)
+//a=FileReader.read("/Users/nickcollins/Desktop/VowelAreaFunctions/MRI/JASAPaper/A-bart.txt"); 
+//
+//b= Array.fill(a.size.div(2),{|i| a[2*i][0]}); 
+//b.size
+//c= b[0..43].asFloat
+
+//run at higher sampling rate? 
+
+/// areasource is 44 we skip 4 and have 11 delays
+
+(
+var areassource= [ 0.45, 0.2, 0.26, 0.21, 0.32, 0.3, 0.33, 1.05, 1.12, 0.85, 0.63, 0.39, 0.26, 0.28, 0.23, 0.32, 0.29, 0.28, 0.4, 0.66, 1.2, 1.05, 1.62, 2.09, 2.56, 2.78, 2.86, 3.02, 3.75, 4.6, 5.09, 6.02, 6.55, 6.29, 6.27, 5.94, 5.28, 4.7, 3.87, 4.13, 4.25, 4.27, 4.69, 5.03 ];
+var areas; 
+var loss, karray, delayarray; 
+
+//convert to sequence of k 
+
+//average length of human male vocal tract 16.9cm (14.1cm adult female)  speed of sound 340.29 m/s. So delay of vocal tract is 
+//0.169/340.29 = 0.00049663522289812 seconds
+//0.0005*44100 is about 22 samples, so less than one sample per section of the throat if more than 22 measurements used! 
+//need higher sampling rate, or less sections in model
+
+//Loy p347, p358, Kelly Lochbaum junctions used in TubeN
+//k= (Z1-Z0)/(Z1+Z0); //Z inversely proportional to A 
+//k= ((A0-A1)/(A0A1))/((A0+A1)/(A0A1)) ie similar relation for Z 
+
+//take every 4th
+areas= Array.fill(11,{|i| areassource[4*i]}); 
+
+//about 2 samples delay for each section! 
+
+loss=0.99; 
+
+karray= Array.fill(10,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); 
+
+//delayarray= Array.fill(11,{0.00049663522289812/11.0}); 
+delayarray= Array.fill(11,{0.000046}); //any smaller and Nyquist problems arise... 
+
+//Impulse too predictable, need a richer low pass filtered and frequency modulated glottal oscillation 
+//Dust.ar(MouseX.kr(100,400),0.9,0.1*PinkNoise.ar)
+{
+Limiter.ar(NTube.ar(PinkNoise.ar(0.3),loss, `karray, `delayarray , 0.5),0.99,0.01).min(1.0).max(-1.0)
+}.play
+
+)
+
+*** LPC possibilities 
+
+//to extract/inverse filter crow excitation/wavetable and to use/test this -> wav...
+
+*All below notes concentrate on singlecrow.wav.*
+
+**** SLP: 14 coeffs
+
+: sox singlecrow.wav -b 16 -t raw singcrow rate 16000 
+
+: ./lpcana singcrow crw_err crw_coeffs
+
+: play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 16000 crw_err
+
+(problem was before using unsigned)
+
+crw_err as error/residual signed/16 bits/16k samplerate: 328/650 odd Hz peaks 
+
+AND re-synthesize with nnnn which is white noise:
+
+: ./lpcsyn nnnn crw_coeffs crow_syn
+
+**** UNIANAL_LPC/UNIANAL 
+
+: ./unianal -i"singlecrow" -a1 -p1 -e2 
+
+: ./unisynt -i"singlecrow" -e2 -a1
+
+but is all quite self-contained. see [[file:~/projects/ERD_modules/worm/docs/UNIANAL_LPC/UNIANAL/readme::UNIANAL,%20UNISYNT%20-%20universal%20speech%20analysis%20and%20synthesis][file:~/projects/ERD_modules/worm/docs/UNIANAL_LPC/UNIANAL/readme::UNIANAL, UNISYNT - universal speech analysis and synthesis]]
+
+and also ref "If the frame is voiced, the synthesis filter is excited
+by the Kronecker pulse train"
+
+what outputs can we get and make sense of?
+
+how many coeffs? default is 10
+
+**** PRAAT 
+
+- read file and then to LPC or to formants
+
+Formants eg.
+
+time(s)	nformants	F1(Hz)	B1(Hz)	F2(Hz)	B2(Hz)	F3(Hz)	B3(Hz)	F4(Hz)	B4(Hz)	F5(Hz)	B5(Hz)
+0.03	5	1378.3	138.5	1754.4	301.5	2547.9	445.1	3714.3	542.7	4813.6	741.2
+0.03	5	1315.5	113.0	1821.4	122.7	2656.2	354.4	3730.6	676.8	4844.6	1348.5
+0.04	5	1305.6	103.1	1831.1	76.9	2655.7	350.9	3683.4	376.0	4923.0	1145.8
+0.04	5	1327.4	88.8	1843.7	73.0	2673.4	343.7	3605.3	301.9	4944.9	744.7
+0.05	5	1374.7	227.3	1834.2	169.7	2597.6	471.1	3295.4	679.8	4911.3	640.0
+0.06	5	1360.0	209.6	1803.2	214.4	2527.3	514.8	3174.0	568.0	4987.3	527.5
+
+pitch as 300 Hz -> can generate audio as pitchhum in raven_rec
+
+how we can synthesize from LPC and thence vocaltract: http://www.fon.hum.uva.nl/rob/VocalTractExamples/ and now VocalTractExample in docs
+
+LPC filter of other signals/ save LPC coeffs (is .LPC files like Files
+starting with type = "ooTextFile" Object class = "LPC 1")
+
+what we can extract from praat code?
+
