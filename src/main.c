@@ -70,19 +70,21 @@ void main(void)
   delay();
   I2S_Block_Init();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
-  init_synth(); // which one?
+  init_synth(); // which one? --> klatt rsynth
   Audio_Init();
+
+
   //  SAMINIT();
 
-  lpc_init();
-  lpc_newsay();
+    lpc_init();
+    lpc_newsay();
 
   initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM!
-  synthesize();
+  synthesize(); // - ?????
 			
   // test audio fill
 
-  /*   for (x=0;x<32768;x++){
+  /*     for (x=0;x<32768;x++){
     audio_buffer[x]=rand()%32768;
     }*/
 
@@ -91,7 +93,7 @@ void main(void)
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-      mode=19; // TESTING
+           mode=18; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
@@ -111,7 +113,7 @@ void main(void)
 	   }
 	   break;
   case 1: // rsynth/klatt-chain of phonemes
-    writepos=run_holmes(writepos);
+    writepos=run_holmes(writepos); 
     break;
   case 2: // vosim free running
     writepos=runVOSIM_SC(writepos);

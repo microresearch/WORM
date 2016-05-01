@@ -2186,7 +2186,24 @@ see raven/also vowel there is okay filter-wise!
 
 shift: [[file:~/projects/ERD_modules/older/eurorack/warps/dsp/modulator.cc::void%20Modulator::ProcessEasterEgg(][file:~/projects/ERD_modules/older/eurorack/warps/dsp/modulator.cc::void Modulator::ProcessEasterEgg(]]
 
-** 29/4
+
+** 29/4---->1/5 UPDATE and RE_APPRAISE
+
+- somehow on our test eurorack version knobs are mixed up so now
+  remapped in audio.h but not sure how/why is so - for final annotated
+  brd
+
+
+*** TODO:
+
+LPC tests, wavetable and excitation inputs across modes, just clean up for PARIS thing so works to some degree...
+
+
+- why tube.c behaves strange: FIXED - think was memory issue for large input_frames array so *we need to watch memory and maybe clean up buffers*
+
+
+- simple wrapping and round robin style
+- where we are with all generators?
 
 - new notes to fill in here esp. on raven/LPC merge - raven wavetable (see braids:
 
@@ -2196,4 +2213,8 @@ excitation is raven wavetable with incoming (eg. voice) as LPC filter to apply
 
 (also inverse filtering to output residual could be done seperately)
 
-TODO: LPC tests, wavetable and excitation inputs across modes, just clean up for PARIS thing so works to some degree...
+*but raven will become seperate module*
+
+////
+
+cleaning up but priority is: basic phoneme round for PARIS and cleanups, LPC and excitation for JAPAN

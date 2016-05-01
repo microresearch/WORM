@@ -40,8 +40,10 @@ LDSCRIPT = stm32_flash.ld
 #CFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard 
 # was -02 before below... 
 
+# LACH is -DTEST option!
+
 CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -I./LPC -I./vocoder -std=gnu99 \
-	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' -DTEST \
+	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' \
 	-mthumb -ggdb\
 	-mfpu=fpv4-sp-d16 \
 	-c -lm -lc -fno-common -O3 \

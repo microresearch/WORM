@@ -410,7 +410,7 @@ float input_frame[16]={-12.5,54.0,0.0,0.0,4.0,4400,600,0.8,0.8,0.4,0.4,1.78,1.78
 
 /// with microint 64 x 16:
 
-float input_frames[64][16]=
+const float input_frames[64][16]  __attribute__ ((section (".flash"))) =
 {
 {0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 0.010000, 0.100000},
 
@@ -1653,7 +1653,7 @@ void synthesize(void)
 	    
 
 	    dataFill(signal);
-
+	    
 	    sampleRateInterpolation();
     
 	    }
@@ -2997,7 +2997,7 @@ void dataEmpty(void)
 	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
 	    audio_buffer[laststart]=rintf(output*scale);
 	    //	    	    audio_buffer[laststart]=rand()%32768;
-	    	    printf("fff %f", output);
+	    //	    	    printf("fff %f", output);
 	      laststart++;
 	      if (laststart>=32768) laststart=0;
 
@@ -3071,7 +3071,7 @@ void dataEmpty(void)
 	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
 	    	    audio_buffer[laststart]=rintf(output*scale);
 	    //	    	    audio_buffer[laststart]=rand()%32768;
-		    printf("fff %f", output);
+		    //		    printf("fff %f", output);
 
 	      laststart++;
 	      if (laststart>=32768) laststart=0;

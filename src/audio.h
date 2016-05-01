@@ -24,9 +24,9 @@
 #define SELY 4 //4
 #define SELZ 1 //1
 #else
-#define MODE 2 // for pcb=2 - speed is at TOP
-#define SELX 3 //3 - left
-#define SPEED 4 // - right
+#define MODE 3 // for pcb=2 - speed is at TOP
+#define SELX 4 //3 - left
+#define SPEED 2 // - right
 #define SELY 0 // down left
 #define SELZ 1 // down right
 #endif

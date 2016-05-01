@@ -6,8 +6,11 @@ LINEIN/OUTL-filter
 
 */
 
-/*- doublecchecked LACH knobs left/right from top (pcb and lach=test) = 0/mode-(2..3)
-1/selX.egX-(3..2) 2/speed-(0..4) 3/end-(4..1)
+/*- LACH knobs left/right from top (pcb and lach=test) = 
+0/mode-(2..3)
+1/selX.egX-(3..2) 
+2/speed-(0..4) 
+3/end-(4..1)
 4/trigthresh/vocoderfreq/othersel.eg/selY-(1..0)*/
 
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
