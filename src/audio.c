@@ -208,7 +208,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       }
       samplepos+=samplespeed;
       eaten+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
     break;
   case 1: // rsynth/klatt-chain of phonemes
@@ -219,7 +219,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       samplepos+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
     framecount++;
     if (framecount>(64/speedy)){
@@ -231,7 +231,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       samplepos+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
     //    framecount++;
     break;
@@ -245,7 +245,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       }
       samplepos+=samplespeed;
       eaten+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
     break;
   case 4: // mdavocoder - WE NEED different carriers?
@@ -392,7 +392,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       mono_buffer[x]=audio_buffer[readpos];
       //                mono_buffer[x]=rand()%65536;
       samplepos+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
       break;
   case 19: // tests for simpleklatt
@@ -400,7 +400,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       samplepos+=samplespeed;
-      if (readpos>=ending) samplepos=0.0f;    
+      if (samplepos>=ending) samplepos=0.0f;    
     }
     break;
   case 20: // tests for nvp.c

@@ -141,7 +141,6 @@ void main(void)
     if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
     break;
   case 19: // parwave/simpleklatt
-
     dosimpleklatt();
     break;
 
