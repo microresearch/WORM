@@ -2246,9 +2246,13 @@ tubes: tube.c, SC tube, tube.cc
 
 - SP0256 MAME question - contact? S14001 also in mame but again ROM license question...
 
+- where we deal with klatt (and other) parameters?
+
 - question of hardware/noise/inputs - TEST!
 
-- production->solder stencil? also TWO INs question??? for LPC and vocoder only???
+- production->solder stencil? also TWO INs question??? for LPC and vocoder only??? probably NOT!
+
+- ADD test pin for audio out//redo zones/vias//re-check all and order!
 
 *** older: 
 
@@ -2267,6 +2271,10 @@ test/compare all vocoders: mda (with excitation), LADSPA, borboom, own ARM FFT
 see also: http://gurzil.livejournal.com/15375.html and pvsvoc in csound code.
 
 - elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
+
+** 28/7
+
+reduce PCB and panel to 12HP
 
 ////
 
