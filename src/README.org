@@ -2276,6 +2276,10 @@ see also: http://gurzil.livejournal.com/15375.html and pvsvoc in csound code.
 
 reduce PCB and panel to 12HP
 
+- modes: 1-klatt//2-klatt raw params//3-talkie-how to change
+  pitch?//4-SAM?//5-tube//6/7-->filter/formants/formlet/fof/formlet/vowgen/fm/voder
+  channels/lpc//8-vocoder 
+
 ////
 
 *** SCHEDULE:
