@@ -14,7 +14,11 @@ init_nvp(void)
 
 generate_nvp(generator* nvp_generator, u16 size, int16_t* incoming, int16_t* outgoing)
 
-but generator* should be void and cast
+or:
+
+generate[x]->pointer to nvp and also generic struct to keep track of frames and so on...
+
+(but generator* should be void and cast)
 
 - satisfactory vocoder
 
@@ -65,7 +69,7 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 9-   | SAM | sam.c | sam.c??? |
 10-  | LPC/Talkie | LPC/lpc.c  | talkie |  larger vocabulary  // = TMS5220
 
-add vocab from: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/TalkoVCO/TalkoVCO.ino]]
+add vocab from: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/TalkoVCO/TalkoVCO.ino]] DONE
 
 have speed of samples change!
 
@@ -263,7 +267,7 @@ void init_synth(void)
 - so klatt mode should just be that looping and maybe a stripped or
   reduced klatt without transitions as a seperate mode with more changes in pitch and so on
 
-- TODO: nsp.c port - ipa.py questions, test generation of klsyn/klatt
+- TODO: nvp.c port - ipa.py questions, test generation of klsyn/klatt
   parameters from simple code, does rsynth sound same on worm or do we
   have samplerate issues - play also with various defines (see above)DONE/// port that simple klatt
 
@@ -2240,8 +2244,6 @@ how to resolve vocoder - switched noise/oscillator(pitch) and voice in? or???
 
 tubes: tube.c, SC tube, tube.cc
 
-- check again nvp and simpleklatt as to how these differ from full klatt
-
 - question of speed and munchkins -> deal with pitch rather?
 
 - SP0256 MAME question - contact? S14001 also in mame but again ROM license question...
@@ -2272,17 +2274,88 @@ see also: http://gurzil.livejournal.com/15375.html and pvsvoc in csound code.
 
 - elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
 
-** 28/7
+** 28/5
 
-reduce PCB and panel to 12HP
+reduce PCB and panel to 12HP: in progress
 
-- modes: 1-klatt//2-klatt raw params//3-talkie-how to change
+- modes: 1-klatt-constrained also to probability table//2-klatt raw params=nvp or?//3-talkie-how to change
   pitch?//4-SAM?//5-tube//6/7-->filter/formants/formlet/fof/formlet/vowgen/fm/voder
-  channels/lpc//8-vocoder 
+  channels/lpc//8-vocoder
 
-////
+** 30/5
 
-*** SCHEDULE:
+- trim code after mode tests-> trimmed/discard saved... prototype function pointer/function
+
+- look at klatt for break down:
+
+holmes = x elements -> each has xx frames(dur?) -> new_parwave/parwave (nsynth.c) for each frame deals with samples
+
+(so which element we are at, which frame in that element, which sample - new element/new frame...)
+
+- interpolation tests for speed changing
+
+- what/where are klatt raw params: nvp.c which looks a mess, and simpleklatt.c
+
+- other klatt params (basic pitch=F0hz10), length of phoneme list, flutter, skew?)
+
+- run through missing/todo/incomplete code => nvp, what is simpleklatt
+  doing, can we use basic phoneme mode 0 klatt code also?, mame code,
+  HMM?
+
+- worm simulation/generation - diverging angle?
+
+MAYBE more categories rather than dailies eg. interpol below, klatt, nvp, raven, all collected here - as also started at start to do!
+
+- PLAN - mode test/check // trim // interpolation tests
+
+- still need to define incoming as gate/whatever? excitation/process? TRIGGER PLAN!
+
+** talkie=LPC/lpc.c 
+
+- port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]]
+
+- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples
+
+- what we could get from MAME code/roms? - cross-compare co-efficients... still trying to extract speech/allophones code from u25_rom1.bin
+
+Now, here is how speech is encoded:
+
+Frame type  Energy Rpt Pitch   K1    K2   K3   K4   K5   K6   K7  K8  K9  K10 
+Voiced      xxxx   0  xxxxxx xxxxx xxxxx xxxx xxxx xxxx xxxx xxxx xxx xxx xxx 
+Unvoiced    xxxx   0  000000 xxxxx xxxxx xxxx xxxx 
+Repeated    xxxx   1  xxxxxx 
+Silence     0000 
+Stop code   1111
+
+from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+
+ti99sim which has spchdump segfaults only not with spchrom which is already encoded!
+
+sox and lpc-10
+
+terminal emulator and ALLPHON or allophones (allophone rom should be u25?) 127 allophones
+
+ti99sim: Release/dumpspch --format=hex ~/Downloads/u25_rom1.bin
+
+format=spch
+
+unianal for lpc-10 and check again encoding but what we want is original allophon code
+
+convert from lpc-10 vie tables in  http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+
+** interpolations
+
+- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]]
+
+- linear interpol and filtering (freq?): http://stackoverflow.com/questions/1125666/how-do-you-do-bicubic-or-other-non-linear-interpolation-of-re-sampled-audio-da
+
+- ominous voice???
+
+http://www.rockbox.org/tracker/12223?getfile=24000
+
+go linear!
+
+** SCHEDULE:
 
 ALL tests above, new code tests and generator tests...
 
