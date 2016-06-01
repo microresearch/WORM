@@ -2339,9 +2339,35 @@ ti99sim: Release/dumpspch --format=hex ~/Downloads/u25_rom1.bin
 
 format=spch
 
-unianal for lpc-10 and check again encoding but what we want is original allophon code
+unianal for lpc-10 and check again encoding but what we want is
+original allophon code - now have DATABASE from text to speech disk
+but somehow can't extract meaningful data...
 
-convert from lpc-10 vie tables in  http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+[[file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE%20][file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE ]]
+
+and codes from dumpspch don;t match at all R or P or... - XLAT, SPEAK in machine language?
+
+lpctest for finding lpc codes but as long as they don't concat/// or we need to jump to next byte
+
+have longer look at format of spchrom.bin
+
+convert from lpc-10 via tables in  http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+
+///
+
+offset 13c3 offset 5059 2 bytes left processing phrase 0
+
+in spchrom is word then 5,,,, then address...
+
+seems like can have REPEAT bit at start with on coeffs>>??
+
+had to NOT reverse bits (and also wh we need to reverse - just do for all arrays beforehand!)
+
+...
+
+question of zeroes in vocab after energy=0xf stop bits
+
+now we can parse with lpctest the spchrom fine... need next to use to try and dump codes from disks/cartridges and so on
 
 ** interpolations
 
@@ -2351,7 +2377,7 @@ convert from lpc-10 vie tables in  http://www.unige.ch/medecine/nouspikel/ti99/s
 
 - ominous voice???
 
-http://www.rockbox.org/tracker/12223?getfile=24000
+and: http://www.rockbox.org/tracker/12223?getfile=24000
 
 go linear!
 
