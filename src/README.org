@@ -2345,7 +2345,9 @@ but somehow can't extract meaningful data...
 
 [[file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE%20][file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE ]]
 
-and codes from dumpspch don;t match at all R or P or... - XLAT, SPEAK in machine language?
+and codes from dumpspch don;t match at all R or P etc which we have in vocab 
+
+ - XLAT, SPEAK in machine language?
 
 lpctest for finding lpc codes but as long as they don't concat/// or we need to jump to next byte
 
@@ -2357,17 +2359,26 @@ convert from lpc-10 via tables in  http://www.unige.ch/medecine/nouspikel/ti99/s
 
 offset 13c3 offset 5059 2 bytes left processing phrase 0
 
-in spchrom is word then 5,,,, then address...
+in spchrom is word then 5x,=,,,, then address...
 
 seems like can have REPEAT bit at start with on coeffs>>??
 
-had to NOT reverse bits (and also wh we need to reverse - just do for all arrays beforehand!)
+had to NOT reverse bits (and also why we need to reverse - just do for all arrays beforehand!)
 
 ...
 
 question of zeroes in vocab after energy=0xf stop bits
 
 now we can parse with lpctest the spchrom fine... need next to use to try and dump codes from disks/cartridges and so on
+
+...
+
+apple II: echo software - now we have some female voice:
+
+is from WORDS_D00 which is expanded from WORDEDIT.SDK but edges are funny and can't GET indexing
+
+?"I can use my TI Text-to-Speech disk along with
+software to capture the LPC strings to create new words"
 
 ** interpolations
 

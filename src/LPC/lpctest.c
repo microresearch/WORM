@@ -8,10 +8,11 @@
 #include "stdio.h"
 #include "math.h"
 
-unsigned char buffer[327680];
+unsigned char buffer[327680];//143360
 //int offset=0x13c3;
 //int offset=0x1408;
-int offset=0;
+int offset=0x00;
+int printer=0;
 
 #define INTERP_PERIOD 25  // samples per subframe
 #define SUBFRAME_PERIOD 8 // subframes per frame
@@ -87,6 +88,7 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	{
 		ptrBit -= 8;
 		ptrAddr++;
+	if (printer==1)	printf("0x%X, ", byte_rev[*ptrAddr]);
 		if (ptrBit==0) {
 		  didntjump=0;
 		}
@@ -139,13 +141,14 @@ int lpc_update_coeffs(void)
 			didntjump=0;*/
 			justafter=1; // paddings?
 			}
-			else justafter=0;
+			//		else justafter=0;
 			return 1;
 		}
 		else if(energy == 0xf)
 		{
 			/* Energy = 15: stop frame. Silence the synthesiser. */
 		  //		  printf("ZZZZZZZZZZZZZZZZZZZZZZ--------------------------------->stop frame %d %X \n",counter,(ptrAddr-buffer));
+		  if (printer==1) printf("\n\n");
 			if (justafter==1) return 0;
 			counter++;
 			//next one
@@ -156,10 +159,11 @@ int lpc_update_coeffs(void)
 			ptrBit =0;
 			ptrAddr++;
 			}
-			if (didntjump){
+						if (didntjump){
 			ptrBit =0;
 			ptrAddr++;
-			}
+			if (printer==1)	printf("0x%X, ", byte_rev[*ptrAddr]);
+			} 
 			didntjump=0;
 			return 1;
 		}
@@ -170,6 +174,72 @@ int lpc_update_coeffs(void)
 		  }
 		else 
 		{
+		  if (justafter==1){
+		    //new 
+		    //		    printf("\n");
+
+		  }
+
+			/* All other energy types */
+		  		  //		  		  printf("ENERGY %d\n", energy);
+			repeat = lpc_getBits(1);
+			//				printf("REPEAT %d\n", repeat);
+			if (justafter==1 && repeat) return 0; // nothing to repeat
+			justafter=0;
+			nextPeriod = tmsPeriod[lpc_getBits(6)];
+			//			printf("repeat %d\n",repeat);
+			/* A repeat frame uses the last coefficients */
+			if(!repeat)
+			{
+				/* All frames use the first 4 coefficients */
+			  //				  printf("frame\n");
+				nextK[0] = tmsK1[lpc_getBits(5)];
+				nextK[1] = tmsK2[lpc_getBits(5)];
+				nextK[2] = tmsK3[lpc_getBits(4)]<<8;
+				nextK[3] = tmsK4[lpc_getBits(4)]<<8;
+				if(nextPeriod)
+				{
+					/* Voiced frames use 6 extra coefficients. */
+				  //				  printf("voiced\n");
+					nextK[4] = tmsK5[lpc_getBits(4)]<<8;
+					nextK[5] = tmsK6[lpc_getBits(4)]<<8;
+					nextK[6] = tmsK7[lpc_getBits(4)]<<8;
+					nextK[7] = tmsK8[lpc_getBits(3)]<<8;
+					nextK[8] = tmsK9[lpc_getBits(3)]<<8;
+					nextK[9] = tmsK10[lpc_getBits(3)]<<8;
+				}
+			}
+		}
+	
+	return 1;
+}
+
+int alt_lpc_update_coeffs(void)
+{
+	int8_t i;
+	uint8_t repeat;
+	uint16_t energy;
+		
+		/* Read speech data, processing the variable size frames. */
+		energy = lpc_getBits(4);
+		//		printf("ENERGY %d\n",energy);
+		if(energy == 0)
+		{
+			/* Energy = 0: rest frame */
+			nextEnergy = 0;
+		}
+		else if(energy == 0xf)
+		{
+			return 0;
+		}
+		else if(energy>0x0f)
+		  {
+		    //		    printf("BOO\n");
+		    return 0;
+		  }
+		else 
+		{
+
 			/* All other energy types */
 		  		  //		  		  printf("ENERGY %d\n", energy);
 			repeat = lpc_getBits(1);
@@ -205,6 +275,7 @@ int lpc_update_coeffs(void)
 }
 
 
+
 int main(){
 
   lpc_init();
@@ -214,22 +285,23 @@ int main(){
    FILE *fp;
    int xx,yy,bits=0,xxy;
    unsigned char rever;
-   int length=24576;
    /* Open file for both reading and writing */
+   int length=23475;
    
-   //   fp = fopen("/root/Downloads/TI99/spchrom.bin", "r");
-   fp = fopen("/root/Downloads/TI99/phm3112g.bin", "r");
+   //      fp = fopen("/root/Downloads/TI99/speech/spchrom.bin", "r");
+   //      fp = fopen("/root/Downloads/TI99/apple/ciderpress/linux/echo2dsk.LPC", "r");
+      fp = fopen("/root/WORDS_D000", "r");
    fread(buffer, 1, length, fp);
 
    //      for (xx=0;xx<32768;xx++){
    //      printf("0x%02X, ",byte_rev[buffer[0x13c3]]); // checks out okay
 	//      }
+   printer=0;
 
+   /*
          while(offset<length){
         counter=0;
 
-
-   /* Read and display data */
 
    //   printf("%s\n", buffer);
 	ptrAddr=buffer+offset; ptrBit=0;
@@ -254,5 +326,25 @@ int main(){
    }
 	 printf("maxcounter %d maxoffset 0x%X reved 0x%x,0x%x\n",maxcounter,maxoffset,byte_rev[buffer[maxoffset]],byte_rev[buffer[maxoffset+1]]);
 	 fclose(fp);
+*/
+
+   	 maxoffset=0;
    
+	 // seek and print with breaks from here;;
+	 //	 ptrAddr=buffer+maxoffset; ptrBit=0;
+	 //	 printer=1; xxy=1;
+
+	 //	 printf("0x%X, ", byte_rev[*ptrAddr]);
+	 //	 while((ptrAddr-buffer<(length-maxoffset))){
+	 //	xxy=alt_lpc_update_coeffs();
+	//		printf("ptrAddr-buffer %d\n",ptrAddr-buffer);
+	//		if (xxy==0) printf("\n\n");
+	 //	}
+    ptrAddr=buffer;
+   // dump reversed
+   for (xx=0;xx<length;xx++){
+     printf("0x%X, ", byte_rev[*ptrAddr+xx]);
+     
+     }
+
 }
