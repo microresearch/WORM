@@ -286,11 +286,11 @@ int main(){
    int xx,yy,bits=0,xxy;
    unsigned char rever;
    /* Open file for both reading and writing */
-   int length=23475;
+   int length=11699;
    
    //      fp = fopen("/root/Downloads/TI99/speech/spchrom.bin", "r");
-   //      fp = fopen("/root/Downloads/TI99/apple/ciderpress/linux/echo2dsk.LPC", "r");
-      fp = fopen("/root/WORDS_D000", "r");
+         fp = fopen("/root/Downloads/TI99/apple/ciderpress/linux/D003", "r");
+   //      fp = fopen("/root/Downloads/TI99/Spch-E", "r");
    fread(buffer, 1, length, fp);
 
    //      for (xx=0;xx<32768;xx++){

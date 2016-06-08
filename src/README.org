@@ -2380,6 +2380,45 @@ is from WORDS_D00 which is expanded from WORDEDIT.SDK but edges are funny and ca
 ?"I can use my TI Text-to-Speech disk along with
 software to capture the LPC strings to create new words"
 
+...
+
+some success with parts of:
+
+- is from WORDS_D00 which is expanded from WORDEDIT.SDK (apple II/echo) - female voice (also D001,2 and 3)
+
+- /root/Downloads/TI99/Spch-EdG.Bin which is phonemes perhaps
+
+----
+
+disassembly but need extracted bins... and where code starts:
+
+: ./getfile ../../disks/WORDEDIT.SDK INIT > INIT
+
+: ../../../dcc6502/dcc INIT | less
+
+from: ~/Downloads/TI99/apple/ciderpress/linux
+
+///
+ 
+also nice to print basic straight HOW? - in wine with ciderpress we can
+
+.....
+
+offsets from POINTERS into D00x still not working
+
+...
+
+next/ extract offsets and test! start in POINTERS is at x203... also
+just test for one single expression/phrase as seems split up somehow...
+
+start for THIR in pointers is: 06A9 -> points to 004D as address/offset
+
+UNITED STATES = 33(dec) in = 1578dec
+
+how long is average vocab in bytes? say 100 bytes
+
+/// potentially add table offset (c7 style) and other fixed offset
+
 ** interpolations
 
 - sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]]
@@ -2400,3 +2439,4 @@ WORMing question?
 
 Then into code prune/generators-structs for all in audio.c
 
+sp0256 look into as license changed
