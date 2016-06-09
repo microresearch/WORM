@@ -2310,6 +2310,55 @@ MAYBE more categories rather than dailies eg. interpol below, klatt, nvp, raven,
 
 - still need to define incoming as gate/whatever? excitation/process? TRIGGER PLAN!
 
+** 9/6+
+
+full LPC vocab and new dumps-> catalogue first with D003:
+
+vocab from talkie library:
+
+Vocab_UK_Acorn: 165 words/phrases
+Vocab_US_Clock: 35
+Vocab_US_Large: 403
+Vocab_US_Male: 206
+Vocab_US_TI99: 360
+
++ new vocabs list as: 
+
+WORDEDIT.SDK = female -> D0,D1,D2,D3
+
+D0 is numbers and 5,6,7,8,9, A, ABLE-> CENT //unknown offset and seems end early
+
+D1 - is FINISH -> NINETY same 279 offset
+
+D2 is NO.NOW till SAY - offset? and ends
+
+D3 starts with THIN but has overlaps with above 279 offset
+
+so we have WORDEDIT.SDK (/WORDS) = This allows a menu of preselected words and phrases
+to be drawn from.  It also includes the smaller version of the high quality,
+prerecorded, female speech that the 800K extended vocabulary disk contains,
+but this one runs on a 5.25" floppy.
+
+3.5 po disks has the larger female vocab (D000-D0034) but what we want
+is allophones/male also - thing is that these wouldn't have stop bit
+so we need really to disassemble to get offsets and lengths?
+
+lpcreader.c goes straight from file top speech with offset
+
+.... echo2LPC LPC from echo2 disk = female 
+
+////
+
+TI99 -> spchrom is same speech data we have no?
+
+parsec rom is phm3112g - offsets around 16992 plus to sort out -
+dulled voice so maybe relook at as perhaps start offsets/ends aren't right
+
+(how to line this up)....
+
+lpc_say has vocab we have!
+
+
 ** talkie=LPC/lpc.c 
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]]

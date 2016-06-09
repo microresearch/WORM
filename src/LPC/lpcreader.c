@@ -4,8 +4,11 @@
  * borrows heavily from Peter Knight's Talkie library for Arduino
  * This code is released under GPLv2 license
  */
+
+// stderr redirect etc =  ./say 0 0 2>&1 > /dev/dsp
  
 #include "stdio.h"
+#include "stdlib.h"
 #include "math.h"
 
 
@@ -26,6 +29,7 @@ uint16_t lpc_get_sample(void);
 #define SUBFRAME_PERIOD 8 // subframes per frame
 
 int didntjump=1;
+   unsigned char *xxx;
 
 uint8_t* ptrAddr, ptrBit;
 uint8_t synth_running, synth_subframe_ctr, synth_sample_ctr;
@@ -37,8 +41,6 @@ int16_t xlpc[10], ulpc[11];
 uint16_t synthRand;
 uint8_t byte_rev[256];
 
-
-uint8_t sp_D001[]=
 /*
  * TMS5xxx LPC coefficient tables
  */
@@ -57,6 +59,7 @@ const int8_t tmsK10[0x08]     = {0xCD,0xDF,0xF1,0x04,0x16,0x20,0x3B,0x4D};
 
 #define CHIRP_SIZE 41
 const int8_t chirp[CHIRP_SIZE] = {0x00,0x2a,0xd4,0x32,0xb2,0x12,0x25,0x14,0x02,0xe1,0xc5,0x02,0x5f,0x5a,0x05,0x0f,0x26,0xfc,0xa5,0xa5,0xd6,0xdd,0xdc,0xfc,0x25,0x2b,0x22,0x21,0x0f,0xff,0xf8,0xee,0xed,0xef,0xf7,0xf6,0xfa,0x00,0x03,0x02,0x01};
+
 
 /*
  * Parse frame parameter bits from the ROM data stream.
@@ -78,7 +81,7 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	didntjump=1;
 	if (ptrBit >= 8)
 	{
-	  printf("0x%X, ",*ptrAddr);
+	  //	  printf("0x%X, ",*ptrAddr);
 		ptrBit -= 8;
 		ptrAddr++;
 		//		didntjump=2;
@@ -126,7 +129,7 @@ void lpc_running(){  // write into audio buffer
   static u16 counterrr=0;
   int16_t samplel=lpc_get_sample()>>2; // TODO or scale samples/speed???
   
-  //    printf("%c",samplel);
+      printf("%c",samplel);
 }
 
 /*
@@ -136,18 +139,6 @@ void lpc_say(uint8_t* addr)
 {
 	/* initialize ROM pointers */
 	ptrAddr = addr;
-	ptrBit = 0;
-	
-	/* Starty the synth */
-	synth_running = 1;
-	starty = 1;
-}
-
-
-void lpc_newsay(void)
-{
-	/* initialize ROM pointers */
-	ptrAddr = spTEST;
 	ptrBit = 0;
 	
 	/* Starty the synth */
@@ -198,7 +189,7 @@ void lpc_update_coeffs(void)
 			//						ptrAddr++; ptrBit=0;
 			if (didntjump){
 			  ptrBit =0;
-			  printf("0x%X, ",*ptrAddr);
+			  //			  printf("0x%X, ",*ptrAddr);
 	  ptrAddr++;
 			} 
 			//			didntjump=0;
@@ -206,8 +197,9 @@ void lpc_update_coeffs(void)
 			//	sleep(1);
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
-	printf("};\n{");
-		       
+	//	printf("};\n{");
+		fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
+
 
 		}
 		else
@@ -324,60 +316,25 @@ uint16_t lpc_get_sample(void)
 
 
 
-void main( int argc, char *argv[]){
+void main(int argc, char *argv[]){
   lpc_init();
-  int uffset=atoi(argv[1]);
-  int uuff=atoi(argv[2]);
+   int uffset=atoi(argv[1]);
+   int lengthy;
+   FILE *fp = fopen(argv[2], "r");
+   fseek(fp,0, SEEK_END);
+   // read in and how long is it?
+   lengthy=ftell(fp);
+   fseek(fp,0, SEEK_SET);
 
-  // stay with first one which could be THIR or THIRTEE according to
-  // TABLE (c40301 which is first of the 03 set D003 comes before THIRTEE and after THIR)
+   // malloc and reverse into buffer
+   xxx=malloc(lengthy+1);
+   fread(xxx,lengthy,1,fp);
+   fclose(fp);
+   //   xxx[lengthy]=0;
 
-  // offset could be c4 plus XX
-  // 279 was approx total offset so 279 minus 77(4d)=202 minus c7=199=3)
+   // speak that buffer
 
-  // 279-199/c7=80(0x50)
+       lpc_say(xxx+uffset);
 
-  // 279 minus 4d/77 = 202 minus c7=199=3
-
-  /* POINTERS:
-00 4d00 b900 5f01  /].]h^.^..M..._.
-0702 6202 f202 6503 ac03 5504 bb04 2a05  ..b...e...U...*.
-8505 e505 8206 fd06 6107 a707 f907 9d08  ........a.......
-1909 8e09 060a 7b0a d10a 680b bf0b 3e0c  ......{...h...>.
-da0c 4c0d a00d 110e 8d0e 470f 2b10 cc10  ..L.......G.+...
-fe10 8811 e011 2012 ae12 4a13 fa13 b714  ...... ...J.....
-4315 d815 7116 bd16 3017 cd17 4b18 b918  C...q...0...K...
-3a19 a819 271a d51a 321b ce1b 581c c21c  :...'...2...X...
-291d 891d d41d 731e f71e 661f cb1f 2820  ).....s...f...( 
-ae20 f820 6321 d321 6022 de22 4e23 ce23  . . c!.!`"."N#.#
-5224 af24 3025 9c25 2326 7e26 1027 9027  R$.$0%.%#&~&.'.'
-0c28 4528 c328 3529 be29 1b2a 8e2a 352b  .(E(.(5).).*.*5+
-c12b 2f2c b92c 352d 
-
-4d=77 279-77=202
-
-  */
-
-  int offsetsfrompointers[]={0x4d,0xb9,0x5f,0x107,0x262,0x2f2,0x265,0x3ac,0x355,0x4bb};
-
-  int offsetsfromtables[]={0xc7,0xc4,0xce,0xd9,0xd4,0xc5,0xc8,0xd4,0xc4,0xd7};
-
-    int offset=offsetsfrompointers[uffset]+offsetsfromtables[uffset]+uuff; // which seems to give us THIN c702c5 - 279 but 
-  //  int offset=offsetsfrompointers[uffset]+ 200 + offsetsfromtables[uffset] ;
-  //  printf("%d\n",offset);
-
-        offset=279;
-    //    printf("TOTAL OFFSET %d\n\n", offset);
-  //  while(1){
-	        lpc_say(sp_D001+offset);
-	//	    lpc_say(sp_TESTD003_xxx);
-
-	// or we try c7 etc as length?
-
-    //        while(synth_running) lpc_running();
-        	while(1) lpc_running();
-    //    offset++;
-    //    sleep(1);
-    //   printf("offset: %d\n",offset);
-    //}
+       while(1) lpc_running();
 }
