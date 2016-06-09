@@ -2484,8 +2484,17 @@ go linear!
 
 ALL tests above, new code tests and generator tests...
 
+GENERATOR and TRIGGERS
+
 WORMing question?
 
 Then into code prune/generators-structs for all in audio.c
 
-sp0256 look into as license changed
+sp0256 look into as license changed/ also digitalk and S14001 (?)
+
+sp0256 roms: sp0256-al2.ic1 (jupace), sp0256a-al2, sp0256-al2.bin, sp0256b-019.bin, dkspeech.rom
+* any hardware notes
+
+latest smaller board is 003
+
+panel is 002
