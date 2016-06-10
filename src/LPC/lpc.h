@@ -12,7 +12,7 @@
 //#include "stm32f0xx.h"
 
 void lpc_init(void);
-void lpc_newsay(void);
+void lpc_newsay(u8 it);
 
 void lpc_say(uint8_t* address);
 u16 lpc_get_sample(void);

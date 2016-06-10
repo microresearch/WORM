@@ -6,7 +6,7 @@
  */
  
 #include "lpc.h"
-//#include "audio.h"
+#include "audio.h"
 
 #define INTERP_PERIOD 25  // samples per subframe
 #define SUBFRAME_PERIOD 8 // subframes per frame
@@ -22,10 +22,12 @@ int16_t xlpc[10], ulpc[11];
 uint16_t synthRand;
 uint8_t byte_rev[256];
 
+extern uint16_t adc_buffer[10];
+
+
 const uint8_t spWHISKY[] __attribute__ ((section (".flash"))) = {0x04,0x88,0xAE,0x8C,0x03,0x12,0x08,0x51,0x74,0x65,0xE9,0xEC,0x68,0x24,0x59,0x46,0x78,0x41,0xD7,0x13,0x37,0x6D,0x62,0xC3,0x5B,0x6F,0xDC,0xD2,0xEA,0x54,0xD2,0xE3,0x89,0x01,0x7E,0x2B,0xF7,0x80,0x07,0x14,0xD0,0xE5,0x15,0x38,0x60,0x8C,0x70,0x03,0x04,0x29,0x36,0xBA,0x5E,0x14,0x34,0x72,0xF6,0xE8,0xA7,0x6F,0x82,0xF4,0x2D,0x73,0xEA,0x47,0x3A,0x67,0x6A,0xC0,0xF0,0x2F,0xF1,0x4E,0xCF,0xA8,0x8A,0x1C,0xB9,0xD8,0xFF,0xEE,0x1F,0xBB,0x59,0xD0,0xD6,0xFE,0x3F};
 
 const uint8_t spMYWORM[] __attribute__ ((section (".flash"))) ={0xc1, 0xb5, 0x45, 0x5d, 0x43, 0xa3, 0x44, 0x37, 0x4, 0x2e, 0x6b, 0xa8, 0x6b, 0xa4, 0x10, 0xa8, 0x6a, 0xa1, 0xa6, 0xa1, 0x93, 0xc3, 0x8a, 0x85, 0x86, 0x5a, 0x2e, 0xc, 0x5e, 0xe1, 0x58, 0x62, 0xa5, 0x90, 0xe8, 0x9a, 0x71, 0x8a, 0xe5, 0x42, 0x91, 0xa7, 0xc6, 0x29, 0x95, 0x13, 0x85, 0x8e, 0x39, 0x3b, 0x47, 0x6e, 0x14, 0xea, 0xe5, 0x54, 0x62, 0xba, 0x90, 0x68, 0xba, 0x71, 0x49, 0xe8, 0x42, 0xe1, 0xed, 0xca, 0x2d, 0xa1, 0x1b, 0xc9, 0xb6, 0x2a, 0xaf, 0x88, 0x19, 0x94, 0x18, 0xa6, 0xbc, 0x2a, 0x64, 0x90, 0xa2, 0x84, 0xe1, 0xb8, 0xd0, 0x45, 0xea, 0x10, 0x8e, 0x9d, 0x46, 0x97, 0xa0, 0xab, 0x29, 0x9d, 0x11, 0x5b, 0xbe, 0x2e, 0x61, 0x34, 0x2e, 0x6c, 0x51, 0x26, 0xbb, 0xf2, 0xb8, 0xb0, 0x45, 0xea, 0xe8, 0x86, 0x13, 0xc2, 0x86, 0xaf, 0x8b, 0x88, 0xac, 0x12, 0x5b, 0xa4, 0x2d, 0xaa, 0x7c, 0x46, 0x6c, 0x51, 0x3a, 0xbb, 0xf2, 0x9a, 0xb0, 0xe5, 0xa9, 0xec, 0x46, 0x63, 0xc4, 0x96, 0x24, 0xb3, 0x29, 0x8f, 0x9, 0x1b, 0x94, 0x2c, 0xa2, 0xb2, 0x4a, 0x6e, 0x48, 0xaa, 0x98, 0xc8, 0x9a, 0xb0, 0x21, 0xa9, 0x6e, 0xaa, 0x23, 0xc2, 0x86, 0x2c, 0xaa, 0xaa, 0xac, 0xa, 0x6b, 0x1, 0xaf, 0x22, 0xba, 0x66, 0xac, 0x5, 0xa4, 0xa9, 0x6a, 0x9b, 0x99, 0x14, 0xe0, 0x2a, 0x6e, 0x65, 0x91, 0x93, 0x84, 0x9a, 0xba, 0x85, 0x59, 0x49, 0x32, 0xae, 0x1a, 0x1a, 0x16, 0x39, 0x29, 0x2c, 0x5b, 0x70, 0x68, 0xe4, 0xa4, 0xc0, 0x62, 0x29, 0x21, 0xb1, 0x13, 0x5, 0xab, 0x85, 0xa4, 0x5a, 0x49, 0x14, 0xce, 0xe2, 0x1a, 0x16, 0x3a, 0xc8, 0xac, 0xa9, 0x6b, 0xa8, 0xe5, 0x40, 0xa9, 0xac, 0x29, 0xa6, 0x96, 0x43, 0x60, 0xb2, 0xb9, 0xb8, 0x45, 0xe, 0x9e, 0x4a, 0xe2, 0x16, 0x16, 0x39, 0xa4, 0xb2, 0xa8, 0x5b, 0x98, 0xa5, 0xe4, 0xaa, 0xac, 0xa1, 0xa1, 0x96, 0x53, 0xcf, 0x8b, 0x85, 0xb8, 0x5a, 0x4e, 0xa9, 0x2a, 0xe6, 0x1a, 0x6a, 0x39, 0x68, 0x3a, 0x6b, 0x68, 0x98, 0xe5, 0x10, 0x9b, 0xec, 0x61, 0x26, 0x51, 0x1e};
-
 
 /// more words....
 
@@ -250,7 +252,7 @@ const uint8_t spS_BLEEP2[]          __attribute__ ((section (".flash")))  = {0x3
 
 // wordlist
 
-const uint8_t *wordlist[196]= {spALPHA, spBRAVO, spCHARLIE, spDELTA, spECHO, spFOXTROT, spGOLF, spHOTEL, spINDIA, spJULIET, spKILO, spLIMA, spMIKE, spNOVEMBER, spOSCAR, spPAPA, spQUEBEC, spROMEO, spSIERRA, spTANGO, spUNIFORM, spVICTOR, spWHISKEY, spXRAY, spYANKEE, spZULU, spA, spB, spC, spD, spE, spF, spG, spH, spI, spL, spJ, spK, spM, spN, spO, spP, spQ, spR, spS, spT, spU, spV, spW, spX, spY, spZ, spF_THE, spF_TIME, spF_IS, spF_A_M_, spF_P_M_, spF_OH, spF_OCLOCK, spF_ONE, spF_TWO, spF_THREE, spF_FOUR, spF_FIVE, spF_SIX, spF_SEVEN, spF_EIGHT, spF_NINE, spF_TEN, spF_ELEVEN, spF_TWELVE, spF_THIRTEEN, spF_FOURTEEN, spF_FIFTEEN, spF_SIXTEEN, spF_SEVENTEEN, spF_EIGHTEEN, spF_NINETEEN, spF_TWENTY, spF_THIRTY, spF_FOURTY, spF_FIFTY, spF_PAUSE1, spM_ZERO, spM_ONE, spM_TWO, spM_THREE, spM_FOUR, spM_FIVE, spM_SIX, spM_SEVEN, spM_EIGHT, spM_NINE, spM_TEN, spM_ELEVEN, spM_TWELVE, spM_THIR_, spM_FIF_, spM__TEEN, spM_TWENTY, spM_T, spM_HUNDRED, spM_THOUSAND, spM_AND, spM_MINUS, spM_MILLI, spM_VOLTS, spM_HERTZ, spOPERATOR, spMOTOR, spFREQUENCY, spTELEPHONE, spINSTRUMENTS, spAIRPORT, spFLIGHT, spBANK, spDEPARTURE, spAIRCRAFT, spCYLINDER, spCRYSTALS, spTAXI, spDOORS, spENGINE, spVACUUM, spCONTROL, spSERVICE, spLEFT, spRIGHT, spOPEN, spSEQUENCE, spREADY, spTRAFFIC, spRADAR, spINFORMATION, spPRESSURE, spTERMINAL, spALERT, spZONE, spFRONT, spWAY, spTARGET, spDANGER, spEMERGENCY, spROGER, spAFFIRMATIVE, spNEGATIVE, spMAYDAY, spWARNING, spPERCENT, spOVER, spCLEAR, spCURRENT, spAT, spEAST, spWEST, spSOUTH, spNORTH, spDEGREES, spCELCIUS, spFARENHEIT, spBOOST, spDEGREE, spTOWER, spCAUTION, spNUMBER, spMINUTES, spSECONDS, spNEW, spSET, spTHE, spFOR, spSTART, spOF, spTIME, spSLOW, spFIRE, spSMOKE, spCIRCUIT, spTURN, spPAST, spSTOP, spMACHINE, spTOO_LOW, spYOU, spAND, spICE, spHEAVY, spGROUND, spREPAIR, spS_BRUSH, spTCHH, spS_BLEEP1, spS_BLEEP2, spKATI, spWHISKY, spMYWORM};
+const uint8_t *wordlist[196]= {spALPHA, spBRAVO, spCHARLIE, spDELTA, spECHO, spFOXTROT, spGOLF, spHOTEL, spINDIA, spJULIET, spKILO, spLIMA, spMIKE, spNOVEMBER, spOSCAR, spPAPA, spQUEBEC, spROMEO, spSIERRA, spTANGO, spUNIFORM, spVICTOR, spWHISKEY, spXRAY, spYANKEE, spZULU, spA, spB, spC, spD, spE, spF, spG, spH, spI, spL, spJ, spK, spM, spN, spO, spP, spQ, spR, spS, spT, spU, spV, spW, spX, spY, spZ, spF_THE, spF_TIME, spF_IS, spF_A_M_, spF_P_M_, spF_OH, spF_OCLOCK, spF_ONE, spF_TWO, spF_THREE, spF_FOUR, spF_FIVE, spF_SIX, spF_SEVEN, spF_EIGHT, spF_NINE, spF_TEN, spF_ELEVEN, spF_TWELVE, spF_THIRTEEN, spF_FOURTEEN, spF_FIFTEEN, spF_SIXTEEN, spF_SEVENTEEN, spF_EIGHTEEN, spF_NINETEEN, spF_TWENTY, spF_THIRTY, spF_FOURTY, spF_FIFTY, spF_PAUSE1, spM_ZERO, spM_ONE, spM_TWO, spM_THREE, spM_FOUR, spM_FIVE, spM_SIX, spM_SEVEN, spM_EIGHT, spM_NINE, spM_TEN, spM_ELEVEN, spM_TWELVE, spM_THIR_, spM_FIF_, spM__TEEN, spM_TWENTY, spM_T, spM_HUNDRED, spM_THOUSAND, spM_AND, spM_MINUS, spM_MILLI, spM_VOLTS, spM_HERTZ, spOPERATOR, spMOTOR, spFREQUENCY, spTELEPHONE, spINSTRUMENTS, spAIRPORT, spFLIGHT, spBANK, spDEPARTURE, spAIRCRAFT, spCYLINDER, spCRYSTALS, spTAXI, spDOORS, spENGINE, spVACUUM, spCONTROL, spSERVICE, spLEFT, spRIGHT, spOPEN, spSEQUENCE, spREADY, spTRAFFIC, spRADAR, spINFORMATION, spPRESSURE, spTERMINAL, spALERT, spZONE, spFRONT, spWAY, spTARGET, spDANGER, spEMERGENCY, spROGER, spAFFIRMATIVE, spNEGATIVE, spMAYDAY, spWARNING, spPERCENT, spOVER, spCLEAR, spCURRENT, spAT, spEAST, spWEST, spSOUTH, spNORTH, spDEGREES, spCELCIUS, spFARENHEIT, spBOOST, spDEGREE, spTOWER, spCAUTION, spNUMBER, spMINUTES, spSECONDS, spNEW, spSET, spTHE, spFOR, spSTART, spOF, spTIME, spSLOW, spFIRE, spSMOKE, spCIRCUIT, spTURN, spPAST, spSTOP, spMACHINE, spTOO_LOW, spYOU, spAND, spICE, spHEAVY, spGROUND, spREPAIR, spS_BRUSH, spTCHH, spS_BLEEP1, spS_BLEEP2, spWHISKY, spMYWORM};
 
 /*
  * TMS5xxx LPC coefficient tables
@@ -331,7 +333,7 @@ void lpc_running(){  // write into audio buffer
   //  lpc_get_sample();
   static uint16_t counterrr=0;
     int16_t samplel=(lpc_get_sample()<<6)-32768; // TODO or scale samples/speed???
-  //  int16_t samplel=rand()%32768; // TODO or scale samples/speed???
+  //  int16_t samplel=rand()%32768; // TODO or scale samples/speed??? INTERP????
   audio_buffer[counterrr++]=samplel;
   if (counterrr>=AUDIO_BUFSZ) counterrr=0;
   audio_buffer[counterrr++]=samplel;
@@ -359,8 +361,8 @@ void lpc_say(uint8_t* addr)
 void lpc_newsay(u8 it)
 {
 	/* initialize ROM pointers */
-    ptrAddr = wordlist[it];
-  //	ptrAddr = spHEAVY;
+      ptrAddr = wordlist[it];
+      //	ptrAddr = sp_D003_0;
 	ptrBit = 0;
 	
 	/* Starty the synth */
@@ -417,6 +419,19 @@ void lpc_update_coeffs(void)
 			nextPeriod = tmsPeriod[lpc_getBits(6)];
 			
 			/* A repeat frame uses the last coefficients */
+			if(repeat && nextPeriod>0) // VCO mode
+			  {
+			  nextPeriod=(64-(adc_buffer[SELZ]>>6))+1;
+			  //			nextEnergy=adc_buffer[SELZ]>>4;
+
+			/*			synthPeriod= map(analogRead(POT_BEND),0,1023,63,1); // check value max ! (63 0x3F)
+		       
+			if (analogRead(POT_BEND)==0)synthPeriod=0; // cheating to have  more fun with the knob because 0 is on the other side of the scale (pitch to high there)
+
+			if(synthPeriod == 0) synthEnergy=map(analogRead(POT_SPEED),0,1023,15,0);//?? whynot working for voiced
+			*/
+			  }
+
 			if(!repeat)
 			{
 				/* All frames use the first 4 coefficients */

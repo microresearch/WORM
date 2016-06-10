@@ -77,7 +77,7 @@ void main(void)
   //  SAMINIT();
 
     lpc_init();
-    lpc_newsay();
+    lpc_newsay(1);
 
   initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM!
   synthesize(); // - ?????
@@ -93,7 +93,7 @@ void main(void)
 
       oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-           mode=18; // TESTING
+           mode=10; // TESTING
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
@@ -136,7 +136,7 @@ void main(void)
 	     }     
     break;
   case 10:
-    //    if(lpc_busy() == 0) lpc_newsay();   
+    if(lpc_busy() == 0) lpc_newsay(adc_buffer[SELX]>>6);   
 
     if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
     break;

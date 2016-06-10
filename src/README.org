@@ -411,7 +411,7 @@ error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
 #define MODE 3 // for pcb=2
 #define SELX 0 //3
 #define SPEED 2 //0
-#define END 4 //4
+#define SELZ/END 4 //4
 #define SELY 1 //1
 
 
@@ -2358,6 +2358,26 @@ dulled voice so maybe relook at as perhaps start offsets/ends aren't right
 
 lpc_say has vocab we have!
 
+///
+
+for parsec we start offsets from 2 in phm3112g5.bin and follow table on: http://atariage.com/forums/topic/249709-parsec-remake/#entry3456049
+
+but still not so happy with speech - is either 8 bit energy question or try tms5220.cpp code instead...
+
+/// further speech tries on TI99, nada : interested in allophones still and TI sings - tisingarc.txt
+
+** 10/6
+
+- NOTE: testing SELX-Z - does it need to be inverted as 0 is far left
+and also all have different end/final for each roughly the same but
+less than what it should be?
+
+- TODO: test TRIGGER IN! how?
+
+- in talkie pitch mod is just over/undersampling which we kind of
+  have, other mods to do with mapping, repeats etc and speed
+
+- also differences in lattice code there and unwrapped loops
 
 ** talkie=LPC/lpc.c 
 
@@ -2482,13 +2502,27 @@ go linear!
 
 ** SCHEDULE:
 
-ALL tests above, new code tests and generator tests...
+- test trigger in and check CVs/PCB->check/order
 
-GENERATOR and TRIGGERS
+- finish LPC vocabulary
 
-WORMing question?
+- new sp0256 and vocab // digitalk/s14001a?
 
-Then into code prune/generators-structs for all in audio.c
+- test and evaluate all algos
+
+- controls X,Y.Z and mode rundown
+
+- wormcode and how fits with modes
+
+- trigger scheme and code - trigger RESTART of algo/generator on IN
+
+- generator - code prune/generators-structs for all in audio.c and each mode
+
+- vocoder
+
+- wrap up
+
+///
 
 sp0256 look into as license changed/ also digitalk and S14001 (?)
 
