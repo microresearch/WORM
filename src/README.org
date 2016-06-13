@@ -63,7 +63,7 @@ audio.c // so larger/main buffer=special case perhaps as mode 0
 3-   | SC-VOSIM? | vosim.c  | SC | 
 4-   | MDA_VOCODER | mdavoc.c | MDA? | excitation is also there? 
 5-   | LADSPA VOCODER | vocode.c | ladspa | 
-6-   | SELX/Y FILTERS |  | | choose/check which bandpass
+6-   | SELX/Y FILTERS |  | | choose/check which bandpass DROP!
 7-   | doformantfilter-few vowels | effect.c | none | try different bandpass/move between vowels/more formants 
 8-   | formlet | effect.c | SC | 
 9-   | SAM | sam.c | sam.c??? |
@@ -2242,6 +2242,8 @@ how to resolve vocoder - switched noise/oscillator(pitch) and voice in? or???
   4-SAM-re-check, 5-talkie, 6-filter (XY or formant version), 7+
   formlet?//fof?//lpc//tube/voicform=vowgen/fm4op//parameterised vocoder=voder channels->10 bandpass
 
+change above to ditch X/y and formants
+
 tubes: tube.c, SC tube, tube.cc
 
 - question of speed and munchkins -> deal with pitch rather?
@@ -2378,6 +2380,10 @@ less than what it should be?
   have, other mods to do with mapping, repeats etc and speed
 
 - also differences in lattice code there and unwrapped loops
+
+** 13/6
+
+- stripped/commented code to just test LPC - as also was not programming/running after reset with all code in there...
 
 ** talkie=LPC/lpc.c 
 

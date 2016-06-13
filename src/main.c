@@ -79,8 +79,8 @@ void main(void)
     lpc_init();
     lpc_newsay(1);
 
-  initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM!
-  synthesize(); // - ?????
+    //  initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM! STRIP_OUT
+    //  synthesize(); // - ????? 
 			
   // test audio fill
 
@@ -91,16 +91,21 @@ void main(void)
   while(1)
     {
 
-      oldmode=mode;    
+      //      oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-           mode=10; // TESTING
+      //           mode=10; // TESTING
+
+      //       if(lpc_busy() == 0) lpc_newsay(adc_buffer[SELX]>>6);   
+
+      //    if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
+
 
   // if there is a change in mode do something?
   //  if (oldmode!=mode){
   //    maintrigger=1;
   //  }
 
-  if (maintrigger==1) {writepos=0;trigger=1;}
+	   /*  if (maintrigger==1) {writepos=0;trigger=1;} // STRIP_OUT
 
   switch(mode){
   case 0:// rsynth/klatt-single phoneme
@@ -151,7 +156,7 @@ void main(void)
       readpos=0;
       maintrigger=0;
   }
-
+	   */
     }
 }
 

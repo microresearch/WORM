@@ -13,6 +13,7 @@
 
 void lpc_init(void);
 void lpc_newsay(u8 it);
+uint16_t lpc_get_sample(void);
 
 void lpc_say(uint8_t* address);
 u16 lpc_get_sample(void);

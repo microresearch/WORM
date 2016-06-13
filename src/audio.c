@@ -28,6 +28,7 @@ LINEIN/OUTL-filter
 #include "lpcansc.h"
 #include "parwave.h"
 #include "nvp.h"
+#include "lpc.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -79,6 +80,8 @@ VocoderInstance* vocoderz;
 Formlet *formy;
 Formant *formanty;
 
+genny* tms5220gen;
+
 void Audio_Init(void)
 {
   float Fc,Q,peakGain;
@@ -89,7 +92,7 @@ void Audio_Init(void)
   int16_t *audio_ptr;
   u16 x,xx;
 
-	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
+  /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
 	mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
 	mdaVocoder_init(mdavocod);
@@ -102,7 +105,7 @@ void Audio_Init(void)
 	LPCAnalyzer_init();
 	initvoicform();
 	init_simpleklatt();
-	init_nvp();
+	init_nvp();*/ // STRIP_OUT
 
 	/* clear the buffer */
 	audio_ptr = audio_buffer;
@@ -110,6 +113,7 @@ void Audio_Init(void)
 		while(i-- > 0)
 		*audio_ptr++ = 0;
 
+		/*
 		for (xx=0;xx<5;xx++){// five formants INIT
 		  for (x=0;x<5;x++){
 		    Fc=freq[xx][x];
@@ -127,8 +131,61 @@ void Audio_Init(void)
 		    state[xx][x] = (float*)malloc(4*sizeof(float));
 		    arm_biquad_cascade_df1_init_f32(&df[xx][x],1,coeffs[xx][x],state[xx][x]);
 		  }
-		}
+		  }*/
+
+// initialize generators???? TODO 
+/// so for tms5220:
+
+// malloc
+		tms5220gen=malloc(sizeof(genny));		
+		tms5220gen->samplepos=0.0f;
 }
+
+
+u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // MODEL GENERATOR: TODO is speed and interpolation options
+
+  u8 xx=0,readpos;
+float samplepos=genstruct->samplepos;
+int16_t samplel=genstruct->lastsample;
+  // lpc_running
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 samplel=(lpc_get_sample()<<6)-32768; // TODO - INTERPOLATION = LINEAR but we need next sample
+	 samplepos-=1.0f;
+       }
+       outgoing[xx]=samplel;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE?
+     while (xx<size){
+       samplel=(lpc_get_sample()<<6)-32768; 
+
+       if (samplepos>=size) {       
+	 outgoing[xx]=samplel;
+	 xx++;
+	 samplepos-=size;
+       }
+       samplepos+=samplespeed;
+     }
+   }
+
+  // refill back counter etc.
+ genstruct->samplepos=samplepos;
+ genstruct->lastsample=samplel;
+ return size;
+};
+
+
+u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -157,24 +214,24 @@ extern u8 trigger;
 extern u16 generated;
 extern u16 writepos;
 extern u8 mode;
-extern u16 readpos;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
-  static u8 framecount=0, tmpcount=0;
-  static float eaten=0;
-  static float samplepos=0.0f; float samplespeed;
+  //  static u8 framecount=0, tmpcount=0;
+  //  static float eaten=0;
+  //  static float samplepos=0.0f; 
+  float samplespeed;
   u16 x;
   u8 speedy;
-  float xx,yy;
+  //  float xx,yy;
 
   // trigger to take care of but figure out basics step by step first!
 
   //  u16 ending=loggy[adc_buffer[END]];
   u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
-  samplespeed=8.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
-  //     samplespeed=1.0f;
+  samplespeed=2.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
+  //  samplespeed=0.1f;
 
   // older:PROCESS incoming audio and activate master_triger
   // TODO:read in audio and process for trigger
@@ -196,6 +253,19 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // generate based on mode, trigger and params // inline - takes care of where we are in phonemes etc.
   //
 
+  mode=0;
+  genny* generator=tms5220gen;
+  x=generators[mode](generator,sample_buffer,mono_buffer,samplespeed,sz); // but sample_buffer needs be split stereo first TODO for TRIGGER also
+
+  /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      samplepos+=samplespeed;
+      if (readpos>=ending) samplepos=0.0f;    
+      }*/
+
+
+  /*
   switch(mode){
   case 0: // rsynth/klatt-single phoneme
     for (x=0;x<sz/2;x++){
@@ -407,6 +477,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     break;
 
   } // mode end
+  */
 
 #ifdef TEST
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);

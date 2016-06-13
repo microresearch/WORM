@@ -31,6 +31,14 @@
 #define SELZ 1 // down right
 #endif
 
+typedef struct {
+  float samplepos;
+  u8 phonem, trigger;
+  u16 storeone,storetwo,storethree;
+  int16_t lastsample;
+  // we need to take account of speed
+}genny;
+
 
 void Audio_Init(void);
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz);

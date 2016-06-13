@@ -421,7 +421,7 @@ void lpc_update_coeffs(void)
 			/* A repeat frame uses the last coefficients */
 			if(repeat && nextPeriod>0) // VCO mode
 			  {
-			  nextPeriod=(64-(adc_buffer[SELZ]>>6))+1;
+			  nextPeriod=(64-(adc_buffer[SELY]>>6))+1;
 			  //			nextEnergy=adc_buffer[SELZ]>>4;
 
 			/*			synthPeriod= map(analogRead(POT_BEND),0,1023,63,1); // check value max ! (63 0x3F)
@@ -484,6 +484,7 @@ uint16_t lpc_get_sample(void)
 	/* if not running just return mid-scale */
 	if(synth_running == 0)
 	{
+	  lpc_newsay(0); // TODO
 	  return 512;
 		}
 	/* Time to update the coeffs? */
