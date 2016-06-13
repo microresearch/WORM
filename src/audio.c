@@ -291,7 +291,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
 
   mode=1;
-  genny* generator[]={tms5220gen,NULL};
+  genny* generator[]={tms5220gen,NULL}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

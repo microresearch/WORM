@@ -27,10 +27,6 @@ generate[x]->pointer to nvp and also generic struct to keep track of frames and 
   how that could work with vocoder - how we can vary excitation such
   as white noise. list excitations
 
-- HW_DESIGN: check noise in filters, new panel/logo - see notes.org,
-  jitter tests on all CV/pois, other Qs: - maybe different solution
-  for CV inputs? hardware encoder for main mode?
-
 - wormings algorithms. control over degree of randomness of movements
 
 * modes
@@ -2324,6 +2320,8 @@ Vocab_US_Large: 403
 Vocab_US_Male: 206
 Vocab_US_TI99: 360
 
+TOTALa pprox 1000 /64 knob = say 16 plus female = say 32 banks
+
 + new vocabs list as: 
 
 WORDEDIT.SDK = female -> D0,D1,D2,D3
@@ -2390,7 +2388,7 @@ less than what it should be?
 - *lpcanalysis* for SC - windowsize is 32 - can streamline some code
   but not sure to include as has NO parameters so far (what these
   could be? - perhaps for excitation source, and trigger as freezing
-  coeffs -  but freeze must be on selx)
+  coeffs -  but freeze must be on selx!)
 
 - if in generators we should also write to mainbuffer for later use?
 
@@ -2408,7 +2406,10 @@ TODO: sp0256, [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%2
 S14001A speech IC emulator]], digitalker, channel vocoder (10 params+
 voices/unvoiced+ pitch)
 
-** talkie=LPC/lpc.c TODO
+- worm movements from paris python -> c
+
+
+* talkie=LPC/lpc.c TODO
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
 
@@ -2517,7 +2518,7 @@ how long is average vocab in bytes? say 100 bytes
 
 /// potentially add table offset (c7 style) and other fixed offset
 
-** interpolations
+* interpolations
 
 - sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]]
 
@@ -2529,21 +2530,21 @@ and: http://www.rockbox.org/tracker/12223?getfile=24000
 
 go linear!
 
-** SCHEDULE:
+* SCHEDULE:
 
-- test trigger in and check CVs/PCB->check/order
+- test trigger in and check CVs/DONE - PCB->check/order
 
-- finish LPC vocabulary
+- finish LPC vocabulary - refine/clean up
 
 - new sp0256 and vocab // digitalk/s14001a?
 
-- test and evaluate all algos
+- test and evaluate all algos// plan modes
 
 - controls X,Y.Z and mode rundown
 
-- wormcode and how fits with modes
+- wormcode and how fits with modes// worm movements/// worming in wavetable
 
-- trigger scheme and code - trigger RESTART of algo/generator on IN
+- trigger scheme and code - trigger RESTART of algo/generator on IN - TESTED prototype
 
 - generator - code prune/generators-structs for all in audio.c and each mode
 
@@ -2556,8 +2557,38 @@ go linear!
 sp0256 look into as license changed/ also digitalk and S14001 (?)
 
 sp0256 roms: sp0256-al2.ic1 (jupace), sp0256a-al2, sp0256-al2.bin, sp0256b-019.bin, dkspeech.rom
+
 * any hardware notes
 
 latest smaller board is 003
 
 panel is 002
+* MODES 13/6_+++
+
+** 0/LPC/TMS5220
+
+- cleanup new vocabulary
+
+- banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
+
+** 1/KLATT
+
+- SELX is phoneme, SELY->, SELZ-> and SPEED
+
+** 2/RAW_KLATT
+
+** 3/SAM
+
+** 4/SP0256 > others
+
+** 5/TUBE
+
+** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters...
+
+** 7/channel vocoder
+
+- 8 or 10 channels, unvoiced, pitch
+
+** 8/vocoder
+
+** 9-15 wormings

@@ -62,6 +62,13 @@ int            m_halted;          /* True when CPU is halted.                   
 UINT32         m_mode;            /* Mode register.                               */
 UINT32         m_page;            /* Page set by SETPAGE                          */
 
+UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
+UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
+
+int            m_sby_line;        /* Standby line state                           */
+int            m_cur_len;         /* Fullness of current sound buffer.            */
+
+int            m_silent;          /* Flag: SP0256 is silent.                      */
 UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
 UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
 UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
