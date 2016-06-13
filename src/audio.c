@@ -62,10 +62,6 @@ extern int16_t* buf16;
 extern u8* datagenbuffer;
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
-float flinbuffer[MONO_BUFSZ];
-float flinbufferz[MONO_BUFSZ];
-float floutbuffer[MONO_BUFSZ];
-float floutbufferz[MONO_BUFSZ];
 
 //for vocoder
 int16_t modulator_sample_buffer[256];
@@ -84,13 +80,16 @@ genny* tms5220gen;
 
 void Audio_Init(void)
 {
-  float Fc,Q,peakGain;
+float Fc,Q,peakGain;
   const float Fs=32000.0f;// TODO
   float a0,a1,a2,b1,b2,norm,V,K;
   float *state[5][5];
   uint32_t i;
   int16_t *audio_ptr;
-  u16 x,xx;
+u16 x,xx;
+
+LPCAnalyzer_init();
+
 
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
@@ -102,7 +101,6 @@ void Audio_Init(void)
 	formanty=(Formant *)malloc(sizeof(Formant));
 	Formant_init(formanty);
 	initbraidworm();
-	LPCAnalyzer_init();
 	initvoicform();
 	init_simpleklatt();
 	init_nvp();*/ // STRIP_OUT
@@ -142,35 +140,47 @@ void Audio_Init(void)
 }
 
 
+#define THRESH 32000
+
 u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
 
   u8 xx=0,readpos;
+  float remainder;
 float samplepos=genstruct->samplepos;
 int16_t samplel=genstruct->lastsample;
+int16_t lastval=genstruct->prevsample;
   // lpc_running
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 
-   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
-	 samplel=(lpc_get_sample()<<6)-32768; // TODO - INTERPOLATION = LINEAR but we need next sample
+	 lastval=samplel;
+	 samplel=(lpc_get_sample()<<6)-32768; 
 	 samplepos-=1.0f;
        }
-       outgoing[xx]=samplel;
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH) lpc_newsay(); // selector is in newsay
        xx++;
        samplepos+=samplespeed;
      }
    }
-   else { // faster=UPSAMPLE?
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
        samplel=(lpc_get_sample()<<6)-32768; 
 
        if (samplepos>=size) {       
 	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH) lpc_newsay(); // selector is in newsay
 	 xx++;
 	 samplepos-=size;
        }
@@ -181,11 +191,30 @@ int16_t samplel=genstruct->lastsample;
   // refill back counter etc.
  genstruct->samplepos=samplepos;
  genstruct->lastsample=samplel;
+ genstruct->prevsample=lastval;
  return size;
 };
 
+float flinbuffer[MONO_BUFSZ];
+float flinbufferz[MONO_BUFSZ];
+float floutbuffer[MONO_BUFSZ];
+float floutbufferz[MONO_BUFSZ];
 
-u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
+u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+  // convert in to float
+  // exciter=indriver to float
+  /* for (u8 x=0;x<size;x++){
+	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
+	    }*/
+        int_to_floot(incoming,flinbuffer,size);
+	LPCAnalyzer_next(NULL, flinbuffer, floutbuffer, 10, size); //poles=10 - CROW TEST!
+    // out from float to int
+    floot_to_int(mono_buffer,floutbuffer,size);
+};
+
+u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -230,8 +259,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //  u16 ending=loggy[adc_buffer[END]];
   u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
-  samplespeed=2.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
-  //  samplespeed=0.1f;
+  samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
+  //  samplespeed=0.25f;
 
   // older:PROCESS incoming audio and activate master_triger
   // TODO:read in audio and process for trigger
@@ -253,9 +282,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // generate based on mode, trigger and params // inline - takes care of where we are in phonemes etc.
   //
 
-  mode=0;
-  genny* generator=tms5220gen;
-  x=generators[mode](generator,sample_buffer,mono_buffer,samplespeed,sz); // but sample_buffer needs be split stereo first TODO for TRIGGER also
+  // splitting input
+
+  for (x=0;x<sz/2;x++){
+    sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
+    src++;
+  }
+
+
+  mode=1;
+  genny* generator[]={tms5220gen,NULL};
+  x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
       readpos=samplepos;

@@ -36,7 +36,7 @@ typedef struct {
   u8 phonem, trigger;
   u16 storeone,storetwo,storethree;
   int16_t lastsample;
-  // we need to take account of speed
+  int16_t prevsample;
 }genny;
 
 

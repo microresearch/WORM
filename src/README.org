@@ -2374,20 +2374,43 @@ but still not so happy with speech - is either 8 bit energy question or try tms5
 and also all have different end/final for each roughly the same but
 less than what it should be?
 
-- TODO: test TRIGGER IN! how?
+- TODO: test TRIGGER IN! DONE - tweaking
 
 - in talkie pitch mod is just over/undersampling which we kind of
-  have, other mods to do with mapping, repeats etc and speed
+  have, other mods to do with mapping, repeats etc and speed DONE - but can go further with this!
 
-- also differences in lattice code there and unwrapped loops
+[- also differences in lattice code there and unwrapped loops]
 
 ** 13/6
 
 - stripped/commented code to just test LPC - as also was not programming/running after reset with all code in there...
 
-** talkie=LPC/lpc.c 
+- starting on generator struct/function pointer using LPC example: interpolation, trigger tests SEEMS to work!
 
-- port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]]
+- *lpcanalysis* for SC - windowsize is 32 - can streamline some code
+  but not sure to include as has NO parameters so far (what these
+  could be? - perhaps for excitation source, and trigger as freezing
+  coeffs -  but freeze must be on selx)
+
+- if in generators we should also write to mainbuffer for later use?
+
+- *lpcforlap.c* prints out array of lpc coeffs from incoming wav file (first option) - uses libsndfile
+
+- lpcannalysis modded for crow coeffs but is a bit static maybe?
+
+TODO *LPC:* need to edit much of new vocab? esp. PARSEC, larger vocab
+imported and banks (SELY/Z changes), any low pass for interpolation
+code
+
+- *sp0256.c* started... easiest way to test?
+
+TODO: sp0256, [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
+S14001A speech IC emulator]], digitalker, channel vocoder (10 params+
+voices/unvoiced+ pitch)
+
+** talkie=LPC/lpc.c TODO
+
+- port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
 
 - BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples
 
