@@ -2406,8 +2406,6 @@ TODO: sp0256, [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%2
 S14001A speech IC emulator]], digitalker, channel vocoder (10 params+
 voices/unvoiced+ pitch)
 
-- worm movements from paris python -> c
-
 
 * talkie=LPC/lpc.c TODO
 
@@ -2573,7 +2571,11 @@ panel is 002
 
 ** 1/KLATT
 
-- SELX is phoneme, SELY->, SELZ-> and SPEED
+- SELX is phoneme, SELY->pos, SELZ->length and SPEED
+
+we need maybe length of sentence, and x,y for phoneme and position
+
+and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
 
 ** 2/RAW_KLATT
 
@@ -2592,3 +2594,7 @@ panel is 002
 ** 8/vocoder
 
 ** 9-15 wormings
+
+- worm movements from paris python -> c
+
+- worm wavetable for excitation with filters

@@ -15,10 +15,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_tim.o adc.o stm32f4xx_pwr.o\
 			stm32f4xx_gpio.o stm32f4xx_i2c.o stm32f4xx_rcc.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
-			syscalls.o audio.o vosim.o mdavoc.o mdavocoder.o effect.o vocode.o \
-			klatt_phoneme.o sam.o render.o LPC/lpc.o vocoder/vocode.o vocoder/fftn.o vocoder/fftaux.o \
-			scformant.o braidworm.o lpcanalysissc.o voicform.o tube.o nvp.o \
-			simpleklatt.o parwave.o worm.o
+			syscalls.o audio.o vosim.o LPC/lpc.o lpcanalysissc.o effect.o
 
 OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\

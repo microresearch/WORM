@@ -29,6 +29,7 @@ LINEIN/OUTL-filter
 #include "parwave.h"
 #include "nvp.h"
 #include "lpc.h"
+#include "holmes.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -59,7 +60,7 @@ float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2
 
 extern __IO uint16_t adc_buffer[10];
 extern int16_t* buf16;
-extern u8* datagenbuffer;
+//extern u8* datagenbuffer;
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
@@ -135,8 +136,8 @@ LPCAnalyzer_init();
 /// so for tms5220:
 
 // malloc
-		tms5220gen=malloc(sizeof(genny));		
-		tms5220gen->samplepos=0.0f;
+tms5220gen=malloc(sizeof(genny));		
+tms5220gen->samplepos=0.0f;
 }
 
 
@@ -200,6 +201,12 @@ float flinbufferz[MONO_BUFSZ];
 float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
+u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  //  u8 x; static unsigned int readpos;
+  // first without speed or any params - break down
+  holmesrun(outgoing, size);
+};
+
 u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
@@ -214,7 +221,7 @@ u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float s
     floot_to_int(mono_buffer,floutbuffer,size);
 };
 
-u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
+u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -242,7 +249,7 @@ inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *
 extern u8 trigger;
 extern u16 generated;
 extern u16 writepos;
-extern u8 mode;
+extern u8 mode; /// ????? TODO do we need these?
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
@@ -290,8 +297,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
 
 
-  mode=1;
-  genny* generator[]={tms5220gen,NULL}; // or just as void/cast in function itself
+  mode=2;
+  genny* generator[]={tms5220gen,NULL,NULL}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

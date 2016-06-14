@@ -16,7 +16,7 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 extern int16_t* buf16;
-extern u8* datagenbuffer;
+//extern u8* datagenbuffer;
 //extern int16_t audio_buffer[AUDIO_BUFSZ];
 extern arm_biquad_casd_df1_inst_f32 df[5][5];
 extern mdavocoder *mdavocod;
