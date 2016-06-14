@@ -2414,6 +2414,8 @@ drastically if runs in audio code
 
 - working NOW. watch sizes of stuff!!!
 
+- what is hiss on sample? overrun?
+
 * talkie=LPC/lpc.c TODO
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
@@ -2578,9 +2580,11 @@ panel is 002
 
 ** 1/KLATT
 
-- SELX is phoneme, SELY->pos, SELZ->length and SPEED
+- SELX is phoneme, SELY->pos, SELZ->length and SPEED=dur of each
 
-we need maybe length of sentence, and x,y for phoneme and position
+we need maybe length of sentence, and x,y for phoneme and position (but also stress and dur for each phoneme?)
+
+- added basic pitch shift to test at the moment????
 
 and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
 

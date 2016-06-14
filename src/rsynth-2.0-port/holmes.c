@@ -17,6 +17,8 @@
 //	#define AMP_ADJ 0
 //#endif
 
+extern uint16_t adc_buffer[10];
+
 int speed = 1;			//normal
 // int speed = 2; 		//slow
 
@@ -513,7 +515,8 @@ void holmesrun(int16_t* outgoing, u8 size){
   if (i>nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
     i=0;
     le = &Elements[0];
-    top = 1.1 * def_pars.F0hz10;
+        top = 1.1 * def_pars.F0hz10;
+    //    top= 200+ adc_buffer[SELX];
     pars = def_pars;
     pars.FNPhz = le->p[fn].stdy;
     pars.B1phz = pars.B1hz = 60;
@@ -585,7 +588,8 @@ void holmesrun(int16_t* outgoing, u8 size){
     // inc and are we at end of frames in which case we need next element?
 
     if (t<dur){
-      float base = top * 0.8 /* 3 * top / 5 */;
+      //      float base = top * 0.8 /* 3 * top / 5 */;
+float base =      200+ adc_buffer[SELX];
       float tp[nEparm];
 
            if (tstress == ntstress)
