@@ -486,7 +486,7 @@ u16 run_holmes(u16 klatthead)
 filter_t flt[nEparm];
 Elm_ptr le;// = &Elements[0];
 Elm_ptr ne;
-unsigned i = 0;
+unsigned i = 31;
 unsigned tstress = 0;
 unsigned ntstress = 0;
 slope_t stress_s;
@@ -495,23 +495,22 @@ float top;// = 1.1 * def_pars.F0hz10;
 unsigned char t;
 
 void holmesrun(int16_t* outgoing, u8 size){
+  u8 x=0;
   static u8 nextelement=1;
-  static u8 samplenumber=0;
+  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   unsigned nelm=30; // 10 phonemes = how many frames approx ???? - in test case we have 87 frames 
   unsigned char *elm=test_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
-  int j; u8 dur;
+  u8 j; 
+  static u8 dur;
   slope_t startyy[nEparm];
   slope_t end[nEparm];
   static klatt_frame_t pars;
 
+  while(x<size){
 
-  i=31;
-
-  for (u8 x=0;x<size;x++){
-
-  if (i>=nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
+  if (i>nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
     i=0;
     le = &Elements[0];
     top = 1.1 * def_pars.F0hz10;
@@ -540,7 +539,6 @@ void holmesrun(int16_t* outgoing, u8 size){
 
   //////// are we on first or next element
   if (nextelement==1){
-
     ce = &Elements[elm[i++]];
     dur = elm[i++];
     i++; /* skip stress */
@@ -548,7 +546,7 @@ void holmesrun(int16_t* outgoing, u8 size){
        boundary values of adjacent elements
     */
 
-    if (dur == 0) { // do what?
+    if (dur == 0) { // do what? NOTHING
     }
     else
       { // startyy to process next frames
@@ -577,24 +575,22 @@ void holmesrun(int16_t* outgoing, u8 size){
 	  }
 	// next set of frames what do we need to init?
 	t=0;
-
 	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
 	newframe=1;
       }
   }
   
   if (newframe==1) { // this is a new frame - so we need new parameters
-        newframe=0;
+    newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
     if (t<dur){
       float base = top * 0.8 /* 3 * top / 5 */;
       float tp[nEparm];
-      int j;
 
-      if (tstress == ntstress)
+           if (tstress == ntstress)
 	{
-	  unsigned j = i;
+	  j = i;
 	  stress_s = stress_e;
 	  tstress = 0;
 	  ntstress = dur;
@@ -614,9 +610,6 @@ void holmesrun(int16_t* outgoing, u8 size){
 		  do
 		    {
 		      d += du;
-#ifdef DEBUG_STRESS
-		      printf("%s", (e && e->dict) ? e->dict : "");
-#endif
 		      e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
 		      du = elm[j++];
 		    }
@@ -626,7 +619,7 @@ void holmesrun(int16_t* outgoing, u8 size){
 		}
 	      ntstress += du;
 	    }
-	}
+	    }
 
       for (j = 0; j < nEparm; j++)
 	tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &startyy[j], &end[j], (float) ce->p[j].stdy, t, dur));
@@ -664,7 +657,7 @@ void holmesrun(int16_t* outgoing, u8 size){
       nextelement=0;
       tstress++; t++;
     }
-    else {
+    else { // hit end of DUR number of frames...
       nextelement=1;
       le = ce; // where we can put this?????? TODO!!!
     }
@@ -672,7 +665,7 @@ void holmesrun(int16_t* outgoing, u8 size){
 
   if (nextelement==0){
     // always run through samples till we hit next frame
-  parwavesample(&klatt_global, &pars, outgoing, samplenumber);
+    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); x++;
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
     if (samplenumber>klatt_global.nspfr) {

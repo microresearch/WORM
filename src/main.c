@@ -70,7 +70,7 @@ void main(void)
   delay();
   I2S_Block_Init();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
-  init_synth(); // which one? --> klatt rsynth
+  init_synth(); // which one? --> klatt rsynth !!!!
   Audio_Init();
 
   //  lpc_init();

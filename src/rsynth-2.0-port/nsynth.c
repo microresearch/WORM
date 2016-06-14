@@ -930,10 +930,10 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 	}
 }
 
-//float out;
+float out;
 
 void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame){
-  float out;
+  //  float out;
 
 	frame_init(globals, frame);
 
@@ -945,8 +945,8 @@ void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame){
 	out=0.0f;
 }
 
-void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, int* jwave, unsigned char ns){
-  float out;
+void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave, unsigned char ns, unsigned char xx){
+  //  float out;
 
 		static unsigned long seed = 5; /* Fixed staring value */
 		float noise;
@@ -1119,7 +1119,9 @@ void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, int* jwave, 
 
 		out = amp_bypas * sourc - out;
 		out = resonator(&rout, out);//*8.0f; - why so quiet tho?
-		*(jwave+ns) = clip(globals, out); /* Convert back to integer */
+		//		*(jwave+(ns%32)) = clip(globals, out); /* Convert back to integer */
+		//		u8 rr=ns%32;
+		jwave[xx]=clip(globals,out);
 		//		*(jwave+ns) = rand()%32768;
 }
 

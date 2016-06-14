@@ -2406,6 +2406,13 @@ TODO: sp0256, [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%2
 S14001A speech IC emulator]], digitalker, channel vocoder (10 params+
 voices/unvoiced+ pitch)
 
+** 14/6
+
+Trying to port rsynth/klatt so runs as generator but crashes and need
+to clean up sizes of variables across all rsynth and to speed up
+drastically if runs in audio code
+
+- working NOW. watch sizes of stuff!!!
 
 * talkie=LPC/lpc.c TODO
 
