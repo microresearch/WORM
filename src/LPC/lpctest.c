@@ -286,10 +286,10 @@ int main(){
    int xx,yy,bits=0,xxy;
    unsigned char rever;
    /* Open file for both reading and writing */
-   int length=11699;
+   int length=2048;
    
    //      fp = fopen("/root/Downloads/TI99/speech/spchrom.bin", "r");
-         fp = fopen("/root/Downloads/TI99/apple/ciderpress/linux/D003", "r");
+         fp = fopen("/root/Downloads/TI99/sauro/sp0256-al2.bin", "r");
    //      fp = fopen("/root/Downloads/TI99/Spch-E", "r");
    fread(buffer, 1, length, fp);
 
@@ -343,7 +343,8 @@ int main(){
     ptrAddr=buffer;
    // dump reversed
    for (xx=0;xx<length;xx++){
-     printf("0x%X, ", byte_rev[*ptrAddr+xx]);
+     //     printf("0x%X, ", byte_rev[*ptrAddr+xx]);
+     printf("0x%X, ", *(ptrAddr+xx));
      
      }
 

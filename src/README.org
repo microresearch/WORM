@@ -2580,7 +2580,7 @@ panel is 002
 
 ** 1/KLATT
 
-- SELX is phoneme, SELY->pos, SELZ->length and SPEED=dur of each
+- SELX is phoneme, SELY->pos, SELZ->length/or/stress and SPEED=dur of each or keep speed as speed!
 
 we need maybe length of sentence, and x,y for phoneme and position (but also stress and dur for each phoneme?)
 
@@ -2588,24 +2588,35 @@ we need maybe length of sentence, and x,y for phoneme and position (but also str
 
 and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
 
-** 2/RAW_KLATT
+- add trigger to reset to beginning of full phrasing
 
-** 3/SAM
+- fill in other KLATT params...
 
-** 4/SP0256 > others
+** 2/RAW_KLATT parameters -> simpleklatt/nvp
 
-** 5/TUBE
+** 3/SAM - test/re-work as not looked at for a while
 
-** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters...
+** 4/SP0256 > others TODO
 
-** 7/channel vocoder
+** 5/TUBE - test
+
+** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters... which ones?
+
+** 7/8channel vocoder TODO
 
 - 8 or 10 channels, unvoiced, pitch
 
-** 8/vocoder
+** 8/9vocoder TODO q of excitation
 
-** 9-15 wormings
+** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
 - worm movements from paris python -> c
 
-- worm wavetable for excitation with filters
+** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters
+
+
+* hardware2
+
+- PCB order
+
+- parts order
