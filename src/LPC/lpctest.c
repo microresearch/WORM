@@ -286,10 +286,11 @@ int main(){
    int xx,yy,bits=0,xxy;
    unsigned char rever;
    /* Open file for both reading and writing */
-   int length=2048;
+   int length=8704;
    
    //      fp = fopen("/root/Downloads/TI99/speech/spchrom.bin", "r");
-         fp = fopen("/root/Downloads/TI99/sauro/sp0256-al2.bin", "r");
+   //         fp = fopen("/root/Downloads/TI99/sauro/sp0256-al2.bin", "r");
+         fp = fopen("/root/Downloads/speaky/sp0256roms/ro-3-9506-010.ic6", "r");
    //      fp = fopen("/root/Downloads/TI99/Spch-E", "r");
    fread(buffer, 1, length, fp);
 

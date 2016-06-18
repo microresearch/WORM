@@ -2400,7 +2400,7 @@ TODO *LPC:* need to edit much of new vocab? esp. PARSEC, larger vocab
 imported and banks (SELY/Z changes), any low pass for interpolation
 code
 
-- *sp0256.c* started... easiest way to test?
+- *sp0256.c* started... easiest way to test? DONE
 
 TODO: sp0256, [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]], digitalker, channel vocoder (10 params+
@@ -2410,11 +2410,16 @@ voices/unvoiced+ pitch)
 
 Trying to port rsynth/klatt so runs as generator but crashes and need
 to clean up sizes of variables across all rsynth and to speed up
-drastically if runs in audio code
+drastically if runs in audio code DONE and no speed up necessary?
 
 - working NOW. watch sizes of stuff!!!
 
 - what is hiss on sample? overrun?
+
+** 16/6
+
+commandline example sp0256 code running roughly 
+
 
 * talkie=LPC/lpc.c TODO
 
@@ -2539,15 +2544,15 @@ go linear!
 
 * SCHEDULE:
 
-- test trigger in and check CVs/DONE - PCB->check/order
+- test trigger in and check CVs/DONE - PCB->check/orderTODO
 
 - finish LPC vocabulary - refine/clean up
 
-- new sp0256 and vocab // digitalk/s14001a?
-
-- test and evaluate all algos// plan modes
+- new sp0256-DONE and vocab // digitalk/s14001a?
 
 - controls X,Y.Z and mode rundown
+
+- test and evaluate all algos// plan modes// interpolation and cleanups
 
 - wormcode and how fits with modes// worm movements/// worming in wavetable
 
@@ -2578,6 +2583,8 @@ panel is 002
 
 - banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
 
+- pausing
+
 ** 1/KLATT
 
 - SELX is phoneme, SELY->pos, SELZ->length/or/stress and SPEED=dur of each or keep speed as speed!
@@ -2590,23 +2597,93 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 - add trigger to reset to beginning of full phrasing
 
-- fill in other KLATT params...
+- fill in other KLATT params from top notes
+
+- pausing
 
 ** 2/RAW_KLATT parameters -> simpleklatt/nvp
 
 ** 3/SAM - test/re-work as not looked at for a while
 
-** 4/SP0256 > others TODO
+** 4/SP0256 
 
-** 5/TUBE - test
+TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH, clean
+up at all, port into generator, dictionary for phonemes and longer
+words/vocab below, time phonemes, samplerate
 
-** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters... which ones?
+10k samplerate?
+
+list/find roms: *we have AL2 which is generic allophones
+
+others dumped as HEX in LPC dir...
+
+ SP0256-019. This variant is found in the Odyssey 2's "The Voice"
+ attachment. It has a number of game oriented phrases, as well as
+ hooks for a rather large library of speech ROMs. One of these speech
+ ROMs appears to contain the same allophone library as appears in the
+ SP0256-AL2.
+
+*sp0256b-019.binX and below
+
+// External 16KiB speech ROM (spr128-003) from "The Voice"
+ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
+// Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder
+ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
+
+all in odyssey2.zipX
+
+*dkspeech.romX
+
+The "012" designation indicates an SP0256 programmed with Mattel's Resident ROM (RESROM) image, as used in the United States. 
+
+*sp0256-012.bin - intv? - intv.zip X
+
+http://wiki.intellivision.us/index.php?title=Resrom.asm
+
+intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sailor: zip in speaky toooo
+
+/////
+
+currah speech - voice [[file:~/mame/src/devices/bus/c64/currah_speech.cpp::/%20set_osc1%20-][file:~/mame/src/devices/bus/c64/currah_speech.cpp::/ set_osc1 -]]
+
+/////
+
+move out rom data from github!
+
+raw instructions and manipulation of parameters (also for dark int): http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
+
+http://spatula-city.org/~im14u2c/sp0256-al2/al2.bit is disassembly of rom...
+
+allophones 64 total inc. pauses
+
+vocab etc: 
+
+https://github.com/jas8mm/retroSpeak/blob/master/retroSpeak.py
+
+http://fddrsn.net/pcomp/examples/SP0256/sp0256code-allophones.html 
+
+http://nsd.dyndns.org/speech/
+
+https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
+
+https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
+
+** +=> others from mame/mess TODO =
+
+[[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
+S14001A speech IC emulator]], 
+
+digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
+
+** 5/TUBE - test!
+
+** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters... which ones? not mutable...
 
 ** 7/8channel vocoder TODO
 
-- 8 or 10 channels, unvoiced, pitch
+- 8 or 10 channels, unvoiced, pitch, controlling?
 
-** 8/9vocoder TODO q of excitation
+** 8/9vocoder TODO q of excitation, pitch/unvoiced
 
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
@@ -2620,3 +2697,5 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 - PCB order
 
 - parts order
+
+- THAT POTS?CV don;t hit end - compensate? !
