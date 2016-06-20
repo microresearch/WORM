@@ -1,9 +1,7 @@
-// port towards ARM now
-
-#include "sp0256.h"
-#include "audio.h"
-
-extern uint16_t adc_buffer[10];
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "string.h"
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -38,11 +36,17 @@ extern uint16_t adc_buffer[10];
 */
 
 typedef unsigned char UINT8;
+typedef unsigned char u8;
 typedef signed char INT8;
-typedef u16 UINT16;
-typedef int16_t INT16;
-typedef uint32_t UINT32;
-typedef int32_t INT32;
+typedef unsigned short UINT16;
+typedef unsigned short u16;
+typedef signed short INT16;
+typedef unsigned int UINT32;
+typedef signed int INT32;
+typedef signed int int32_t;
+typedef unsigned int uint32_t;
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
 
 // al2.bin dumped here// now we use one from sauro.zip
 
@@ -65,7 +69,7 @@ static const unsigned char m_rom[] __attribute__ ((section (".flash"))) = {0xE0,
 struct lpc12_t
 {
 	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-  UINT32  per, per_orig, rng;       /* Period, Amplitude, Random Number Generator   */
+	UINT32  per, rng;       /* Period, Amplitude, Random Number Generator   */
 	INT16     amp;
 	INT16   f_coef[6];      /* F0 through F5.                               */
 	INT16   b_coef[6];      /* B0 through B5.                               */
@@ -222,9 +226,8 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		if (f->per_orig)
+		if (f->per)
 		{
-		f->per=f->per_orig+adc_buffer[SELY]>>8;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -270,7 +273,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			f->r[1] += f->r[15];
 
 			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-			f->per_orig   = f->r[1];
+			f->per   = f->r[1];
 
 			do_int   = 0;
 		}
@@ -336,7 +339,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
-	f->per_orig = f->r[1];
+	f->per = f->r[1];
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -1130,7 +1133,8 @@ void micro()
    u8 dada;
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     dada=adc_buffer[SELX]>>6;
+     //     dada=adc_buffer[SELX]>>6;
+     dada=44;
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
      m_lrq = 0; //from 8 bit write
    }
@@ -1145,12 +1149,20 @@ void micro()
  void sp0256_newsay(void){
    u8 dada;
    m_halted=1;
-   dada=adc_buffer[SELX]>>6;
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   dada=0;
+   m_ald = ((dada&64) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
 
  void sp0256_init(void){
    sp0256_iinit();
    reset();
+ }
+
+ void main(void){
+   sp0256_init();
+   while(1){
+     int xx=sp0256_get_sample();
+     printf("%c",xx);
+   }
  }

@@ -358,7 +358,7 @@ uint16_t lpc_get_sample(void)
 
 
 
-void main( int argc, char *argv[]){
+void main(int argc, char *argv[]){
   lpc_init();
    int uffset=atoi(argv[1]);
    //   int uuff=atoi(argv[2]);

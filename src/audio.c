@@ -30,6 +30,7 @@ LINEIN/OUTL-filter
 #include "nvp.h"
 #include "lpc.h"
 #include "holmes.h"
+#include "sp0256.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -78,6 +79,7 @@ Formlet *formy;
 Formant *formanty;
 
 genny* tms5220gen;
+genny* sp0256gen;
 
 void Audio_Init(void)
 {
@@ -89,8 +91,9 @@ float Fc,Q,peakGain;
   int16_t *audio_ptr;
 u16 x,xx;
 
-LPCAnalyzer_init();
-
+ LPCAnalyzer_init();
+ sp0256_init();
+ lpc_init(); 
 
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
@@ -138,11 +141,68 @@ LPCAnalyzer_init();
 // malloc
 tms5220gen=malloc(sizeof(genny));		
 tms5220gen->samplepos=0.0f;
+
+sp0256gen=malloc(sizeof(genny));		
+sp0256gen->samplepos=0.0f;
+
 }
 
 
 #define THRESH 32000
 
+u16 sp0256(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // MODEL GENERATOR: TODO is speed and interpolation options
+
+  u8 xx=0,readpos;
+  float remainder;
+float samplepos=genstruct->samplepos;
+int16_t samplel=genstruct->lastsample;
+int16_t lastval=genstruct->prevsample;
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_sample();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH) sp0256_newsay(); // selector is in newsay
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=sp0256_get_sample();
+
+       if (samplepos>=size) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH) sp0256_newsay(); // selector is in newsay
+	 xx++;
+	 samplepos-=size;
+       }
+       samplepos+=samplespeed;
+     }
+   }
+
+  // refill back counter etc.
+ genstruct->samplepos=samplepos;
+ genstruct->lastsample=samplel;
+ genstruct->prevsample=lastval;
+ return size;
+};
+
+	 
 u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
@@ -221,7 +281,9 @@ u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float s
     floot_to_int(mono_buffer,floutbuffer,size);
 };
 
-u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt};//,klatt,rawklatt,SAM,tubes,spo256,vocoder};
+
+
+u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -297,8 +359,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
 
 
-  mode=2;
-  genny* generator[]={tms5220gen,NULL,NULL}; // or just as void/cast in function itself
+  mode=3;
+  //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
+  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

@@ -2410,7 +2410,7 @@ voices/unvoiced+ pitch)
 
 Trying to port rsynth/klatt so runs as generator but crashes and need
 to clean up sizes of variables across all rsynth and to speed up
-drastically if runs in audio code DONE and no speed up necessary?
+drastically if runs in audio code DONE and no speed up necessary?DONE
 
 - working NOW. watch sizes of stuff!!!
 
@@ -2420,6 +2420,21 @@ drastically if runs in audio code DONE and no speed up necessary?
 
 commandline example sp0256 code running roughly 
 
+** 20/6
+
+- sp0256 = fix so we work with halt and repeat rather than just ... so should be good on timings
+
+- we can clean up, sort 0x1000 business(NO NEED) and then test for ARM (new file), also test first bends = pitch
+
+- sp0256b-019.bin vocab across other 2 large roms seems limited in terms of phrases for large space... only 2nd rom seems accessed 0x4000+
+
+here how to allophones compare, where did we find sound effects?
+
+<<4 on dada means we skip 2 bytes so... <<3 is each byte
+
+*porting to arm and question is (as with lpc/tms5220) if we keep repeating - in case of allophones on sp0256 is maybe different to phrases???*
+
+*also all questions of pausing*
 
 * talkie=LPC/lpc.c TODO
 
@@ -2548,7 +2563,7 @@ go linear!
 
 - finish LPC vocabulary - refine/clean up
 
-- new sp0256-DONE and vocab // digitalk/s14001a?
+- new sp0256-DONE and vocabTODO // digitalk/s14001a?
 
 - controls X,Y.Z and mode rundown
 
@@ -2562,7 +2577,11 @@ go linear!
 
 - vocoder
 
-- wrap up
+- move out rom data from github -> roms.h
+
+- wrap up/ MANUAL/ prodcution tests
+
+
 
 ///
 
@@ -2575,7 +2594,8 @@ sp0256 roms: sp0256-al2.ic1 (jupace), sp0256a-al2, sp0256-al2.bin, sp0256b-019.b
 latest smaller board is 003
 
 panel is 002
-* MODES 13/6_+++
+
+* MODES 13/6_+++ TODO:
 
 ** 0/LPC/TMS5220
 
@@ -2609,13 +2629,17 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH, clean
 up at all, port into generator, dictionary for phonemes and longer
-words/vocab below, time phonemes, samplerate
+words/vocab below, 
+
+time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones ours are short but we can run slower no?
 
 10k samplerate?
 
 list/find roms: *we have AL2 which is generic allophones
 
 others dumped as HEX in LPC dir...
+
+////
 
  SP0256-019. This variant is found in the Odyssey 2's "The Voice"
  attachment. It has a number of game oriented phrases, as well as
@@ -2624,6 +2648,8 @@ others dumped as HEX in LPC dir...
  SP0256-AL2.
 
 *sp0256b-019.binX and below
+
+ROM_LOAD( "sp0256b-019.bin",  0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
 
 // External 16KiB speech ROM (spr128-003) from "The Voice"
 ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
@@ -2644,11 +2670,12 @@ intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sa
 
 /////
 
+?????
+
 currah speech - voice [[file:~/mame/src/devices/bus/c64/currah_speech.cpp::/%20set_osc1%20-][file:~/mame/src/devices/bus/c64/currah_speech.cpp::/ set_osc1 -]]
 
 /////
 
-move out rom data from github!
 
 raw instructions and manipulation of parameters (also for dark int): http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
 
@@ -2673,7 +2700,33 @@ https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
 [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]], 
 
+ROMS:
+
+
+
 digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
+
+	ROM_REGION( 0x10000, "digitalker", 0) /* 64k? for digitalker voice samples */
+	ROM_LOAD( "mblvsb2.2a",0x0000, 0x1000, NO_DUMP ) /* size may be wrong */
+	ROM_LOAD( "mblvsb3.4a",0x1000, 0x1000, NO_DUMP ) /* size may be wrong */
+
+	// bank switched (from samples region)
+
+	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_LOAD( "9.2a", 0x0000, 0x2000, CRC(059b3725) SHA1(5837bee1ef34ce19a3101b851ca55029776e4b3e) )    // digitalker header
+	ROM_LOAD( "8.2b", 0x2000, 0x2000, CRC(679da4e1) SHA1(01a5b9dd132c1b0de97c153d7de226f5bf357338) )
+
+	ROM_LOAD( "7.2c", 0x4000, 0x2000, CRC(f8461b33) SHA1(717a8842e0ce9ba94dd59504a324bede4844e389) )    // digitalker header
+	ROM_LOAD( "6.2d", 0x6000, 0x2000, CRC(156c91e0) SHA1(6017d4b5609b214a6e66dcd76493a7d1442c04d4) )
+
+	ROM_LOAD( "5.3a", 0x8000, 0x2000, CRC(19904604) SHA1(633c211a9a822cdf597a6f3c221ae9c8d6482e82) )    // digitalker header
+	ROM_LOAD( "4.3b", 0xa000, 0x2000, CRC(c3386d51) SHA1(7882e88db55ba914be81075e4b2d76e246c34d3b) )
+
+	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
+	ROM_LOAD( "igr_scorpion_32_a3.ic25", 0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
+	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
+	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
+
 
 ** 5/TUBE - test!
 
@@ -2683,7 +2736,13 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
 - 8 or 10 channels, unvoiced, pitch, controlling?
 
+- which filter basis or FFT?
+
+- what are channel frequencies and bandwidth?
+
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced
+
+changing bandwidth,,, see other codes...
 
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
@@ -2694,7 +2753,7 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
 * hardware2
 
-- PCB order
+- check panel etc. PCB order
 
 - parts order
 

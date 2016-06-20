@@ -73,7 +73,6 @@ void main(void)
   init_synth(); // which one? --> klatt rsynth !!!!
   Audio_Init();
 
-  //  lpc_init();
   //  lpc_newsay(1);
 
 
