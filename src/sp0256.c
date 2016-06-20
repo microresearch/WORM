@@ -207,7 +207,7 @@ static inline INT16 limit(INT16 s)
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-static inline INT16 lpc12_update(struct lpc12_t *f)
+static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
 	INT16 samp;
@@ -224,7 +224,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		f->per=f->per_orig+adc_buffer[SELY]>>8;
+		f->per=f->per_orig+adc_buffer[SELY]>>5;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -279,7 +279,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		//		if (f->rpt <= 0) break; // HOWTO break out of single loop and signal this! TODO!
+		if (f->rpt <= 0) return 0; // HOWTO break out of single loop and signal this! TODO!
 
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
@@ -317,7 +317,8 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		return samp<<2;
+		*out= limit(samp)<<2;
+		return 1;
 }
 
 static const u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
@@ -1126,8 +1127,11 @@ void micro()
 }
 
  u16 sp0256_get_sample(void){
-   u16 output;
+   u16* output;
    u8 dada;
+
+   u8 howmany=0;
+   while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      dada=adc_buffer[SELX]>>6;
@@ -1136,10 +1140,11 @@ void micro()
    }
 
    micro();
-   output=lpc12_update(&m_filt);
+     howmany=lpc12_update(&m_filt, output);
+   }
    //   output=rand()%32768;
 
-   return output;
+   return *output;
  }
 
  void sp0256_newsay(void){

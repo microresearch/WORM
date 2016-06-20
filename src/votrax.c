@@ -411,7 +411,7 @@ void update_subphoneme_clock_period()
 	//	m_subphoneme_period=PhonemeLengths[m_phoneme];
 		ppp=(unsigned int)(ceil(period * (double)(m_master_clock_freq)));
 
-		printf("ms length %d calc_period %d new_calc %d",m_latch_80, ppp,m_subphoneme_period);
+		//		printf("ms length %d calc_period %d new_calc %d",m_latch_80, ppp,m_subphoneme_period);
 }
 
 //-------------------------------------------------
@@ -862,7 +862,7 @@ void sound_stream_update(int samples)
 						{
 						  	   	m_latch_80 = romdata & 0x7f;
 								//		m_latch_80 = PhonemeLengths[m_phoneme];
-								printf("\n[PH=%d]", romdata & 0x7f);
+								//								printf("\n[PH=%d]", romdata & 0x7f);
 							unsigned int old_period = m_subphoneme_period;
 							update_subphoneme_clock_period();
 							m_subphoneme_count = (m_subphoneme_count * m_subphoneme_period) / old_period;
@@ -1251,10 +1251,11 @@ void sound_stream_update(int samples)
 
 		// TODO: apply closure circuit (undocumented)
 
+
 		// output the current result
 		unsigned int s16 = (unsigned int)(s4_out * 4000);
 		//						printf("%d\n",(unsigned int)((s4_out+2)*128));
-		//		printf("%d %f\n",s16, s4_out);
+				printf("%c",s16+128);
 		
 		unsigned char c = (unsigned)s16 & 255;
 		fwrite(&c, 1, 1, fo);
@@ -1476,7 +1477,7 @@ void main(void){
 
 	  const unsigned char *rom = m_rom + ((m_phoneme << 3));
 
-          printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
+	  //          printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
 
 
 	// the STROBE signal resets the phoneme counter

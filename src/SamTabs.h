@@ -2,13 +2,13 @@
 #define SAMTABS_H
 
 //tab40672
-const unsigned char stressInputTable[] =
+const unsigned char stressInputTable[] __attribute__ ((section (".flash")))=
 {
 	'*', '1', '2', '3', '4', '5', '6', '7', '8'
 };
 
 //tab40682
-const unsigned char signInputTable1[]={
+const unsigned char signInputTable1[]= __attribute__ ((section (".flash"))){
 	' ', '.', '?', ',', '-', 'I', 'I', 'E',
 	'A', 'A', 'A', 'A', 'U', 'A', 'I', 'E',
 	'U', 'O', 'R', 'L', 'W', 'Y', 'W', 'R',
@@ -23,7 +23,7 @@ const unsigned char signInputTable1[]={
 };
 
 //tab40763
-const unsigned char signInputTable2[] =
+const unsigned char signInputTable2[] __attribute__ ((section (".flash"))) =
 {
 	'*', '*', '*', '*', '*', 'Y', 'H', 'H',
 	'E', 'A', 'H', 'O', 'H', 'X', 'X', 'R',
@@ -57,7 +57,7 @@ const unsigned char flags[81]  __attribute__ ((section (".flash")))={
 
 //??? flags overlap flags2
 //loc_9FDA
-const unsigned char flags2[] = 
+const unsigned char flags2[]  __attribute__ ((section (".flash")))= 
 {
 	0x80 , 0xC1 , 0xC1 , 0xC1 , 0xC1 , 0x00 , 0x00 , 0x00 ,
 	0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 ,
@@ -74,7 +74,7 @@ const unsigned char flags2[] =
 
 
 //tab45616???
-const unsigned char phonemeStressedLengthTable[] = 
+const unsigned char phonemeStressedLengthTable[] __attribute__ ((section (".flash"))) = 
 {
 	0x00 , 0x12 , 0x12 , 0x12 , 8 ,0xB , 9 ,0xB ,
 	0xE ,0xF ,0xB , 0x10 ,0xC , 6 , 6 ,0xE ,
@@ -89,7 +89,7 @@ const unsigned char phonemeStressedLengthTable[] =
 };
 
 //tab45536???
-const unsigned char phonemeLengthTable[] = 
+const unsigned char phonemeLengthTable[] __attribute__ ((section (".flash")))= 
 {
 	0 , 0x12 , 0x12 , 0x12 , 8 , 8 , 8 , 8 ,
 	8 ,0xB , 6 ,0xC ,0xA , 5 , 5 ,0xB ,

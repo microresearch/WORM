@@ -2320,7 +2320,7 @@ Vocab_US_Large: 403
 Vocab_US_Male: 206
 Vocab_US_TI99: 360
 
-TOTALa pprox 1000 /64 knob = say 16 plus female = say 32 banks
+TOTAL approx 1000 /64 knob = say 16 plus female = say 32 banks
 
 + new vocabs list as: 
 
@@ -2357,6 +2357,7 @@ dulled voice so maybe relook at as perhaps start offsets/ends aren't right
 (how to line this up)....
 
 lpc_say has vocab we have!
+
 
 ///
 
@@ -2432,7 +2433,7 @@ here how to allophones compare, where did we find sound effects?
 
 <<4 on dada means we skip 2 bytes so... <<3 is each byte
 
-*porting to arm and question is (as with lpc/tms5220) if we keep repeating - in case of allophones on sp0256 is maybe different to phrases???*
+*porting to armDONE and question is (as with lpc/tms5220) if we keep repeating - in case of allophones on sp0256 is maybe different to phrases???*
 
 *also all questions of pausing*
 
@@ -2440,7 +2441,7 @@ here how to allophones compare, where did we find sound effects?
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
 
-- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples
+- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples DONEorNOT?
 
 - what we could get from MAME code/roms? - cross-compare co-efficients... still trying to extract speech/allophones code from u25_rom1.bin
 
@@ -2559,11 +2560,17 @@ go linear!
 
 * SCHEDULE:
 
+*TRIGGERS/REPEATS/PAUSING/GENERATORS/WORMING/VOCODING*
+
+- filter on interpolation???
+
+- re-check triggers and what repeats for TMS and SP0256
+
 - test trigger in and check CVs/DONE - PCB->check/orderTODO
 
 - finish LPC vocabulary - refine/clean up
 
-- new sp0256-DONE and vocabTODO // digitalk/s14001a?
+- new sp0256-DONE and vocabTODO // [digitalk/s14001a?]
 
 - controls X,Y.Z and mode rundown
 
@@ -2577,17 +2584,10 @@ go linear!
 
 - vocoder
 
-- move out rom data from github -> roms.h
+- move out rom data from github -> xxx_roms.h eg. 256_roms.h
 
 - wrap up/ MANUAL/ prodcution tests
 
-
-
-///
-
-sp0256 look into as license changed/ also digitalk and S14001 (?)
-
-sp0256 roms: sp0256-al2.ic1 (jupace), sp0256a-al2, sp0256-al2.bin, sp0256b-019.bin, dkspeech.rom
 
 * any hardware notes
 
@@ -2599,15 +2599,19 @@ panel is 002
 
 ** 0/LPC/TMS5220
 
-- cleanup new vocabulary
-
+- cleanup new vocabulary and groupings of...
+ 
 - banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
 
-- pausing
+- pausing/breaks/repeat
+
+singing TI? tisingarc.txt
+
+vocab notes from 9/6+ and LPC above to check
 
 ** 1/KLATT
 
-- SELX is phoneme, SELY->pos, SELZ->length/or/stress and SPEED=dur of each or keep speed as speed!
+- SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!
 
 we need maybe length of sentence, and x,y for phoneme and position (but also stress and dur for each phoneme?)
 
@@ -2625,13 +2629,32 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 ** 3/SAM - test/re-work as not looked at for a while
 
+how what we have differs from: https://github.com/s-macke/SAM/blob/master/src/main.c ???
+
+reciter which changes text to phonemes is difference
+
+how to select phonemes and stress etc...
+
+sing???
+
 ** 4/SP0256 
 
-TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH, clean
-up at all, port into generator, dictionary for phonemes and longer
-words/vocab below, 
+TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
+cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH_DONE, port
+into generatorDONE,
 
-time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones ours are short but we can run slower no?
+dictionary for phonemes and longer words/vocab below -> so we can have banks (also with and without pitch bend or fixed or ...)
+
+question of repeat/pause and if we cycle through list as in KLATT - so have banks/phrases SELX/Y Z is pitch or other bend
+these are questions also for TMS
+
+also repeat/length of phoneme as BEND/parameter - do this as one of banks for allophones
+
+banks: allophones/64, new vocab phrases-012/019, these with certain bends x3=6, dictionary phrasings=8, groupings
+
+///
+
+time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones ours are short but we can run slower no? test again ???
 
 10k samplerate?
 
@@ -2662,7 +2685,7 @@ all in odyssey2.zipX
 
 The "012" designation indicates an SP0256 programmed with Mattel's Resident ROM (RESROM) image, as used in the United States. 
 
-*sp0256-012.bin - intv? - intv.zip X
+*sp0256-012.bin - intv? - intv.zip X 
 
 http://wiki.intellivision.us/index.php?title=Resrom.asm
 
@@ -2727,6 +2750,7 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
+and RE-CHCK VOTRAX!
 
 ** 5/TUBE - test!
 

@@ -320,7 +320,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		return samp<<2;
+		return (samp>>2)+128;
 }
 
 static const u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
@@ -340,6 +340,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
 	f->per = f->r[1];
+	fprintf(stderr, "PER: %d\n",f->per);
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -1134,7 +1135,7 @@ void micro()
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      //     dada=adc_buffer[SELX]>>6;
-     dada=44;
+     dada=15;
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
      m_lrq = 0; //from 8 bit write
    }
