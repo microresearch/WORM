@@ -149,11 +149,12 @@ sp0256gen->samplepos=0.0f;
 
 
 #define THRESH 32000
+#define THRESHLOW 30000
 
 u16 sp0256(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
-
+  static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
 float samplepos=genstruct->samplepos;
@@ -175,7 +176,12 @@ int16_t lastval=genstruct->prevsample;
        //       outgoing[xx]=samplel;
 
        // TEST trigger: 
-       if (incoming[xx]>THRESH) sp0256_newsay(); // selector is in newsay
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
        xx++;
        samplepos+=samplespeed;
      }
@@ -187,7 +193,11 @@ int16_t lastval=genstruct->prevsample;
        if (samplepos>=size) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
-       if (incoming[xx]>THRESH) sp0256_newsay(); // selector is in newsay
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 	 xx++;
 	 samplepos-=size;
        }
@@ -206,7 +216,7 @@ int16_t lastval=genstruct->prevsample;
 u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
-
+  static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
 float samplepos=genstruct->samplepos;
@@ -229,7 +239,12 @@ int16_t lastval=genstruct->prevsample;
        //       outgoing[xx]=samplel;
 
        // TEST trigger: 
-       if (incoming[xx]>THRESH) lpc_newsay(); // selector is in newsay
+       if (incoming[xx]>THRESH && !triggered) {
+	 lpc_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
        xx++;
        samplepos+=samplespeed;
      }
@@ -241,7 +256,12 @@ int16_t lastval=genstruct->prevsample;
        if (samplepos>=size) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
-       if (incoming[xx]>THRESH) lpc_newsay(); // selector is in newsay
+       if (incoming[xx]>THRESH && !triggered) {
+	 lpc_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
 	 xx++;
 	 samplepos-=size;
        }
@@ -358,8 +378,10 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
+  //u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  mode=3;
+
+  mode=0;
   //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 

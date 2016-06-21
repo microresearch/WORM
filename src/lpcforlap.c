@@ -9,6 +9,12 @@
  *  Created by Nicholas Collins on 10/09/2009.
  *  Copyright 2009 Nicholas M Collins. All rights reserved.
  *
+
+// gcc -std=c99 lpcforlap.c -o sclpc -lm -lsndfile
+
+// 
+
+
  */
 
 typedef float LPCfloat;
@@ -378,7 +384,7 @@ void main(int argc, char * argv []){
 
 	while ((readcount = sf_readf_float (infile, inputty, BLOCK_SIZE)) > 0)
 	{	
-	  printf("readcount %d\n",readcount);
+	  //	  printf("readcount %d\n",readcount);
 	  /*	  for (k = 0 ; k < readcount ; k++)
 		{	
 		  printf (" % 12.10f", buf [k]) ;

@@ -40,7 +40,7 @@ void ADC1_Init(uint16_t *ADC_Buffer)
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
 	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
 	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Enable; // was disable         
+	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable; // was enable         
 	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
 	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
 	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
@@ -51,16 +51,16 @@ void ADC1_Init(uint16_t *ADC_Buffer)
 	ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
 	ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div8;
 	ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
-	ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+	ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_20Cycles; // was 5?
 	ADC_CommonInit(&ADC_CommonInitStructure);
 
 	/* ADC1 Init ------------------------------------------------------------*/
 	ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
 	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE; // was enable
 	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
-	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; // was right
 	ADC_InitStructure.ADC_NbrOfConversion = 10;
 	//	ADC_InitStructure.ADC_NbrOfChannel = 10; not existing
 	ADC_Init(ADC1, &ADC_InitStructure);

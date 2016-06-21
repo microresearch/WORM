@@ -2558,15 +2558,33 @@ and: http://www.rockbox.org/tracker/12223?getfile=24000
 
 go linear!
 
-* SCHEDULE:
+* SCHEDULE/TODO:
 
 *TRIGGERS/REPEATS/PAUSING/GENERATORS/WORMING/VOCODING*
 
-- filter on interpolation???
+- trigger in: is it filtered, what is the level, trigger must also go
+  off on down so not always triggering (if !triggered). trigger out from gamma is 5v?
 
-- re-check triggers and what repeats for TMS and SP0256
+21/6 - TRIGGER In is set by THRESH in audio.c and works with geiger and USG
 
-- test trigger in and check CVs/DONE - PCB->check/orderTODO
+- knobs end/start defined
+
+21/6 - with >>6 (so to 6 bits=64) we have around 0-(58-60) - either
+try with resistor value or make up for this with 58-x and wraparound?
+
+organise vocab banks around this
+
+/////
+
+- filter on interpolation and check interpolation???
+
+- what and how repeats for TMS and SP0256
+
+- check CVs/DONE - PCB->check/orderTODO
+
+- wormings - plot first on PC, worm wavetable
+
+///////
 
 - finish LPC vocabulary - refine/clean up
 
@@ -2584,11 +2602,11 @@ go linear!
 
 - vocoder
 
-- move out rom data from github -> xxx_roms.h eg. 256_roms.h
+- move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github
 
 - wrap up/ MANUAL/ prodcution tests
 
-
+  
 * any hardware notes
 
 latest smaller board is 003
@@ -2763,6 +2781,10 @@ and RE-CHCK VOTRAX!
 - which filter basis or FFT?
 
 - what are channel frequencies and bandwidth?
+
+SELX/SELY choose channel and setting, SELZ bandwidth SPEED as silence/no-pitch/pitch/external excitation
+
+what is excitation?
 
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced
 
