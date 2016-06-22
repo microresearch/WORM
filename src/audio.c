@@ -153,7 +153,7 @@ sp0256gen->samplepos=0.0f;
 
 u16 sp0256(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  // MODEL GENERATOR: TODO is speed and interpolation options
+  // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -164,7 +164,7 @@ int16_t lastval=genstruct->prevsample;
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 
-   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
@@ -381,7 +381,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 
-  mode=0;
+  mode=1;
   //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 

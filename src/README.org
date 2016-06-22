@@ -2429,7 +2429,7 @@ commandline example sp0256 code running roughly
 
 - sp0256b-019.bin vocab across other 2 large roms seems limited in terms of phrases for large space... only 2nd rom seems accessed 0x4000+
 
-here how to allophones compare, where did we find sound effects?
+here how do allophones compare, where did we find sound effects?
 
 <<4 on dada means we skip 2 bytes so... <<3 is each byte
 
@@ -2558,27 +2558,35 @@ and: http://www.rockbox.org/tracker/12223?getfile=24000
 
 go linear!
 
+downsample=throw out samples (speed up)... lowpass first then decimate
+
+upsample=interpolate - do we need filter as this is on output?
+
 * SCHEDULE/TODO:
 
-*TRIGGERS/REPEATS/PAUSING/GENERATORS/WORMING/VOCODING*
+*REPEATS/PAUSING/WORMING/VOCODING*
 
 - trigger in: is it filtered, what is the level, trigger must also go
   off on down so not always triggering (if !triggered). trigger out from gamma is 5v?
 
 21/6 - TRIGGER In is set by THRESH in audio.c and works with geiger and USG
 
-- knobs end/start defined
+- knobs end/start defined - far right is 0 which is GND, far left is -10V ref which doesn't hit the top! MEasure???
 
 21/6 - with >>6 (so to 6 bits=64) we have around 0-(58-60) - either
 try with resistor value or make up for this with 58-x and wraparound?
 
-organise vocab banks around this
+no great need to invert...
+
+organise vocab banks around this??? tricky
+
+why is so as we only get up to 3700 instead of 4096... = around 2.98 volts // 3 volts (mcp6002 will go to 0.025v of 3.3v rail = 3.275!)
 
 /////
 
 - filter on interpolation and check interpolation???
 
-- what and how repeats for TMS and SP0256
+- what and how repeats function for TMS and SP0256
 
 - check CVs/DONE - PCB->check/orderTODO
 
@@ -2588,23 +2596,19 @@ organise vocab banks around this
 
 - finish LPC vocabulary - refine/clean up
 
-- new sp0256-DONE and vocabTODO // [digitalk/s14001a?]
+- new sp0256-DONE and vocabTODO - report on both TMS and sp0256 ROMs // [digitalk/s14001a?]
 
 - controls X,Y.Z and mode rundown
 
-- test and evaluate all algos// plan modes// interpolation and cleanups
+- test and evaluate all algos//plan modes// 
 
 - wormcode and how fits with modes// worm movements/// worming in wavetable
 
-- trigger scheme and code - trigger RESTART of algo/generator on IN - TESTED prototype
-
-- generator - code prune/generators-structs for all in audio.c and each mode
-
-- vocoder
+- vocoder/channel vocoder
 
 - move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github
 
-- wrap up/ MANUAL/ prodcution tests
+- wrap up/ MANUAL/ production tests
 
   
 * any hardware notes

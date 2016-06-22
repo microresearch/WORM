@@ -242,9 +242,9 @@ void LPCAnalysisinit(int _windowsize) {
   zeroAll();
 
   crow_coeffz[0].crowy=own_crow_coeffs;
-  crow_coeffz[0].crowlength=10296;
+  crow_coeffz[0].crowlength=7480;
   crow_coeffz[1].crowy=single_crow_coeffs;
-  crow_coeffz[1].crowlength=10450;
+  crow_coeffz[1].crowlength=6974;
 
 
   //  pos=0;
