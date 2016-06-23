@@ -2437,6 +2437,10 @@ here how do allophones compare, where did we find sound effects?
 
 *also all questions of pausing*
 
+** 23/6 
+
+- breaking up TMS5220 roms into different .h - add, document
+
 * talkie=LPC/lpc.c TODO
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
@@ -2621,7 +2625,7 @@ panel is 002
 
 ** 0/LPC/TMS5220
 
-- cleanup new vocabulary and groupings of...
+- cleanup new vocabulary and groupings of -> now in files but we need to define banks of 64 (how many)
  
 - banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
 
