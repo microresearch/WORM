@@ -2808,3 +2808,19 @@ changing bandwidth,,, see other codes...
 - parts order
 
 - THAT POTS?CV don;t hit end - compensate? !
+
+= -10v ref measured -9.23v with incoming -11.6v dropped from -11.86 incoming after diode
+
+following http://mutable-instruments.net/forum/discussion/4016/lm4040-grids/p1 we change R1 to 200R (done on latest pcb now)
+
+as:
+
+Il =5x10v/10k = 0.005 5mA
+
+shunt of 200ohms gives us for 12-10=2/200=0.01 = 10mA
+
+and for 11v in 11-10=1/200=0.005 = 5mA so max heat is 0.005 x 10 = 0.05 which is 50mW which is within 300mW dissipation
+
+this test to 9.9v
+
+test for POTS now: 0-62/63 some jitter???

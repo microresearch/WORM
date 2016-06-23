@@ -381,7 +381,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 
-  mode=1;
+  mode=0;
   //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 

@@ -133,9 +133,8 @@ void lpc_say(uint8_t* addr)
 void lpc_newsay(void)
 {
 	/* initialize ROM pointers */
-  ptrAddr = wordlist[adc_buffer[SELX]>>6]; /// 64 vocab! - but still maybe jitter and only goes up to 58 on SELX, 60 on SELY, 59 on SELZ 
-  // which si not good
-  // for banks 3 bits is 8 in this case 4 is 16 test here -> SELX gives us only 15 which is fine as we don;t hit 4096
+  ptrAddr = wordlist[adc_buffer[SELX]>>6]; /// 64 vocab! - but still maybe jitter and with -10v fix we hit 62 or 63 max
+ // for banks 3 bits is 8 in this case 4 is 16 test here -> SELX gives us only 15 which is fine as we don;t hit 4096
   //  ptrAddr=sp_parNICE2;
       //	ptrAddr = sp_D003_0;
 	ptrBit = 0;
