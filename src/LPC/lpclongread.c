@@ -4,15 +4,34 @@
  * borrows heavily from Peter Knight's Talkie library for Arduino
  * This code is released under GPLv2 license
  */
+
+// stderr redirect etc =  ./say 0 0 2>&1 > /dev/dsp
  
-#include "lpc.h"
-#include "audio.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+
+
+//#include "lpc.h"
+//#include "audio.h"
+
+typedef unsigned char uint8_t;
+typedef signed char int8_t;
+typedef unsigned short uint16_t;
+typedef unsigned short u16;
+typedef signed short int16_t;
+typedef unsigned int uint32_t;
+typedef signed int int32_t;
+
+uint16_t lpc_get_sample(void);
 
 #define INTERP_PERIOD 25  // samples per subframe
 #define SUBFRAME_PERIOD 8 // subframes per frame
 
-const uint8_t* ptrAddr;
-uint8_t ptrBit;
+int didntjump=1;
+   unsigned char *xxx;
+
+uint8_t* ptrAddr, ptrBit;
 uint8_t synth_running, synth_subframe_ctr, synth_sample_ctr;
 uint8_t starty, nextPeriod, synthPeriod;
 uint16_t nextEnergy, synthEnergy;
@@ -21,13 +40,6 @@ uint8_t periodCounter;
 int16_t xlpc[10], ulpc[11];
 uint16_t synthRand;
 uint8_t byte_rev[256];
-
-extern uint16_t adc_buffer[10];
-
-#include "vocab_testroms.h"
-#include "vocab_custom.h"
-#include "vocab_talko.h"
-
 
 /*
  * TMS5xxx LPC coefficient tables
@@ -48,6 +60,7 @@ const int8_t tmsK10[0x08]     = {0xCD,0xDF,0xF1,0x04,0x16,0x20,0x3B,0x4D};
 #define CHIRP_SIZE 41
 const int8_t chirp[CHIRP_SIZE] = {0x00,0x2a,0xd4,0x32,0xb2,0x12,0x25,0x14,0x02,0xe1,0xc5,0x02,0x5f,0x5a,0x05,0x0f,0x26,0xfc,0xa5,0xa5,0xd6,0xdd,0xdc,0xfc,0x25,0x2b,0x22,0x21,0x0f,0xff,0xf8,0xee,0xed,0xef,0xf7,0xf6,0xfa,0x00,0x03,0x02,0x01};
 
+
 /*
  * Parse frame parameter bits from the ROM data stream.
  */
@@ -57,17 +70,27 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint16_t data;
 	
 	data = byte_rev[*ptrAddr]<<8;
+	//	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-		data |= byte_rev[*(ptrAddr+1)];
+	  	 	data |= byte_rev[*(ptrAddr+1)];
+	  //  data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
 	value = data >> (16-num_bits);
 	ptrBit += num_bits;
+	didntjump=1;
 	if (ptrBit >= 8)
 	{
+	  //	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
+
+	  //	  	  printf("0x%X, ",*ptrAddr);
 		ptrBit -= 8;
 		ptrAddr++;
+		//		didntjump=2;
+		if (ptrBit==0) {
+		  	  didntjump=0;
+		}
 	}
 	return value;
 }
@@ -102,21 +125,14 @@ void lpc_init(void)
 	synthRand = 1;
 }
 
-extern int16_t audio_buffer[AUDIO_BUFSZ];
+//extern int16_t audio_buffer[AUDIO_BUFSZ];
 
 void lpc_running(){  // write into audio buffer
   //  lpc_get_sample();
-  static uint16_t counterrr=0;
-    int16_t samplel=(lpc_get_sample()<<6)-32768; // TODO or scale samples/speed???
-  //  int16_t samplel=rand()%32768; // TODO or scale samples/speed??? INTERP????
-  audio_buffer[counterrr++]=samplel;
-  if (counterrr>=AUDIO_BUFSZ) counterrr=0;
-  audio_buffer[counterrr++]=samplel;
-  if (counterrr>=AUDIO_BUFSZ) counterrr=0;
-  audio_buffer[counterrr++]=samplel;
-  if (counterrr>=AUDIO_BUFSZ) counterrr=0;
-  audio_buffer[counterrr++]=samplel;
-  if (counterrr>=AUDIO_BUFSZ) counterrr=0;
+  static u16 counterrr=0;
+  int16_t samplel=lpc_get_sample()>>2; // TODO or scale samples/speed???
+  
+        printf("%c",samplel);
 }
 
 /*
@@ -126,20 +142,6 @@ void lpc_say(uint8_t* addr)
 {
 	/* initialize ROM pointers */
 	ptrAddr = addr;
-	ptrBit = 0;
-	
-	/* Starty the synth */
-	synth_running = 1;
-	starty = 1;
-}
-
-void lpc_newsay(void)
-{
-	/* initialize ROM pointers */
-ptrAddr = wordlist_parsec[(adc_buffer[SELX]>>6)%22]; /// 64 vocab! - but still maybe jitter and with -10v fix we hit 62 or 63 max
- // for banks 3 bits is 8 in this case 4 is 16 test here -> SELX gives us only 15 which is fine as we don;t hit 4096
-  //  ptrAddr=sp_parNICE2;
-      //	ptrAddr = sp_D003_0;
 	ptrBit = 0;
 	
 	/* Starty the synth */
@@ -186,7 +188,22 @@ void lpc_update_coeffs(void)
 			for(i=0;i<10;i++)
 				nextK[i] = 0;
 			synth_running = 0;
-			
+			// try jump 
+			//						ptrAddr++; ptrBit=0;
+			if (didntjump){
+			  ptrBit =0;
+						  //			  			  printf("0x%X, ",*ptrAddr);
+			  ptrAddr++;
+			} 
+			//			didntjump=0;
+			starty=1;
+			//	sleep(1);
+	synth_subframe_ctr = 0;
+	synth_sample_ctr = 0;
+	//	printf("};\n{");
+	// 	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
+
+
 		}
 		else
 		{
@@ -196,20 +213,6 @@ void lpc_update_coeffs(void)
 			nextPeriod = tmsPeriod[lpc_getBits(6)];
 			
 			/* A repeat frame uses the last coefficients */
-			if(repeat && nextPeriod>0) // VCO mode
-			  {
-			    // if we have one PARAM keep as SELY/nextPeriod TODO
-			    //			    nextPeriod=(64-(adc_buffer[SELY]>>6))+1; // TODO: tweak and override so not always on
-			    //			  nextEnergy=adc_buffer[SELZ]>>4;
-
-			/*			synthPeriod= map(analogRead(POT_BEND),0,1023,63,1); // check value max ! (63 0x3F)
-		       
-			if (analogRead(POT_BEND)==0)synthPeriod=0; // cheating to have  more fun with the knob because 0 is on the other side of the scale (pitch to high there)
-
-			if(synthPeriod == 0) synthEnergy=map(analogRead(POT_SPEED),0,1023,15,0);//?? whynot working for voiced
-			*/
-			  }
-
 			if(!repeat)
 			{
 				/* All frames use the first 4 coefficients */
@@ -232,19 +235,17 @@ void lpc_update_coeffs(void)
 	}
 	
 	/* skip interp on 1st subframe */
-	if(starty)
-	{
+		if(starty)
+		{
 		starty = 0;
-		/* targets are currents */
 		synthPeriod = nextPeriod;
 		synthEnergy = nextEnergy;
 		for(i=0;i<10;i++)
 			synthK[i] = nextK[i] ;
-	}
+			}
 	else
 	{
-		/* expo decay to target interpolation */
-#define EXPO_SHIFT 2
+#define	EXPO_SHIFT 2
 		synthPeriod += (nextPeriod-synthPeriod)>>EXPO_SHIFT;
 		synthEnergy += (nextEnergy-synthEnergy)>>EXPO_SHIFT;
 		for(i=0;i<10;i++)
@@ -257,14 +258,15 @@ void lpc_update_coeffs(void)
  */
 uint16_t lpc_get_sample(void)
 {
-  int8_t i; 
+	int8_t i;
 	
 	/* if not running just return mid-scale */
-	if(synth_running == 0)
+	/*		if(synth_running == 0)
 	{
-	  lpc_newsay(); // TODO
-	  return 512;
+		return 512;
 		}
+	*/
+	
 	/* Time to update the coeffs? */
 	if(++synth_sample_ctr == INTERP_PERIOD)
 	{
@@ -313,4 +315,33 @@ uint16_t lpc_get_sample(void)
 	
 	/* return 10-bit offset binary */
 	return ulpc[0]+512;
+}
+
+
+
+void main(int argc, char *argv[]){
+  lpc_init();
+   int uffset=atoi(argv[1]);
+   int lengthy,flag=0;
+   FILE *fp = fopen(argv[2], "r");
+   fseek(fp,0, SEEK_END);
+   // read in and how long is it?
+   lengthy=ftell(fp);
+   fseek(fp,0, SEEK_SET);
+
+   // malloc and reverse into buffer
+   xxx=malloc(lengthy+1);
+   fread(xxx,lengthy,1,fp);
+   fclose(fp);
+   //   xxx[lengthy]=0;
+
+   // speak that buffer
+        while(flag==0){
+	      	fprintf(stderr, "OFF: %d\r", uffset);
+          lpc_say(xxx+uffset);
+	       while(synth_running) lpc_running();
+	           uffset++;
+	               if (uffset>lengthy) flag=1;
+	  //	                while(1) lpc_running();
+		           }
 }

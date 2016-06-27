@@ -32,7 +32,7 @@ int didntjump=1;
    unsigned char *xxx;
 
 uint8_t* ptrAddr, ptrBit;
-uint8_t synth_running, synth_subframe_ctr, synth_sample_ctr;
+uint8_t synth_running, synth_subframe_ctr=8, synth_sample_ctr;
 uint8_t starty, nextPeriod, synthPeriod;
 uint16_t nextEnergy, synthEnergy;
 int16_t synthK[10], nextK[10];
@@ -69,11 +69,12 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint8_t value;
 	uint16_t data;
 	
-		data = byte_rev[*ptrAddr]<<8;
-	//	data = (*ptrAddr)<<8;
+			data = byte_rev[*ptrAddr]<<8;
+			//	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-		data |= byte_rev[*(ptrAddr+1)];
+	      data |= byte_rev[*(ptrAddr+1)];
+	  //	   data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
 	value = data >> (16-num_bits);
@@ -81,7 +82,8 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	didntjump=1;
 	if (ptrBit >= 8)
 	{
-	  //	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
+	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
+	  //	  fprintf(stderr, "lastbyte: 0x%x\n", *ptrAddr);
 
 	  //	  	  printf("0x%X, ",*ptrAddr);
 		ptrBit -= 8;
@@ -119,7 +121,7 @@ void lpc_init(void)
 	}
 	starty = 0;
 	synth_running = 0;
-	synth_subframe_ctr = 0;
+	synth_subframe_ctr = 7;
 	synth_sample_ctr = 0;
 	synthRand = 1;
 }
@@ -190,9 +192,8 @@ void lpc_update_coeffs(void)
 			// try jump 
 			//						ptrAddr++; ptrBit=0;
 			if (didntjump){
-			  			  ptrBit =0;
-						  //			  			  printf("0x%X, ",*ptrAddr);
-			  	  ptrAddr++;
+			  ptrBit =0;
+			  ptrAddr++;
 			} 
 			//			didntjump=0;
 			starty=1;
@@ -200,7 +201,7 @@ void lpc_update_coeffs(void)
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
 	//	printf("};\n{");
-	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
+	// 	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
 
 
 		}
@@ -209,8 +210,13 @@ void lpc_update_coeffs(void)
 			/* All other energy types */
 			nextEnergy = tmsEnergy[energy];
 			repeat = lpc_getBits(1);
+			//			ptrBit =0; // TEST for ALPHONS
+			//			ptrAddr++;
 			nextPeriod = tmsPeriod[lpc_getBits(6)];
-			
+			//			ptrBit =0; // TEST for ALPHONS
+			//			ptrAddr++;
+			//			nextPeriod=64;
+			//			nextPeriod=128;
 			/* A repeat frame uses the last coefficients */
 			if(!repeat)
 			{
@@ -250,6 +256,7 @@ void lpc_update_coeffs(void)
 		for(i=0;i<10;i++)
 			synthK[i] += (nextK[i]-synthK[i])>>EXPO_SHIFT;
 	}
+		//		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod);
 }
 
 /*
@@ -321,8 +328,9 @@ uint16_t lpc_get_sample(void)
 void main(int argc, char *argv[]){
   lpc_init();
    int uffset=atoi(argv[1]);
-   int lengthy;
-   FILE *fp = fopen(argv[2], "r");
+   int uuffset=atoi(argv[2]);
+   int lengthy,flag=0;
+   FILE *fp = fopen(argv[3], "r");
    fseek(fp,0, SEEK_END);
    // read in and how long is it?
    lengthy=ftell(fp);
@@ -335,9 +343,13 @@ void main(int argc, char *argv[]){
    //   xxx[lengthy]=0;
 
    // speak that buffer
-
-       lpc_say(xxx+uffset);
-       //            while(synth_running) lpc_running();
-
-              while(1) lpc_running();
+   //        while(flag==0){  
+//	      	fprintf(stderr, "OFF: %d\r", uffset);
+          lpc_say(xxx+uffset);
+	  //	  	  while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
+	  //	  while(synth_running) lpc_running();
+	  //       uffset++;
+	  //           if (uffset>lengthy) flag=1;
+	  	                while(1) lpc_running();
+				//	           }
 }

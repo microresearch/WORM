@@ -2358,7 +2358,6 @@ dulled voice so maybe relook at as perhaps start offsets/ends aren't right
 
 lpc_say has vocab we have!
 
-
 ///
 
 for parsec we start offsets from 2 in phm3112g5.bin and follow table on: http://atariage.com/forums/topic/249709-parsec-remake/#entry3456049
@@ -2441,11 +2440,100 @@ here how do allophones compare, where did we find sound effects?
 
 - breaking up TMS5220 roms into different .h - add, document
 
+** 24/6
+
+- back over TI99 and APPLE IIe echo/word extraction. still trying for TI99 allophones
+
+how - tisingarc extracted into disk images... ALPHON in TEII terminal emulator is what we're after - shows up (as word) in phm3035g3.bin
+
+** 25/6
+
+still trying
+
+: /usr/games/mess ti99_4ae -peb:slot3 speech -cart1 /root/mess/roms/terminal_emulator_2.rpk -window
+
+in partial mode shift F12 pastes code into basic
+
+100 OPEN #1:"SPEECH",OUTPUT
+110 OPEN #2:"ALPHON",INTERNAL
+120 PRINT #1:"I AM THE T I HOME COMPUTER"
+130 PRINT #1:"HELLO"
+140 INPUT #1:A$
+150 PRINT #2:A$
+
+110 OPEN "ALPHON"
+
+CALL SPGET("HELLO.",A$) doesn't work
+
+modifying spchdump to run through all... - this approach doesn't work as is trying find dictionary
+
+now modified lpcr on phm3035g3.bin - look for at/dollar etc... are they there?
+
+got up to 866 - maybe something at 579 or aroundDONE--NONE
+
+				<rom name="phm3035g3.bin" size="0x1800" crc="ecd14bcc" sha1="6088758f2854bee430d604790721e1f08a7fcb1d" offset="0x0000" />
+				<rom name="phm3035g4.bin" size="0x1800" crc="2644e917" sha1="65236d6de87c4f1bdf01decd29563d62a12648b3" offset="0x2000" />
+				<rom name="phm3035g6.bin" size="0x1800" crc="bbd99158" sha1="44cbc2dcb262757a894d0b277fbed2f255fdc09a" offset="0x6000" />
+				<rom name="phm3035g7.bin" size="0x1800" crc="2ffcd798" sha1="6d2340138a014b5685e1dbe428e9106238d04285" offset="0x8000" />
+
+other option to hook into mess/mame but can't compile: need gcc 4.9
+
+byte rev or not - in parsec for example we need to reverse
+
+VOCAB:
+
+buck=3226g4 2400+ DONE
+alpiner=3112g5 (that is parsec) - alpiner is 3056g5?DONE
+mash=3158g5 500+ offset*DONE
+startrek=3225g4 400+ DONE
+
+termemu=3035/no luck - see below
+fathom=3222 = can't locate but may be late in files CHECK
+
+////
+
+
+moonmine=3131g5 = 200+
+
+
+TMS howto TI99 eg...:
+
+test first with lpc_reader for approx offset: ./lpcr 2400 /root/mess/software/ti99_4ae/phm3226g4.bin > /dev/dsp  
+
+then dump to hex: ./lpcdump /root/mess/software/ti99_4ae/phm3226g4.bin > phm3226g4.hex
+
+then copy into lpc_split, edit then run and test in lpc_say??? or/???
+
+** 26//27/6+
+
+- re-acquaint with sp0256 vocab and tms vocab/update/finish
+- raw LPC for both if possible
+- wormings
+
+///
+
+-  PRINT #1;CHR$(22) for one allophone-> test, upgrade, compile MESS and add hook
+
+- rest of tms?more apple II???/sp vocabs?
+
+////
+
+seems like g7 has allophone data as we can see indexing at start which refers to a data block from fe 254 to 1qfe=4595 approx
+
+so first offsets are like 0fe=254, 115=277, 12c=300, 143=323, but when
+we feed thse to lpc doesn't make sense so maybe data is in another
+format before being passed to LPC/5220 - for example to calculate pitch
+
+pitch 0-63 and slope for pitch in allophones code
+
+
+
+
 * talkie=LPC/lpc.c TODO
 
 - port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
 
-- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples DONEorNOT?
+- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples DONEorNOT? DONE
 
 - what we could get from MAME code/roms? - cross-compare co-efficients... still trying to extract speech/allophones code from u25_rom1.bin
 
@@ -2625,7 +2713,9 @@ panel is 002
 
 ** 0/LPC/TMS5220
 
-- cleanup new vocabulary and groupings of -> now in files but we need to define banks of 64 (how many)
+- cleanup new vocabulary// seems okay
+
+ and groupings of -> now in files but we need to define banks of 64 (how many, how much memory, macro)
  
 - banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
 
@@ -2686,7 +2776,7 @@ time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones our
 
 list/find roms: *we have AL2 which is generic allophones
 
-others dumped as HEX in LPC dir...
+others dumped as HEX in LPC dir moved to sporoms
 
 ////
 
