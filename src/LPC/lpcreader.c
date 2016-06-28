@@ -69,12 +69,12 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint8_t value;
 	uint16_t data;
 	
-			data = byte_rev[*ptrAddr]<<8;
-			//	data = (*ptrAddr)<<8;
+	//			data = byte_rev[*ptrAddr]<<8;
+	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-	      data |= byte_rev[*(ptrAddr+1)];
-	  //	   data |= *(ptrAddr+1);
+	  //      data |= byte_rev[*(ptrAddr+1)];
+	  	   data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
 	value = data >> (16-num_bits);
@@ -190,7 +190,7 @@ void lpc_update_coeffs(void)
 				nextK[i] = 0;
 			synth_running = 0;
 			// try jump 
-			//						ptrAddr++; ptrBit=0;
+			//ptrAddr++; ptrBit=0;
 			if (didntjump){
 			  ptrBit =0;
 			  ptrAddr++;
@@ -222,17 +222,37 @@ void lpc_update_coeffs(void)
 			{
 				/* All frames use the first 4 coefficients */
 				nextK[0] = tmsK1[lpc_getBits(5)];
+				//			ptrBit =0; // TEST for ALPHONS
+				//			ptrAddr++;
+
 				nextK[1] = tmsK2[lpc_getBits(5)];
+				//			ptrBit =0; // TEST for ALPHONS
+				//			ptrAddr++;
 				nextK[2] = tmsK3[lpc_getBits(4)]<<8;
+				//			ptrBit =0; // TEST for ALPHONS
+				//			ptrAddr++;
 				nextK[3] = tmsK4[lpc_getBits(4)]<<8;
 				if(nextPeriod)
 				{
 					/* Voiced frames use 6 extra coefficients. */
+				  //			ptrBit =0; // TEST for ALPHONS
+				  //			ptrAddr++;
+
 					nextK[4] = tmsK5[lpc_getBits(4)]<<8;
+					//			ptrBit =0; // TEST for ALPHONS
+					//			ptrAddr++;
 					nextK[5] = tmsK6[lpc_getBits(4)]<<8;
+					//			ptrBit =0; // TEST for ALPHONS
+					//			ptrAddr++;
 					nextK[6] = tmsK7[lpc_getBits(4)]<<8;
+					//			ptrBit =0; // TEST for ALPHONS
+					//			ptrAddr++;
 					nextK[7] = tmsK8[lpc_getBits(3)]<<8;
+					//			ptrBit =0; // TEST for ALPHONS
+					//			ptrAddr++;
 					nextK[8] = tmsK9[lpc_getBits(3)]<<8;
+					//			ptrBit =0; // TEST for ALPHONS
+					//			ptrAddr++;
 					nextK[9] = tmsK10[lpc_getBits(3)]<<8;
 				}
 			}
@@ -256,7 +276,7 @@ void lpc_update_coeffs(void)
 		for(i=0;i<10;i++)
 			synthK[i] += (nextK[i]-synthK[i])>>EXPO_SHIFT;
 	}
-		//		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod);
+	       		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod);
 }
 
 /*
@@ -346,10 +366,10 @@ void main(int argc, char *argv[]){
    //        while(flag==0){  
 //	      	fprintf(stderr, "OFF: %d\r", uffset);
           lpc_say(xxx+uffset);
-	  //	  	  while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
+	  	  	  while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
 	  //	  while(synth_running) lpc_running();
 	  //       uffset++;
 	  //           if (uffset>lengthy) flag=1;
-	  	                while(1) lpc_running();
+	  //	  	                while(1) lpc_running();
 				//	           }
 }

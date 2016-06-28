@@ -2457,9 +2457,14 @@ in partial mode shift F12 pastes code into basic
 100 OPEN #1:"SPEECH",OUTPUT
 110 OPEN #2:"ALPHON",INTERNAL
 120 PRINT #1:"I AM THE T I HOME COMPUTER"
-130 PRINT #1:"HELLO"
-140 INPUT #1:A$
+PRINT #1:"ahyyyzzzz"
+130 PRINT #2:"HELLO"
+140 INPUT #2:A$
 150 PRINT #2:A$
+
+OPEN #1:"SPEECH",OUTPUT
+OPEN #2:"ALPHON",INTERNAL
+PRINT #2:CHR$(77)
 
 110 OPEN "ALPHON"
 
@@ -2471,10 +2476,10 @@ now modified lpcr on phm3035g3.bin - look for at/dollar etc... are they there?
 
 got up to 866 - maybe something at 579 or aroundDONE--NONE
 
-				<rom name="phm3035g3.bin" size="0x1800" crc="ecd14bcc" sha1="6088758f2854bee430d604790721e1f08a7fcb1d" offset="0x0000" />
-				<rom name="phm3035g4.bin" size="0x1800" crc="2644e917" sha1="65236d6de87c4f1bdf01decd29563d62a12648b3" offset="0x2000" />
-				<rom name="phm3035g6.bin" size="0x1800" crc="bbd99158" sha1="44cbc2dcb262757a894d0b277fbed2f255fdc09a" offset="0x6000" />
-				<rom name="phm3035g7.bin" size="0x1800" crc="2ffcd798" sha1="6d2340138a014b5685e1dbe428e9106238d04285" offset="0x8000" />
+<rom name="phm3035g3.bin" size="0x1800" crc="ecd14bcc" sha1="6088758f2854bee430d604790721e1f08a7fcb1d" offset="0x0000" />
+<rom name="phm3035g4.bin" size="0x1800" crc="2644e917" sha1="65236d6de87c4f1bdf01decd29563d62a12648b3" offset="0x2000" />
+<rom name="phm3035g6.bin" size="0x1800" crc="bbd99158" sha1="44cbc2dcb262757a894d0b277fbed2f255fdc09a" offset="0x6000" />
+<rom name="phm3035g7.bin" size="0x1800" crc="2ffcd798" sha1="6d2340138a014b5685e1dbe428e9106238d04285" offset="0x8000" />
 
 other option to hook into mess/mame but can't compile: need gcc 4.9
 
@@ -2487,13 +2492,14 @@ alpiner=3112g5 (that is parsec) - alpiner is 3056g5?DONE
 mash=3158g5 500+ offset*DONE
 startrek=3225g4 400+ DONE
 
+moonmine=3131g5 = 200+ DONE - this one done quite thoroughly
+
+
 termemu=3035/no luck - see below
 fathom=3222 = can't locate but may be late in files CHECK
 
 ////
 
-
-moonmine=3131g5 = 200+
 
 
 TMS howto TI99 eg...:
@@ -2512,21 +2518,88 @@ then copy into lpc_split, edit then run and test in lpc_say??? or/???
 
 ///
 
--  PRINT #1;CHR$(22) for one allophone-> test, upgrade, compile MESS and add hook
+-  PRINT #2:CHR$(77) = AH for one allophone-> test, upgrade, compile MESS and add hook
 
 - rest of tms?more apple II???/sp vocabs?
 
 ////
 
-seems like g7 has allophone data as we can see indexing at start which refers to a data block from fe 254 to 1qfe=4595 approx
+seems like 3035g7 has allophone data as we can see indexing at start
+which refers to a data block from fe 254 to 1qfe=4595 approx
+
 
 so first offsets are like 0fe=254, 115=277, 12c=300, 143=323, but when
-we feed thse to lpc doesn't make sense so maybe data is in another
+we feed these to lpc doesn't make sense so maybe data is in another
 format before being passed to LPC/5220 - for example to calculate pitch
+
+but whole data black is non ascii so not ANY 0x20/32->0x7e/127 why?
+
+implies 5 bit, byte alligned format with bit 8 as?
+
+bits 32 and 64 missing? = first five bits, and last bit ONLY
+
+
+The module ROM contains two subprograms, the first one breaks plain
+english sentences into a list of allophons, the second creates the
+speech data from those allophons, adds accentuation and voice
+inflexion, and passes it to the speech synthesizer via the
+Speak-External command. T
+
+
+///
+compare pitched and noise/unpitched allophone data/// to reverse or not:
+
+first are:
+
+1 AE1 - 0fe:
+
+020b 8f15 0908 0606 0a05 0204 0b8f 1509 0806 060a 0502 04
+
+2 AE1N - 115:
+
+02 0b93 1807 0903 0409 0403 040b 9318 0709 0304 0904 0304 
+
+3 AH1 - 12c:
+
+020b 8e0f 0a0c 0a02 0605 0405 0b8e 0f0a 0c0a 0206 0504 05
+
+4 AH1N - 143:
+
+02 0b90 0c0d 0b07 0305 0504 040b 900c 0d0b 0703 0505 0404 
+
+5 AW1 - 15a:
+
+020a8f0a090f0803050505030a8b0f0e0c070109050304 = 23 bytes
+
+////so far all same length - start with 020a or 020b
+
+try later....
+
+125 THF- 11da->11f0:
+
+0506 0f06 0706 0713 0906 0204 1013 0706 010a 1005 0500
+
+or is it 11cd->11da:
+
+04 0414 0e06 04f9 fa04 140e 0606 
+
+////
 
 pitch 0-63 and slope for pitch in allophones code
 
+** 28/6
 
+- tms5220/vocab_testroms////moonmine is most complete - if wishes we can go back and re-do
+  others. lpc_say now prints bytes so we can check for excess and
+  re-examine...
+
+- mame phoneme access:
+
+OPEN #1:"SPEECH",OUTPUT
+OPEN #2:"ALPHON",INTERNAL
+PRINT #2:CHR$(77)
+
+now trying to add hook but need to do lengthy recompile
 
 
 * talkie=LPC/lpc.c TODO
@@ -2840,8 +2913,6 @@ https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
 S14001A speech IC emulator]], 
 
 ROMS:
-
-
 
 digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
