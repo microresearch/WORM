@@ -12,7 +12,7 @@ Following klatt:
 
 ///////
 
-Notes from Pickett:
+Notes from Pickett???:
 
 //////
 
