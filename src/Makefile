@@ -16,7 +16,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_gpio.o stm32f4xx_i2c.o stm32f4xx_rcc.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
 			syscalls.o audio.o vosim.o LPC/lpc.o lpcanalysissc.o effect.o \
-			sp0256.o worm_movement.o
+			sp0256.o
 
 OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\

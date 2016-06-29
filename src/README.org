@@ -2597,10 +2597,38 @@ pitch 0-63 and slope for pitch in allophones code
 
 OPEN #1:"SPEECH",OUTPUT
 OPEN #2:"ALPHON",INTERNAL
-PRINT #2:CHR$(77)
 
-now trying to add hook but need to do lengthy recompile
+PRINT #2:CHR$(100)
 
+now trying to add hook DONE
+
+** 29/6
+
+- added hook and dumps all (126,127 are empty?)
+
+TODO:
+
+[- how does data compare with ROM we have?]
+
+- test all in lpc_sayDONE
+
+/// special functions and pitch tested in mame...
+
+- probability list for allophones=>how did we generate the klatt one? phoneme_prob_remap - was using rsynth/klatt itself?
+
+The pitch is how high or low the voice sounds and can be a number from
+0 through 63. Zero is a whisper, 1 is the highest pitched voice, and
+63 is the lowest pitched voice. The slope is the rate at which the
+pitch changes in a spoken phrase. The slope may be a number from 0
+through 255. For the best results, the manual recommends a slope 3.2
+times the pitch. There are certain combinations of pitch and slope
+that will not be accepted.
+
+- for testroms convert all to const etc,, place in banks and test
+
+- wrap up TMS/talkie with pitch/repeats/banks etc... also how we can think of raw encoding
+
+- redo parsec, buck rogers, star trek, mash
 
 * talkie=LPC/lpc.c TODO
 
@@ -2790,7 +2818,7 @@ panel is 002
 
  and groupings of -> now in files but we need to define banks of 64 (how many, how much memory, macro)
  
-- banks of 64 words/phrases SELX/SELY, SELZ is nextperiod
+- banks of 64 words/phrases SELX/SELY, SELZ is nextperiod=pitch
 
 - pausing/breaks/repeat
 
