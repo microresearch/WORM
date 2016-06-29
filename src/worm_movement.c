@@ -49,11 +49,15 @@ u8 randyx(u8 xnum,u8 xnum){
   while(x==xnum || x==666){
     x=randy(num);
   }
+  return x;
 }
 
-float runiform(float lrange, float urange){
-  // smallest random= but no double on ARM
+float runiform(float a, float b){
 
+  //a + (b-a) * random()
+
+  // smallest random= but no double on ARM
+  float x = a + (b-a) * ((float)rand()/(float)(RAND_MAX));
   //
 
 }
@@ -67,32 +71,28 @@ void normalize(xy* loc){
   float x=loc->x;  
   float y=loc->y;
   float mag=sqrtf(x*x + y*y);
-  if mag!=0 {
+  if (mag!=0) {
       x=x/mag;
         y=y/mag;
 	  }
+  loc->x=x;
+  loc->y=y;
 }
 
-/*
-def normalize(tup):
-    x=tup[0]
-    y=tup[1]
-    mag=math.sqrt(x*x + y*y)
-    if mag!=0:
-        x=x/mag
-        y=y/mag
-    return (x,y)
+void limit(xy* loc, float limit){
+  float x=loc->x;  
+  float y=loc->y;
+  
+  if (sqrtf(x*x + y*y) > limit*limit){
+    normalize(loc);
+    x=loc->x*limit
+      y=loc->y*limit
+	  }
+  loc->x=x;
+  loc->y=y;
+}
 
-def limit(tup,limit):
-    x=tup[0]
-    y=tup[1]
-#   (magSq() > max*max) { normalize(); mult(max); 
-    if math.sqrt(x*x + y*y) > limit*limit:
-        (x,y)=normalize(tup)
-        x=x*limit
-        y=y*limit
-    return (x,y)
-*/
+// check x and y against bounds
 
 // >>>>>>>>>>>>>>>>what are the worms?
 
