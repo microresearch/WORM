@@ -181,9 +181,11 @@ and then each parameter has list
 - see klsyn (restrictions on commercial use) also for synthesis from
   base parameters - also new parameters - to test this out but seems bit cumbersome...
 
-- for klatt we use: ./klatt -i example1.par -r 2 -s 8000 -o test.raw and:
+- for klatt we use: 
 
- play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
+: ./klatt -i example1.par -r 2 -s 8000 -o test.raw and:
+
+: play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
 
 with examples as list of parameters 
 
@@ -1032,7 +1034,7 @@ buffer is 1024,,,, functions: flushbuffer, datafill , *dataempty writes to temp 
 - play with TRM/tube on PC - worm simulation - width of mouth/nose???? DONE
 - implement generic wavetables, envelopes etc. for excitations and how might work with buffer
 - TRM portings DONE
-- triggering, list of modes and tweaks/modifiers to each one - finalise almost
+
 *- wormings, raw LSM tests, raw KLATT*
 
 - tie up formant filters maybe see https://github.com/4ms/SMR https://www.keil.com/pack/doc/CMSIS/DSP/html/group___g_e_q5_band.html
@@ -1041,7 +1043,7 @@ buffer is 1024,,,, functions: flushbuffer, datafill , *dataempty writes to temp 
 
 TRM Notes:
 
-- At 32k samples we have 96k samples for 12 sets of parameters in input (so 96/12=8k per set)
+- At 32k samples we have 96k samples for 12 sets of parameters in input (so 96/12=8k per set) ????WHAT?
 
 - Basic parameters and then frame parameters
 
@@ -2200,7 +2202,6 @@ LPC tests, wavetable and excitation inputs across modes, just clean up for PARIS
 - why tube.c behaves strange: FIXED - think was memory issue for large input_frames array so *we need to watch memory and maybe clean up buffers*
 
 - simple wrapping and round robin style
-- where we are with all generators?
 
 - new notes to fill in here esp. on raven/LPC merge - raven wavetable (see braids:
 
@@ -2630,25 +2631,34 @@ that will not be accepted.
 ** 30/6
 
 - worm_movement.c first lap tests ok but need to think on how is
-  applied to parameter lists first, how would worm wavetable work as
-  one dimension also?
+  applied to parameter lists first
 
-need sample parameter list and size/dimensions - speed of worm
+need sample parameter list and size/dimensions eg. worm in raw klatt-genparamNOTES BELOW - TEST! - speed of worm
 movement through but also speed at which we call the worm movement (eg. every x samples)
+
+worm in 2d to parameters eg. x->which param, y as value constrained
+
+- removed lpc sc live code from makefile/audio.c
 
 - LPC/5220 random parameter tests in lpc_say.c DONE
 
 - TODO: redo alpiner, buck rogers, star trek, mash DONE
 
-- removed lpc sc live code from makefile/audio.c
+BREAKOUT all raven notes - plague wavetable
+
+- TODO: genparams see below and eg: Warning: glottal open period cannot exceed T0, truncated as was 196 T0=132
+
+** 1/7
+
+- interpolation and general
+
+- each mode before worming part finalised
 
 * interpolations
 
 - sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]]
 
 - linear interpol and filtering (freq?): http://stackoverflow.com/questions/1125666/how-do-you-do-bicubic-or-other-non-linear-interpolation-of-re-sampled-audio-da
-
-- ominous voice???
 
 and: http://www.rockbox.org/tracker/12223?getfile=24000
 
@@ -2675,11 +2685,13 @@ upsample=interpolate - do we need filter as this is on output?
 
 - check CVs/DONE - PCB->check/orderTODO-DONE
 
-- wormings - plot first on PC-DONE, worm wavetable
+- wormings - plot first on PC-DONE
+
+- worm wavetable-2d?-> how is implemented in braids - *LEAVE FOR RAVEN*
 
 ///////
 
-- finish LPC vocabulary - refine/clean up
+- finish LPC vocabulary - refine/clean upDONE  - DO BANKS
 
 - new sp0256-DONE and vocabTODO - report on both TMS-DONE and sp0256 ROMs // [digitalk/s14001a?]
 
@@ -2734,7 +2746,24 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 - pausing
 
-** 2/RAW_KLATT parameters -> simpleklatt/nvp
+** 2/RAW_KLATT parameters -> simpleklatt/nvp - also to wormings
+
+see genparam.c -> how that works on commandline?
+
+klatt in docs:
+
+:  ./genny > genexample 
+
+: ./klatt -i genexample -r 2 -s 8000 -o test.raw and:
+
+: play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
+
+- how we break this out to knobs X/Y select and val as Z
+
+- how we get nvp.c array?
+
+- simpleklatt and genparam frames??????
+
 
 ** 3/SAM - test/re-work as not looked at for a while
 
@@ -2750,14 +2779,14 @@ sing???
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
 cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH_DONE, port
-into generatorDONE,
+into generatorDONE, text to speech NRL->retroTTS/phoneme.c
 
-dictionary for phonemes and longer words/vocab below -> so we can have banks (also with and without pitch bend or fixed or ...)
+- dictionary for phonemes and longer words/vocab below -> so we can have banks (also with and without pitch bend or fixed or ...)
 
-question of repeat/pause and if we cycle through list as in KLATT - so have banks/phrases SELX/Y Z is pitch or other bend
+- question of repeat/pause and if we cycle through list as in KLATT - so have banks/phrases SELX/Y Z is pitch or other bend
 these are questions also for TMS
 
-also repeat/length of phoneme as BEND/parameter - do this as one of banks for allophones
+- also repeat/length of phoneme as BEND/parameter - do this as one of banks for allophones
 
 banks: allophones/64, new vocab phrases-012/019, these with certain bends x3=6, dictionary phrasings=8, groupings
 
@@ -2859,7 +2888,9 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
 ** 5/TUBE - test!
 
-** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters... which ones? not mutable...
+TRM tube notes???? 
+
+** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
 
 ** 7/8channel vocoder TODO
 
@@ -2881,7 +2912,7 @@ changing bandwidth,,, see other codes...
 
 - worm movements from paris python -> c-TESTING
 
-** LPC parameter mode
+*** LPC parameter mode
 
 - in LPC/lpc_say.c we have random generation of LPC/5220 parameters
 
