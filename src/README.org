@@ -2622,7 +2622,7 @@ through 255. For the best results, the manual recommends a slope 3.2
 times the pitch. There are certain combinations of pitch and slope
 that will not be accepted.
 
-- for testroms convert all to const etc,, place in banks and test
+- for testroms convert all to const etc,DONE place in banks and test
 
 - wrap up TMS/talkie with pitch/repeats/banks etc... 
 
@@ -2631,121 +2631,16 @@ that will not be accepted.
 
 - worm_movement.c first lap tests ok but need to think on how is
   applied to parameter lists first, how would worm wavetable work as
-  one dimension?
+  one dimension also?
+
+need sample parameter list and size/dimensions - speed of worm
+movement through but also speed at which we call the worm movement (eg. every x samples)
 
 - LPC/5220 random parameter tests in lpc_say.c DONE
 
 - TODO: redo alpiner, buck rogers, star trek, mash DONE
 
-
-* talkie=LPC/lpc.c TODO
-
-- port and change bendss from talko: [[file:~/projects/ERD_modules/older/euro-modules/Talko/Software/Talko1_2/Talko1_2.cpp]] DONE
-
-- BRING IN larger vocab from:   /root/projects/earthvoice2/Talkie-LPCcode/Talkie/examples DONEorNOT? DONE
-
-- what we could get from MAME code/roms? - cross-compare co-efficients... still trying to extract speech/allophones code from u25_rom1.bin
-
-Now, here is how speech is encoded:
-
-Frame type  Energy Rpt Pitch   K1    K2   K3   K4   K5   K6   K7  K8  K9  K10 
-Voiced      xxxx   0  xxxxxx xxxxx xxxxx xxxx xxxx xxxx xxxx xxxx xxx xxx xxx 
-Unvoiced    xxxx   0  000000 xxxxx xxxxx xxxx xxxx 
-Repeated    xxxx   1  xxxxxx 
-Silence     0000 
-Stop code   1111
-
-from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
-
-ti99sim which has spchdump segfaults only not with spchrom which is already encoded!
-
-sox and lpc-10
-
-terminal emulator and ALLPHON or allophones (allophone rom should be u25?) 127 allophones
-
-ti99sim: Release/dumpspch --format=hex ~/Downloads/u25_rom1.bin
-
-format=spch
-
-unianal for lpc-10 and check again encoding but what we want is
-original allophon code - now have DATABASE from text to speech disk
-but somehow can't extract meaningful data...
-
-[[file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE%20][file:~/projects/ERD_modules/worm/docs/ti99sim/src/util/DATABASE::DATABASE ]]
-
-and codes from dumpspch don;t match at all R or P etc which we have in vocab 
-
- - XLAT, SPEAK in machine language?
-
-lpctest for finding lpc codes but as long as they don't concat/// or we need to jump to next byte
-
-have longer look at format of spchrom.bin
-
-convert from lpc-10 via tables in  http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
-
-///
-
-offset 13c3 offset 5059 2 bytes left processing phrase 0
-
-in spchrom is word then 5x,=,,,, then address...
-
-seems like can have REPEAT bit at start with on coeffs>>??
-
-had to NOT reverse bits (and also why we need to reverse - just do for all arrays beforehand!)
-
-...
-
-question of zeroes in vocab after energy=0xf stop bits
-
-now we can parse with lpctest the spchrom fine... need next to use to try and dump codes from disks/cartridges and so on
-
-...
-
-apple II: echo software - now we have some female voice:
-
-is from WORDS_D00 which is expanded from WORDEDIT.SDK but edges are funny and can't GET indexing
-
-?"I can use my TI Text-to-Speech disk along with
-software to capture the LPC strings to create new words"
-
-...
-
-some success with parts of:
-
-- is from WORDS_D00 which is expanded from WORDEDIT.SDK (apple II/echo) - female voice (also D001,2 and 3)
-
-- /root/Downloads/TI99/Spch-EdG.Bin which is phonemes perhaps
-
-----
-
-disassembly but need extracted bins... and where code starts:
-
-: ./getfile ../../disks/WORDEDIT.SDK INIT > INIT
-
-: ../../../dcc6502/dcc INIT | less
-
-from: ~/Downloads/TI99/apple/ciderpress/linux
-
-///
- 
-also nice to print basic straight HOW? - in wine with ciderpress we can
-
-.....
-
-offsets from POINTERS into D00x still not working
-
-...
-
-next/ extract offsets and test! start in POINTERS is at x203... also
-just test for one single expression/phrase as seems split up somehow...
-
-start for THIR in pointers is: 06A9 -> points to 004D as address/offset
-
-UNITED STATES = 33(dec) in = 1578dec
-
-how long is average vocab in bytes? say 100 bytes
-
-/// potentially add table offset (c7 style) and other fixed offset
+- removed lpc sc live code from makefile/audio.c
 
 * interpolations
 
@@ -2772,17 +2667,6 @@ upsample=interpolate - do we need filter as this is on output?
 
 21/6 - TRIGGER In is set by THRESH in audio.c and works with geiger and USG
 
-- knobs end/start defined - far right is 0 which is GND, far left is -10V ref which doesn't hit the top! MEasure???
-
-21/6 - with >>6 (so to 6 bits=64) we have around 0-(58-60) - either
-try with resistor value or make up for this with 58-x and wraparound?
-
-no great need to invert...
-
-organise vocab banks around this??? tricky
-
-why is so as we only get up to 3700 instead of 4096... = around 2.98 volts // 3 volts (mcp6002 will go to 0.025v of 3.3v rail = 3.275!)
-
 /////
 
 - filter on interpolation and check interpolation???
@@ -2797,7 +2681,7 @@ why is so as we only get up to 3700 instead of 4096... = around 2.98 volts // 3 
 
 - finish LPC vocabulary - refine/clean up
 
-- new sp0256-DONE and vocabTODO - report on both TMS and sp0256 ROMs // [digitalk/s14001a?]
+- new sp0256-DONE and vocabTODO - report on both TMS-DONE and sp0256 ROMs // [digitalk/s14001a?]
 
 - controls X,Y.Z and mode rundown
 
@@ -2822,17 +2706,17 @@ panel is 002
 
 ** 0/LPC/TMS5220
 
-- cleanup new vocabulary// seems okay
+- cleanup new vocabulary// seems okay DONE
 
- and groupings of -> now in files but we need to define banks of 64 (how many, how much memory, macro)
+ and groupings of -> now in files but we need to define banks of 64 (how many, how much memory, macro?)
+
+TOTALS: ti99 360, test 420, talko 191, male 206, large_male 403, acorn 165 = TOTAL: 1745 / 64 = 28 banks with some doubles/adds to make 32 banks
+
+subdivide or get rid of say talko as is duplicates...
  
-- banks of 64 words/phrases SELX/SELY, SELZ is nextperiod=pitch
+- banks of 64 words/phrases SELX/SELY, SELZ is nextperiod=pitch OR cutoff/start in some banks if we double up banks
 
-- pausing/breaks/repeat
-
-singing TI? tisingarc.txt
-
-vocab notes from 9/6+ and LPC above to check
+- pausing/breaks/repeat???
 
 ** 1/KLATT
 
@@ -2973,8 +2857,6 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
-and RE-CHCK VOTRAX!
-
 ** 5/TUBE - test!
 
 ** 6/choose vosim etc - 7- vosim/fof/other etc - ditch formant filters... which ones? not mutable...
@@ -2997,16 +2879,30 @@ changing bandwidth,,, see other codes...
 
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
-- worm movements from paris python -> c
+- worm movements from paris python -> c-TESTING
+
+** LPC parameter mode
+
+- in LPC/lpc_say.c we have random generation of LPC/5220 parameters
+
+Frame type  Energy Rpt Pitch   K1    K2   K3   K4   K5   K6   K7  K8  K9  K10 
+Voiced      xxxx   0  xxxxxx xxxxx xxxxx xxxx xxxx xxxx xxxx xxxx xxx xxx xxx 
+Unvoiced    xxxx   0  000000 xxxxx xxxxx xxxx xxxx 
+Repeated    xxxx   1  xxxxxx 
+Silence     0000 
+Stop code   1111
+
+from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+
 
 ** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters
 
 
 * hardware2
 
-- check panel etc. PCB order
+- check panel etc. PCB order DONE
 
-- parts order
+- parts order DONE
 
 - THAT POTS?CV don;t hit end - compensate? !
 

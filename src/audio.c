@@ -91,7 +91,7 @@ float Fc,Q,peakGain;
   int16_t *audio_ptr;
 u16 x,xx;
 
- LPCAnalyzer_init();
+// LPCAnalyzer_init();
  sp0256_init();
  lpc_init(); 
 
@@ -287,7 +287,7 @@ u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float sam
   holmesrun(outgoing, size);
 };
 
-u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+//u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
   // convert in to float
@@ -295,15 +295,15 @@ u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float s
   /* for (u8 x=0;x<size;x++){
 	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
 	    }*/
-        int_to_floot(incoming,flinbuffer,size);
-	LPCAnalyzer_next(NULL, flinbuffer, floutbuffer, 10, size); //poles=10 - CROW TEST!
+//        int_to_floot(incoming,flinbuffer,size);
+//	LPCAnalyzer_next(NULL, flinbuffer, floutbuffer, 10, size); //poles=10 - CROW TEST!
     // out from float to int
-    floot_to_int(mono_buffer,floutbuffer,size);
-};
+//    floot_to_int(mono_buffer,floutbuffer,size);
+//};
 
 
 
-u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -383,7 +383,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   mode=0;
   //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
-  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
+  genny* generator[]={tms5220gen,NULL,sp0256gen}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
