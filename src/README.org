@@ -2500,8 +2500,6 @@ fathom=3222 = can't locate but may be late in files CHECK
 
 ////
 
-
-
 TMS howto TI99 eg...:
 
 test first with lpc_reader for approx offset: ./lpcr 2400 /root/mess/software/ti99_4ae/phm3226g4.bin > /dev/dsp  
@@ -2626,9 +2624,19 @@ that will not be accepted.
 
 - for testroms convert all to const etc,, place in banks and test
 
-- wrap up TMS/talkie with pitch/repeats/banks etc... also how we can think of raw encoding
+- wrap up TMS/talkie with pitch/repeats/banks etc... 
 
-- redo parsec, buck rogers, star trek, mash
+
+** 30/6
+
+- worm_movement.c first lap tests ok but need to think on how is
+  applied to parameter lists first, how would worm wavetable work as
+  one dimension?
+
+- LPC/5220 random parameter tests done in lpc_say.c
+
+- TODO: redo alpiner, buck rogers, star trek, mash
+
 
 * talkie=LPC/lpc.c TODO
 
@@ -2783,7 +2791,7 @@ why is so as we only get up to 3700 instead of 4096... = around 2.98 volts // 3 
 
 - check CVs/DONE - PCB->check/orderTODO
 
-- wormings - plot first on PC, worm wavetable
+- wormings - plot first on PC-DONE, worm wavetable
 
 ///////
 
