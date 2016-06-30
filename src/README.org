@@ -2633,9 +2633,9 @@ that will not be accepted.
   applied to parameter lists first, how would worm wavetable work as
   one dimension?
 
-- LPC/5220 random parameter tests done in lpc_say.c
+- LPC/5220 random parameter tests in lpc_say.c DONE
 
-- TODO: redo alpiner, buck rogers, star trek, mash
+- TODO: redo alpiner, buck rogers, star trek, mash DONE
 
 
 * talkie=LPC/lpc.c TODO
@@ -2789,7 +2789,7 @@ why is so as we only get up to 3700 instead of 4096... = around 2.98 volts // 3 
 
 - what and how repeats function for TMS and SP0256
 
-- check CVs/DONE - PCB->check/orderTODO
+- check CVs/DONE - PCB->check/orderTODO-DONE
 
 - wormings - plot first on PC-DONE, worm wavetable
 
