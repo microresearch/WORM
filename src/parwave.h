@@ -55,20 +55,20 @@ typedef struct
 typedef struct
 {
   unsigned char synthesis_model; /* cascade-parallel or all-parallel */
-  unsigned int samrate;     /* Number of output samples per second           */
-  unsigned int FLPhz ;      /* Frequeny of glottal downsample low-pass filter */
-  unsigned int BLPhz ;      /* Bandwidth of glottal downsample low-pass filter */
-  unsigned int nfcascade;   /* Number of formants in cascade vocal tract    */
+  uint16_t samrate;     /* Number of output samples per second           */
+  uint16_t FLPhz ;      /* Frequeny of glottal downsample low-pass filter */
+  uint16_t BLPhz ;      /* Bandwidth of glottal downsample low-pass filter */
+  uint16_t nfcascade;   /* Number of formants in cascade vocal tract    */
   unsigned char glsource;    /* Type of glottal source */
-  int f0_flutter;   /* Percentage of f0 flutter 0-100 */
+  int16_t f0_flutter;   /* Percentage of f0 flutter 0-100 */
   flag quiet_flag;  /* set to TRUE for error messages */
-  unsigned int nspfr;       /* number of samples per frame */
-  unsigned int nper;        /* Counter for number of samples in a pitch period */
-  unsigned int ns;
-  unsigned int T0;          /* Fundamental period in output samples times 4 */
-  unsigned int nopen;       /* Number of samples in open phase of period    */
-  unsigned int nmod;        /* Position in period to begin noise amp. modul */
-  unsigned int nrand;       /* Varible used by random number generator      */
+  uint16_t nspfr;       /* number of samples per frame */
+  uint16_t nper;        /* Counter for number of samples in a pitch period */
+  uint16_t ns;
+  uint16_t T0;          /* Fundamental period in output samples times 4 */
+  uint16_t nopen;       /* Number of samples in open phase of period    */
+  uint16_t nmod;        /* Position in period to begin noise amp. modul */
+  uint16_t nrand;       /* Varible used by random number generator      */
   float pulse_shape_a;  /* Makes waveshape of glottal pulse when open   */
   float pulse_shape_b;  /* Makes waveshape of glottal pulse when open   */
   float onemd;
@@ -80,10 +80,10 @@ typedef struct
   float amp_frica; /* AF converted to linear gain              */
   float amp_breth; /* ATURB converted to linear gain           */
   float amp_gain0; /* G0 converted to linear gain              */
-  int num_samples; /* number of glottal samples */
+  int16_t num_samples; /* number of glottal samples */
   float sample_factor; /* multiplication factor for glottal samples */
-  int *natural_samples; /* pointer to an array of glottal samples */
-  unsigned int original_f0; /* original value of f0 not modified by flutter */
+  int16_t *natural_samples; /* pointer to an array of glottal samples */
+  uint16_t original_f0; /* original value of f0 not modified by flutter */
 
   resonator_t rnpp; /* internal storage for resonators */
   resonator_t r1p;
@@ -109,53 +109,12 @@ typedef struct
   
 /** @brief The audio characteristics of an audio frame.
   */
-typedef struct
-{
-  unsigned int F0hz10; /* Voicing fund freq in Hz                          */        
-  unsigned int AVdb;   /* Amp of voicing in dB,            0 to   70       */        
-  unsigned int F1hz;   /* First formant freq in Hz,        200 to 1300     */        
-  unsigned int B1hz;   /* First formant bw in Hz,          40 to 1000      */        
-  unsigned int F2hz;   /* Second formant freq in Hz,       550 to 3000     */        
-  unsigned int B2hz;   /* Second formant bw in Hz,         40 to 1000      */        
-  unsigned int F3hz;   /* Third formant freq in Hz,        1200 to 4999    */        
-  unsigned int B3hz;   /* Third formant bw in Hz,          40 to 1000      */        
-  unsigned int F4hz;   /* Fourth formant freq in Hz,       1200 to 4999    */        
-  unsigned int B4hz;   /* Fourth formant bw in Hz,         40 to 1000      */        
-  unsigned int F5hz;   /* Fifth formant freq in Hz,        1200 to 4999    */        
-  unsigned int B5hz;   /* Fifth formant bw in Hz,          40 to 1000      */        
-  unsigned int F6hz;   /* Sixth formant freq in Hz,        1200 to 4999    */        
-  unsigned int B6hz;   /* Sixth formant bw in Hz,          40 to 2000      */        
-  unsigned int FNZhz;  /* Nasal zero freq in Hz,           248 to  528     */        
-  unsigned int BNZhz;  /* Nasal zero bw in Hz,             40 to 1000      */        
-  unsigned int FNPhz;  /* Nasal pole freq in Hz,           248 to  528     */        
-  unsigned int BNPhz;  /* Nasal pole bw in Hz,             40 to 1000      */        
-  unsigned int ASP;    /* Amp of aspiration in dB,         0 to   70       */        
-  unsigned int Kopen;  /* # of samples in open period,     10 to   65      */        
-  unsigned int Aturb;  /* Breathiness in voicing,          0 to   80       */        
-  unsigned int TLTdb;  /* Voicing spectral tilt in dB,     0 to   24       */        
-  unsigned int AF;     /* Amp of frication in dB,          0 to   80       */        
-  unsigned int Kskew;  /* Skewness of alternate periods,   0 to   40 in sample#/2  */
-  unsigned int A1;     /* Amp of par 1st formant in dB,    0 to   80       */        
-  unsigned int B1phz;  /* Par. 1st formant bw in Hz,       40 to 1000      */        
-  unsigned int A2;     /* Amp of F2 frication in dB,       0 to   80       */        
-  unsigned int B2phz;  /* Par. 2nd formant bw in Hz,       40 to 1000      */        
-  unsigned int A3;     /* Amp of F3 frication in dB,       0 to   80       */        
-  unsigned int B3phz;  /* Par. 3rd formant bw in Hz,       40 to 1000      */        
-  unsigned int A4;     /* Amp of F4 frication in dB,       0 to   80       */        
-  unsigned int B4phz;  /* Par. 4th formant bw in Hz,       40 to 1000      */        
-  unsigned int A5;     /* Amp of F5 frication in dB,       0 to   80       */        
-  unsigned int B5phz;  /* Par. 5th formant bw in Hz,       40 to 1000      */        
-  unsigned int A6;     /* Amp of F6 (same as r6pa),        0 to   80       */        
-  unsigned int B6phz;  /* Par. 6th formant bw in Hz,       40 to 2000      */        
-  unsigned int ANP;    /* Amp of par nasal pole in dB,     0 to   80       */        
-  unsigned int AB;     /* Amp of bypass fric. in dB,       0 to   80       */        
-  unsigned int AVpdb;  /* Amp of voicing,  par in dB,      0 to   70       */        
-  unsigned int Gain0;  /* Overall gain, 60 dB is unity,    0 to   60       */        
- } klatt_frame_tt, *klatt_frame_ptrr;
 
-void simple_parwave(klatt_global_ptrr,klatt_frame_ptrr);
+void simple_parwave(klatt_global_ptrr,int16_t*);
 void simple_parwave_init(klatt_global_ptrr);
 void dosimpleklatt(void);
-void init_simpleklatt(void);
+void simpleklatt_init(void);
+void single_parwave(klatt_global_ptrr globals, int16_t* frame, u8 newframe, u16 samplenumber,u8 x, int16_t* outgoing);
+void dosimpleklattsamples(int16_t* outgoing, u8 size);
 
 #endif

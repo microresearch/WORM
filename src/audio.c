@@ -94,6 +94,7 @@ u16 x,xx;
 // LPCAnalyzer_init();
  sp0256_init();
  lpc_init(); 
+ simpleklatt_init();
 
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
@@ -282,9 +283,13 @@ float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
 u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  //  u8 x; static unsigned int readpos;
   // first without speed or any params - break down
   holmesrun(outgoing, size);
+};
+
+u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // first without speed or any params - break down
+  dosimpleklattsamples(outgoing, size);
 };
 
 //u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -303,7 +308,6 @@ u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float sam
 
 
 
-u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -381,9 +385,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 
-  mode=0;
+  mode=3;
   //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
-  genny* generator[]={tms5220gen,NULL,sp0256gen}; // or just as void/cast in function itself
+
+  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+
+  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL}; // or just as void/cast in function itself
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

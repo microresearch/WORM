@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "time.h"
 
 /*
       &frame->F0hz10, &frame->AVdb, 0,1
@@ -24,6 +25,23 @@
       &frame->A6,     &frame->B6phz,
       &frame->ANP,    &frame->AB,
       &frame->AVpdb,  &frame->Gain0);
+
+Warning: glottal open period cannot exceed T0, truncated as was 196 T0=132
+
+// see genparam.c - what are important ones, how they depend on each other esp. F0 and nopen/T0 timings:
+
+    // T0 is 4* the number of samples in one pitch period
+
+    globals->T0 = (40 * globals->samrate) / frame->F0hz10;
+
+and nopen (=4x Kopen in the frame) cannot be > T0
+
+// in our test case samrate is 8000 so x40=320,000 / F0hz which starts at 1000 = less than 320 /4 for kopen=80
+
+// how do we calculate this
+
+kopen must be < 80000/f0
+
 */
 
 typedef struct
@@ -46,6 +64,7 @@ void main(void){
   int x,y;
 
   framer frame[40];
+  srand (time(NULL));
 
     for (y=0;y<40;y++){
       frame[y].val=val[y];
@@ -64,6 +83,10 @@ void main(void){
 	// forwards
 	val[y]+=rand()%((maxs[y]-mins[y])/10); // later do as table
 	if (val[y]>maxs[y]) dir[y]=2;
+	if (y==19){ // kopen?
+	  printf("val %d KKK %d\n",val[19],320000/val[0]);
+	  if (val[19]>=(80000/val[0])) dir[19]=2;
+	}
 	break;
       case 2:
 	// backwards

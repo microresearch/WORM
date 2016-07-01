@@ -2648,11 +2648,17 @@ BREAKOUT all raven notes - plague wavetable
 
 - TODO: genparams see below and eg: Warning: glottal open period cannot exceed T0, truncated as was 196 T0=132
 
-** 1/7
+** 1/7 +
 
-- interpolation and general
+- generator for random/wormed LPC/TMS5220
+
+- interpolation and general stuff
 
 - each mode before worming part finalised
+
+- worm constraints not limits for each parameter table - so morelike scaling?
+
+- ported simpleklatt to generator - TO TEST and fix K0 problem in genparam - don't worry about this for moment
 
 * interpolations
 
@@ -2748,7 +2754,15 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 ** 2/RAW_KLATT parameters -> simpleklatt/nvp - also to wormings
 
-see genparam.c -> how that works on commandline?
+- port to generatorDONE -> to TEST!
+
+- how we break this out to knobs X/Y select and val as Z
+
+- how we get nvp.c array?
+
+- simpleklatt and genparam frames??????
+
+// see genparam.c -> how that works on commandline? test with wormings
 
 klatt in docs:
 
@@ -2757,12 +2771,6 @@ klatt in docs:
 : ./klatt -i genexample -r 2 -s 8000 -o test.raw and:
 
 : play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
-
-- how we break this out to knobs X/Y select and val as Z
-
-- how we get nvp.c array?
-
-- simpleklatt and genparam frames??????
 
 
 ** 3/SAM - test/re-work as not looked at for a while
@@ -2926,7 +2934,7 @@ Stop code   1111
 from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 
-** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters
+** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code
 
 
 * hardware2
