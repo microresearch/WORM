@@ -2650,15 +2650,38 @@ BREAKOUT all raven notes - plague wavetable
 
 ** 1/7 +
 
-- generator for random/wormed LPC/TMS5220
+TODO:
 
-- interpolation and general stuff
+- generator for random/wormed LPC/TMS5220 TODO
 
-- each mode before worming part finalised
+- interpolation and general stuff TODO
 
-- worm constraints not limits for each parameter table - so morelike scaling?
+- each mode before worming part finalised TODO-sam, tube, vosim
 
-- ported simpleklatt to generator - TO TEST and fix K0 problem in genparam - don't worry about this for moment
+- worm constraints not limits for each parameter table - so more like scaling?
+
+- ported simpleklatt to generator - TO TEST and fix K0 problem in
+  genparam - don't worry about this for moment WORKING sort of - port worming into this!
+
+- /root/mame2/src/mess/drivers/tispeak.c ??? ROMS-> tmc0351n2l.vsm???? 5110?
+
+- NLP in text.c - rsynth - text to speech?? do we need this? cut down to what is needed!!!!
+
+- for speed change use other examples in audio.c and take size out of klatt, simpleklatt generators into audio.c
+
+- clean main.c and audio.c -> dump
+
+- 5110 - tables and pitch size // 5200 and test mess/mame code roughly for new speak and spell roms in lpc_reader
+
+- compare mess/mame 5220 code and talkie - port mess/mame code
+
+file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer, unsigned int size)]]
+
+eg. 
+
+- talkie/lpc.c uses TI_0280_PATENT_CHIRP rather than LATER_CHIRP
+  (tms5110r.hxx all refs), pitch is close but bit off, how do coefefs
+  work as there is like bit shifts
 
 * interpolations
 
@@ -2693,15 +2716,17 @@ upsample=interpolate - do we need filter as this is on output?
 
 - wormings - plot first on PC-DONE
 
-- worm wavetable-2d?-> how is implemented in braids - *LEAVE FOR RAVEN*
+- worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN*
+
+[[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWaveMap(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWaveMap(]]
+
+wt_waves is: 256*129=33024 bytes??? how is generated...
 
 ///////
 
 - finish LPC vocabulary - refine/clean upDONE  - DO BANKS
 
 - new sp0256-DONE and vocabTODO - report on both TMS-DONE and sp0256 ROMs // [digitalk/s14001a?]
-
-- controls X,Y.Z and mode rundown
 
 - test and evaluate all algos//plan modes// 
 
@@ -2736,9 +2761,19 @@ subdivide or get rid of say talko as is duplicates...
 
 - pausing/breaks/repeat???
 
+- does it sound different if we use mame audio process code?
+
+[[file:~/mame2/src/emu/sound/tms5220.c::void%20tms5220_device::process(INT16%20*buffer,%20unsigned%20int%20size)][file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer, unsigned int size)]]
+
+** 0.5 raw LPC/TMS5220 also to later wormings
+
+in lpc_say.c
+  
 ** 1/KLATT
 
 - SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!
+
+Todo speed etc... triggers
 
 we need maybe length of sentence, and x,y for phoneme and position (but also stress and dur for each phoneme?)
 
@@ -2754,14 +2789,19 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 ** 2/RAW_KLATT parameters -> simpleklatt/nvp - also to wormings
 
-- port to generatorDONE -> to TEST!
+- port to generatorDONE -> to TEST! WORKING but needs tweaking, speed and triggers///alll!!
 
-- how we break this out to knobs X/Y select and val as Z
-
-- how we get nvp.c array?
+- what changes/can change WITHIN the frame?
 
 - simpleklatt and genparam frames??????
 
+- how we figure x/y/z and continuation of frames/reset...
+
+x sets param, y sets contour and z???
+
+/// bother with nvp: - how we get nvp.c array?
+
+//////////////
 // see genparam.c -> how that works on commandline? test with wormings
 
 klatt in docs:
@@ -2772,6 +2812,7 @@ klatt in docs:
 
 : play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 8000 test.raw
 
+//////
 
 ** 3/SAM - test/re-work as not looked at for a while
 
@@ -2869,7 +2910,16 @@ https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
 [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]], 
 
-ROMS:
+5110/speak and spell: VSM- http://www.seanriddle.com/speakandspell.html voice synth memory... we have 
+
+tmc0351n2l.vsm
+tmc0352n2l.vsm
+
+see also http://ploguechipsounds.blogspot.de/2014/12/chipspeech-diary-part-2.html
+
+how is 5110 differing from 5220? check bits for pitch and tables :
+
+5 pitch bits rather than 6 for 5200
 
 digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 

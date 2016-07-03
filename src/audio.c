@@ -283,12 +283,12 @@ float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
 u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down
+  // first without speed or any params - break down as above in tms, spo256
   holmesrun(outgoing, size);
 };
 
 u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down
+  // first without speed or any params - break down as above in tms, spo256
   dosimpleklattsamples(outgoing, size);
 };
 
@@ -382,11 +382,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  //u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,LPCanalyzer,fullklatt,sp0256};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
-
-
   mode=3;
-  //  genny* generator[]={tms5220gen,NULL,NULL,sp0256gen}; // or just as void/cast in function itself
 
   u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 

@@ -69,12 +69,12 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint8_t value;
 	uint16_t data;
 	
-	//			data = byte_rev[*ptrAddr]<<8;
-	data = (*ptrAddr)<<8;
+	data = byte_rev[*ptrAddr]<<8;
+	//	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-	  //      data |= byte_rev[*(ptrAddr+1)];
-	  	   data |= *(ptrAddr+1);
+	  data |= byte_rev[*(ptrAddr+1)];
+	  //  	   data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
 	value = data >> (16-num_bits);
@@ -82,7 +82,7 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	didntjump=1;
 	if (ptrBit >= 8)
 	{
-	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
+	  //	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
 	  //	  fprintf(stderr, "lastbyte: 0x%x\n", *ptrAddr);
 
 	  //	  	  printf("0x%X, ",*ptrAddr);
@@ -201,7 +201,7 @@ void lpc_update_coeffs(void)
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
 	//	printf("};\n{");
-	// 	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
+	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
 
 
 		}
@@ -276,7 +276,7 @@ void lpc_update_coeffs(void)
 		for(i=0;i<10;i++)
 			synthK[i] += (nextK[i]-synthK[i])>>EXPO_SHIFT;
 	}
-	       		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod);
+		//	       		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod);
 }
 
 /*
@@ -363,13 +363,14 @@ void main(int argc, char *argv[]){
    //   xxx[lengthy]=0;
 
    // speak that buffer
-   //        while(flag==0){  
-//	      	fprintf(stderr, "OFF: %d\r", uffset);
+   //           while(flag==0){  
+   //	      	fprintf(stderr, "OFF: %d\r", uffset);
           lpc_say(xxx+uffset);
-	  	  	  while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
+	  //	  while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
 	  //	  while(synth_running) lpc_running();
-	  //       uffset++;
-	  //           if (uffset>lengthy) flag=1;
+	  while(1) lpc_running();
+	  //	  uffset++;
+	  //	  if (uffset>lengthy) flag=1;
 	  //	  	                while(1) lpc_running();
-				//	           }
+	  // }
 }
