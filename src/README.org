@@ -2656,7 +2656,7 @@ TODO:
 
 - interpolation and general stuff TODO
 
-- each mode before worming part finalised TODO-sam, tube, vosim
+- each mode before worming part finalised TODO-samPART_DONE, tube, vosim
 
 - worm constraints not limits for each parameter table - so more like scaling?
 
@@ -2673,7 +2673,7 @@ TODO:
 
 - 5110 - tables and pitch size // 5200 and test mess/mame code roughly for new speak and spell roms in lpc_reader
 
-- compare mess/mame 5220 code and talkie - port mess/mame code
+- compare mess/mame 5220 code and talkie - port mess/mame code. compare basics in lpc_say
 
 file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer, unsigned int size)]]
 
@@ -2682,6 +2682,26 @@ eg.
 - talkie/lpc.c uses TI_0280_PATENT_CHIRP rather than LATER_CHIRP
   (tms5110r.hxx all refs), pitch is close but bit off, how do coefefs
   work as there is like bit shifts
+
+** 4/7
+
+- SAM, sam.c working on lap (sam_lap: gcc sam_lap.c render_lap.c -o
+  sam) - test with speed on STM: TODO: changes to speech array and how
+  we lookup into this, how and when we can change pitch etc, what else
+  can be changed, speed and interpol in audio.c, number of bits we use is correct
+  at 4 bits, timetableindex (work with interpol) in render.c in:
+
+  /root/projects/ERD_modules/worm/src/sam2/SAM: from  https://github.com/s-macke/SAM/blob/master/src/render.c
+
+[apart from this versions we have are the same]
+
+- TUBE - see interpolation code
+
+- 5110 - lpc_reader changed for 5110 renders  ./lpcr 0 0 /root/Downloads/speaky/tmc0351n2l.vsm > /dev/dsp  from 1024+
+
+looking at newchirp.. compare for 5200! switch on banks?
+
+*- maybe wrap up code we have so far-.trm,sp0256,klatt,rawklatt,sam - 5 modes and lap tests first*
 
 * interpolations
 

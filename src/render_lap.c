@@ -1,8 +1,19 @@
-#include "audio.h"
+//#include "audio.h"
 #include "render.h"
 #include "RenderTabs.h"
 
 #define abs(a)	   (((a) < 0) ? -(a) : (a))
+
+typedef unsigned char uint8_t;
+typedef unsigned char u8; 
+typedef signed char int8_t;
+typedef unsigned short uint16_t;
+typedef unsigned short u16;
+typedef unsigned short u16;
+typedef signed short int16_t;
+typedef unsigned int uint32_t;
+typedef signed int int32_t;
+
 
 unsigned char wait1 = 7;
 unsigned char wait2 = 6;
@@ -208,14 +219,14 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 	// if bit set, output 26
 	X = 26;
 	//	Output(3, X);
-	*sample=((X)<<12)-32768; // check >>12???
+	*sample=((X)<<12);//-32768; // check >>12???
       } else
       {
 	//timetable 4
 	// bit is not set, output a 6
 	X=6;
 	//	Output(4, X);
-	*sample=((X)<<12)-32768; // check >>12???
+	*sample=((X)<<12);//-32768; // check >>12???
       }
 
     mem56--;
@@ -303,14 +314,14 @@ pos48280:
 		//mem[54296] = X;
         // output the byte
 		//		Output(1, X);
-		*sample=((X&15)<<12)-32768; // check >>12??? .. but we can't output further one?
+		*sample=((X&15)<<12);//-32768; // check >>12??? .. but we can't output further one?
 		if (X!=0) return 4;
 		else return 6;
 	}		// if X != 0, exit loop
 		//		if(X != 0) goto pos48296;
 pos48295:
 	//		Output(2, 5);
-	*sample=((5)<<12)-32768; // check >>12???
+	*sample=((5)<<12);//-32768; // check >>12???
 
 pos48296:
 	X = 0;
@@ -378,7 +389,7 @@ u8 rendersamsample(int16_t* sample){
 			//mem[54296] = A;
 			
 			// output the accumulated value
-			*sample=((A&255)<<8)-32768; // 4 bits over from above
+			*sample=((A&255)<<8);//-32768; 1 byte
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;

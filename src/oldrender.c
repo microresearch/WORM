@@ -21,35 +21,63 @@ extern unsigned char speedd;
 extern unsigned char pitch;
 extern int singmode;
 
-//unsigned char phase1 = 0;  //mem43
-unsigned char phase2;
-unsigned char phase3;
-unsigned char mem66;
-unsigned char mem38;
-unsigned char mem40;
-unsigned char speedcounter; //mem45
-unsigned char mem48;
-
+extern int16_t audio_buffer[AUDIO_BUFSZ]; 
 
 extern unsigned char phonemeIndexOutput[60]; //tab47296
 extern unsigned char stressOutput[60]; //tab47365
 extern unsigned char phonemeLengthOutput[60]; //tab47416
 
-unsigned char pitches[256]; // tab43008
+unsigned char pitches[256] __attribute__ ((section (".ccmdata"))); // tab43008
 
-unsigned char frequency1[256];
-unsigned char frequency2[256];
-unsigned char frequency3[256];
+unsigned char frequency1[256] __attribute__ ((section (".ccmdata")));
+unsigned char frequency2[256] __attribute__ ((section (".ccmdata")));
+unsigned char frequency3[256] __attribute__ ((section (".ccmdata")));
 
-unsigned char amplitude1[256];
-unsigned char amplitude2[256];
-unsigned char amplitude3[256];
+unsigned char amplitude1[256] __attribute__ ((section (".ccmdata")));
+unsigned char amplitude2[256] __attribute__ ((section (".ccmdata")));
+unsigned char amplitude3[256] __attribute__ ((section (".ccmdata")));
 
-unsigned char sampledConsonantFlag[256]; // tab44800
+unsigned char sampledConsonantFlag[256] __attribute__ ((section (".ccmdata"))); // tab44800
 
 
 void AddInflection(unsigned char mem48, unsigned char phase1);
 unsigned char trans(unsigned char mem39212, unsigned char mem39213);
+
+
+// contains the final soundbuffer
+//extern int bufferpos;
+//extern char *buffer;
+
+//timetable for more accurate c64 simulation
+/*int timetable[5][5] =
+{
+	{162, 167, 167, 127, 128},
+	{226, 60, 60, 0, 0},
+	{225, 60, 59, 0, 0},
+	{200, 0, 0, 54, 55},
+	{199, 0, 0, 54, 54}
+	};*/
+
+void Output(int index, unsigned char A)
+{
+  //	static unsigned oldtimetableindex = 0;
+	static u16 samcount=0;
+	//	int x;
+	//	int wait = timetable[oldtimetableindex][index];
+	//	oldtimetableindex = index;
+	// wait a few us according to the wait variable
+	//	out = A & 15;
+	//	printf("%c",A&15);
+	audio_buffer[samcount++]=((u16)(A&15)<<12)-32768;
+	if (samcount>=AUDIO_BUFSZ) samcount=0;
+	/*	audio_buffer[samcount++]=((A&15)<<10)-32768;
+	if (samcount-=AUDIO_BUFSZ) samcount=0;
+	audio_buffer[samcount++]=((A&15)<<10)-32768;
+	if (samcount==AUDIO_BUFSZ) samcount=0;
+	audio_buffer[samcount++]=((A&15)<<10)-32768;
+	if (samcount==AUDIO_BUFSZ) samcount=0;
+	*/
+}
 
 //written by me because of different table positions.
 // mem[47] = ...
@@ -146,111 +174,10 @@ void Write(unsigned char p, unsigned char Y, unsigned char value)
 //
 // For voices samples, samples are interleaved between voiced output.
 
-u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 
-  static unsigned char phase1;
-  int tempA;
-
-  if (state==0){ // beginning /////////
-	// current phoneme's index
-	mem49 = Y;
-
-	// mask low three bits and subtract 1 get value to 
-	// convert 0 bits on unvoiced samples.
-	A = mem39&7;
-	X = A-1;
-
-    // store the result
-	mem56 = X;
-	
-	// determine which offset to use from table { 0x18, 0x1A, 0x17, 0x17, 0x17 }
-	// T, S, Z                0          0x18
-	// CH, J, SH, ZH          1          0x1A
-	// P, F*, V, TH, DH       2          0x17
-	// /H                     3          0x17
-	// /X                     4          0x17
-
-    // get value from the table
-	mem53 = tab48426[X];
-	mem47 = X;      //46016+mem[56]*256
-	
-	// voiced sample?
-	Y = mem49;
-	A = pitches[mem49] >> 4;
-
-	// handle voiced samples here
-	// number of samples?
-	phase1 = A ^ 255;
-	Y = *mem66;
-	state=2; // jump to outer loop
-  } // 0 state
-
-  // outer loop
-
-  if (state==2) {
-    mem56 = 8;
-    //A = Read(mem47, Y);
-    // fetch value from table
-    A = sampleTable[mem47*256+Y];
-    state=1;
-  }
-
-  // inner loop
-  if (state==1) {
-    //48327: ASL A
-    //48328: BCC 48337
-			
-    // left shift and check high bit
-    tempA = A;
-    A = A << 1;
-    if ((tempA & 128) != 0)
-      {
-	// if bit set, output 26
-	X = 26;
-	//	Output(3, X);
-	*sample=((X)<<12)-32768; // check >>12???
-      } else
-      {
-	//timetable 4
-	// bit is not set, output a 6
-	X=6;
-	//	Output(4, X);
-	*sample=((X)<<12)-32768; // check >>12???
-      }
-
-    mem56--;
-    if (mem56==0) {
-      state=2; // outer loop
-      Y++;
-      // continue until counter done
-      phase1++;
-
-    if (phase1 == 0) { //started - first inc we don't check
-      state=0;
-	// restore values and return - when?
-      	A = 1;
-	mem44 = 1;
-	*mem66 = Y;
-	Y = mem49;
-	//	return 0;
-    }
-    }
-    ///////////////
-
-  }
-  return state;
-		////////////////////////
-  }
-
-u8 renderunvoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
-
-  if (state==3) goto pos48274;
-  else if (state==4) goto pos48296;
-  else if (state==5) goto pos48280;
-  else if (state==6) goto pos48295;
-
-  // A&248 !=0
-
+// Code48227()
+void RenderSample(unsigned char *mem66)
+{     
 	int tempA;
 	// current phoneme's index
 	mem49 = Y;
@@ -276,9 +203,17 @@ u8 renderunvoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 	
 	// voiced sample?
 	A = mem39 & 248;
-
+	if(A == 0)
+	{
+        // voiced phoneme: Z*, ZH, V*, DH
+		Y = mem49;
+		A = pitches[mem49] >> 4;
+		
+		// jump to voiced portion
+		goto pos48315;
+	}
+	
 	Y = A ^ 255;
-
 pos48274:
          
     // step through the 8 bits in the sample
@@ -287,7 +222,6 @@ pos48274:
 	// get the next sample from the table
     // mem47*256 = offset to start of samples
 	A = sampleTable[mem47*256+Y];
-
 pos48280:
 
     // left shift to get the high bit
@@ -302,198 +236,127 @@ pos48280:
 		X = mem53;
 		//mem[54296] = X;
         // output the byte
-		//		Output(1, X);
-		*sample=((X&15)<<12)-32768; // check >>12??? .. but we can't output further one?
-		if (X!=0) return 4;
-		else return 6;
-	}		// if X != 0, exit loop
-		//		if(X != 0) goto pos48296;
-pos48295:
-	//		Output(2, 5);
-	*sample=((5)<<12)-32768; // check >>12???
+		Output(1, X);
+		// if X != 0, exit loop
+		if(X != 0) goto pos48296;
+	}
+	
+	// output a 5 for the on bit
+	Output(2, 5);
 
+	//48295: NOP
 pos48296:
+
 	X = 0;
 
     // decrement counter
 	mem56--;
-	if (mem56 != 0) return 5;
+	
+	// if not done, jump to top of loop
+	if (mem56 != 0) goto pos48280;
 	
 	// increment position
 	Y++;
-	//	if (Y != 0) goto pos48274
-	if (Y != 0) return 3;
+	if (Y != 0) goto pos48274;
 	
 	// restore values and return
 	mem44 = 1;
 	Y = mem49;
-	return 0; // return state which is - ended?
+	return;
 
-}
 
-u8 rendersamsample(int16_t* sample){
-  static u8 state=0;
-  static unsigned char phase1 = 0;  //mem43
-  u8 carry=0;
-  static u8 secondstate=0;
-  u8 nosample=1;
-  
-  while (nosample){
+	unsigned char phase1;
 
-    if (state==3 || state==4 || state==5 || state==6){ // in process of rendering unvoiced sample
-      state=renderunvoicedsample(&mem66,sample,state);
-      if (state==0){			// skip ahead two in the phoneme buffer - once we're done
-		  Y += 2;
-		  mem48 -= 2;
-		  state=1; secondstate=0;
-		  if(mem48 == 0) 	return 1; // ended
-		  speedcounter = speedd;
-      }
-      return 0;
-    }
-        // get the sampled information on the phoneme
-    else  if (state==0)
-    {
-		A = sampledConsonantFlag[Y];
-		mem39 = A;
+pos48315:
+// handle voiced samples here
+
+   // number of samples?
+	phase1 = A ^ 255;
+
+	Y = *mem66;
+	do
+	{
+		//pos48321:
+
+        // shift through all 8 bits
+		mem56 = 8;
+		//A = Read(mem47, Y);
 		
-		// unvoiced sampled phoneme?
-		A = A & 248;
-		if(A != 0)
+		// fetch value from table
+		A = sampleTable[mem47*256+Y];
+
+        // loop 8 times
+		//pos48327:
+		do
 		{
-            // render the sample for the phoneme
-		  //FILL IN			RenderSample(&mem66);
-		  state=renderunvoicedsample(&mem66,sample,state);
-		  return 0;
-		} else
-		  ///////
-		  {
-            // simulate the glottal pulse and formants
-			mem56 = multtable[sinus[phase1] | amplitude1[Y]];
-			carry = 0;
-			if ((mem56+multtable[sinus[phase2] | amplitude2[Y]] ) > 255) carry = 1;
-			mem56 += multtable[sinus[phase2] | amplitude2[Y]];
-			A = mem56 + multtable[rectangle[phase3] | amplitude3[Y]] + (carry?1:0);
-			A = ((A + 136) & 255); //there must be also a carry - took out >>4
-			//mem[54296] = A;
+			//48327: ASL A
+			//48328: BCC 48337
 			
-			// output the accumulated value
-			*sample=((A&255)<<8)-32768; // 4 bits over from above
-			speedcounter--;
-			if (speedcounter != 0) { //goto pos48155;
-			  secondstate=0;
-			  state=1;
-			  return 0;
+			// left shift and check high bit
+			tempA = A;
+			A = A << 1;
+			if ((tempA & 128) != 0)
+			{
+                // if bit set, output 26
+				X = 26;
+				Output(3, X);
+			} else
+			{
+				//timetable 4
+				// bit is not set, output a 6
+				X=6;
+				Output(4, X);
 			}
-			//			else{
-			Y++; //go to next amplitude
-			// decrement the frame count
-			mem48--;
-			if(mem48 == 0) {
-			  //			  state=0; // NON?
-			  return 1; // ended frame
-			}	
-			speedcounter = speedd;
-			state=1; secondstate=0;
-			return 0;
-			//			} // else
-		} // A/0
-    } // state is zero // we always OUT
-		
-  else if (state==1){
 
-    if (secondstate!=0) {
-      secondstate=rendervoicedsample(&mem66,sample,secondstate);
-		  if (secondstate==0) {
-		
-			A = pitches[Y];
-			mem44 = A;
-			A = A - (A>>2);
-			mem38 = A;
-			
-			// reset the formant wave generators to keep them in 
-			// sync with the glottal pulse
-			phase1 = 0;
-			phase2 = 0;
-			phase3 = 0;
-			//			continue;
-			state = 0;  // but state shouldn't reset until secondstate is 0;
-		//		goto pos48159;
-			//    }
-			return 0;
-		  }
-    }
-    else {
-        // decrement the remaining length of the glottal pulse
-		mem44--;
-		
-		// finished with a glottal pulse?
-		if(mem44 == 0)
-		{
-		  //		pos48159:
-            // fetch the next glottal pulse length
-			A = pitches[Y];
-			mem44 = A;
-			A = A - (A>>2);
-			mem38 = A;
-			
-			// reset the formant wave generators to keep them in 
-			// sync with the glottal pulse
-			phase1 = 0;
-			phase2 = 0;
-			phase3 = 0;
-			state = 0; // is this so? - but we haven't returned a sample/???
-			continue;
-			//			return 0;
-		}
-		
-		// decrement the count
-		mem38--;
-		
-		// is the count non-zero and the sampled flag is zero?
-		if((mem38 != 0) || (mem39 == 0))
-		{
-            // reset the phase of the formants to match the pulse
-			phase1 += frequency1[Y];
-			phase2 += frequency2[Y];
-			phase3 += frequency3[Y];
-			state = 0; // is this so? no sample so circulate
-			continue;
-			//			return 0;
-		}
-		
-		// voiced sampled phonemes interleave the sample with the
-		// glottal pulse. The sample flag is non-zero, so render
-		// the sample for the phoneme.
+			mem56--;
+		} while(mem56 != 0);
 
-		//FILL IN		RenderSample(&mem66);
-		  secondstate=rendervoicedsample(&mem66,sample,secondstate);
-		  if (secondstate==0) { // finish render
+        // move ahead in the table
+		Y++;
 		
-			A = pitches[Y];
-			mem44 = A;
-			A = A - (A>>2);
-			mem38 = A;
-			
-			// reset the formant wave generators to keep them in 
-			// sync with the glottal pulse
-			phase1 = 0;
-			phase2 = 0;
-			phase3 = 0;
-			//			continue;
-			state = 0;  // but state shouldn't reset until secondstate is 0;
-		//		goto pos48159;
-			//    }
-		  }
-    }
-			return 0;
-  }
-}
+		// continue until counter done
+		phase1++;
+
+	} while (phase1 != 0);
+	//	if (phase1 != 0) goto pos48321;
+	
+	// restore values and return
+	A = 1;
+	mem44 = 1;
+	*mem66 = Y;
+	Y = mem49;
+	return;
 }
 
-void renderframe(){
 
+
+// RENDER THE PHONEMES IN THE LIST
+//
+// The phoneme list is converted into sound through the steps:
+//
+// 1. Copy each phoneme <length> number of times into the frames list,
+//    where each frame represents 10 milliseconds of sound.
+//
+// 2. Determine the transitions lengths between phonemes, and linearly
+//    interpolate the values across the frames.
+//
+// 3. Offset the pitches by the fundamental frequency.
+//
+// 4. Render the each frame.
+
+
+
+//void Code47574()
+void Render()
+{
 	unsigned char phase1 = 0;  //mem43
+	unsigned char phase2;
+	unsigned char phase3;
+	unsigned char mem66;
+	unsigned char mem38;
+	unsigned char mem40;
+	unsigned char speedcounter; //mem45
+	unsigned char mem48;
 	int i;
 	int carry;
 	if (phonemeIndexOutput[0] == 255) return; //exit if no data
@@ -790,7 +653,7 @@ do
 	phase2 = 0;
 	phase3 = 0;
 	mem49 = 0;
-	speedcounter = 72; //sam standard speed
+	speedcounter = 72; //sam standard speed=72
 
 // RESCALE AMPLITUDE
 //
@@ -812,24 +675,155 @@ do
 	mem38 = A - (A>>2);     // 3/4*A ???
 
 
+// PROCESS THE FRAMES
+//
+// In traditional vocal synthesis, the glottal pulse drives filters, which
+// are attenuated to the frequencies of the formants.
+//
+// SAM generates these formants directly with sin and rectangular waves.
+// To simulate them being driven by the glottal pulse, the waveforms are
+// reset at the beginning of each glottal pulse.
+
+	//finally the loop for sound output
+	//pos48078:
+	while(1)
+	{
+        // get the sampled information on the phoneme
+		A = sampledConsonantFlag[Y];
+		mem39 = A;
+		
+		// unvoiced sampled phoneme?
+		A = A & 248;
+		if(A != 0)
+		{
+            // render the sample for the phoneme
+			RenderSample(&mem66);
+			
+			// skip ahead two in the phoneme buffer
+			Y += 2;
+			mem48 -= 2;
+		} else
+		{
+            // simulate the glottal pulse and formants
+			mem56 = multtable[sinus[phase1] | amplitude1[Y]];
+
+			carry = 0;
+			if ((mem56+multtable[sinus[phase2] | amplitude2[Y]] ) > 255) carry = 1;
+			mem56 += multtable[sinus[phase2] | amplitude2[Y]];
+			A = mem56 + multtable[rectangle[phase3] | amplitude3[Y]] + (carry?1:0);
+			A = ((A + 136) & 255) >> 4; //there must be also a carry
+			//mem[54296] = A;
+			
+			// output the accumulated value
+			Output(0, A);
+			speedcounter--;
+			if (speedcounter != 0) goto pos48155;
+			Y++; //go to next amplitude
+			
+			// decrement the frame count
+			mem48--;
+		}
+		
+		// if the frame count is zero, exit the loop
+		if(mem48 == 0) 	return;
+		speedcounter = speedd;
+pos48155:
+         
+        // decrement the remaining length of the glottal pulse
+		mem44--;
+		
+		// finished with a glottal pulse?
+		if(mem44 == 0)
+		{
+pos48159:
+            // fetch the next glottal pulse length
+			A = pitches[Y];
+			mem44 = A;
+			A = A - (A>>2);
+			mem38 = A;
+			
+			// reset the formant wave generators to keep them in 
+			// sync with the glottal pulse
+			phase1 = 0;
+			phase2 = 0;
+			phase3 = 0;
+			continue;
+		}
+		
+		// decrement the count
+		mem38--;
+		
+		// is the count non-zero and the sampled flag is zero?
+		if((mem38 != 0) || (mem39 == 0))
+		{
+            // reset the phase of the formants to match the pulse
+			phase1 += frequency1[Y];
+			phase2 += frequency2[Y];
+			phase3 += frequency3[Y];
+			continue;
+		}
+		
+		// voiced sampled phonemes interleave the sample with the
+		// glottal pulse. The sample flag is non-zero, so render
+		// the sample for the phoneme.
+		RenderSample(&mem66);
+		goto pos48159;
+	} //while
+
+
+    // The following code is never reached. It's left over from when
+    // the voiced sample code was part of this loop, instead of part
+    // of RenderSample();
+
+	//pos48315:
+	/*	int tempA;
+	phase1 = A ^ 255;
+	Y = mem66;
+	do
+	{
+		//pos48321:
+
+		mem56 = 8;
+		A = Read(mem47, Y);
+
+		//pos48327:
+		do
+		{
+			//48327: ASL A
+			//48328: BCC 48337
+			tempA = A;
+			A = A << 1;
+			if ((tempA & 128) != 0)
+			{
+				X = 26;
+				// mem[54296] = X;
+				bufferpos += 150;
+				buffer[bufferpos/50] = (X & 15)*16;
+			} else
+			{
+				//mem[54296] = 6;
+				X=6; 
+				bufferpos += 150;
+				buffer[bufferpos/50] = (X & 15)*16;
+			}
+
+			for(X = wait2; X>0; X--); //wait
+			mem56--;
+		} while(mem56 != 0);
+
+		Y++;
+		phase1++;
+
+	} while (phase1 != 0);
+	*/
+	//	if (phase1 != 0) goto pos48321;
+	A = 1;
+	mem44 = 1;
+	mem66 = Y;
+	Y = mem49;
+	return;
 }
 
-
-// RENDER THE PHONEMES IN THE LIST
-//
-// The phoneme list is converted into sound through the steps:
-//
-// 1. Copy each phoneme <length> number of times into the frames list,
-//    where each frame represents 10 milliseconds of sound.
-//
-// 2. Determine the transitions lengths between phonemes, and linearly
-//    interpolate the values across the frames.
-//
-// 3. Offset the pitches by the fundamental frequency.
-//
-// 4. Render the each frame.
-
-//void Code47574()
 
 // Create a rising or falling inflection 30 frames prior to 
 // index X. A rising inflection is used for questions, and 

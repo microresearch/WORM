@@ -1,6 +1,7 @@
 #include "sam.h"
 #include "render.h"
 #include "SamTabs.h"
+#include <stdio.h>
 
 char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445
 //standard sam sound
@@ -16,10 +17,10 @@ char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445
 */
 
 
-unsigned char speedd = 100;
+unsigned char speedd = 72;
 unsigned char pitch = 64;
-unsigned char mouth = 150;
-unsigned char throat = 200;
+unsigned char mouth = 128;
+unsigned char throat = 128;
 int singmode = 1;
 
 
@@ -76,7 +77,7 @@ void SetMouthThroat(unsigned char mouth, unsigned char throat);
 void Init()
 {
 	int i;
-	SetMouthThroat( mouth, throat);
+	//	SetMouthThroat( mouth, throat);
 
 	/*
 	freq2data = &mem[45136];
@@ -149,7 +150,7 @@ u8 sam_newsay(void){
 	} while (X != 0);
 
 	//pos39848:
-	//	InsertBreath();
+	InsertBreath();
 	A=0; X=0; Y=0;
 	
 }
@@ -162,16 +163,17 @@ int16_t sam_get_sample(void){
   int16_t newsample;
   u8 ended=0,noout=1;
   static u8 beginning=1;
-  static u8 inphoneme=0; // do we need beginning or does it cycle round?
+  static inphoneme=0; // do we need beginning or does it cycle round?
   while (noout){
   if (!inphoneme){
-       A = phonemeindex[X];
+    A = phonemeindex[X];
     //    A=rand()%256;
       if (A == 255)
 	{
 	  A = 255;
 	  phonemeIndexOutput[Y] = 255;
 	  renderframe(); // this is a new frame - the end? but why we render
+	  //    printf("AA: %d X: %d ended %d\n",A,X,ended);
 	  beginning=0;
 	  inphoneme=1;
 	}
@@ -190,7 +192,7 @@ int16_t sam_get_sample(void){
 	{
 	  X++;
 	  continue;
-	}
+		}
       else {
     phonemeIndexOutput[Y] = A;
     phonemeLengthOutput[Y] = phonemeLength[X];
@@ -200,22 +202,25 @@ int16_t sam_get_sample(void){
     continue;
       }
   }
+
     // render the frame samples until we finish and then set inphoneme to 0!
-    ended=rendersamsample(&newsample);      
+      ended=rendersamsample(&newsample);      
+      printf("%c", newsample>>8);
+  //  ended=1;
     noout=0;
   // when we're finished with frame we need to set below:
 
   if (ended){
-    A = 1;
+    //	A = 1;
     mem44 = 1;
 	//	mem66 = Y;
-	Y = mem49;
+    Y = mem49;
 	inphoneme=0;
 	if (beginning==0){ // start again just to test now
 	  beginning=1;
-	  //	  sam_newsay();
+	  printf("BEG");
 	  A=0;X=0;Y=0;
-	  
+	  //	InsertBreath();
 	}
   }
   }
@@ -1378,6 +1383,13 @@ void Code47503(unsigned char mem52)
 
 }
 
+void main(){
+  sam_init();
+  sam_newsay();
+  while(1) {
+  sam_get_sample();
+  }
+}
 
 
 

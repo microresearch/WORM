@@ -1,6 +1,20 @@
 #ifndef SAM_H
 #define SAM_H
 
+#include "audio.h"
+
+/*
+typedef unsigned char uint8_t;
+typedef unsigned char u8; 
+typedef signed char int8_t;
+typedef unsigned short uint16_t;
+typedef unsigned short u16;
+typedef unsigned short u16;
+typedef signed short int16_t;
+typedef unsigned int uint32_t;
+typedef signed int int32_t;
+*/
+
 void SetInput(char *_input);
 void SetSpeed(unsigned char _speed);
 void SetPitch(unsigned char _pitch);
@@ -9,9 +23,10 @@ void SetThroat(unsigned char _throat);
 void EnableSingmode();
 void EnableDebug();
 
-int SAMINIT();
+int sam_init();
+u8 sam_newsay();
 int SAMMain();
-
+int16_t sam_get_sample();
 
 //char input[]={"/HAALAOAO MAYN NAAMAEAE IHSTT SAEBAASTTIHAAN \x9b\x9b\0"};
 //unsigned char input[]={"/HAALAOAO \x9b\0"};

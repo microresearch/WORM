@@ -29,6 +29,7 @@ LINEIN/OUTL-filter
 #include "parwave.h"
 #include "nvp.h"
 #include "lpc.h"
+#include "sam.h"
 #include "holmes.h"
 #include "sp0256.h"
 
@@ -95,6 +96,8 @@ u16 x,xx;
  sp0256_init();
  lpc_init(); 
  simpleklatt_init();
+ sam_init();
+ sam_newsay(); // TEST!
 
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
@@ -213,7 +216,18 @@ int16_t lastval=genstruct->prevsample;
  return size;
 };
 
-	 
+u16 sammy(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+ u8 xx=0,readpos;
+ int16_t samplel;
+ 	 
+ while (xx<size){
+   samplel=sam_get_sample();
+   outgoing[xx]=samplel;
+   xx++;
+ }
+
+}
+
 u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
@@ -283,12 +297,12 @@ float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
 u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down as above in tms, spo256
+  // first without speed or any params - break down as above in tms, spo256 - pull out size
   holmesrun(outgoing, size);
 };
 
 u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down as above in tms, spo256
+  // first without speed or any params - break down as above in tms, spo256 - pull out size
   dosimpleklattsamples(outgoing, size);
 };
 
@@ -382,11 +396,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=3;
+  mode=4;
 
-  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt,sammy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL}; // or just as void/cast in function itself
+  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,NULL}; // or just as void/cast in function itself would make sense
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

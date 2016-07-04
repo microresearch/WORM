@@ -8,7 +8,7 @@ const unsigned char stressInputTable[] __attribute__ ((section (".flash")))=
 };
 
 //tab40682
-const unsigned char signInputTable1[]= __attribute__ ((section (".flash"))){
+const unsigned char signInputTable1[] __attribute__ ((section (".flash")))={
 	' ', '.', '?', ',', '-', 'I', 'I', 'E',
 	'A', 'A', 'A', 'A', 'U', 'A', 'I', 'E',
 	'U', 'O', 'R', 'L', 'W', 'Y', 'W', 'R',
