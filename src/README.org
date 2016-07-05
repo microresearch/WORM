@@ -2680,26 +2680,43 @@ file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer
 eg. 
 
 - talkie/lpc.c uses TI_0280_PATENT_CHIRP rather than LATER_CHIRP
-  (tms5110r.hxx all refs), pitch is close but bit off, how do coefefs
-  work as there is like bit shifts
+  (tms5110r.hxx all refs), pitch is close but bit off, how do lpc oeffs
+  work as there is like bit shifts 
 
 ** 4/7
 
 - SAM, sam.c working on lap (sam_lap: gcc sam_lap.c render_lap.c -o
   sam) - test with speed on STM: TODO: changes to speech array and how
-  we lookup into this, how and when we can change pitch etc, what else
-  can be changed, speed and interpol in audio.c, number of bits we use is correct
-  at 4 bits, timetableindex (work with interpol) in render.c in:
+  we lookup into this, vocabulary, text to speech?, how and when we
+  can change pitch etc, what else can be changed, speed and interpol
+  in audio.c, number of bits we use is correct at 4 bits,
+  timetableindex (work with interpol) in render.c in:
 
   /root/projects/ERD_modules/worm/src/sam2/SAM: from  https://github.com/s-macke/SAM/blob/master/src/render.c
 
-[apart from this versions we have are the same]
+[apart from this, versions we have are the same]
 
 - TUBE - see interpolation code
 
-- 5110 - lpc_reader changed for 5110 renders  ./lpcr 0 0 /root/Downloads/speaky/tmc0351n2l.vsm > /dev/dsp  from 1024+
+- 5110/5200 - lpc_reader changed for 5110 renders okay  ./lpcr 0 0 /root/Downloads/speaky/tmc0351n2l.vsm > /dev/dsp  from 1024+
 
-looking at newchirp.. compare for 5200! switch on banks?
+changes to split and dump these speaknspell codes and maybe find more!
+
+looking at newchirp.. compare for 5200! switch these differences on banks? - newchirp and newperiod -> lpc_say
+
+morph chirp/pitch codes with wormings
+
+also INTERP_SHIFT?????
+
+[[file:~/mame/src/devices/sound/tms5220.cpp::m_current_energy%20%3D%20(m_current_energy%20%2B%20(((m_coeff->energytable%5Bm_new_frame_energy_idx%5D%20-%20m_current_energy)*(1-inhibit_state))%20INTERP_SHIFT))*(1-m_zpar)%3B][file:~/mame/src/devices/sound/tms5220.cpp::m_current_energy = (m_current_energy + (((m_coeff->energytable[m_new_frame_energy_idx] - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT))*(1-m_zpar);]]
+
+shift to new mame/mess code for tms????
+
+how filter works in talkie code for coeffs???? see: https://github.com/going-digital/Talkie/issues/6
+
+try coeff code only substitute for talkie...,,, also what about INTERP_SHIFT - RE_DO lpc_say with mame/mess code
+
+*wormed morphings of pitch and chirp tables*
 
 *- maybe wrap up code we have so far-.trm,sp0256,klatt,rawklatt,sam - 5 modes and lap tests first*
 
@@ -2836,7 +2853,7 @@ klatt in docs:
 
 ** 3/SAM - test/re-work as not looked at for a while
 
-how what we have differs from: https://github.com/s-macke/SAM/blob/master/src/main.c ???
+how what we have differs from: https://github.com/s-macke/SAM/blob/master/src/main.c ??? *see above*
 
 reciter which changes text to phonemes is difference
 
@@ -2989,6 +3006,8 @@ changing bandwidth,,, see other codes...
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
 - worm movements from paris python -> c-TESTING
+
+*- use audio_buffer which should be filled by all modes*
 
 *** LPC parameter mode
 
