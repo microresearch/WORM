@@ -84,7 +84,7 @@ extern unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr pars,s
 extern void parwave_init  (klatt_global_ptr);
 extern void pr_pars (void);
 extern void init_synth(void);
-extern int16_t parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns);
+extern unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns);
 extern  long samp_rate;
 
 

@@ -947,7 +947,7 @@ void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame){
 
 //    sample=parwavesinglesample(&klatt_global, &pars, samplenumber); 
 
-int16_t parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns){
+unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns){
 		static unsigned long seed = 5; /* Fixed staring value */
 		float noise;
 		int n4;

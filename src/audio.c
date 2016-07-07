@@ -33,6 +33,7 @@ LINEIN/OUTL-filter
 #include "holmes.h"
 #include "sp0256.h"
 #include "biquad.h"
+#include "tms5200x.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -83,6 +84,7 @@ Formant *formanty;
 genny* tms5220gen;
 genny* sp0256gen;
 genny* samgen;
+genny* tms5200gen;
 
 biquad *newB;
 
@@ -102,7 +104,8 @@ u16 x,xx;
  simpleklatt_init();
  sam_init();
  sam_newsay(); // TEST!
-
+ tms5200_init();
+ tms5200_newsay();
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
 	mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
@@ -155,6 +158,10 @@ sp0256gen->samplepos=0.0f;
 
 samgen=malloc(sizeof(genny));		
 samgen->samplepos=0.0f;
+
+tms5200gen=malloc(sizeof(genny));		
+tms5200gen->samplepos=0.0f;
+
 
 newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
 
@@ -322,7 +329,7 @@ int16_t lastval=genstruct->prevsample;
  return size;
 }
 
-u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 tms5220talkie(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
@@ -391,7 +398,7 @@ float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
 u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params SELZ is pitch bend
+  // first without speed or any params SELZ is pitch bend commentd now OUT
   //  klattrun(outgoing, size);
   u8 xx=0;
      while (xx<size){
@@ -399,6 +406,70 @@ u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float sam
        xx++;
      }
 };
+
+u16 tms5200mame(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // MODEL GENERATOR: TODO is speed and interpolation options
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+float samplepos=genstruct->samplepos;
+int16_t samplel=genstruct->lastsample;
+int16_t lastval=genstruct->prevsample;
+  // lpc_running
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=(tms5200_get_sample());//<<6)-32768; 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms5200_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=(tms5200_get_sample());//<<6)-32768; 
+
+       if (samplepos>=size) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms5200_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+	 xx++;
+	 samplepos-=size;
+       }
+       samplepos+=samplespeed;
+     }
+   }
+
+  // refill back counter etc.
+ genstruct->samplepos=samplepos;
+ genstruct->lastsample=samplel;
+ genstruct->prevsample=lastval;
+ return size;
+};
+
+
 
 u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params - break down as above in tms, spo256 - pull out size
@@ -495,11 +566,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=1;
+  mode=5;
 
-  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt,sammy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,samgen}; // or just as void/cast in function itself would make sense
+  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,samgen,tms5200gen}; // or just as void/cast in function itself would make sense
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

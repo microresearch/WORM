@@ -2779,6 +2779,10 @@ sam_init();
 sam_newsay(); 
 sam_get_sample();
 
+///
+
+*do we we need seperate samplepos in audio.c for each generator?*
+
 
 
 * important notes
