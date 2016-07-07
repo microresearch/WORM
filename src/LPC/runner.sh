@@ -3,7 +3,7 @@
 var=$2
 while true; do
     var=`expr $var + 1`
-    ./say $1 $var > /dev/dsp
+    ./say $var $1 > /dev/dsp
     echo "\n"
     echo $var
     sleep 1

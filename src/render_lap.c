@@ -1,6 +1,8 @@
+
 //#include "audio.h"
-#include "render.h"
+#include "renderll.h"
 #include "RenderTabs.h"
+#include <stdio.h>
 
 #define abs(a)	   (((a) < 0) ? -(a) : (a))
 
@@ -11,8 +13,43 @@ typedef unsigned short uint16_t;
 typedef unsigned short u16;
 typedef unsigned short u16;
 typedef signed short int16_t;
-typedef unsigned int uint32_t;
+typedef unsigned int uintb32_t;
 typedef signed int int32_t;
+
+//extern int bufferpos;
+//extern char buffer[327680];
+
+//timetable for more accurate c64 simulation
+int timetable[5][5] =
+{
+	{162, 167, 167, 127, 128},
+	{226, 60, 60, 0, 0},
+	{225, 60, 59, 0, 0},
+	{200, 0, 0, 54, 55},
+	{199, 0, 0, 54, 54}
+};
+
+/*void Output(int index, unsigned char A)
+{
+  static unsigned oldtimetableindex = 0, oldbufferpos, older=5;
+	int k;
+	// but is the NEXT index which determines our length?
+
+	bufferpos += timetable[oldtimetableindex][index];
+	//	printf("+= %d old %d INDEX %d BUFF %d\n",timetable[oldtimetableindex][index],oldtimetableindex,index,bufferpos/50);
+	//printf("diffpos %d oldind %d ind %d\n",(bufferpos/50)-(oldbufferpos/50), oldtimetableindex, index);
+	oldtimetableindex = index;
+	// write a little bit in advance
+	// so is overwritten NEXT TIME with index
+	//	older=5;
+	for(k=0; k<older; k++)
+	  printf("%c",(A & 15)*16);
+	//	for(k=0; k<5; k++)
+	//	  buffer[bufferpos/50 + k] = (A & 15)*16;
+	
+	older=	(bufferpos/50)-(oldbufferpos/50);
+	oldbufferpos=bufferpos;
+	}*/
 
 
 unsigned char wait1 = 7;
@@ -27,6 +64,7 @@ extern unsigned char mem50;
 extern unsigned char mem51;
 extern unsigned char mem53;
 extern unsigned char mem56;
+extern unsigned char mem66;
 
 extern unsigned char speedd;
 extern unsigned char pitch;
@@ -35,12 +73,12 @@ extern int singmode;
 //unsigned char phase1 = 0;  //mem43
 unsigned char phase2;
 unsigned char phase3;
-unsigned char mem66;
+//unsigned char mem66;
 unsigned char mem38;
 unsigned char mem40;
 unsigned char speedcounter; //mem45
 unsigned char mem48;
-
+unsigned char mem48stored;
 
 extern unsigned char phonemeIndexOutput[60]; //tab47296
 extern unsigned char stressOutput[60]; //tab47365
@@ -160,7 +198,7 @@ void Write(unsigned char p, unsigned char Y, unsigned char value)
 u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 
   static unsigned char phase1;
-  int tempA;
+  unsigned char tempA;
 
   if (state==0){ // beginning /////////
 	// current phoneme's index
@@ -218,15 +256,15 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
       {
 	// if bit set, output 26
 	X = 26;
-	//	Output(3, X);
-	*sample=((X)<<12);//-32768; // check >>12???
+	//		Output(3, X);
+		*sample=((X)<<12)-32768; // check >>12???
       } else
       {
 	//timetable 4
 	// bit is not set, output a 6
 	X=6;
 	//	Output(4, X);
-	*sample=((X)<<12);//-32768; // check >>12???
+		*sample=((X)<<12)-32768; // check >>12???
       }
 
     mem56--;
@@ -256,13 +294,13 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 u8 renderunvoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 
   if (state==3) goto pos48274;
-  else if (state==4) goto pos48296;
+  //  else if (state==4) goto pos48296;
   else if (state==5) goto pos48280;
   else if (state==6) goto pos48295;
 
   // A&248 !=0
 
-	int tempA;
+	unsigned char tempA;
 	// current phoneme's index
 	mem49 = Y;
 
@@ -314,14 +352,14 @@ pos48280:
 		//mem[54296] = X;
         // output the byte
 		//		Output(1, X);
-		*sample=((X&15)<<12);//-32768; // check >>12??? .. but we can't output further one?
-		if (X!=0) return 4;
+		*sample=((X&15)<<12)-32768; // check >>12??? .. but we can't output further one?
+		if (X!=0) goto pos48296;
 		else return 6;
 	}		// if X != 0, exit loop
 		//		if(X != 0) goto pos48296;
 pos48295:
-	//		Output(2, 5);
-	*sample=((5)<<12);//-32768; // check >>12???
+	//			Output(2, 5);
+	*sample=((5)<<12)-32768; // check >>12???
 
 pos48296:
 	X = 0;
@@ -342,12 +380,36 @@ pos48296:
 
 }
 
+void renderupdate(){
+
+  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d mem66 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48,mem66);
+
+}
+
+void    sam_frame_rerun() {
+  //	phase1 = 0;
+	phase2 = 0;
+	phase3 = 0;
+	mem49 = 0;
+	speedcounter = 72; //sam standard speed
+	mem48=mem48stored;
+
+	Y = 0;
+	A = pitches[0];
+	mem44 = A;
+	X = A;
+	mem38 = A - (A>>2);     // 3/4*A ???
+	mem66=0;
+}
+
 u8 rendersamsample(int16_t* sample){
   static u8 state=0;
   static unsigned char phase1 = 0;  //mem43
   u8 carry=0;
   static u8 secondstate=0;
   u8 nosample=1;
+  //  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48);
+
   
   while (nosample){
 
@@ -357,7 +419,11 @@ u8 rendersamsample(int16_t* sample){
 		  Y += 2;
 		  mem48 -= 2;
 		  state=1; secondstate=0;
-		  if(mem48 == 0) 	return 1; // ended
+		  if(mem48 == 0) 	{
+		    
+		    state=0;
+		    return 1; // ended
+		  }
 		  speedcounter = speedd;
       }
       return 0;
@@ -385,11 +451,17 @@ u8 rendersamsample(int16_t* sample){
 			if ((mem56+multtable[sinus[phase2] | amplitude2[Y]] ) > 255) carry = 1;
 			mem56 += multtable[sinus[phase2] | amplitude2[Y]];
 			A = mem56 + multtable[rectangle[phase3] | amplitude3[Y]] + (carry?1:0);
-			A = ((A + 136) & 255); //there must be also a carry - took out >>4
+			//	A = ((A + 136) & 255); //there must be also a carry - took out >>4
 			//mem[54296] = A;
 			
 			// output the accumulated value
-			*sample=((A&255)<<8);//-32768; 1 byte
+						A = ((A + 136) & 255) >> 4; //there must be also a carry
+			//mem[54296] = A;
+			
+			// output the accumulated value
+						//			Output(0, A);
+
+						*sample=((A&15)<<12)-32768; //1 byte
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;
@@ -401,7 +473,7 @@ u8 rendersamsample(int16_t* sample){
 			// decrement the frame count
 			mem48--;
 			if(mem48 == 0) {
-			  //			  state=0; // NON?
+			  state=0; // NON?
 			  return 1; // ended frame
 			}	
 			speedcounter = speedd;
@@ -506,7 +578,7 @@ void renderframe(){
 
 	unsigned char phase1 = 0;  //mem43
 	int i;
-	int carry;
+	u8 carry;
 	if (phonemeIndexOutput[0] == 255) return; //exit if no data
 
 	A = 0;
@@ -821,7 +893,7 @@ do
 	mem44 = A;
 	X = A;
 	mem38 = A - (A>>2);     // 3/4*A ???
-
+	mem48stored=mem48;
 
 }
 

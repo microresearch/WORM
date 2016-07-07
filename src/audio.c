@@ -29,9 +29,10 @@ LINEIN/OUTL-filter
 #include "parwave.h"
 #include "nvp.h"
 #include "lpc.h"
-#include "sam.h"
+#include "saml.h"
 #include "holmes.h"
 #include "sp0256.h"
+#include "biquad.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -81,6 +82,9 @@ Formant *formanty;
 
 genny* tms5220gen;
 genny* sp0256gen;
+genny* samgen;
+
+biquad *newB;
 
 void Audio_Init(void)
 {
@@ -148,6 +152,11 @@ tms5220gen->samplepos=0.0f;
 
 sp0256gen=malloc(sizeof(genny));		
 sp0256gen->samplepos=0.0f;
+
+samgen=malloc(sizeof(genny));		
+samgen->samplepos=0.0f;
+
+newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
 
 }
 
@@ -217,15 +226,100 @@ int16_t lastval=genstruct->prevsample;
 };
 
 u16 sammy(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
- u8 xx=0,readpos;
- int16_t samplel;
- 	 
- while (xx<size){
-   samplel=sam_get_sample();
-   outgoing[xx]=samplel;
-   xx++;
- }
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  float xx,xxx;
+  float tmpbuffer[32];
 
+float samplepos=genstruct->samplepos;
+int16_t samplel=genstruct->lastsample;
+int16_t lastval=genstruct->prevsample;
+  // lpc_running
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+//samplespeed=1.0f;
+ /*
+     while (x<size){
+       //       if (howmany==0) {howmany=(sam_get_sample(&samplel)); 
+       //	 howmany--;
+       //       }
+       //	 else {
+       //	   howmany--;
+       //	 }
+       if (howmany==0){
+	 //       samplel=(sam_get_sample());
+	 howmany=sam_get_sample(&samplel);
+	 //	 howmany=0;
+       }
+       else howmany--;
+
+       outgoing[x]=samplel; // interpol with remainder - to test - 1 sample behind
+       x++;
+     }
+ */
+     // test lowpass/biquad:
+     /*
+     int_to_floot(outgoing,tmpbuffer,32);
+    for (x=0;x<32;x++){
+    xxx=tmpbuffer[x];
+    xx=BiQuad(xxx,newB); 
+    tmpbuffer[x]=xx;
+      }
+    floot_to_int(outgoing,tmpbuffer,32);
+     */
+
+ 
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (x<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[x]=samplel;
+
+       // TEST trigger: 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (x<size){
+       while (howmany==0)	 howmany=(sam_get_sample(&samplel)); 
+       howmany--;
+       if (samplepos>=size) {       
+	 outgoing[x]=samplel;
+       // TEST trigger: 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+	 x++;
+	 samplepos-=size;
+       }
+       samplepos+=samplespeed;
+       }
+       }
+
+  // refill back counter etc.
+ genstruct->samplepos=samplepos;
+ genstruct->lastsample=samplel;
+ genstruct->prevsample=lastval;
+ return size;
 }
 
 u16 tms5220(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -297,8 +391,13 @@ float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
 u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down as above in tms, spo256 - pull out size
-  holmesrun(outgoing, size);
+  // first without speed or any params SELZ is pitch bend
+  //  klattrun(outgoing, size);
+  u8 xx=0;
+     while (xx<size){
+       outgoing[xx]=klatt_get_sample();
+       xx++;
+     }
 };
 
 u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -396,11 +495,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=4;
+  mode=1;
 
   u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220,fullklatt,sp0256,simpleklatt,sammy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,NULL}; // or just as void/cast in function itself would make sense
+  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,samgen}; // or just as void/cast in function itself would make sense
   x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

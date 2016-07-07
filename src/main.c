@@ -56,9 +56,9 @@ volatile u8 maintrigger=0;
 volatile u16 generated=0;
 u16 writepos=0;
 
-const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt
+const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
-u8 test_elm[30]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0};
+u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  44, 8, 0, 1, 8, 0}; // ELM_LEN in holmes - but why do we need extra
 
 void main(void)
 {
@@ -74,24 +74,26 @@ void main(void)
   Audio_Init();
 
   //  lpc_newsay(1);
-
-
   //  SAMINIT();
-
     //  initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM! STRIP_OUT
     //  synthesize(); // - ????? 
-			
   // test audio fill
-
   /*      for (x=0;x<32768;x++){
     audio_buffer[x]=rand()%32768;
     }*/
- 
-  // writepos=run_holmes(writepos); 
+   // writepos=run_holmes(writepos); 
 
   while(1)
     {
-     
+ 
+      //      /*
+  // testing changing test_elm
+      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
+      // change element, change length? leave stress as is 0
+      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
+      test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
+      //      */
+    
 
       //      oldmode=mode;    
       //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)

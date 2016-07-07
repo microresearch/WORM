@@ -6,3 +6,4 @@ extern void init_holmes(void);
 extern void term_holmes (void);
 extern int speed;
 extern void holmesrun(int16_t* outgoing, u8 size);
+extern int16_t klatt_get_sample(void);

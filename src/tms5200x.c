@@ -2,16 +2,28 @@
 
 // TABLES and defines
 
+#include "stdio.h"
+#include "math.h"
+#include "time.h"
+
+
 typedef unsigned char UINT8;
 typedef unsigned char u8; 
+typedef unsigned char uint8_t; 
 typedef signed char INT8;
 typedef unsigned short UINT16;
 typedef unsigned short u16;
 typedef signed short INT16;
+typedef signed short int16_t;
 typedef unsigned int UINT32;
 typedef signed int INT32;
 
 #include "tms5110r.inc"
+
+uint8_t* ptrAddr, ptrBit;
+uint8_t byte_rev[256];
+
+#define PERFECT_INTERPOLATION_HACK 0
 
 static INT16 clip_analog(INT16 cliptemp);
 
@@ -30,6 +42,7 @@ static INT16 clip_analog(INT16 cliptemp);
  * or clip logic, even though the real hardware doesn't do this, partially verified by decap */
 #undef ALLOW_4_LSB
 
+//#define ALLOW_4_LSB 1
 
 /* *****configuration of chip connection stuff***** */
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
@@ -42,7 +55,7 @@ static INT16 clip_analog(INT16 cliptemp);
 /* *****debugging defines***** */
 #undef VERBOSE
 // above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
-#undef DEBUG_DUMP_INPUT_DATA
+#define DEBUG_DUMP_INPUT_DATA 1
 // above dumps the data input to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
 #undef DEBUG_FIFO
 // above debugs fifo stuff: writes, reads and flag updates
@@ -93,7 +106,7 @@ static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5
 	// internal state
 
 	/* coefficient tables */
-	int m_variant;                /* Variant of the 5xxx - see tms5110r.h */
+int m_variant=TMS5220_IS_5200;                /* Variant of the 5xxx - see tms5110r.h */
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *m_coeff;
@@ -189,6 +202,41 @@ static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5
 
 
 // helpers
+
+int extract_bits(int count) // extract from rom image/array
+{
+
+  uint8_t value;
+  UINT16 data;
+  INT8 num_bits=count;
+
+  	data = byte_rev[*ptrAddr]<<8;
+	//	data = (*ptrAddr)<<8;
+	if (ptrBit+num_bits > 8)
+	{
+	    data |= byte_rev[*(ptrAddr+1)];
+	    //  	  data |= *(ptrAddr+1);
+	}
+	data <<= ptrBit;
+	value = data >> (16-num_bits);
+	ptrBit += num_bits;
+	//	didntjump=1;
+	if (ptrBit >= 8)
+	{
+	  //	  fprintf(stderr,"%x, ",*ptrAddr);
+		ptrBit -= 8;
+		ptrAddr++;
+		//		didntjump=2;
+		if (ptrBit==0) {
+		  //		  didntjump=0;
+		}
+	}
+//	tobits(value,num_bits);
+	return value;
+
+
+}
+
 
 /**********************************************************************************************
 
@@ -319,17 +367,120 @@ INT32 lattice_filter()
 		return m_u[0];
 }
 
+
+// parse frame
+
+void parse_frame()
+{
+	int indx, i, rep_flag;
+
+	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
+
+	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
+	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
+	if ((TMS5220_HAS_RATE_CONTROL) && (m_c_variant_rate & 0x04))
+	{
+		indx = extract_bits(2);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(indx,2);
+		fprintf(stderr," ");
+#endif
+		m_IP = reload_table[indx];
+	}
+	else // non-5220C and 5220C in fixed rate mode
+	m_IP = reload_table[m_c_variant_rate&0x3];
+
+	//	update_fifo_status_and_ints();
+	if (!m_talk_status) goto ranout;
+
+	// attempt to extract the energy index
+	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
+	fprintf(stderr," ");
+#endif
+	//	update_fifo_status_and_ints();
+	if (!m_talk_status) goto ranout;
+	// if the energy index is 0 or 15, we're done
+	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
+		return;
+
+
+	// attempt to extract the repeat flag
+	rep_flag = extract_bits(1);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(rep_flag, 1);
+	fprintf(stderr," ");
+#endif
+
+	// attempt to extract the pitch
+	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
+	fprintf(stderr," ");
+#endif
+	//	update_fifo_status_and_ints();
+	if (!m_talk_status) goto ranout;
+	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
+	if (rep_flag)
+		return;
+
+	// extract first 4 K coefficients
+	for (i = 0; i < 4; i++)
+	{
+		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
+		fprintf(stderr," ");
+#endif
+		//		update_fifo_status_and_ints();
+		if (!m_talk_status) goto ranout;
+	}
+
+	// if the pitch index was zero, we only need 4 K's...
+	if (m_new_frame_pitch_idx == 0)
+	{
+		/* and the rest of the coefficients are zeroed, but that's done in the generator code */
+		return;
+	}
+
+	// If we got here, we need the remaining 6 K's
+	for (i = 4; i < m_coeff->num_k; i++)
+	{
+		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
+		fprintf(stderr," ");
+#endif
+		//		update_fifo_status_and_ints();
+		if (!m_talk_status) goto ranout;
+	}
+#ifdef VERBOSE
+	if (m_speak_external)
+		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", (m_fifo_count*8)-(m_fifo_bits_taken));
+	else
+		logerror("Parsed a frame successfully in ROM\n");
+#endif
+	return;
+
+	ranout:
+#ifdef DEBUG_FRAME_ERRORS
+	logerror("Ran out of bits on a parse!\n");
+#endif
+	return;
+}
+
+
 // main process loop
 
-void process(INT16 *buffer, unsigned int size)
+int16_t process(u8 *ending)
 {
-	int buf_count=0;
 	int i, bitout, zpar;
 	INT32 this_sample;
-
+	int16_t sample;
 	/* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && m_speaking_now)
-	{
+	//	if (m_speaking_now)
+	//	{
 		/* if it is the appropriate time to update the old energy/pitch idxes,
 		 * i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
 		 * is JUST BEFORE the transition to IP=0 PC=0 T=0 sybcycle=(0 or 1),
@@ -367,13 +518,15 @@ void process(INT16 *buffer, unsigned int size)
 #ifdef DEBUG_GENERATION
 				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
-				m_speaking_now = 0; // finally halt speech
-				goto empty;
+				//				m_speaking_now = 1; // finally halt speech
+				*ending=1;
+				// keep speaking - RESET TOD!
+				//				goto empty;
 			}
 
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
-			//			parse_frame(); TODO!
+			parse_frame(); //TODO!
 #ifdef DEBUG_PARSE_FRAME_DUMP
 			fprintf(stderr,"\n");
 #endif
@@ -532,20 +685,23 @@ void process(INT16 *buffer, unsigned int size)
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
 		if (m_digital_select == 0) // analog SPK pin output is only 8 bits, with clipping
-			buffer[buf_count] = clip_analog(this_sample);
+		  //			buffer[buf_count] = clip_analog(this_sample);
+		  sample= clip_analog(this_sample);
 		else // digital I/O pin output is 12 bits
 		{
 #ifdef ALLOW_4_LSB
 			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
 			// N taps:                       ^                 = 0x2000;
 			// output: ssss ssss ssss ssss snnn nnnn nnnn nnnN
-			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+		  //			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+		  sample=(this_sample<<1)|((this_sample&0x2000)>>13);
 #else
 			this_sample &= ~0xF;
 			// input:  ssss ssss ssss ssss ssnn nnnn nnnn 0000
 			// N taps:                       ^^ ^^^            = 0x3E00;
 			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
-			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+			//			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+			sample=(this_sample<<1)|((this_sample&0x3E00)>>9);
 #endif
 		}
 		// Update all counts
@@ -575,33 +731,83 @@ void process(INT16 *buffer, unsigned int size)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0;
 		m_pitch_count &= 0x1FF;
-		buf_count++;
-		size--;
-	}
-
-empty:
-
-	while (size > 0)
-	{
-		m_subcycle++;
-		if ((m_subcycle == 2) && (m_PC == 12))
-		{
-			m_subcycle = m_subc_reload;
-			m_PC = 0;
-			m_IP++;
-			m_IP&=0x7;
-		}
-		else if (m_subcycle == 3)
-		{
-			m_subcycle = m_subc_reload;
-			m_PC++;
-		}
-		buffer[buf_count] = -1; /* should be just -1; actual chip outputs -1 every idle sample; (cf note in data sheet, p 10, table 4) */
-		buf_count++;
-		size--;
-	}
+		//		buf_count++;
+		//		size--;
+		//	}
+	return sample;
 }
 
-void main(){
+const uint8_t sp_parNICE[] __attribute__ ((section (".flash"))) = {0x46, 0xE3, 0xB2, 0x27, 0x24, 0x14, 0x37, 0xCD, 0x47, 0xF, 0x5F, 0x95, 0x73, 0xB4, 0x18, 0x3B, 0x3C, 0xDA, 0xCE, 0xD5, 0xAE, 0x76, 0xD4, 0x14, 0x33, 0x2C, 0x5B, 0xF1, 0x51, 0x4A, 0x76, 0xD7, 0x2D, 0xD9, 0x4B, 0x2E, 0xC1, 0xDC, 0xD6, 0xA5, 0xE, 0xA9, 0x3A, 0x9, 0x7F, 0x57, 0xD2, 0x84, 0x62, 0x38, 0xA2, 0x82, 0x56, 0xE2, 0xB3, 0x65, 0x93, 0x4F, 0x39, 0x8E, 0x4F, 0xC2, 0x38, 0x6B, 0x9D, 0x30, 0xE0, 0xEB, 0xC, 0xA, 0x50, 0x80, 0x2, 0x4, 0x98, 0xCC, 0x12, 0x1, 0x86, 0x57, 0x21, 0x20, 0x30, 0x69, 0x5, 0xBC, 0x31, 0xE1, 0x1, 0xF, 0x44, 0x20, 0x3, 0x1, 0xB8, 0xBB, 0xA9, 0xF0, 0xCD, 0xB0, 0xBA, 0x4D, 0x93, 0x21, 0xF6, 0x64, 0xCA, 0x9A, 0x55, 0x86, 0xD8, 0xB2, 0xB, 0x6B, 0x54, 0x6E, 0x62, 0x4B, 0x26, 0x6C, 0x31, 0x3B, 0x48, 0xD3, 0x89, 0xB2, 0x65, 0x23, 0x3, 0xC, 0x19, 0x61, 0x80, 0xAF, 0x8C, 0x19, 0x40, 0x53, 0x4D, 0x31, 0x72, 0x50, 0x8B, 0x5A, 0xDA, 0xC9, 0xCE, 0x41, 0xA2, 0x22, 0xE9, 0x44, 0xDB, 0xDB, 0xC6, 0x8E, 0x5A, 0x6B, 0x54, 0xD5, 0x18, 0x3B, 0x8, 0xAF, 0x14, 0xB5, 0xA3, 0xAD, 0x7};
 
+
+// break out into generator...
+
+void tms5200_init()
+{
+
+  INT16 i,j;
+
+  m_coeff=&T0285_2501E_coeff; // this is for 5200! //		m_coeff = &tms5220_coeff;
+	
+  //  m_coeff=tms5220_coeff;
+  // do we need byte_rev?  
+  for(i=0;i<256;i++)
+    {
+      j = (i>>4) | (i<<4); // Swap in groups of 4
+      j = ((j & 0xcc)>>2) | ((j & 0x33)<<2); // Swap in groups of 2
+      byte_rev[i] = ((j & 0xaa)>>1) | ((j & 0x55)<<1); // Swap bit pairs
+    }
+  
+  
+  // what needs to be set to start speaking?
+
+  m_new_frame_energy_idx = 0;
+  m_new_frame_pitch_idx = 0;
+  for (i = 0; i < 4; i++)
+    m_new_frame_k_idx[i] = 0;
+  for (i = 4; i < 7; i++)
+    m_new_frame_k_idx[i] = 0xF;
+  for (i = 7; i < m_coeff->num_k; i++)
+    m_new_frame_k_idx[i] = 0x7;
+  m_talk_status = 1;
+};
+
+
+void tms5200_newsay(){
+  INT16 i;
+  m_new_frame_energy_idx = 0;
+  m_new_frame_pitch_idx = 0;
+  for (i = 0; i < 4; i++)
+    m_new_frame_k_idx[i] = 0;
+  for (i = 4; i < 7; i++)
+    m_new_frame_k_idx[i] = 0xF;
+  for (i = 7; i < m_coeff->num_k; i++)
+    m_new_frame_k_idx[i] = 0x7;
+  m_talk_status = 1;
+
+  ptrAddr = sp_parNICE;
+  ptrBit = 0;
+
+};
+
+int16_t tms5200_get_sample();
+
+
+void main(){
+  INT16 i, sample; u8 ending=0;
+  // buffer?
+  tms5200_init();
+  tms5200_newsay();
+  // ptraddr and speech data array
+  //  m_IP=0;
+
+  while(1){
+    sample=  process(&ending);
+    printf("%c",(sample+32768)>>8);
+    if (ending==1){
+      ending=0; tms5200_newsay();
+    }
+
+  //  for (i=0;i<32768;i++) printf("%c",(speechbuffer[i]+32768)>>8);
+  }
 }

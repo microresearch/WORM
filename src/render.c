@@ -1,8 +1,67 @@
 #include "audio.h"
-#include "render.h"
+//#include "render.h"
 #include "RenderTabs.h"
+#include <stdio.h>
 
 #define abs(a)	   (((a) < 0) ? -(a) : (a))
+
+extern __IO uint16_t adc_buffer[10];
+
+//timetable for more accurate c64 simulation
+u8 timetable[5][5] =
+{
+	{162, 167, 167, 127, 128},
+	{226, 60, 60, 0, 0},
+	{225, 60, 59, 0, 0},
+	{200, 0, 0, 54, 55},
+	{199, 0, 0, 54, 54}
+};
+
+/*void Output(int index, unsigned char A)
+{
+  static unsigned oldtimetableindex = 0, oldbufferpos, older=5;
+	int k;
+	// but is the NEXT index which determines our length?
+
+	bufferpos += timetable[oldtimetableindex][index];
+	//	printf("+= %d old %d INDEX %d BUFF %d\n",timetable[oldtimetableindex][index],oldtimetableindex,index,bufferpos/50);
+	//printf("diffpos %d oldind %d ind %d\n",(bufferpos/50)-(oldbufferpos/50), oldtimetableindex, index);
+	oldtimetableindex = index;
+	// write a little bit in advance
+	// so is overwritten NEXT TIME with index
+	//	older=5;
+	for(k=0; k<older; k++)
+	  printf("%c",(A & 15)*16);
+	//	for(k=0; k<5; k++)
+	//	  buffer[bufferpos/50 + k] = (A & 15)*16;
+	
+	older=	(bufferpos/50)-(oldbufferpos/50);
+	oldbufferpos=bufferpos;
+	}*/
+
+extern int32_t bufferpos;//oldbufferpos=0;
+
+
+static inline unsigned char Output(unsigned char index) // is one step behind what it should be
+/* 
+   nextbufferpos-currentbufferpos 
+   but we don't have that yet...
+
+   always keep next sample in reserve... this is now done in sam.c but is all still glitchy
+
+ */
+
+{
+  static unsigned char oldtimetableindex = 0;//, older=5;
+  unsigned char k;
+	bufferpos += timetable[oldtimetableindex][index];
+	oldtimetableindex = index;
+	//	older=	(bufferpos/50)-(oldbufferpos/50);
+	//	oldbufferpos=bufferpos;
+	//	k=older;
+		k=5;
+	return k;
+}
 
 unsigned char wait1 = 7;
 unsigned char wait2 = 6;
@@ -16,6 +75,7 @@ extern unsigned char mem50;
 extern unsigned char mem51;
 extern unsigned char mem53;
 extern unsigned char mem56;
+extern unsigned char mem66;
 
 extern unsigned char speedd;
 extern unsigned char pitch;
@@ -24,12 +84,12 @@ extern int singmode;
 //unsigned char phase1 = 0;  //mem43
 unsigned char phase2;
 unsigned char phase3;
-unsigned char mem66;
+//unsigned char mem66;
 unsigned char mem38;
 unsigned char mem40;
 unsigned char speedcounter; //mem45
 unsigned char mem48;
-
+unsigned char mem48stored;
 
 extern unsigned char phonemeIndexOutput[60]; //tab47296
 extern unsigned char stressOutput[60]; //tab47365
@@ -146,11 +206,12 @@ void Write(unsigned char p, unsigned char Y, unsigned char value)
 //
 // For voices samples, samples are interleaved between voiced output.
 
-u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
+static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state, u8* howmany){
 
   static unsigned char phase1;
-  int tempA;
-
+  u8 tempA;
+  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+  
   if (state==0){ // beginning /////////
 	// current phoneme's index
 	mem49 = Y;
@@ -176,7 +237,10 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 	
 	// voiced sample?
 	Y = mem49;
-	A = pitches[mem49] >> 4;
+	pitchmod+=pitches[mem49];
+	if (pitchmod>126) pitchmod=126;
+	else if (pitchmod<1) pitchmod=1;
+	A = (pitchmod) >> 4;
 
 	// handle voiced samples here
 	// number of samples?
@@ -207,15 +271,21 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
       {
 	// if bit set, output 26
 	X = 26;
-	//	Output(3, X);
-	*sample=((X)<<12)-32768; // check >>12???
+	//		Output(3, X);
+	*howmany=Output(3);
+	//		*sample=((X)<<12)-28672; // check >>12???
+			*sample=((X-8)<<12); //1 byte
+			
       } else
       {
 	//timetable 4
 	// bit is not set, output a 6
 	X=6;
 	//	Output(4, X);
-	*sample=((X)<<12)-32768; // check >>12???
+	*howmany=Output(4);
+	//		*sample=((X)<<12)-28672; // check >>12???
+			*sample=((X-8)<<12); //1 byte
+
       }
 
     mem56--;
@@ -242,16 +312,15 @@ u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
 		////////////////////////
   }
 
-u8 renderunvoicedsample(unsigned char *mem66, int16_t* sample, u8 state){
+static inline u8 renderunvoicedsample(unsigned char *mem66, int16_t* sample, u8 state, u8* howmany){
+	u8 tempA;
 
   if (state==3) goto pos48274;
-  else if (state==4) goto pos48296;
   else if (state==5) goto pos48280;
   else if (state==6) goto pos48295;
 
   // A&248 !=0
 
-	int tempA;
 	// current phoneme's index
 	mem49 = Y;
 
@@ -303,18 +372,27 @@ pos48280:
 		//mem[54296] = X;
         // output the byte
 		//		Output(1, X);
-		*sample=((X&15)<<12)-32768; // check >>12??? .. but we can't output further one?
-		if (X!=0) return 4;
+		*howmany=Output(1);
+
+		//		*sample=((X&15)<<12)-28672; // check >>12??? .. but we can't output further one?
+				*sample=(((X&15)-8)<<12); //1 byte
+		//	*sample=(rand()%65536)-32768;
+
+		if (X!=0) goto pos48296;
 		else return 6;
 	}		// if X != 0, exit loop
 		//		if(X != 0) goto pos48296;
 pos48295:
-	//		Output(2, 5);
-	*sample=((5)<<12)-32768; // check >>12???
+	//			Output(2, 5);
+	*howmany=Output(2);
+
+	//	*sample=((5)<<12)-28672; // check >>12???
+		*sample=((-3)<<12); //1 byte
+	//		*sample=(rand()%65536)-32768;
+
 
 pos48296:
 	X = 0;
-
     // decrement counter
 	mem56--;
 	if (mem56 != 0) return 5;
@@ -331,25 +409,65 @@ pos48296:
 
 }
 
-u8 rendersamsample(int16_t* sample){
+void renderupdate(){
+
+  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d mem66 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48,mem66);
+
+}
+
+void    sam_frame_rerun() {
+  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+
+  //	phase1 = 0;
+	phase2 = 0;
+	phase3 = 0;
+	mem49 = 0;
+	speedcounter = speedd; //sam standard speed
+	//	speedcounter = (adc_buffer[SELY]>>4)+1;
+
+	mem48=mem48stored;
+
+	Y = 0;
+	pitchmod+=pitches[0];
+	if (pitchmod>126) pitchmod=126;
+	else if (pitchmod<1) pitchmod=1;
+	A = (pitchmod) >> 4;
+
+	//	A = pitches[0];
+	mem44 = A;
+	X = A;
+	mem38 = A - (A>>2);     // 3/4*A ???
+	mem66=0;
+}
+
+u8 rendersamsample(int16_t* sample,u8* ending){
+  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
   static u8 state=0;
   static unsigned char phase1 = 0;  //mem43
   u8 carry=0;
   static u8 secondstate=0;
-  u8 nosample=1;
+  u8 nosample=1; u8 howmany=0;
+  //  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48);
+
   
   while (nosample){
 
     if (state==3 || state==4 || state==5 || state==6){ // in process of rendering unvoiced sample
-      state=renderunvoicedsample(&mem66,sample,state);
+      state=renderunvoicedsample(&mem66,sample,state,&howmany);
       if (state==0){			// skip ahead two in the phoneme buffer - once we're done
 		  Y += 2;
 		  mem48 -= 2;
 		  state=1; secondstate=0;
-		  if(mem48 == 0) 	return 1; // ended
-		  speedcounter = speedd;
+		  if(mem48 == 0) 	{
+		    *ending=1;
+		    state=0;
+		    sam_frame_rerun();
+		    return howmany; // ended
+		  }
+		  		  speedcounter = speedd;
+		  //		  speedcounter = (adc_buffer[SELY]>>4)+1;
       }
-      return 0;
+      return howmany;
     }
         // get the sampled information on the phoneme
     else  if (state==0)
@@ -363,8 +481,8 @@ u8 rendersamsample(int16_t* sample){
 		{
             // render the sample for the phoneme
 		  //FILL IN			RenderSample(&mem66);
-		  state=renderunvoicedsample(&mem66,sample,state);
-		  return 0;
+		  state=renderunvoicedsample(&mem66,sample,state,&howmany);
+		  return howmany;
 		} else
 		  ///////
 		  {
@@ -374,28 +492,35 @@ u8 rendersamsample(int16_t* sample){
 			if ((mem56+multtable[sinus[phase2] | amplitude2[Y]] ) > 255) carry = 1;
 			mem56 += multtable[sinus[phase2] | amplitude2[Y]];
 			A = mem56 + multtable[rectangle[phase3] | amplitude3[Y]] + (carry?1:0);
-			A = ((A + 136) & 255); //there must be also a carry - took out >>4
+			// output the accumulated value
+			A = ((A + 136) & 255) >> 4; //there must be also a carry
 			//mem[54296] = A;
 			
 			// output the accumulated value
-			*sample=((A&255)<<8)-32768; // 4 bits over from above
+						//			Output(0, A);
+			howmany=Output(0);
+			*sample=((A-8)<<12); //1 byte
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;
 			  state=1;
-			  return 0;
+			  return howmany;
 			}
 			//			else{
 			Y++; //go to next amplitude
 			// decrement the frame count
 			mem48--;
 			if(mem48 == 0) {
-			  //			  state=0; // NON?
-			  return 1; // ended frame
+			  state=0; // NON?
+			  sam_frame_rerun();
+			  *ending=1;
+			  return howmany; // ended frame
 			}	
-			speedcounter = speedd;
+						speedcounter = speedd;
+						//speedcounter = (adc_buffer[SELY]>>4)+1;
+
 			state=1; secondstate=0;
-			return 0;
+			return howmany;
 			//			} // else
 		} // A/0
     } // state is zero // we always OUT
@@ -403,10 +528,14 @@ u8 rendersamsample(int16_t* sample){
   else if (state==1){
 
     if (secondstate!=0) {
-      secondstate=rendervoicedsample(&mem66,sample,secondstate);
+      secondstate=rendervoicedsample(&mem66,sample,secondstate, &howmany);
 		  if (secondstate==0) {
-		
-			A = pitches[Y];
+
+			pitchmod+=pitches[Y];
+			if (pitchmod>126) pitchmod=126;
+			else if (pitchmod<1) pitchmod=1;
+
+			A = pitchmod;
 			mem44 = A;
 			A = A - (A>>2);
 			mem38 = A;
@@ -432,7 +561,11 @@ u8 rendersamsample(int16_t* sample){
 		{
 		  //		pos48159:
             // fetch the next glottal pulse length
-			A = pitches[Y];
+			pitchmod+=pitches[Y];
+			if (pitchmod>126) pitchmod=126;
+			else if (pitchmod<1) pitchmod=1;
+
+			A = pitchmod;
 			mem44 = A;
 			A = A - (A>>2);
 			mem38 = A;
@@ -467,10 +600,13 @@ u8 rendersamsample(int16_t* sample){
 		// the sample for the phoneme.
 
 		//FILL IN		RenderSample(&mem66);
-		  secondstate=rendervoicedsample(&mem66,sample,secondstate);
+		secondstate=rendervoicedsample(&mem66,sample,secondstate,&howmany);
 		  if (secondstate==0) { // finish render
-		
-			A = pitches[Y];
+		    pitchmod+=pitches[Y];
+		    if (pitchmod>126) pitchmod=126;
+		    else if (pitchmod<1) pitchmod=1;
+
+			A = pitchmod;
 			mem44 = A;
 			A = A - (A>>2);
 			mem38 = A;
@@ -494,8 +630,8 @@ u8 rendersamsample(int16_t* sample){
 void renderframe(){
 
 	unsigned char phase1 = 0;  //mem43
-	int i;
-	int carry;
+	int16_t i;
+	//	u8 carry;
 	if (phonemeIndexOutput[0] == 255) return; //exit if no data
 
 	A = 0;
@@ -774,7 +910,7 @@ do
 // pitch contour. Without this, the output would be at a single
 // pitch level (monotone).
 
-	
+/*	
 	// don't adjust pitch if in sing mode
 	if (!singmode)
 	{
@@ -785,7 +921,7 @@ do
     		pitches[i] -= (frequency1[i] >> 1);
         }
 	}
-
+*/
 	phase1 = 0;
 	phase2 = 0;
 	phase3 = 0;
@@ -810,7 +946,7 @@ do
 	mem44 = A;
 	X = A;
 	mem38 = A - (A>>2);     // 3/4*A ???
-
+	mem48stored=mem48;
 
 }
 

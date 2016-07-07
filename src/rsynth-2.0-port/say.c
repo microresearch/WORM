@@ -58,7 +58,7 @@ extern char *Revision;
 
 
 //short *pWavBuffer;
-int16_t pWavBuffer[10240] __attribute__ ((section (".ccmdata")));
+//int16_t pWavBuffer[10240] __attribute__ ((section (".ccmdata")));
 
 darray_t wav_elm;
 unsigned short wav_len;

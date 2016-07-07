@@ -3,6 +3,8 @@
 #include "sp0256.h"
 #include "audio.h"
 
+#include "256_roms.h"
+
 extern uint16_t adc_buffer[10];
 
 // license:BSD-3-Clause

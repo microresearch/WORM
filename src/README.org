@@ -2702,23 +2702,88 @@ eg.
 
 changes to split and dump these speaknspell codes and maybe find more!
 
-looking at newchirp.. compare for 5200! switch these differences on banks? - newchirp and newperiod -> lpc_say
+looking at newchirp.. compare for 5200! switch these differences on banks? - newchirp and newperiod -> lpc_sayDONE
 
 morph chirp/pitch codes with wormings
 
-also INTERP_SHIFT?????
-
-[[file:~/mame/src/devices/sound/tms5220.cpp::m_current_energy%20%3D%20(m_current_energy%20%2B%20(((m_coeff->energytable%5Bm_new_frame_energy_idx%5D%20-%20m_current_energy)*(1-inhibit_state))%20INTERP_SHIFT))*(1-m_zpar)%3B][file:~/mame/src/devices/sound/tms5220.cpp::m_current_energy = (m_current_energy + (((m_coeff->energytable[m_new_frame_energy_idx] - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT))*(1-m_zpar);]]
-
-shift to new mame/mess code for tms????
+shift to new mame/mess code for tms???? TESTING
 
 how filter works in talkie code for coeffs???? see: https://github.com/going-digital/Talkie/issues/6
 
-try coeff code only substitute for talkie...,,, also what about INTERP_SHIFT - RE_DO lpc_say with mame/mess code
+try coeff code only substitute for talkie...,,, also what about INTERP_SHIFT - RE_DO lpc_say with mame/mess code now as tms5200x.c (also 5100)
+
+-- how we could just have new tables in say to keep it simple - RE_TEST
 
 *wormed morphings of pitch and chirp tables*
 
-*- maybe wrap up code we have so far-.trm,sp0256,klatt,rawklatt,sam - 5 modes and lap tests first*
+*- maybe wrap up code we have so far-.tms,sp0256,klatt,rawklatt,sam - 5 modes and lap tests first*
+
+** 5/7
+
+- new tms5200x.c code sounds better than talkie code for parsec
+  samples - need to sort generator and end of phrase repeat and make a
+  bit more robust but works on laptop
+
+- prioritise - first 5 modes working this week, tube code also... documentation
+
+- sam wrapped in speed but sounds a bit rough
+
+** 6/7
+
+SAM
+
+- added lowpass biquad in audio.c to sam which improves a bit
+- added bends to pitch and speed internally in render.c (not audio.c as we leave that for the moment)
+
+- crashing on new vocab and other changes in newsay - is crash in vocab or...
+
+others
+
+- cleaned up vocabs for TMS/LPC but these are all too big - see below
+
+** 7/7
+
+SAM
+
+- cleaned up vocab which gives errors
+
+KLATT
+
+- commented pitch bend, pulled out to single sample and now try to change array of test_elm in main.cTESTING?DONE - glitchy but?
+
+TMS5xxx
+
+//
+
+- what are the chip.vocab.code differences:
+
+TI99=5200
+
+Vocab_UK_Acorn was designed to be played on the TMS5220 (The Acorn Speech synthesiser add-on)
+Vocab_Soundbites was designed to be played on the TMS5220 (probably encoded with QBOX Pro, which ships with TMS5220 coefficients only)
+The other vocabularies are random speech ROMs off the 'net, with unknown heritage. I speculate they were also encoded for the TMS5220.
+
+differences in code talkie/mame mess are in interpolation and in calculation of filter
+
+/./////
+
+TODO: try 5200 as generator, 
+
+5100 in split and extract 2x speak and spell, where are other ROMs?
+
+convert 5100 and 5200 coeffs into format we can use with talkie code to compare also here...
+
+FORMAT:
+
+sam_init();
+sam_newsay(); 
+sam_get_sample();
+
+
+
+* important notes
+
+- all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have?
 
 * interpolations
 
@@ -2808,7 +2873,9 @@ in lpc_say.c
   
 ** 1/KLATT
 
-- SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!
+- SELZ is pitch bend DONEbutcommented, and pulled down to single sample, put phoneme sel in main
+
+- SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!TODO
 
 Todo speed etc... triggers
 
@@ -2851,15 +2918,50 @@ klatt in docs:
 
 //////
 
-** 3/SAM - test/re-work as not looked at for a while
+** 3/SAM - test/re-work
 
-how what we have differs from: https://github.com/s-macke/SAM/blob/master/src/main.c ??? *see above*
+- singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
 
-reciter which changes text to phonemes is difference
+- short vocab - TESTING - how to divide up vocab as we use up SELX?Y?Z????
 
-how to select phonemes and stress etc...
+/// possible 2 more modes 
 
-sing???
+1= phonetic array (position in array (of 32), phonemes, stress)
+2= bent raw phonemeindex/length/stress going through but how to stop this malfunctioning and add breaths also?
+
+///////
+
+.... details from: http://www.retrobits.net/atari/sam.shtml#ch1.1
+
+PITCH
+POKE PITCH,N
+N=
+00-20	impractical
+20-30	very high
+30-40	high
+40-50	high normal
+50-70	normal
+70-80	low normal
+80-90	low
+90-255	very low
+default = 64
+
+SPEED
+POKE SPEED,M
+M=
+0-20	impractical
+20-40	very fast
+40-60	fast
+60-70	fast conversational
+70-75	normal conversational
+75-90	narrative
+90-100	slow
+100-225	very slow
+default = 72
+
+
+//// 
+
 
 ** 4/SP0256 
 
@@ -3049,3 +3151,14 @@ and for 11v in 11-10=1/200=0.005 = 5mA so max heat is 0.005 x 10 = 0.05 which is
 this test to 9.9v
 
 test for POTS now: 0-62/63 some jitter???
+* rom extraction howto
+
+TMS howto TI99 eg...:
+
+test first with lpc_reader for approx offset: ./lpcr 2400 /root/mess/software/ti99_4ae/phm3226g4.bin > /dev/dsp  
+
+then dump to hex: ./lpcdump /root/mess/software/ti99_4ae/phm3226g4.bin > phm3226g4.hex
+
+then copy into lpc_split, edit then run and test in lpc_say??? or/???
+
+//watch number of pitch bits for 5100=5 and 5200=6 

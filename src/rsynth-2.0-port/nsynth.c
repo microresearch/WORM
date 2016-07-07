@@ -945,6 +945,188 @@ void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame){
 	out=0.0f;
 }
 
+//    sample=parwavesinglesample(&klatt_global, &pars, samplenumber); 
+
+int16_t parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns){
+		static unsigned long seed = 5; /* Fixed staring value */
+		float noise;
+		int n4;
+		float sourc;                   /* Sound source if all-parallel config used  */
+		float glotout;                 /* Output of glottal sound source  */
+		float par_glotout;             /* Output of parallelglottal sound sourc  */
+		float voice;                   /* Current sample of voicing waveform  */
+		float frics;                   /* Frication sound source  */
+		float aspiration;              /* Aspiration sound source  */
+		long nrand;                    /* Varible used by random number generator  */
+
+		/* Our own code like rand(), but portable
+		whole upper 31 bits of seed random 
+		assumes 32-bit unsigned arithmetic
+		with untested code to handle larger.
+		*/
+		seed = seed * 1664525 + 1;
+		if (8 * sizeof(unsigned long) > 32)
+			seed &= 0xFFFFFFFF;
+
+		/* Shift top bits of seed up to top of long then back down to LS 14 bits */
+		/* Assumes 8 bits per sizeof unit i.e. a "byte" */
+		nrand = (((long) seed) << (8 * sizeof(long) - 32)) >> (8 * sizeof(long) - 14);
+
+		/* Tilt down noise spectrum by soft low-pass filter having
+		*    a pole near the origin in the z-plane, i.e.
+		*    output = input + (0.75 * lastoutput) */
+
+		noise = nrand + (0.75 * nlast);	/* Function of samp_rate ? */
+		nlast = noise;
+
+		/* Amplitude modulate noise (reduce noise amplitude during
+		second half of glottal period) if voicing simultaneously present
+		*/
+
+		if (nper > nmod)
+		{
+			noise *= 0.5;
+		}
+
+		/* Compute frication noise */
+		sourc = frics = amp_frica * noise;
+
+		/* Compute voicing waveform : (run glottal source simulation at
+		4 times normal sample rate to minimize quantization noise in 
+		period of female voice)
+		*/
+
+		for (n4 = 0; n4 < 4; n4++)
+		{
+			if (globals->glsource == IMPULSIVE)
+			{
+				/* Use impulsive glottal source */
+				voice = impulsive_source(nper);
+			}
+			else
+			{
+				/* Or use a more-natural-shaped source waveform with excitation
+				occurring both upon opening and upon closure, stronest at closure */
+				voice = natural_source(nper);
+			}
+
+			/* Reset period when counter 'nper' reaches T0 */
+			if (nper >= T0)
+			{
+				nper = 0;
+				pitch_synch_par_reset(globals, frame, ns);
+			}
+
+			/* Low-pass filter voicing waveform before downsampling from 4*globals->samrate */
+			/* to globals->samrate samples/sec.  Resonator f=.09*globals->samrate, bw=.06*globals->samrate  */
+
+			voice = resonator(&rlp, voice);	/* in=voice, out=voice */
+
+			/* Increment counter that keeps track of 4*globals->samrate samples/sec */
+			nper++;
+		}
+
+		/* Tilt spectrum of voicing source down by soft low-pass filtering, amount
+		of tilt determined by TLTdb
+		*/
+		voice = (voice * onemd) + (vlast * decay);
+		vlast = voice;
+
+		/* Add breathiness during glottal open phase */
+		if (nper < nopen)
+		{
+			/* Amount of breathiness determined by parameter Aturb */
+			/* Use nrand rather than noise because noise is low-passed */
+			voice += amp_breth * nrand;
+		}
+
+		/* Set amplitude of voicing */
+		glotout = amp_voice * voice;
+
+		/* Compute aspiration amplitude and add to voicing source */
+		aspiration = amp_aspir * noise;
+		glotout += aspiration;
+
+		par_glotout = glotout;
+
+		if (globals->synthesis_model != ALL_PARALLEL)
+		{
+			/* Cascade vocal tract, excited by laryngeal sources.
+			Nasal antiresonator, then formants FNP, F5, F4, F3, F2, F1
+			*/
+			float rnzout = antiresonator(&rnz, glotout);	/* Output of cascade nazal zero resonator  */
+			float casc_next_in = resonator(&rnpc, rnzout);	/* in=rnzout, out=rnpc.p1 */
+
+			/* Recoded from sequence of if's to use C's fall through switch
+			semantics. May allow compiler to optimize
+			*/
+			switch (globals->nfcascade)
+			{
+				case 8:
+					casc_next_in = resonator(&r8c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 7:
+					casc_next_in = resonator(&r7c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 6:
+					casc_next_in = resonator(&r6c, casc_next_in);	/* Do not use unless long vocal tract or samrat increased */
+				case 5:
+					casc_next_in = resonator(&r5c, casc_next_in);
+				case 4:
+					casc_next_in = resonator(&r4c, casc_next_in);
+				case 3:
+					casc_next_in = resonator(&r3c, casc_next_in);
+				case 2:
+					casc_next_in = resonator(&r2c, casc_next_in);
+				case 1:
+					out = resonator(&r1c, casc_next_in);
+					break;
+				default:
+					out = 0.0;
+			}
+			#if 0
+			/* Excite parallel F1 and FNP by voicing waveform */
+			/* Source is voicing plus aspiration */
+			/* Add in phase, boost lows for nasalized */
+			out += (resonator(&rnpp, par_glotout) + resonator(&r1p, par_glotout));
+			#endif
+		}
+		else
+		{
+			/* Is ALL_PARALLEL */
+			/* NIS - rsynth "hack"
+			As Holmes' scheme is weak at nasals and (physically) nasal cavity
+			is "back near glottis" feed glottal source through nasal resonators
+			Don't think this is quite right, but improves things a bit
+			*/
+			par_glotout = antiresonator(&rnz, par_glotout);
+			par_glotout = resonator(&rnpc, par_glotout);
+			/* And just use r1p NOT rnpp */
+			out = resonator(&r1p, par_glotout);
+			/* Sound sourc for other parallel resonators is frication
+			plus first difference of voicing waveform.
+			*/
+			sourc += (par_glotout - glotlast);
+			glotlast = par_glotout;
+		}
+
+		/* Standard parallel vocal tract
+		Formants F6,F5,F4,F3,F2, outputs added with alternating sign
+		*/
+		out = resonator(&r6p, sourc) - out;
+		out = resonator(&r5p, sourc) - out;
+		out = resonator(&r4p, sourc) - out;
+		out = resonator(&r3p, sourc) - out;
+		out = resonator(&r2p, sourc) - out;
+
+		out = amp_bypas * sourc - out;
+		out = resonator(&rout, out);//*8.0f; - why so quiet tho?
+		//		*(jwave+(ns%32)) = clip(globals, out); /* Convert back to integer */
+		//		u8 rr=ns%32;
+		return clip(globals,out);
+		//		*(jwave+ns) = rand()%32768;
+}
+
+
+
 void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave, unsigned char ns, unsigned char xx){
   //  float out;
 
