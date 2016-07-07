@@ -31,6 +31,23 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	TI_INTERP
 };
 
+static const struct tms5100_coeffs T0280B_0281A_coeff =
+{
+	/* subtype */
+	SUBTYPE_0281A,
+	10,
+	4,
+	5,
+	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
+	TI_0280_PATENT_ENERGY
+	TI_0280_2801_PATENT_PITCH
+	{
+	TI_0280_PATENT_LPC
+	},
+	TI_0280_PATENT_CHIRP
+	TI_INTERP
+};
+
 
 #define TI_028X_LATER_ENERGY \
 		/* E  */\
@@ -58,8 +75,6 @@ static const struct tms5100_coeffs tms5110a_coeff =
 #define TI_INTERP \
 	/* interpolation shift coefficients */\
 	{ 0, 3, 3, 3, 2, 2, 1, 1 }
-
-// TODO: check against talkie?
 
 #define TI_5110_5220_LPC \
 		/* K1  */\

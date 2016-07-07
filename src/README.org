@@ -2700,17 +2700,17 @@ eg.
 
 - 5110/5200 - lpc_reader changed for 5110 renders okay  ./lpcr 0 0 /root/Downloads/speaky/tmc0351n2l.vsm > /dev/dsp  from 1024+
 
-changes to split and dump these speaknspell codes and maybe find more!
+changes to split and dump these speaknspell codes and maybe find more: http://www.datamath.org/Story/Speak_Version.htm
 
 looking at newchirp.. compare for 5200! switch these differences on banks? - newchirp and newperiod -> lpc_sayDONE
 
 morph chirp/pitch codes with wormings
 
-shift to new mame/mess code for tms???? TESTING
+shift to new mame/mess code for tms???? TESTING DONE
 
 how filter works in talkie code for coeffs???? see: https://github.com/going-digital/Talkie/issues/6
 
-try coeff code only substitute for talkie...,,, also what about INTERP_SHIFT - RE_DO lpc_say with mame/mess code now as tms5200x.c (also 5100)
+try coeff code only substitute for talkie...,,, also what about INTERP_SHIFT - RE_DO lpc_say with mame/mess code now as tms5200x.c (also 5100)DONE
 
 -- how we could just have new tables in say to keep it simple - RE_TEST
 
@@ -2760,18 +2760,20 @@ TMS5xxx
 TI99=5200
 
 Vocab_UK_Acorn was designed to be played on the TMS5220 (The Acorn Speech synthesiser add-on)
-Vocab_Soundbites was designed to be played on the TMS5220 (probably encoded with QBOX Pro, which ships with TMS5220 coefficients only)
-The other vocabularies are random speech ROMs off the 'net, with unknown heritage. I speculate they were also encoded for the TMS5220.
 
 differences in code talkie/mame mess are in interpolation and in calculation of filter
 
 /./////
 
-TODO: try 5200 as generator, 
+TODO: try 5200 as generatorDONE, for 5100 do we just use different tables and byte size? 5200xlap version?
 
-5100 in split and extract 2x speak and spell, where are other ROMs?
+in lpc_say try different energy/pitch tables and port these into lpc.cDONE unTESTed for 5220/5200
+
+5100 in split and extract 2x speak and spellDONE, where are other ROMs? see below 
 
 convert 5100 and 5200 coeffs into format we can use with talkie code to compare also here...
+
+/////
 
 FORMAT:
 
@@ -2779,11 +2781,26 @@ sam_init();
 sam_newsay(); 
 sam_get_sample();
 
-///
+
+** 8/7
+
+- TODO:
 
 *do we we need seperate samplepos in audio.c for each generator?*
 
+- new 5100 roms below to decode and clean up all 5100 roms 
 
+- 5100 in 5200x code - try to just plug in different   m_coeff= and int m_variant=TMS5220_IS_5200;                /* Variant of the 5xxx - see tms5110r.h */
+
+- or port tms5110x.c which should not be necessary
+
+- sp0256 vocabularies - and how works with 2 bits... re-acquaint
+
+- tubes.c and do we ignore nvp.c
+
+// new/extra modes:
+
+talkie and different tables/5100/52xx/sam single phonemes/low pass variants and change the low pass
 
 * important notes
 
@@ -2933,6 +2950,8 @@ klatt in docs:
 1= phonetic array (position in array (of 32), phonemes, stress)
 2= bent raw phonemeindex/length/stress going through but how to stop this malfunctioning and add breaths also?
 
+raw phoneme is a bit brittle and should maybe be abandoned - or somehow break to single functions and no parsing at all???
+
 ///////
 
 .... details from: http://www.retrobits.net/atari/sam.shtml#ch1.1
@@ -3053,17 +3072,6 @@ https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
 [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]], 
 
-5110/speak and spell: VSM- http://www.seanriddle.com/speakandspell.html voice synth memory... we have 
-
-tmc0351n2l.vsm
-tmc0352n2l.vsm
-
-see also http://ploguechipsounds.blogspot.de/2014/12/chipspeech-diary-part-2.html
-
-how is 5110 differing from 5220? check bits for pitch and tables :
-
-5 pitch bits rather than 6 for 5200
-
 digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
 	ROM_REGION( 0x10000, "digitalker", 0) /* 64k? for digitalker voice samples */
@@ -3166,3 +3174,21 @@ then dump to hex: ./lpcdump /root/mess/software/ti99_4ae/phm3226g4.bin > phm3226
 then copy into lpc_split, edit then run and test in lpc_say??? or/???
 
 //watch number of pitch bits for 5100=5 and 5200=6 
+* roms - ti99/apple/games/speak and spell
+
+http://www.datamath.org/Story/Speak_Version.htm
+
+vsm for 5100 and others...
+
+list of roms:
+
+[[file:~/mame2/src/mess/drivers/tispeak.c]]
+
+in speaky: cd2352.vsm, cd2350a.vsm 
+
+5110/speak and spell: VSM- http://www.seanriddle.com/speakandspell.html voice synth memory... we have 
+
+tmc0351n2l.vsm
+tmc0352n2l.vsm BOTH DONE
+
+see also http://ploguechipsounds.blogspot.de/2014/12/chipspeech-diary-part-2.html
