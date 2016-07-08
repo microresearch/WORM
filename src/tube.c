@@ -11,11 +11,7 @@
 *
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/param.h>
-#include <math.h>
-#include <string.h>
+#include "audio.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -142,8 +138,8 @@
 #define RANGE_MAX                 32767.0
 
 /*  MATH CONSTANTS  */
-#define PI                        3.1415927
-#define TWO_PI                    (2.0 * PI)
+#define TUBEPI                        3.1415927
+#define TWO_PI                    (2.0 * TUBEPI)
 
 /*  FUNCTION RETURN CONSTANTS  */
 #define ERROR                     (-1)
@@ -183,30 +179,13 @@
 
 #define OUTPUT_SRATE_LOW          22050.0
 #define OUTPUT_SRATE_HIGH         44100.0
-#define BUFFER_SIZE               1024                 /*  ring buffer size  */
+//#define BUFFER_SIZE               1024                 /*  ring buffer size  */
 
-extern signed int audio_buffer[32768];
+//extern signed int audio_buffer[32768];
 //signed int audio_buffer[32767];
-static unsigned int laststart;
+//static unsigned int laststart;
 
 /*  DATA TYPES  **************************************************************/
-
-/*  VARIABLES FOR INPUT TABLES  */
-typedef struct _INPUT {
-    struct _INPUT *previous;
-    struct _INPUT *next;
-
-    float glotPitch;
-    float glotVol;
-    float aspVol;
-    float fricVol;
-    float fricPos;
-    float fricCF;
-    float fricBW;
-    float radius[TOTAL_REGIONS];
-    float velum;
-} INPUT;
-
 
 
 /*  GLOBAL VARIABLES *********************************************************/
@@ -249,7 +228,8 @@ float actualTubeLength;            /*  actual length in cm  */
 float dampingFactor;               /*  calculated damping factor  */
 float crossmixFactor;              /*  calculated crossmix factor  */
 
-float wavetable[TABLE_LENGTH];
+//float wavetable[TABLE_LENGTH];
+float* wavetable;
 
 //float *wavetable;
 int    tableDiv1;
@@ -292,16 +272,8 @@ int prev_ptr = 0;
 /*  MEMORY FOR FRICATION TAPS  */
 float fricationTap[TOTAL_FRIC_COEFFICIENTS];
 
-/*  VARIABLES FOR INPUT TABLE STORAGE  */
-INPUT *inputHead = NULL;
-INPUT *inputTail = NULL;
-int numberInputTables = 0;
-
-INPUT tableone;
-INPUT tabletwo;
-
 /*  VARIABLES FOR INTERPOLATION  */
-struct {
+struct currentt{
     float glotPitch;
     float glotPitchDelta;
     float glotVol;
@@ -320,22 +292,26 @@ struct {
     float radiusDelta[TOTAL_REGIONS];
     float velum;
     float velumDelta;
-} current;
+};
+
+struct currentt current;
 
 /*  VARIABLES FOR FIR LOWPASS FILTER  */
-float FIRData[128], FIRCoef[128];
+//float FIRData[128], FIRCoef[128];
+float *FIRData, *FIRCoef;
+
 int FIRPtr, numberTaps;
 
 /*  VARIABLES FOR SAMPLE RATE CONVERSION  */
 float sampleRateRatio;
-float h[FILTER_LENGTH], deltaH[FILTER_LENGTH], buffer[BUFFER_SIZE];
+//float h[FILTER_LENGTH], deltaH[FILTER_LENGTH], buffer[BUFFER_SIZE];
 int fillPtr, emptyPtr = 0, padSize, fillSize;
 unsigned int timeRegisterIncrement, filterIncrement, phaseIncrement;
 unsigned int timeRegister = 0;
 
 /*  GLOBAL FUNCTIONS (LOCAL TO THIS FILE)  ***********************************/
 
-int initializeSynthesizer(void);
+//int initializeSynthesizer(void);
 
 void initializeWavetable(void);
 float speedOfSound(float temperature);
@@ -349,23 +325,8 @@ float radiationFilter(float input);
 void initializeNasalFilterCoefficients(float coeff);
 float nasalReflectionFilter(float input);
 float nasalRadiationFilter(float input);
-void addInput(float glotPitch, float glotVol, float aspVol, float fricVol,
-	      float fricPos, float fricCF, float fricBW, float *radius,
-	      float velum);
-INPUT *newInputTable(void);
-float glotPitchAt(int position);
-float glotVolAt(int position);
-float *radiiAt(int position);
-float radiusAtRegion(int position, int region);
-float velumAt(int position);
-float aspVolAt(int position);
-float fricVolAt(int position);
-float fricPosAt(int position);
-float fricCFAt(int position);
-float fricBWAt(int position);
-INPUT *inputAt(int position);
-void synthesize(void);
-void setControlRateParameters(int pos);
+
+void setControlRateParameters();
 void sampleRateInterpolation(void);
 void initializeNasalCavity(void);
 void initializeThroat(void);
@@ -387,159 +348,25 @@ void rationalApproximation(float number, int *order, int *numerator,
 float FIRFilter(float input, int needOutput);
 int increment(int pointer, int modulus);
 int decrement(int pointer, int modulus);
-void initializeConversion(void);
-void initializeFilter(void);
+//void initializeConversion(void);
+//void initializeFilter(void);
 float Izero(float x);
-void initializeBuffer(void);
-void dataFill(float data);
-void dataEmpty(void);
-void flushBuffer(void);
-void srIncrement(int *pointer, int modulus);
-void srDecrement(int *pointer, int modulus);
+//void initializeBuffer(void);
+//void dataFill(float data);
+//void dataEmpty(void);
 
 /////////////////////////////////////////////=???????
-
-
 
 // example input to convert to arrays in first INIT
 // and transcribe that list of vowels/frames
 
 float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
-float input_frame[16]={-12.5,54.0,0.0,0.0,4.0,4400,600,0.8,0.8,0.4,0.4,1.78,1.78,1.26,0.8,0.0};
+float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
+
+//float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
 
 /// with microint 64 x 16:
-
-const float input_frames[64][16]  __attribute__ ((section (".flash"))) =
-{
-{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 0.010000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.650000, 0.650000, 1.310000, 1.230000, 1.310000, 1.670000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.840000, 1.150000, 1.310000, 1.590000, 1.590000, 2.610000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.450000, 0.940000, 1.100000, 1.520000, 1.460000, 2.450000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.520000, 0.450000, 0.790000, 1.490000, 1.670000, 1.020000, 1.590000, 1.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.520000, 0.450000, 0.790000, 1.490000, 1.670000, 1.020000, 1.590000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.100000, 0.940000, 0.420000, 1.490000, 1.670000, 1.780000, 1.050000, 0.100000},
-
-{-2.000000, 43.500000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
-
-{-2.000000, 43.500000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
-
-{-2.000000, 0.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.000000, 0.790000, 0.790000, 0.100000},
-
-{-2.000000, 43.500000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.300000, 0.100000},
-
-{-1.000000, 54.000000, 0.000000, 0.250000, 6.000000, 4400.000000, 4500.000000, 0.800000, 1.200000, 1.500000, 1.350000, 1.200000, 1.200000, 0.400000, 1.000000, 0.100000},
-
-{-2.000000, 43.500000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.680000, 1.120000, 1.695000, 1.385000, 1.070000, 1.045000, 2.060000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.670000, 1.905000, 1.985000, 0.810000, 0.495000, 0.730000, 1.485000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
-
-{-1.000000, 0.000000, 0.000000, 0.500000, 7.000000, 3300.000000, 1000.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 0.890000, 0.840000, 0.500000, 0.100000},
-
-{-2.000000, 43.500000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
-
-{0.000000, 0.000000, 10.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
-
-{0.000000, 0.000000, 10.000000, 0.000000, 1.000000, 1000.000000, 1000.000000, 0.800000, 0.240000, 0.400000, 0.810000, 0.760000, 1.050000, 1.230000, 1.120000, 0.100000},
-
-{0.000000, 42.000000, 10.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.800000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.045000, 1.565000, 1.750000, 0.940000, 0.680000, 0.785000, 1.120000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.650000, 0.835000, 1.150000, 1.305000, 1.590000, 1.590000, 2.610000, 1.500000},
-
-{-2.000000, 48.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.000000, 0.790000, 0.790000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 1.100000, 0.970000, 0.890000, 0.340000, 0.290000, 1.120000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.630000, 0.470000, 0.650000, 1.540000, 0.450000, 0.260000, 1.050000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.630000, 0.470000, 0.650000, 1.540000, 0.450000, 0.260000, 1.050000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 1.000000, 0.050000, 1.440000, 1.310000, 0.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.000000, 0.925000, 0.600000, 1.270000, 1.830000, 1.970000, 1.120000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.000000, 0.925000, 0.600000, 1.265000, 1.830000, 1.965000, 1.120000, 1.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
-
-{-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 0.010000, 0.100000},
-
-{-2.000000, 0.000000, 0.000000, 0.000000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.100000, 0.790000, 0.790000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 4.700000, 2000.000000, 2000.000000, 0.800000, 1.700000, 1.300000, 0.990000, 0.100000, 1.070000, 0.730000, 1.490000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 2000.000000, 700.000000, 0.800000, 0.890000, 0.760000, 1.280000, 1.800000, 0.990000, 0.840000, 0.100000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.000000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.400000, 1.310000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
-
-{-1.000000, 0.000000, 0.000000, 0.000000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.600000, 1.310000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 0.730000, 1.070000, 2.120000, 0.470000, 1.780000, 0.650000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.310000, 0.730000, 1.310000, 2.120000, 0.630000, 1.780000, 0.650000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.800000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 0.200000, 0.400000, 1.310000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.400000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.370000, 0.790000, 0.790000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 7.000000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.250000, 6.000000, 4400.000000, 4500.000000, 0.800000, 1.200000, 1.500000, 1.350000, 1.200000, 1.200000, 0.400000, 1.000000, 0.100000},
-
-{-10.000000, 0.000000, 0.000000, 0.000000, 6.700000, 4500.000000, 2000.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.760000, 0.100000, 1.440000, 1.310000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.625000, 0.600000, 0.705000, 1.120000, 1.930000, 1.515000, 0.625000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 1.050000, 1.230000, 1.120000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 0.885000, 0.990000, 0.810000, 0.755000, 1.045000, 1.225000, 1.120000, 1.500000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.910000, 1.440000, 0.600000, 1.020000, 1.330000, 1.560000, 0.550000, 0.100000},
-
-{-1.000000, 54.000000, 0.000000, 0.200000, 7.000000, 3300.000000, 1000.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.760000, 0.890000, 0.840000, 0.500000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.910000, 1.440000, 0.600000, 1.020000, 1.330000, 1.560000, 0.550000, 0.100000},
-
-{0.000000, 0.000000, 0.000000, 0.500000, 2.000000, 1770.000000, 900.000000, 0.800000, 1.700000, 1.300000, 0.400000, 0.990000, 1.070000, 0.730000, 1.490000, 0.100000},
-
-{0.000000, 60.000000, 0.000000, 0.000000, 5.500000, 2500.000000, 500.000000, 0.800000, 1.670000, 1.910000, 1.990000, 0.630000, 0.290000, 0.580000, 1.490000, 0.250000},
-
-{-1.000000, 54.000000, 0.000000, 0.800000, 5.800000, 5500.000000, 500.000000, 0.800000, 1.310000, 1.490000, 1.250000, 0.900000, 00, 0.600000, 1.310000, 0.100000},
-
-{-1.000000, 54.000000, 0.000000, 0.400000, 5.600000, 2500.000000, 2600.000000, 0.800000, 1.360000, 1.740000, 1.870000, 0.940000, 0.370000, 0.790000, 0.790000, 0.100000}
-};
 
 
 
@@ -549,7 +376,7 @@ float glotPitch, glotVol, radius[TOTAL_REGIONS], velum, aspVol;
 float fricVol, fricPos, fricCF, fricBW;
 unsigned char i;
 
- laststart=0;
+// laststart=0;
  outputRate = 32000;
  controlRate = 4.0;
 
@@ -610,6 +437,7 @@ mixOffset = parameter_list[20];
 
 // then read in frame - so we will have 2 inputtables!
 
+/*
 glotPitch = input_frame[0]+globglotpitch;
 glotVol = input_frame[1];
 aspVol = input_frame[2];
@@ -618,25 +446,31 @@ fricPos = input_frame[4];
 fricCF = input_frame[5];
 fricBW = input_frame[6];
 
+
 for (i = 0; i < TOTAL_REGIONS; i++) radius[i] = input_frame[7+i];
 
 velum = input_frame[7+i];
 
+*/
+
 //ADD THE PARAMETERS TO THE INPUT LIST  
-addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,fricBW, radius, velum);
+//addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,fricBW, radius, velum);
 
 // printff("NUMMMMMM %d",numberInputTables);
 
 
 //FLOAT UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  -- adds one
-if (numberInputTables > 0) {
+/*if (numberInputTables > 0) {
 int lastTable = numberInputTables - 1;
 addInput(glotPitchAt(lastTable), glotVolAt(lastTable),
 aspVolAt(lastTable), fricVolAt(lastTable),
 fricPosAt(lastTable), fricCFAt(lastTable),
 fricBWAt(lastTable), radiiAt(lastTable),
 velumAt(lastTable));
-}
+}*/
+
+// do as last:
+
 
 //    printff("NUMMMMMM %d",numberInputTables);
 
@@ -694,51 +528,12 @@ velumAt(lastTable));
 
 
 
-/******************************************************************************
-*
-*	function:	speedOfSound
-*
-*	purpose:	Returns the speed of sound according to the value of
-*                       the temperature (in Celsius degrees).
-*			
-*       arguments:      temperature
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float speedOfSound(float temperature)
 {
     return (331.4 + (0.6 * temperature));
 }
 
-
-
-/******************************************************************************
-*
-*	function:	initializeSynthesizer
-*
-*	purpose:	Initializes all variables so that the synthesis can
-*                       be run.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	speedOfSound, amplitude, initializeWavetable,
-*                       initializeFIR, initializeNasalFilterCoefficients,
-*                       initializeNasalCavity, initializeThroat,
-*                       initializeConversion
-*
-*	library
-*	functions:	rintf, fprintff, tmpfile, rewind
-*
-******************************************************************************/
-
-int initializeSynthesizer(void)
+void tube_init(void)
 {
     float nyquist;
 
@@ -763,47 +558,28 @@ int initializeSynthesizer(void)
     dampingFactor = (1.0 - (lossFactor / 100.0));
 
     /*  INITIALIZE THE WAVE TABLE  */
-    initializeWavetable();
+        initializeWavetable();
 
     /*  INITIALIZE THE FIR FILTER  */
-    initializeFIR(FIR_BETA, FIR_GAMMA, FIR_CUTOFF);
+        initializeFIR(FIR_BETA, FIR_GAMMA, FIR_CUTOFF);
 
     /*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-    initializeMouthCoefficients((nyquist - mouthCoef) / nyquist);
+        initializeMouthCoefficients((nyquist - mouthCoef) / nyquist);
 
     /*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-    initializeNasalFilterCoefficients((nyquist - noseCoef) / nyquist);
+        initializeNasalFilterCoefficients((nyquist - noseCoef) / nyquist);
 
     /*  INITIALIZE NASAL CAVITY FIXED SCATTERING COEFFICIENTS  */ 
-    initializeNasalCavity();
+        initializeNasalCavity();
 
     /*  INITIALIZE THE THROAT LOWPASS FILTER  */
-    initializeThroat();
+        initializeThroat();
 
     /*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-    initializeConversion();
+    //    initializeConversion(); // not now
 
-    return 1;
+    //    return 1;
 }
-
-
-
-/******************************************************************************
-*
-*	function:	initializeWavetable
-*
-*	purpose:	Calculates the initial glottal pulse and stores it
-*                       in the wavetable, for use in the oscillator.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	calloc, rintf
-*
-******************************************************************************/
 
 void initializeWavetable(void)
 {
@@ -811,7 +587,7 @@ void initializeWavetable(void)
 
 
     /*  ALLOCATE MEMORY FOR WAVETABLE  */
-    //    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
+    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
 
 
     /*  CALCULATE WAVE TABLE PARAMETERS  */
@@ -845,29 +621,10 @@ void initializeWavetable(void)
     else {
 	/*  SINE WAVE  */
 	for (i = 0; i < TABLE_LENGTH; i++) {
-	    wavetable[i] = sinf( ((float)i/(float)TABLE_LENGTH) * 2.0 * PI );
+	    wavetable[i] = sinf( ((float)i/(float)TABLE_LENGTH) * 2.0 * TUBEPI );
 	}
     }	
 }
-
-
-
-/******************************************************************************
-*
-*	function:	updateWavetable
-*
-*	purpose:	Rewrites the changeable part of the glottal pulse
-*                       according to the amplitude.
-*			
-*       arguments:      amplitude
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	rintf
-*
-******************************************************************************/
 
 void updateWavetable(float amplitude)
 {
@@ -890,24 +647,6 @@ void updateWavetable(float amplitude)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	initializeFIR
-*
-*	purpose:	Allocates memory and initializes the coefficients
-*                       for the FIR filter used in the oversampling oscillator.
-*			
-*       arguments:      beta, gamma, cutoff
-*                       
-*	internal
-*	functions:	maximallyFlat, trim
-*
-*	library
-*	functions:	calloc
-*
-******************************************************************************/
-
 void initializeFIR(float beta, float gamma, float cutoff)
 {
     int i, pointer, increment, numberCoefficients;
@@ -924,8 +663,8 @@ void initializeFIR(float beta, float gamma, float cutoff)
     numberTaps = (numberCoefficients * 2) - 1;
 
     /*  ALLOCATE MEMORY FOR DATA AND COEFFICIENTS  */
-    //    FIRData = (float *)calloc(numberTaps, sizeof(float)); // NOT FIXED as dependent on BETA!
-    //    FIRCoef = (float *)calloc(numberTaps, sizeof(float));
+        FIRData = (float *)calloc(numberTaps, sizeof(float)); // NOT FIXED as dependent on BETA!
+        FIRCoef = (float *)calloc(numberTaps, sizeof(float));
 
     /*  INITIALIZE THE COEFFICIENTS  */
     increment = (-1);
@@ -943,24 +682,6 @@ void initializeFIR(float beta, float gamma, float cutoff)
     FIRPtr = 0;
 }
 
-
-
-/******************************************************************************
-*
-*	function:	noise
-*
-*	purpose:	Returns one value of a random sequence.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float noise(void)
 {
     static float seed = INITIAL_SEED;
@@ -970,24 +691,6 @@ float noise(void)
     return (seed - 0.5);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	noiseFilter
-*
-*	purpose:	One-zero lowpass filter.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float noiseFilter(float input)
 {
     static float noiseX = 0.0;
@@ -996,26 +699,6 @@ float noiseFilter(float input)
     noiseX = input;
     return (output);
 }
-
-
-
-/******************************************************************************
-*
-*	function:	initializeMouthCoefficients
-*
-*	purpose:	Calculates the reflection/radiation filter coefficients
-*                       for the mouth, according to the mouth aperture
-*                       coefficient.
-*			
-*       arguments:      coeff - mouth aperture coefficient
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	fabs
-*
-******************************************************************************/
 
 void initializeMouthCoefficients(float coeff)
 {
@@ -1027,24 +710,6 @@ void initializeMouthCoefficients(float coeff)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	reflectionFilter
-*
-*	purpose:	Is a variable, one-pole lowpass filter, whose cutoff
-*                       is determined by the mouth aperture coefficient.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float reflectionFilter(float input)
 {
     static float reflectionY = 0.0;
@@ -1054,25 +719,6 @@ float reflectionFilter(float input)
     return (output);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	radiationFilter
-*
-*	purpose:	Is a variable, one-zero, one-pole, highpass filter,
-*                       whose cutoff point is determined by the mouth aperture
-*                       coefficient.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float radiationFilter(float input)
 {
@@ -1085,25 +731,6 @@ float radiationFilter(float input)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	initializeNasalFilterCoefficients
-*
-*	purpose:	Calculates the fixed coefficients for the nasal
-*                       reflection/radiation filter pair, according to the
-*                       nose aperture coefficient.
-*			
-*       arguments:      coeff - nose aperture coefficient
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	fabs
-*
-******************************************************************************/
-
 void initializeNasalFilterCoefficients(float coeff)
 {
     nb11 = -coeff;
@@ -1114,24 +741,6 @@ void initializeNasalFilterCoefficients(float coeff)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	nasalReflectionFilter
-*
-*	purpose:	Is a one-pole lowpass filter, used for terminating
-*                       the end of the nasal cavity.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float nasalReflectionFilter(float input)
 {
     static float nasalReflectionY = 0.0;
@@ -1140,25 +749,6 @@ float nasalReflectionFilter(float input)
     nasalReflectionY = output;
     return (output);
 }
-
-
-
-/******************************************************************************
-*
-*	function:	nasalRadiationFilter
-*
-*	purpose:	Is a one-zero, one-pole highpass filter, used for the
-*                       radiation characteristic from the nasal cavity.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float nasalRadiationFilter(float input)
 {
@@ -1171,470 +761,87 @@ float nasalRadiationFilter(float input)
     return (output);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	addInput
-*
-*	purpose:	Adds table control data to the end of a linked list.
-*			
-*       arguments:      glotPitch, glotVol, radius, velum, aspVol,
-*                       fricVol, fricPos,
-*                       fricCF, fricBW
-*                       
-*	internal
-*	functions:	newInputTable
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-// TODO as there are only 2 tables
-
-void addInput(float glotPitch, float glotVol, float aspVol, float fricVol,
-	      float fricPos, float fricCF, float fricBW, float *radius,
-	      float velum)
+float glotPitchAt()
 {
-    int i;
-    INPUT *tempPtr;
-
-
-    if (inputHead == NULL) { // first table
-            inputTail = inputHead = &tableone;
-      //            inputTail = inputHead = newInputTable();
-	inputTail->previous = NULL;
-    }
-    else {
-      tempPtr = inputTail; // second table
-            inputTail = tempPtr->next = &tabletwo;
-      //      inputTail = tempPtr->next = newInputTable();
-
-	inputTail->previous = tempPtr;
-    }
-
-    /*  SET NULL POINTER TO NEXT, SINCE END OF LIST  */
-    inputTail->next = NULL;
-
-    /*  ADD GLOTTAL PITCH AND VOLUME  */
-    inputTail->glotPitch = glotPitch;
-    inputTail->glotVol = glotVol;
-
-    /*  ADD ASPIRATION  */
-    inputTail->aspVol = aspVol;
-
-    /*  ADD FRICATION PARAMETERS  */
-    inputTail->fricVol = fricVol;
-    inputTail->fricPos = fricPos;
-    inputTail->fricCF = fricCF;
-    inputTail->fricBW = fricBW;
-
-    /*  ADD TUBE REGION RADII  */
-    for (i = 0; i < TOTAL_REGIONS; i++)
-	inputTail->radius[i] = radius[i];
-
-    /*  ADD VELUM RADIUS  */
-    inputTail->velum = velum;
-
-    /*  INCREMENT NUMBER OF TABLES  */
-    numberInputTables++;
+  return input_frame[0]+globglotpitch;
 }
 
-
-
-/******************************************************************************
-*
-*	function:	newInputTable
-*
-*	purpose:	Allocates memory for a new input table.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	malloc
-*
-******************************************************************************/
-
-
-INPUT *newInputTable(void)
+float glotVolAt()
 {
-  return ((INPUT *)malloc(sizeof(INPUT))); // TODO? - from addinput?
+  return input_frame[1];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	glotPitchAt
-*
-*	purpose:	Returns the pitch stored in the table at 'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	inputAt
-*
-******************************************************************************/
-
-float glotPitchAt(int position)
+float *radiiAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->glotPitch);
-    else
-	return (0.0);
+  return &input_frame[7];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	glotVolAt
-*
-*	purpose:	Returns the glotVol stored in the table at 'position'.
-*			
-*       arguments:      position
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	inputAt
-*
-******************************************************************************/
-
-float glotVolAt(int position)
+float radiusAtRegion(u8 region)
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->glotVol);
-    else
-	return (0.0);
+  return input_frame[7+region];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	radiiAt
-*
-*	purpose:	Returns the variable tube radii stored in the table at
-*                       'position'.
-*			
-*       arguments:      position
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	inputAt
-*
-******************************************************************************/
-
-float *radiiAt(int position)
+float velumAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->radius);
-    else
-	return (NULL);
+return input_frame[7+TOTAL_REGIONS];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	radiusAtRegion
-*
-*	purpose:	Returns the radius for 'region', from the table at
-*                       'position'.
-*			
-*       arguments:      position, region
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float radiusAtRegion(int position, int region)
+float aspVolAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->radius[region]);
-    else
-	return (0.0);
+  return input_frame[2];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	velumAt
-*
-*	purpose:	Returns the velum radius from the table at 'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float velumAt(int position)
+float fricVolAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->velum);
-    else
-	return (0.0);
+  return input_frame[3];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	aspVolAt
-*
-*	purpose:	Returns the aspiration factor from the table at
-*                       'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float aspVolAt(int position)
+float fricPosAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->aspVol);
-    else
-	return (0.0);
+  return input_frame[4];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	fricVolAt
-*
-*	purpose:	Returns the frication volume from the table at
-*                       'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float fricVolAt(int position)
+float fricCFAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->fricVol);
-    else
-	return (0.0);
+  return input_frame[5];
 }
 
-
-
-/******************************************************************************
-*
-*	function:	fricPosAt
-*
-*	purpose:	Returns the frication position from the table at
-*                       'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float fricPosAt(int position)
+float fricBWAt()
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->fricPos);
-    else
-	return (0.0);
+  return input_frame[6];
 }
 
+void tube_newsay(void){
+  // what we need to reset
 
+  setControlRateParameters(); // TODO - just replace with straight array in
 
-/******************************************************************************
-*
-*	function:	fricCFAt
-*
-*	purpose:	Returns the frication center frequency from the table
-*                       at 'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float fricCFAt(int position)
-{
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->fricCF);
-    else
-	return (0.0);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	fricBWAt
-*
-*	purpose:	Returns the frication bandwidth from the table
-*                       at 'position'.
-*                       
-*       arguments:      position
-*                       
-*	internal
-*	functions:	inputAt
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-float fricBWAt(int position)
+int16_t tube_get_sample(void)
 {
-    INPUT *ptr;
-
-    if ((ptr = inputAt(position)))
-	return (ptr->fricBW);
-    else
-	return (0.0);
-}
-
-
-
-/******************************************************************************
-*
-*	function:	inputAt
-*
-*	purpose:	Returns a pointer to the table specified by 'position'.
-*			
-*       arguments:      position
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-INPUT *inputAt(int position)
-{
-    int i;
-    INPUT *tempPtr = inputHead;
-
-    if ((position < 0) || (position >= numberInputTables))
-	return (NULL);
-
-    /*  LOOP THROUGH TO PROPER POSITION IN LIST  */
-    for (i = 0; i < position; i++)
-	tempPtr = tempPtr->next;
+  static int16_t j=0;
+  int16_t sample;
+  float f0, ax, ah1, pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
   
-    return (tempPtr);
-}
-
-
-
-/******************************************************************************
-*
-*	function:	synthesize
-*
-*	purpose:	Performs the actual synthesis of sound samples.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	setControlRateParameters, frequency, amplitude,
-*                       calculateTubeCoefficients, noise, noiseFilter,
-*                       updateWavetable, oscillator, vocalTract, throat,
-*                       dataFill, sampleRateInterpolation
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void synthesize(void)
-{
-    int i, j;
-    float f0, ax, ah1, pulse, lp_noise, pulsed_noise, signal, crossmix;
-
-    
-    for (i = 1; i < numberInputTables; i++) {
-      setControlRateParameters(i); // just replace with straight array in
-	   
-	for (j = 0; j < controlPeriod; j++) {
-	    f0 = frequency(current.glotPitch);
-	    ax = amplitude(current.glotVol);
-	    //	    printf("sig %f", current.glotPitch);
-	    ah1 = amplitude(current.aspVol);
+    // do we have a new frame? -> newsay 
+    if (j>=controlPeriod) {
+      tube_newsay();
+      j=0;
+    }
+    f0 = frequency(current.glotPitch); // without interpol these are all the same?
+    ax = amplitude(current.glotVol);
+    ah1 = amplitude(current.aspVol);
 	    calculateTubeCoefficients();
 	    setFricationTaps();
 	    calculateBandpassCoefficients();
 
 	    lp_noise = noiseFilter(noise());
-
 	    if (waveform == PULSE)		updateWavetable(ax);
-
 	    pulse = oscillator(f0);
-
 	    pulsed_noise = lp_noise * pulse;
-
 	    pulse = ax * ((pulse * (1.0 - breathinessFactor)) +
 			  (pulsed_noise * breathinessFactor));
-
 
 	    if (modulation) {
 		crossmix = ax * crossmixFactor;
@@ -1647,55 +854,36 @@ void synthesize(void)
 
 	    signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE), bandpassFilter(signal));
 
-	    // here signal is 00000
-
 	    signal += throaty(pulse * VT_SCALE);
 	    
-
-	    dataFill(signal);
+	    //	    dataFill(signal); // this is where we get samples - no interpolation of samples OR control - just to test
+	    absoluteSampleValue = fabsf(signal);
+	    if (absoluteSampleValue > maximumSampleValue)
+		maximumSampleValue = absoluteSampleValue;
 	    
-	    sampleRateInterpolation();
-    
-	    }
-	}
+	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
+	    if (maximumSampleValue > 0)
+	      scale = (RANGE_MAX / maximumSampleValue);
+	    signal=signal*scale;
+	    sample=rintf(signal); 	 
+	    j++;
+	    //	     sample=rand()%32768;
+	    return sample;
 }
 
-
-
-/******************************************************************************
-*
-*	function:	setControlRateParameters
-*
-*	purpose:	Calculates the current table values, and their
-*                       associated sample-to-sample delta values.
-*			
-*       arguments:      pos
-*                       
-*	internal
-*	functions:	glotPitchAt, glotVolAt, aspVolAt, fricVolAt, fricPosAt,
-*                       fricCFAt, fricBWAt, radiusAtRegion, velumAt,
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void setControlRateParameters(int pos)
+void setControlRateParameters()
 {
-    int i;
+    u8 i;
+    current.glotPitch = glotPitchAt();
 
-    /*  GLOTTAL PITCH  */
-    current.glotPitch = glotPitchAt(pos - 1);
-    current.glotPitchDelta =
-	(glotPitchAt(pos) - current.glotPitch) / (float)controlPeriod;
+    //    current.glotPitchDelta =
+    //	(glotPitchAt(pos) - current.glotPitch) / (float)controlPeriod;
 
-    /*  GLOTTAL VOLUME  */
-    current.glotVol = glotVolAt(pos - 1);
-    current.glotVolDelta =
-	(glotVolAt(pos) - current.glotVol) / (float)controlPeriod;
+    current.glotVol = glotVolAt();
+    //    current.glotVolDelta =
+    //	(glotVolAt(pos) - current.glotVol) / (float)controlPeriod;
 
-    /*  ASPIRATION VOLUME  */
-    current.aspVol = aspVolAt(pos - 1);
+    current.aspVol = aspVolAt();
 #if MATCH_DSP
     current.aspVolDelta = 0.0;
 #else
@@ -1703,8 +891,7 @@ void setControlRateParameters(int pos)
 	(aspVolAt(pos) - current.aspVol) / (float)controlPeriod;
 #endif
 
-    /*  FRICATION VOLUME  */
-    current.fricVol = fricVolAt(pos - 1);
+    current.fricVol = fricVolAt();
 #if MATCH_DSP
     current.fricVolDelta = 0.0;
 #else
@@ -1712,8 +899,7 @@ void setControlRateParameters(int pos)
 	(fricVolAt(pos) - current.fricVol) / (float)controlPeriod;
 #endif
 
-    /*  FRICATION POSITION  */
-    current.fricPos = fricPosAt(pos - 1);
+    current.fricPos = fricPosAt();
 #if MATCH_DSP
     current.fricPosDelta = 0.0;
 #else
@@ -1721,8 +907,7 @@ void setControlRateParameters(int pos)
 	(fricPosAt(pos) - current.fricPos) / (float)controlPeriod;
 #endif
 
-    /*  FRICATION CENTER FREQUENCY  */
-    current.fricCF = fricCFAt(pos - 1);
+    current.fricCF = fricCFAt();
 #if MATCH_DSP
     current.fricCFDelta = 0.0;
 #else
@@ -1730,8 +915,7 @@ void setControlRateParameters(int pos)
 	(fricCFAt(pos) - current.fricCF) / (float)controlPeriod;
 #endif
 
-    /*  FRICATION BANDWIDTH  */
-    current.fricBW = fricBWAt(pos - 1);
+    current.fricBW = fricBWAt();
 #if MATCH_DSP
     current.fricBWDelta = 0.0;
 #else
@@ -1739,37 +923,18 @@ void setControlRateParameters(int pos)
 	(fricBWAt(pos) - current.fricBW) / (float)controlPeriod;
 #endif
 
-    /*  TUBE REGION RADII  */
     for (i = 0; i < TOTAL_REGIONS; i++) {
-	current.radius[i] = radiusAtRegion((pos - 1), i);
-	current.radiusDelta[i] =
-	    (radiusAtRegion(pos,i) - current.radius[i]) /
-		(float)controlPeriod;
+      	current.radius[i] = radiusAtRegion(i);
+	//	current.radiusDelta[i] =
+	//	    (radiusAtRegion(pos,i) - current.radius[i]) /
+	//		(float)controlPeriod;
     }
 
-    /*  VELUM RADIUS  */
-    current.velum = velumAt(pos - 1);
-    current.velumDelta =
-	(velumAt(pos) - current.velum) / (float)controlPeriod;
+    current.velum = velumAt();
+    //    current.velumDelta =
+    //	(velumAt(pos) - current.velum) / (float)controlPeriod;
+    
 }
-
-
-
-/******************************************************************************
-*
-*	function:	sampleRateInterpolation
-*
-*	purpose:	Interpolates table values at the sample rate.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 void sampleRateInterpolation(void)
 {
@@ -1777,34 +942,15 @@ void sampleRateInterpolation(void)
 
     current.glotPitch += current.glotPitchDelta;
     current.glotVol += current.glotVolDelta;
-    current.aspVol += current.aspVolDelta;
-    current.fricVol += current.fricVolDelta;
-    current.fricPos += current.fricPosDelta;
-    current.fricCF += current.fricCFDelta;
-    current.fricBW += current.fricBWDelta;
+    //    current.aspVol += current.aspVolDelta; // 0.0
+    //    current.fricVol += current.fricVolDelta; // 0.0
+    //    current.fricPos += current.fricPosDelta; // 0.0
+    //    current.fricCF += current.fricCFDelta;// 0.0
+    current.fricBW += current.fricBWDelta; // 0.0
     for (i = 0; i < TOTAL_REGIONS; i++)
 	current.radius[i] += current.radiusDelta[i];
     current.velum += current.velumDelta;
 }
-
-
-
-/******************************************************************************
-*
-*	function:	initializeNasalCavity
-*
-*	purpose:	Calculates the scattering coefficients for the fixed
-*                       sections of the nasal cavity.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 void initializeNasalCavity(void)
 {
@@ -1826,25 +972,6 @@ void initializeNasalCavity(void)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	initializeThroat
-*
-*	purpose:	Initializes the throat lowpass filter coefficients
-*                       according to the throatCutoff value, and also the
-*                       throatGain, according to the throatVol value.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	fabs
-*
-******************************************************************************/
-
 void initializeThroat(void)
 {
     ta0 = (throatCutoff * 2.0)/sampleRate;
@@ -1853,26 +980,6 @@ void initializeThroat(void)
     throatGain = amplitude(throatVol);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	calculateTubeCoefficients
-*
-*	purpose:	Calculates the scattering coefficients for the vocal
-*                       tract according to the current radii.  Also calculates
-*                       the coefficients for the reflection/radiation filter
-*                       pair for the mouth and nose.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 void calculateTubeCoefficients(void)
 {
@@ -1907,25 +1014,6 @@ void calculateTubeCoefficients(void)
     nasal_coeff[NC1] = (radA2 - radB2) / (radA2 + radB2);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	setFricationTaps
-*
-*	purpose:	Sets the frication taps according to the current
-*                       position and amplitude of frication.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 void setFricationTaps(void)
 {
     int i, integerPart;
@@ -1951,56 +1039,19 @@ void setFricationTaps(void)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	calculateBandpassCoefficients
-*
-*	purpose:	Sets the frication bandpass filter coefficients
-*                       according to the current center frequency and
-*                       bandwidth.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	tan, cos
-*
-******************************************************************************/
-
 void calculateBandpassCoefficients(void)
 {
     float tanValue, cosValue;
 
 
-    tanValue = tanf((PI * current.fricBW) / sampleRate);
-    cosValue = cosf((2.0 * PI * current.fricCF) / sampleRate);
+    tanValue = tanf((TUBEPI * current.fricBW) / sampleRate);
+    cosValue = cosf((2.0 * TUBEPI * current.fricCF) / sampleRate);
 
     bpBeta = (1.0 - tanValue) / (2.0 * (1.0 + tanValue));
     bpGamma = (0.5 + bpBeta) * cosValue;
     bpAlpha = (0.5 - bpBeta) / 2.0;
 }
 
-
-
-/******************************************************************************
-*
-*	function:	mod0
-*
-*	purpose:	Returns the modulus of 'value', keeping it in the
-*                       range 0 -> TABLE_MODULUS.
-*			
-*       arguments:      value
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float mod0(float value)
 {
@@ -2011,47 +1062,11 @@ float mod0(float value)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	incrementTablePosition
-*
-*	purpose:	Increments the position in the wavetable according to
-*                       the desired frequency.
-*			
-*       arguments:      frequency
-*                       
-*	internal
-*	functions:	mod0
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 void incrementTablePosition(float frequency)
 {
     currentPosition = mod0(currentPosition + (frequency * basicIncrement));
 }
 
-
-
-/******************************************************************************
-*
-*	function:	oscillator
-*
-*	purpose:	Is a 2X oversampling interpolating wavetable
-*                       oscillator.
-*			
-*       arguments:      frequency
-*                       
-*	internal
-*	functions:	incrementTablePosition, mod0, FIRFilter
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 #if OVERSAMPLING_OSCILLATOR
 float oscillator(float frequency)  /*  2X OVERSAMPLING OSCILLATOR  */
@@ -2101,26 +1116,6 @@ float oscillator(float frequency)  /*  PLAIN OSCILLATOR  */
 }
 #endif
 
-
-
-/******************************************************************************
-*
-*	function:	vocalTract
-*
-*	purpose:	Updates the pressure wave throughout the vocal tract,
-*                       and returns the summed output of the oral and nasal
-*                       cavities.  Also injects frication appropriately.
-*			
-*       arguments:      input, frication
-*                       
-*	internal
-*	functions:	reflectionFilter, radiationFilter,
-*                       nasalReflectionFilter, nasalRadiationFilter
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float vocalTract(float input, float frication)
 {
@@ -2230,26 +1225,6 @@ float vocalTract(float input, float frication)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	throat
-*
-*	purpose:	Simulates the radiation of sound through the walls
-*                       of the throat.  Note that this form of the filter
-*                       uses addition instead of subtraction for the
-*                       second term, since tb1 has reversed sign.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float throaty(float input)
 {
     static float throatY = 0.0;
@@ -2259,24 +1234,6 @@ float throaty(float input)
     return (output * throatGain);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	bandpassFilter
-*
-*	purpose:	Frication bandpass filter, with variable center
-*                       frequency and bandwidth.
-*			
-*       arguments:      input
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float bandpassFilter(float input)
 {
@@ -2296,63 +1253,6 @@ float bandpassFilter(float input)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	writeOutputToFile
-*
-*	purpose:	Scales the samples stored in the temporary file, and
-*                       writes them to the output file, with the appropriate
-*                       header.  Also does master volume scaling, and stereo
-*                       balance scaling, if 2 channels of output.
-*			
-*       arguments:      fileName
-*                       
-*	internal
-*	functions:	flushbuffer, amplitude
-*
-*	library
-*	functions:	rewind, fopen, NXSwapHostIntToBig, fwrite, printff,
-*                       fread, NXSwapHostShortToBig, rintf, fclose
-*
-******************************************************************************/
-
-/*
-void writeOutputToFile(char *fileName)
-{
-
-    flushBuffer();  
-
-    scale = 
-	OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
-
-
-	for (i = 0; i < numberSamples; i++) {
-	    float sample;
-	    short data;
-
-	    fread(&sample, sizeof(sample), 1, tempFilePtr); // tempfile?????
-	    data = NXSwapHostShortToBig((short)rintf(sample * scale));
-	    fwrite(&data, sizeof(data), 1, fd);
-	}
-}
-*/
-
-
-/******************************************************************************
-*
-*       function:       amplitude
-*
-*       purpose:        Converts dB value to amplitude value.
-*
-*       internal
-*       functions:      none
-*
-*       library
-*       functions:      pow
-*
-******************************************************************************/
-
 float amplitude(float decibelLevel)
 {
     /*  CONVERT 0-60 RANGE TO -60-0 RANGE  */
@@ -2371,49 +1271,11 @@ float amplitude(float decibelLevel)
 }
 
 
-
-
-/******************************************************************************
-*
-*       function:       frequency
-*
-*       purpose:        Converts a given pitch (0 = middle C) to the
-*                       corresponding frequency.
-*
-*       internal
-*       functions:      none
-*
-*       library
-*       functions:      pow
-*
-******************************************************************************/
-
 float frequency(float pitch)
 {
     return(PITCH_BASE * powf(2.0,(((float)(pitch+PITCH_OFFSET))/12.0)));
 }
 
-
-
-/******************************************************************************
-*
-*	function:	maximallyFlat
-*
-*	purpose:	Calculates coefficients for a linear phase lowpass FIR
-*                       filter, with beta being the center frequency of the
-*                       transition band (as a fraction of the sampling
-*                       frequency), and gamme the width of the transition
-*                       band.
-*			
-*       arguments:      beta, gamma, np, coefficient
-*                       
-*	internal
-*	functions:	rationalApproximation
-*
-*	library
-*	functions:	cos, pow
-*
-******************************************************************************/
 
 int maximallyFlat(float beta, float gamma, int *np, float *coefficient)
 {
@@ -2493,25 +1355,6 @@ int maximallyFlat(float beta, float gamma, int *np, float *coefficient)
     return(0);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	trim
-*
-*	purpose:	Trims the higher order coefficients of the FIR filter
-*                       which fall below the cutoff value.
-*			
-*       arguments:      cutoff, numberCoefficients, coefficient
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	fabs
-*
-******************************************************************************/
-
 void trim(float cutoff, int *numberCoefficients, float *coefficient)
 {
     int i;
@@ -2524,24 +1367,6 @@ void trim(float cutoff, int *numberCoefficients, float *coefficient)
     }
 }
 
-
-
-/******************************************************************************
-*
-*	function:	rationalApproximation
-*
-*	purpose:	Calculates the best rational approximation to 'number',
-*                       given the maximum 'order'.
-*			
-*       arguments:      number, order, numerator, denominator
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	fabs
-*
-******************************************************************************/
 
 void rationalApproximation(float number, int *order,
 			   int *numerator, int *denominator)
@@ -2593,23 +1418,6 @@ void rationalApproximation(float number, int *order,
 }
 
 
-
-/******************************************************************************
-*
-*	function:	FIRFilter
-*
-*	purpose:	Is the linear phase, lowpass FIR filter.
-*			
-*       arguments:      input, needOutput
-*                       
-*	internal
-*	functions:	increment, decrement
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 float FIRFilter(float input, int needOutput)
 {
     if (needOutput) {
@@ -2643,24 +1451,6 @@ float FIRFilter(float input, int needOutput)
 }
 
 
-
-/******************************************************************************
-*
-*	function:	increment
-*
-*	purpose:	Increments the pointer to the circular FIR filter
-*                       buffer, keeping it in the range 0 -> modulus-1.
-*			
-*       arguments:      pointer, modulus
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 int increment(int pointer, int modulus)
 {
     if (++pointer >= modulus)
@@ -2670,23 +1460,6 @@ int increment(int pointer, int modulus)
 }
 
 
-/******************************************************************************
-*
-*	function:	decrement
-*
-*	purpose:	Decrements the pointer to the circular FIR filter
-*                       buffer, keeping it in the range 0 -> modulus-1.
-*			
-*       arguments:      pointer, modulus
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
 int decrement(int pointer, int modulus)
 {
     if (--pointer < 0)
@@ -2695,124 +1468,6 @@ int decrement(int pointer, int modulus)
 	return(pointer);
 }
 
-
-
-/******************************************************************************
-*
-*	function:	initializeConversion
-*
-*	purpose:	Initializes all the sample rate conversion functions.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	initializeFilter, initializeBuffer
-*
-*	library
-*	functions:	rintf, pow
-*
-******************************************************************************/
-
-void initializeConversion(void)
-{
-    float roundedSampleRateRatio;
-
-
-    /*  INITIALIZE FILTER IMPULSE RESPONSE  */
-    initializeFilter();
-
-    /*  CALCULATE SAMPLE RATE RATIO  */
-    sampleRateRatio = (float)outputRate / (float)sampleRate;
-
-    /*  CALCULATE TIME REGISTER INCREMENT  */
-    timeRegisterIncrement =
-	(int)rintf( powf(2.0, FRACTION_BITS) / sampleRateRatio );
-
-    /*  CALCULATE ROUNDED SAMPLE RATE RATIO  */
-    roundedSampleRateRatio =
-	powf(2.0, FRACTION_BITS) / (float)timeRegisterIncrement;
-
-    /*  CALCULATE PHASE OR FILTER INCREMENT  */
-    if (sampleRateRatio >= 1.0) {
-	filterIncrement = L_RANGE;
-    }
-    else {
-	phaseIncrement = 
-	     (unsigned int)rintf(sampleRateRatio * (float)FRACTION_RANGE);
-    }
-    
-    /*  CALCULATE PAD SIZE  */
-    padSize = (sampleRateRatio >= 1.0) ? ZERO_CROSSINGS :
-	(int)((float)ZERO_CROSSINGS / roundedSampleRateRatio) + 1;
-
-    /*  INITIALIZE THE RING BUFFER  */
-    initializeBuffer();
-}
-
-
-
-/******************************************************************************
-*
-*	function:	initializeFilter
-*
-*	purpose:	Initializes filter impulse response and impulse delta
-*                       values.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	sin, cos
-*
-******************************************************************************/
-
-void initializeFilter(void)
-{
-    float x, IBeta;
-    int i;
-
-
-    /*  INITIALIZE THE FILTER IMPULSE RESPONSE  */
-    h[0] = LP_CUTOFF;
-    x = PI / (float)L_RANGE;
-    for (i = 1; i < FILTER_LENGTH; i++) {
-	float y = (float)i * x;
-	h[i] = sinf(y * LP_CUTOFF) / y;
-    }
-
-    /*  APPLY A KAISER WINDOW TO THE IMPULSE RESPONSE  */
-    IBeta = 1.0 / Izero(BETA);
-    for (i = 0; i < FILTER_LENGTH; i++) {
-	float temp = (float)i / FILTER_LENGTH;
-	h[i] *= Izero(BETA * sqrtf(1.0 - (temp * temp))) * IBeta;
-    }
-
-    /*  INITIALIZE THE FILTER IMPULSE RESPONSE DELTA VALUES  */
-    for (i = 0; i < FILTER_LIMIT; i++)
-	deltaH[i] = h[i+1] - h[i];
-    deltaH[FILTER_LIMIT] = 0.0 - h[FILTER_LIMIT];
-}
-
-
-
-/******************************************************************************
-*
-*	function:	Izero
-*
-*	purpose:	Returns the value for the modified Bessel function of
-*                       the first kind, order 0, as a float.
-*			
-*       arguments:      x - input argument
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
 
 float Izero(float x)
 {
@@ -2833,356 +1488,3 @@ float Izero(float x)
 
     return(sum);
 }
-
-
-
-/******************************************************************************
-*
-*	function:	initializeBuffer
-*
-*	purpose:	Initializes the ring buffer used for sample rate
-*                       conversion.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void initializeBuffer(void)
-{
-    int i;
-
-
-    /*  FILL THE RING BUFFER WITH ALL ZEROS  */
-    for (i = 0; i < BUFFER_SIZE; i++)
-	buffer[i] = 0.0;
-
-    /*  INITIALIZE FILL POINTER  */
-    fillPtr = padSize;
-
-    /*  CALCULATE FILL SIZE  */
-    fillSize = BUFFER_SIZE - (2 * padSize);
-}
-
-
-
-/******************************************************************************
-*
-*	function:	dataFill
-*
-*	purpose:	Fills the ring buffer with a single sample, increments
-*                       the counters and pointers, and empties the buffer when
-*                       full.
-*			
-*       arguments:      data
-*                       
-*	internal
-*	functions:	srIncrement, dataEmpty
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void dataFill(float data)
-{
-    static int fillCounter = 0;
-
-
-    /*  PUT THE DATA INTO THE RING BUFFER  */
-    buffer[fillPtr] = data;
-
-    /*  INCREMENT THE FILL POINTER, MODULO THE BUFFER SIZE  */
-    srIncrement(&fillPtr, BUFFER_SIZE);
-
-    /*  INCREMENT THE COUNTER, AND EMPTY THE BUFFER IF FULL  */
-    if (++fillCounter >= fillSize) {
-      dataEmpty();
-	/* RESET THE FILL COUNTER  */
-	fillCounter = 0;
-    }
-}
-
-
-
-/******************************************************************************
-*
-*	function:	dataEmpty
-*
-*	purpose:	Converts available portion of the input signal to the
-*                       new sampling rate, and outputs the samples to the
-*                       sound struct.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	srDecrement, srIncrement
-*
-*	library
-*	functions:	rintf, fabs, fwrite
-*
-******************************************************************************/
-
-
-void dataEmpty(void)
-{
-    int endPtr;
-
-
-    /*  CALCULATE END POINTER  */
-    endPtr = fillPtr - padSize;
-
-    /*  ADJUST THE END POINTER, IF LESS THAN ZERO  */
-    if (endPtr < 0)
-	endPtr += BUFFER_SIZE;
-
-    /*  ADJUST THE ENDPOINT, IF LESS THEN THE EMPTY POINTER  */
-    if (endPtr < emptyPtr)
-	endPtr += BUFFER_SIZE;
-
-    /*  UPSAMPLE LOOP (SLIGHTLY MORE EFFICIENT THAN DOWNSAMPLING)  */
-    if (sampleRateRatio >= 1.0) {
-	while (emptyPtr < endPtr) {
-	    int index;
-	    unsigned int filterIndex;
-	    float output, interpolation, absoluteSampleValue;
-
-	    /*  RESET ACCUMULATOR TO ZERO  */
-	    output = 0.0;
-
-	    /*  CALCULATE INTERPOLATION VALUE (STATIC WHEN UPSAMPLING)  */
-	    interpolation = (float)mValue(timeRegister) / (float)M_RANGE;
-
-	    /*  COMPUTE THE LEFT SIDE OF THE FILTER CONVOLUTION  */
-	    index = emptyPtr;
-	    for (filterIndex = lValue(timeRegister);
-		 filterIndex < FILTER_LENGTH;
-		 srDecrement(&index,BUFFER_SIZE),
-		 filterIndex += filterIncrement) {
-		output += (buffer[index] *
-		    (h[filterIndex] + (deltaH[filterIndex] * interpolation)));
-	    }
-
-	    /*  ADJUST VALUES FOR RIGHT SIDE CALCULATION  */
-	    timeRegister = ~timeRegister;
-	    interpolation = (float)mValue(timeRegister) / (float)M_RANGE;
-
-	    /*  COMPUTE THE RIGHT SIDE OF THE FILTER CONVOLUTION  */
-	    index = emptyPtr;
-	    srIncrement(&index,BUFFER_SIZE);
-	    for (filterIndex = lValue(timeRegister);
-		 filterIndex < FILTER_LENGTH;
-		 srIncrement(&index,BUFFER_SIZE),
-		 filterIndex += filterIncrement) {
-		output += (buffer[index] *
-		    (h[filterIndex] + (deltaH[filterIndex] * interpolation)));
-	    }
-
-	    /*  RECORD MAXIMUM SAMPLE VALUE  */
-	    absoluteSampleValue = fabs(output);
-	    if (absoluteSampleValue > maximumSampleValue)
-		maximumSampleValue = absoluteSampleValue;
-    
-	    /*  INCREMENT SAMPLE NUMBER  */
-	    numberSamples++;
-    
-	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
-	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr);  // TODO write scaled (see SCALE) to our buffer and update/return pointer
-	    // should deal with ringbuffer but... TODO
-	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
-	    audio_buffer[laststart]=rintf(output*scale);
-	    //	    	    audio_buffer[laststart]=rand()%32768;
-	    //	    	    printf("fff %f", output);
-	      laststart++;
-	      if (laststart>=32768) laststart=0;
-
-	    /*  CHANGE TIME REGISTER BACK TO ORIGINAL FORM  */
-	    timeRegister = ~timeRegister;
-
-	    /*  INCREMENT THE TIME REGISTER  */
-	    timeRegister += timeRegisterIncrement;
-
-	    /*  INCREMENT THE EMPTY POINTER, ADJUSTING IT AND END POINTER  */
-	    emptyPtr += nValue(timeRegister);
-
-	    if (emptyPtr >= BUFFER_SIZE) {
-		emptyPtr -= BUFFER_SIZE;
-		endPtr -= BUFFER_SIZE;
-	    }
-
-	    /*  CLEAR N PART OF TIME REGISTER  */
-	    timeRegister &= (~N_MASK);
-	}
-    }
-    /*  DOWNSAMPLING CONVERSION LOOP  */
-    else {
-	while (emptyPtr < endPtr) {
-	    int index;
-	    unsigned int phaseIndex, impulseIndex;
-	    float absoluteSampleValue, output, impulse;
-	    
-	    /*  RESET ACCUMULATOR TO ZERO  */
-	    output = 0.0;
-
-	    /*  COMPUTE P PRIME  */
-	    phaseIndex = (unsigned int)rintf(
-		   ((float)fractionValue(timeRegister)) * sampleRateRatio);
-
-	    /*  COMPUTE THE LEFT SIDE OF THE FILTER CONVOLUTION  */
-	    index = emptyPtr;
-	    while ((impulseIndex = (phaseIndex>>M_BITS)) < FILTER_LENGTH) {
-		impulse = h[impulseIndex] + (deltaH[impulseIndex] *
-		    (((float)mValue(phaseIndex)) / (float)M_RANGE));
-		output += (buffer[index] * impulse);
-		srDecrement(&index,BUFFER_SIZE);
-		phaseIndex += phaseIncrement;
-	    }
-
-	    /*  COMPUTE P PRIME, ADJUSTED FOR RIGHT SIDE  */
-	    phaseIndex = (unsigned int)rintf(
-		((float)fractionValue(~timeRegister)) * sampleRateRatio);
-
-	    /*  COMPUTE THE RIGHT SIDE OF THE FILTER CONVOLUTION  */
-	    index = emptyPtr;
-	    srIncrement(&index,BUFFER_SIZE);
-	    while ((impulseIndex = (phaseIndex>>M_BITS)) < FILTER_LENGTH) {
-		impulse = h[impulseIndex] + (deltaH[impulseIndex] *
-		    (((float)mValue(phaseIndex)) / (float)M_RANGE));
-		output += (buffer[index] * impulse);
-		srIncrement(&index,BUFFER_SIZE);
-		phaseIndex += phaseIncrement;
-	    }
-
-	    /*  RECORD MAXIMUM SAMPLE VALUE  */
-	    absoluteSampleValue = fabsf(output);
-	    if (absoluteSampleValue > maximumSampleValue)
-		maximumSampleValue = absoluteSampleValue;
-    
-	    /*  INCREMENT SAMPLE NUMBER  */
-	    numberSamples++;
-    
-	    /*  OUTPUT THE SAMPLE TO THE TEMPORARY FILE  */
-	    //	    fwrite((char *)&output, sizeof(output), 1, tempFilePtr); // TODO write scaled (see SCALE) to our buffer and update/return pointer
-	    float scale = OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(volume);
-	    	    audio_buffer[laststart]=rintf(output*scale);
-	    //	    	    audio_buffer[laststart]=rand()%32768;
-		    //		    printf("fff %f", output);
-
-	      laststart++;
-	      if (laststart>=32768) laststart=0;
-
-
-
-	    /*  INCREMENT THE TIME REGISTER  */
-	    timeRegister += timeRegisterIncrement;
-
-	    /*  INCREMENT THE EMPTY POINTER, ADJUSTING IT AND END POINTER  */
-	    emptyPtr += nValue(timeRegister);
-	    if (emptyPtr >= BUFFER_SIZE) {
-		emptyPtr -= BUFFER_SIZE;
-		endPtr -= BUFFER_SIZE;
-	    }
-
-	    /*  CLEAR N PART OF TIME REGISTER  */
-	    timeRegister &= (~N_MASK);
-	}
-    }
-}
-
-
-
-/******************************************************************************
-*
-*	function:	flushBuffer
-*
-*	purpose:	Pads the buffer with zero samples, and flushes it by
-*                       converting the remaining samples.
-*			
-*       arguments:      none
-*                       
-*	internal
-*	functions:	dataFill, dataEmpty
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void flushBuffer(void)
-{
-    int i;
-
-
-    /*  PAD END OF RING BUFFER WITH ZEROS  */
-    for (i = 0; i < (padSize * 2); i++)
-	dataFill(0.0);
-
-    /*  FLUSH UP TO FILL POINTER - PADSIZE  */
-    dataEmpty();
-}
-
-
-
-/******************************************************************************
-*
-*	function:	srIncrement
-*
-*	purpose:	Increments the pointer, keeping it within the range
-*                       0 to (modulus-1).
-*			
-*       arguments:      pointer, modulus
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void srIncrement(int *pointer, int modulus)
-{
-    if ( ++(*pointer) >= modulus)
-	(*pointer) -= modulus;
-}
-
-
-
-/******************************************************************************
-*
-*	function:	srDecrement
-*
-*	purpose:	Decrements the pointer, keeping it within the range
-*                       0 to (modulus-1).
-*                       
-*       arguments:      pointer, modulus
-*                       
-*	internal
-*	functions:	none
-*
-*	library
-*	functions:	none
-*
-******************************************************************************/
-
-void srDecrement(int *pointer, int modulus)
-{
-    if ( --(*pointer) < 0)
-	(*pointer) += modulus;
-
-}
-
-
- // testcode in gdb
-/*void main(void){
-
-  //  init_parameters(); // TUBE.C - TRM!
-  initializeSynthesizer(); 
-  synthesize();
-  }*/
-

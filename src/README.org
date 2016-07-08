@@ -2787,25 +2787,42 @@ sam_get_sample();
 
 *do we we need seperate samplepos in audio.c for each generator?* REMOVED///RE_TEST
 
-- check sanity interpol DONE - and need to fix audio.c
+- check sanity interpol DONE - and need to fix audio.c DONE-TESTED
 
-- re-check sample size in sam
-
-- new 5100 roms below to decode and clean up all 5100 roms 
+- re-check sample size in sam DONE still glitchy TO FIX!
 
 - 5100 in 5200x code - try to just plug in different   m_coeff= and int m_variant=TMS5220_IS_5200;                /* Variant of the 5xxx - see tms5110r.h */
 
-- or port tms5110x.c which should not be necessary
+- still need to compare to original 5100 code! - done on lap and appears close enough - tms5100x can be ported to arm if necessaryDONE
 
-- sp0256 roms and vocabularies - and how works with 2/3 bitshift re-acquaint - sp0256lap? ./sp0256 ... document this!
+- or port tms5110x.c which should not be necessaryDONE
 
-- tubes.c and do we ignore nvp.c ?
+- sp0256 roms and THEN vocabulariesDONE - and how works with 2/3 bitshift re-acquaint - sp0256lap? ./sp0256 ... document this!DONE
+
+///->DONE MARK
+
+- tube.c - crahsing on init or some clash somewhere????
+
+- do we ignore nvp.c - re-look at
+
+- recheck sam.c for uninitialised variable and sanity/sound?
+
+////////////////////////////
 
 - choose VOSIM etc...
 
 // new/extra modes -> maybe 32 modes:
 
 talkie and different tables/5100/52xx/sam single phonemes/low pass variants and change the low pass
+
+/////EVENINGS:
+
+- new 5100 roms below to decode and clean up all 5100 roms
+
+- sp0256 vocabulary/dictionary/text to speech and other rombanks
+
+- sp0256 translated vocab from retrospeakDONE, make checks on the whole and worldlist also
+
 
 * important notes
 
@@ -2836,11 +2853,7 @@ upsample=interpolate - do we need filter as this is on output?
 
 /////
 
-- filter on interpolation and check interpolation???
-
-- check CVs/DONE - PCB->check/orderTODO-DONE
-
-- wormings - plot first on PC-DONE
+- filter on interpolation 
 
 - worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN*
 
@@ -2858,13 +2871,12 @@ wt_waves is: 256*129=33024 bytes??? how is generated...
 
 - wormcode and how fits with modes// worm movements/// worming in wavetable
 
-- vocoder/channel vocoder
+- vocoder/channel vocoders
 
 - move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github
 
 - wrap up/ MANUAL/ production tests
-
-  
+ 
 * any hardware notes
 
 latest smaller board is 003
@@ -2993,7 +3005,22 @@ default = 72
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
 cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH_DONE, port
-into generatorDONE, text to speech NRL->retroTTS/and/phoneme.c
+into generatorDONE, text to speech NRL->retroTTS/and/phoneme.c:
+
+or... english2phoneme in speaky 
+
+and retroTTS has:
+
+NRLIPAtoSPO256 = { 'AA':'AA', 'AE':'AE', 'AH':'AX AX', 'AO':'AO', 'AW':'AW',  'AX':'AX',
+                   'AY':'AY', 'b':'BB1', 'CH':'CH',  'd':'DD1', 'DH':'DH1', 'EH':'EH',
+                   'ER':'ER1','EY':'EY', 'f':'FF',   'g':'GG2', 'h':'HH1',  'IH':'IH',
+                   'IY':'IY', 'j':'JH',  'k':'KK1',  'l':'LL',  'm':'MM',   'n':'NN1',
+                   'NG':'NG', 'OW':'OW', 'OY':'OY',  'p':'PP',  'r':'RR1',  's':'SS',
+                   'SH':'SH', 't':'TT1', 'TH':'TH',  'UH':'UH',  'UW':'UW2','v':'VV',
+                   'w':'WW', 'WH':'WH', 'y':'YY1', 'z':'ZZ', 'ZH':'ZH', 'PAUSE':'PA4' };
+
+
+/////
 
 - dictionary for phonemes and longer words/vocab below -> so we can have banks (also with and without pitch bend or fixed or ...)
 
@@ -3101,7 +3128,27 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 
 ** 5/TUBE - test!
 
-TRM tube notes???? 
+TRM tube notes assembled...
+
+seems to work but lots of messiness with mallocs and possibly slow to adjust:
+
+inlinings, what else - do we need interpolate/filter:
+
+what is sampleRateRatio=    32000 / (float)sampleRate;
+
+sampleRate = controlRate=4.0 * controlPeriod;
+
+	controlPeriod =
+	    rintf((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+
+samplerate calced in test.c is 19478 - try without interpol = rougher but no sense to interpol twice for speed
+
+issues: generator and interpolation, linked list and generation of params, changing major parameters
+
+start with just one list = input_frame and do without interpolation, then implement as lastblah
+
+
+
 
 ** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
 
@@ -3178,7 +3225,9 @@ then dump to hex: ./lpcdump /root/mess/software/ti99_4ae/phm3226g4.bin > phm3226
 then copy into lpc_split, edit then run and test in lpc_say??? or/???
 
 //watch number of pitch bits for 5100=5 and 5200=6 
-* roms - ti99/apple/games/speak and spell
+* roms 
+
+** TMS5xxx - ti99/apple/games/speak and spell
 
 http://www.datamath.org/Story/Speak_Version.htm
 
@@ -3196,3 +3245,50 @@ tmc0351n2l.vsm
 tmc0352n2l.vsm BOTH DONE
 
 see also http://ploguechipsounds.blogspot.de/2014/12/chipspeech-diary-part-2.html
+
+** SP0256:
+
+- question of offsets, bits - how we can include whole files which address themselves????
+
+// LOG:
+
+AL2binalt GOOD <<4 counter
+012 GOOD <<4 counter - phrases
+019 GOOD <<4 counter - phrases
+
+/////// no luck with as just gives odd phrases - maybe try with 0x4000 offset???? tried and still only odd phrases->LEAVE THIS OUT!
+
+128-003
+128-004
+
+- al2 dumped from AL2binalt - all in sporoms, sp0256lap.c can be used to test images
+
+- sp0256b-019.bin vocab across other 2 large roms seems limited in terms of phrases for large space... only 2nd rom seems accessed 0x4000+ ????
+
+ SP0256-019. This variant is found in the Odyssey 2's "The Voice"
+ attachment. It has a number of game oriented phrases, as well as
+ hooks for a rather large library of speech ROMs. One of these speech
+ ROMs appears to contain the same allophone library as appears in the
+ SP0256-AL2.
+
+*sp0256b-019.binX and below - this is from various voice.c in mame/mess code:
+
+ROM_LOAD( "sp0256b-019.bin",  0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392dc96c89d1d4e089a20bd21e609) )
+
+// External 16KiB speech ROM (spr128-003) from "The Voice"
+ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
+// Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder
+ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
+
+all in odyssey2.zipX
+
+*dkspeech.romXNON!
+
+The "012" designation indicates an SP0256 programmed with Mattel's Resident ROM (RESROM) image, as used in the United States. 
+
+*sp0256-012.bin - intv? - intv.zip X 
+
+http://wiki.intellivision.us/index.php?title=Resrom.asm
+
+intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sailor: zip in speaky toooo
+

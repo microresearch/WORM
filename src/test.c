@@ -1,4 +1,5 @@
 #include "stdio.h"
+#include "math.h"
 #include "stdlib.h"
 #include "forlap.h"
 
@@ -71,6 +72,10 @@ int16_t lastval=genstruct->prevsample;
  return size;
 };
 
+float speedOfSound(float temperature)
+{
+    return (331.4 + (0.6 * temperature));
+}
 
 void main(){
   float x=0.0f;
@@ -85,11 +90,25 @@ void main(){
   int16_t mono_buffer[32];
   int16_t sample_buffer[32];
 
-  while(1){
+  y=128;
+
+  //  xx= (0x4000 << 3);
+  //  printf("XXXX %d",xx);
+
+
+  float c = speedOfSound(32);
+  int controlPeriod =    rint((c * 10 * 100.0) /(18.0 * 1.0));
+  int sampleRate = 4.0 * controlPeriod;
+
+  printf("controlperiod %d\n",controlPeriod);
+
+
+
+  /*  while(1){
 
     //  x=generators[mode](allgen,sample_buffer,mono_buffer,samplespeed,sz/2); 
     xx=sp0256(allgen,sample_buffer,mono_buffer,samplespeed,32);
-  }
+    }*/
 
   //  int idx0 = (m_pc    ) >> 3, d0; //???
 

@@ -744,7 +744,7 @@ void main(int argc, char *argv[]){
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-   lpc_say(wordlist_testspell2[uffset]+uuffset);
+   lpc_say(wordlist_testspell1[uffset]+uuffset);
    //                lpc_say(testfor5100+uffset);
 
 	// or we try c7 etc as length?

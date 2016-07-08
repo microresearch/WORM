@@ -14,7 +14,7 @@ char input[256];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
 const unsigned char* phoneme_list[54]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q"}; 
 
-unsigned char phoneme_array[2][16]; // 16 and potential stresses
+//unsigned char phoneme_array[2][16]; // 16 and potential stresses
 
 
 //char input[256]={"MAY4.\x9b"};
@@ -97,7 +97,7 @@ void Init()
 {
 	int i;
 	SetMouthThroat( mouth, throat);
-	phoneme_array[1][16]=255;
+	//phoneme_array[1][16]=255;
 
 	/*
 	freq2data = &mem[45136];

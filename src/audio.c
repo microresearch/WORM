@@ -34,6 +34,7 @@ LINEIN/OUTL-filter
 #include "sp0256.h"
 #include "biquad.h"
 #include "tms5200x.h"
+#include "tube.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -96,19 +97,21 @@ float Fc,Q,peakGain;
 u16 x,xx;
 
 // LPCAnalyzer_init();
- sp0256_init();
- lpc_init(); 
- simpleklatt_init();
- sam_init();
- sam_newsay(); // TEST!
- tms5200_init();
+sp0256_init();
+lpc_init(); 
+simpleklatt_init();
+sam_init();
+sam_newsay(); // TEST!
+tms5200_init();
  tms5200_newsay();
+ //tube_init();
+ // tube_newsay();
 
 // malloc
 allgen=malloc(sizeof(genny));		
 allgen->samplepos=0.0f;
 
-newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
+//newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
 
 
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
@@ -197,7 +200,7 @@ int16_t lastval=genstruct->prevsample;
      while (xx<size){
        samplel=sp0256_get_sample();
 
-       if (samplepos>=size) {       
+       if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
@@ -206,9 +209,9 @@ int16_t lastval=genstruct->prevsample;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 	 xx++;
-	 samplepos-=size;
+	 samplepos-=samplespeed;
        }
-       samplepos+=samplespeed;
+       samplepos+=1.0f;
      }
    }
 
@@ -218,6 +221,68 @@ int16_t lastval=genstruct->prevsample;
  genstruct->prevsample=lastval;
  return size;
 };
+
+u16 tubes(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // MODEL GENERATOR: TODO is speed and interpolation options DONE
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+float samplepos=genstruct->samplepos;
+int16_t samplel=genstruct->lastsample;
+int16_t lastval=genstruct->prevsample;
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=tube_get_sample();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tube_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=tube_get_sample();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tube_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
+  // refill back counter etc.
+ genstruct->samplepos=samplepos;
+ genstruct->lastsample=samplel;
+ genstruct->prevsample=lastval;
+ return size;
+};
+
 
 u16 sammy(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
@@ -235,25 +300,7 @@ int16_t lastval=genstruct->prevsample;
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 //samplespeed=1.0f;
- /*
-     while (x<size){
-       //       if (howmany==0) {howmany=(sam_get_sample(&samplel)); 
-       //	 howmany--;
-       //       }
-       //	 else {
-       //	   howmany--;
-       //	 }
-       if (howmany==0){
-	 //       samplel=(sam_get_sample());
-	 howmany=sam_get_sample(&samplel);
-	 //	 howmany=0;
-       }
-       else howmany--;
 
-       outgoing[x]=samplel; // interpol with remainder - to test - 1 sample behind
-       x++;
-     }
- */
      // test lowpass/biquad:
      /*
      int_to_floot(outgoing,tmpbuffer,32);
@@ -293,7 +340,7 @@ int16_t lastval=genstruct->prevsample;
      while (x<size){
        while (howmany==0)	 howmany=(sam_get_sample(&samplel)); 
        howmany--;
-       if (samplepos>=size) {       
+       if (samplepos>=samplespeed) {       
 	 outgoing[x]=samplel;
        // TEST trigger: 
        if (incoming[x]>THRESH && !triggered) {
@@ -303,9 +350,9 @@ int16_t lastval=genstruct->prevsample;
        if (incoming[x]<THRESHLOW && triggered) triggered=0;
 
 	 x++;
-	 samplepos-=size;
+	 samplepos-=samplespeed;
        }
-       samplepos+=samplespeed;
+       samplepos+=1.0f;
        }
        }
 
@@ -356,7 +403,7 @@ int16_t lastval=genstruct->prevsample;
      while (xx<size){
        samplel=(lpc_get_sample()<<6)-32768; 
 
-       if (samplepos>=size) {       
+       if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
@@ -366,9 +413,9 @@ int16_t lastval=genstruct->prevsample;
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 
 	 xx++;
-	 samplepos-=size;
+	 samplepos-=samplespeed;
        }
-       samplepos+=samplespeed;
+       samplepos+=1.0f;
      }
    }
 
@@ -433,7 +480,7 @@ int16_t lastval=genstruct->prevsample;
      while (xx<size){
        samplel=(tms5200_get_sample());//<<6)-32768; 
 
-       if (samplepos>=size) {       
+       if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
@@ -443,9 +490,9 @@ int16_t lastval=genstruct->prevsample;
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 
 	 xx++;
-	 samplepos-=size;
+	 samplepos-=samplespeed;
        }
-       samplepos+=samplespeed;
+       samplepos+=1.0f;
      }
    }
 
@@ -514,13 +561,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //  static float eaten=0;
   //  static float samplepos=0.0f; 
   float samplespeed;
-  u16 x;
+  static float samplepos=0;
+  u8 x;
+  u16 readpos;
   u8 speedy;
   //  float xx,yy;
 
   u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
+
+  //  samplespeed=1.0f;
 
   // splitting input
 
@@ -531,10 +582,20 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   mode=5;
 
-  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
 
-  x=generators[mode](allgen,sample_buffer,mono_buffer,samplespeed,sz/2); 
+    x=generators[mode](allgen,sample_buffer,mono_buffer,samplespeed,sz/2); 
+
+  /*    for (x=0;x<sz/2;x++){
+      readpos=samplepos;
+      mono_buffer[x]=audio_buffer[readpos];
+      //                mono_buffer[x]=rand()%65536;
+      samplepos+=samplespeed;
+      if (samplepos>=ending) samplepos=0.0f;    
+      }*/
+
+
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
       readpos=samplepos;

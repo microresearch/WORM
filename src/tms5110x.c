@@ -1,125 +1,241 @@
-// from tms5110r.hxx
+//#include "audio.h"
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+#include "math.h"
+#include "time.h"
+#include "forlap.h"
 
-struct tms5100_coeffs
-{
-	int             subtype;
-	int             num_k;
-	int             energy_bits;
-	int             pitch_bits;
-	int             kbits[MAX_K];
-	unsigned short  energytable[MAX_SCALE];
-	unsigned short  pitchtable[MAX_SCALE];
-	int             ktable[MAX_K][MAX_SCALE];
-	INT16           chirptable[MAX_CHIRP_SIZE];
-	INT8            interp_coeff[8];
-};
+#include "tms5110r.inc"
 
-static const struct tms5100_coeffs tms5110a_coeff =
+#define DEBUG_5110  0
+
+//extern uint8_t* ptrAddr, ptrBit;
+//extern uint8_t byte_rev[256];
+
+uint8_t* ptrAddr, ptrBit;
+uint8_t byte_rev[256];
+
+const uint8_t sp_spk0352n9[]         __attribute__ ((section (".flash")))  ={0xCB, 0x87, 0x26, 0x15, 0x93, 0x8A, 0xAE, 0x3F, 0x36, 0x64, 0x49, 0x9F, 0xB2, 0x7A, 0xCD, 0x55, 0x47, 0x1A, 0xEB, 0x95, 0x71, 0x52, 0xAE, 0x38, 0xC2, 0xD8, 0x70, 0x8F, 0x33, 0x7B, 0xC5, 0x10, 0x5A, 0x7B, 0x98, 0x5F, 0xE8, 0x2E, 0x8B, 0x9E, 0x14, 0xB3, 0x2C, 0x6A, 0x19, 0x70, 0xA, 0xB1, 0x3, 0x3F, 0xB2, 0x2D, 0xE7, 0xB5, 0x5A, 0xC4, 0x54, 0xBA, 0xFE, 0xC4, 0xE0, 0xC4, 0x3C, 0x37, 0xF2, 0x49, 0xD1, 0x9B, 0xBB, 0x6F, 0x98, 0x9B, 0x6F, 0xBD, 0xF5, 0xB4, 0xA0, 0x4A, 0x2C, 0x32, 0xF2, 0x6D, 0xB3, 0x8D, 0x66, 0xBD, 0x86, 0x58, 0x64, 0x9E, 0x75, 0xE6, 0x99, 0x6A, 0x2A, 0xD1, 0x26, 0xA7, 0x4C, 0x93, 0xFC}; // ends okay
+
+
+/// vars - all from tms5110.c in mame2
+
+	UINT8 m_talk_status;
+	UINT8 m_speaking_now;
+	UINT8 m_state;
+
+	/* Rom interface */
+	UINT32 m_address;
+	UINT8  m_next_is_address;
+	UINT8  m_schedule_dummy_read;
+	UINT8  m_addr_bit;
+	/* read byte */
+	UINT8  m_CTL_buffer;
+
+	/* these contain data describing the current and previous voice frames */
+	UINT16 m_old_energy;
+	UINT16 m_old_pitch;
+	INT32 m_old_k[10];
+
+	UINT16 m_new_energy;
+	UINT16 m_new_pitch;
+	INT32 m_new_k[10];
+
+
+	/* these are all used to contain the current state of the sound generation */
+	UINT16 m_current_energy;
+	UINT16 m_current_pitch;
+	INT32 m_current_k[10];
+
+	UINT16 m_target_energy;
+	UINT16 m_target_pitch;
+	INT32 m_target_k[10];
+
+	UINT8 m_interp_count;       /* number of interp periods (0-7) */
+	UINT8 m_sample_count;       /* sample number within interp (0-24) */
+	INT32 m_pitch_count;
+
+	INT32 m_x[11];
+
+	INT32 m_RNG;  /* the random noise generator configuration is: 1 + x + x^3 + x^4 + x^13 */
+
+	INT32 m_speech_rom_bitnum;
+
+	/* coefficient tables */
+	const struct tms5100_coeffs *m_coeff;
+	const UINT8 *m_table;
+
+
+// helpers
+
+int extract_bits(int count) // extract from rom image/array
 {
-	/* subtype */
-	SUBTYPE_5110,
-	10,
-	4,
-	5,
-	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 }, // kbits
-	TI_028X_LATER_ENERGY
-	TI_5110_PITCH
+
+  uint8_t value;
+  UINT16 data;
+  INT8 num_bits=count;
+
+  	data = byte_rev[*ptrAddr]<<8;
+	//	data = (*ptrAddr)<<8;
+	if (ptrBit+num_bits > 8)
 	{
-	TI_5110_5220_LPC
-	},
-	TI_LATER_CHIRP
-	TI_INTERP
-};
-
-static const struct tms5100_coeffs T0280B_0281A_coeff =
-{
-	/* subtype */
-	SUBTYPE_0281A,
-	10,
-	4,
-	5,
-	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	TI_0280_PATENT_ENERGY
-	TI_0280_2801_PATENT_PITCH
+	    data |= byte_rev[*(ptrAddr+1)];
+	    //  	  data |= *(ptrAddr+1);
+	}
+	data <<= ptrBit;
+	value = data >> (16-num_bits);
+	ptrBit += num_bits;
+	//	didntjump=1;
+	if (ptrBit >= 8)
 	{
-	TI_0280_PATENT_LPC
-	},
-	TI_0280_PATENT_CHIRP
-	TI_INTERP
-};
+	  //	  fprintf(stderr,"%x, ",*ptrAddr);
+		ptrBit -= 8;
+		ptrAddr++;
+		//		didntjump=2;
+		if (ptrBit==0) {
+		  //		  didntjump=0;
+		}
+	}
+//	tobits(value,num_bits);
+	return value;
+}
 
 
-#define TI_028X_LATER_ENERGY \
-		/* E  */\
-		{   0,  1,  2,  3,  4,  6,  8, 11, \
-			16, 23, 33, 47, 63, 85,114, 0 },
-
-#define TI_5110_PITCH \
-	/* P */\
-	{   0,  15,  16,  17,  19,  21,  22,  25,  \
-		26,  29,  32,  36,  40,  42,  46,  50,  \
-		55,  60,  64,  68,  72,  76,  80,  84,  \
-		86,  93, 101, 110, 120, 132, 144, 159},
-
-#define TI_LATER_CHIRP \
-	/* Chirp table */\
-	{   0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,\
-		0x25, 0x26, 0x4c, 0x44, 0x1a, 0x32, 0x3b, 0x13,\
-		0x37, 0x1a, 0x25, 0x1f, 0x1d, 0x00, 0x00, 0x00,\
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
-		0x00, 0x00, 0x00, 0x00 },
-
-/* Interpolation Table */
-#define TI_INTERP \
-	/* interpolation shift coefficients */\
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
-
-#define TI_5110_5220_LPC \
-		/* K1  */\
-		{ -501, -498, -497, -495, -493, -491, -488, -482,\
-			-478, -474, -469, -464, -459, -452, -445, -437,\
-			-412, -380, -339, -288, -227, -158,  -81,   -1,\
-			80,  157,  226,  287,  337,  379,  411,  436 },\
-		/* K2  */\
-		{ -328, -303, -274, -244, -211, -175, -138,  -99,\
-			-59,  -18,   24,   64,  105,  143,  180,  215,\
-			248,  278,  306,  331,  354,  374,  392,  408,\
-			422,  435,  445,  455,  463,  470,  476,  506 },\
-		/* K3  */\
-		{ -441, -387, -333, -279, -225, -171, -117,  -63,\
-			-9,   45,   98,  152,  206,  260,  314,  368  },\
-		/* K4  */\
-		{ -328, -273, -217, -161, -106,  -50,    5,   61,\
-			116,  172,  228,  283,  339,  394,  450,  506  },\
-		/* K5  */\
-		{ -328, -282, -235, -189, -142,  -96,  -50,   -3,\
-			43,   90,  136,  182,  229,  275,  322,  368  },\
-		/* K6  */\
-		{ -256, -212, -168, -123,  -79,  -35,   10,   54,\
-			98,  143,  187,  232,  276,  320,  365,  409  },\
-		/* K7  */\
-		{ -308, -260, -212, -164, -117,  -69,  -21,   27,\
-			75,  122,  170,  218,  266,  314,  361,  409  },\
-		/* K8  */\
-		{ -256, -161,  -66,   29,  124,  219,  314,  409  },\
-		/* K9  */\
-		{ -256, -176,  -96,  -15,   65,  146,  226,  307  },\
-		/* K10 */\
-		{ -205, -132,  -59,   14,   87,  160,  234,  307  },
-
-// from 5110.c see also 5110.h
-
-void tms5110_device::process(INT16 *buffer, unsigned int size)
+void parse_frame()
 {
-	int buf_count=0;
+	int bits, indx, i, rep_flag;
+#if (DEBUG_5110)
+	int ene;
+#endif
+
+	/* count the total number of bits available */ /// ?????
+	//	bits = m_fifo_count;
+
+
+	/* attempt to extract the energy index */
+	bits -= m_coeff->energy_bits;
+	/*	if (bits < 0)
+	{
+		request_bits( -bits ); // toggle M0 to receive needed bits
+		bits = 0;
+	}*/
+	indx = extract_bits(m_coeff->energy_bits);
+	m_new_energy = m_coeff->energytable[indx];
+#if (DEBUG_5110)
+	ene = indx;
+#endif
+
+	/* if the energy index is 0 or 15, we're done */
+
+	if ((indx == 0) || (indx == 15))
+	{
+		if (DEBUG_5110) logerror("  (4-bit energy=%d frame)\n",m_new_energy);
+
+	/* clear the k's */
+		if (indx == 0)
+		{
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_new_k[i] = 0;
+		}
+
+		/* clear fifo if stop frame encountered */
+/*		if (indx == 15)
+		{
+			if (DEBUG_5110) logerror("  (4-bit energy=%d STOP frame)\n",m_new_energy);
+			m_fifo_head = m_fifo_tail = m_fifo_count = 0;
+		}
+		return;*/
+	}
+
+
+	/* attempt to extract the repeat flag */
+/*	bits -= 1;
+	if (bits < 0)
+	{
+		request_bits( -bits ); // toggle M0 to receive needed bits 
+		bits = 0;
+	}*/
+	rep_flag = extract_bits(1);
+
+	/* attempt to extract the pitch */
+/*	bits -= m_coeff->pitch_bits;
+	if (bits < 0)
+	{
+		request_bits( -bits ); // toggle M0 to receive needed bits 
+		bits = 0;
+	}*/
+	indx = extract_bits(m_coeff->pitch_bits);
+	m_new_pitch = m_coeff->pitchtable[indx];
+
+	/* if this is a repeat frame, just copy the k's */
+	if (rep_flag)
+	{
+	//actually, we do nothing because the k's were already loaded (on parsing the previous frame)
+
+		if (DEBUG_5110) logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", m_new_energy, m_new_pitch, rep_flag);
+		return;
+	}
+
+
+	/* if the pitch index was zero, we need 4 k's */
+	if (indx == 0)
+	{
+		/* attempt to extract 4 K's */
+	  /*		bits -= 18;
+		if (bits < 0)
+		{
+		request_bits( -bits ); / toggle M0 to receive needed bits
+		bits = 0;
+		}*/
+		for (i = 0; i < 4; i++)
+			m_new_k[i] = m_coeff->ktable[i][extract_bits(m_coeff->kbits[i])];
+
+	/* and clear the rest of the new_k[] */
+		for (i = 4; i < m_coeff->num_k; i++)
+			m_new_k[i] = 0;
+
+		if (DEBUG_5110) logerror("  (28-bit energy=%d pitch=%d rep=%d 4K frame)\n", m_new_energy, m_new_pitch, rep_flag);
+		return;
+	}
+
+	/* else we need 10 K's */
+/*	bits -= 39;
+	if (bits < 0)
+	{
+			request_bits( -bits ); // toggle M0 to receive needed bits 
+		bits = 0;
+	}*/
+#if (DEBUG_5110)
+	printf("FrameDump %02d ", ene);
+	for (i = 0; i < m_coeff->num_k; i++)
+	{
+		int x;
+		x = extract_bits( m_coeff->kbits[i]);
+		m_new_k[i] = m_coeff->ktable[i][x];
+		printf("%02d ", x);
+	}
+	printf("\n");
+#else
+	for (i = 0; i < m_coeff->num_k; i++)
+	{
+		int x;
+		x = extract_bits( m_coeff->kbits[i]);
+		m_new_k[i] = m_coeff->ktable[i][x];
+	}
+#endif
+	if (DEBUG_5110) logerror("  (49-bit energy=%d pitch=%d rep=%d 10K frame)\n", m_new_energy, m_new_pitch, rep_flag);
+
+}
+
+
+
+//////////////////
+
+int16_t fiveoneprocess(u8* ending)
+{
 	int i, interp_period, bitout;
-	INT16 Y11, cliptemp;
-
-	/* if we're not speaking, fill with nothingness */
-	if (!m_speaking_now)
-		goto empty;
+	INT16 Y11, cliptemp, sample;
 
 	/* if we're to speak, but haven't started */
 	if (!m_talk_status)
@@ -144,8 +260,8 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 
 	/* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && m_speaking_now)
-	{
+	//	while ((size > 0) && m_speaking_now)
+	//	{
 		int current_val;
 
 		/* if we're ready for a new frame */
@@ -165,7 +281,9 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 				m_target_energy = m_current_energy = 0;
 				m_speaking_now = m_talk_status = 0;
 				m_interp_count = m_sample_count = m_pitch_count = 0;
-				goto empty;
+				//				goto empty; // ENDING
+				*ending=1;
+				return 0;
 			}
 
 
@@ -377,11 +495,15 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 		else if (cliptemp < -512) cliptemp = 511 - (cliptemp+512);
 
 		if (cliptemp > 127)
-			buffer[buf_count] = 127*256;
+		  //			buffer[buf_count] = 127*256;
+		  sample=32767;
 		else if (cliptemp < -128)
-			buffer[buf_count] = -128*256;
+		  //	buffer[buf_count] = -128*256;
+		  sample=-32767;
+		  
 		else
-			buffer[buf_count] = cliptemp *256;
+		  //	buffer[buf_count] = cliptemp *256;
+		  sample=cliptemp<<8;
 
 		/* Update all counts */
 
@@ -398,21 +520,86 @@ void tms5110_device::process(INT16 *buffer, unsigned int size)
 
 		m_interp_count = (m_interp_count + 1) % 25;
 
-		buf_count++;
-		size--;
-	}
-
-empty:
-
-	while (size > 0)
-	{
-		m_sample_count = (m_sample_count + 1) % 200;
-		m_interp_count = (m_interp_count + 1) % 25;
-
-		buffer[buf_count] = 0x00;
-		buf_count++;
-		size--;
-	}
+		return sample;
+		//		buf_count++;
+		//		size--;
+		//	}
 }
 
 
+void tms5100_init(){
+   m_coeff = &T0280B_0281A_coeff; // this is for 5100!
+   INT16 i,j;
+  //  m_coeff=tms5220_coeff;
+  // set up byte_rev
+  for(i=0;i<256;i++)
+    {
+      j = (i>>4) | (i<<4); // Swap in groups of 4
+      j = ((j & 0xcc)>>2) | ((j & 0x33)<<2); // Swap in groups of 2
+      byte_rev[i] = ((j & 0xaa)>>1) | ((j & 0x55)<<1); // Swap bit pairs
+    }
+
+	m_speaking_now = m_talk_status = 1;
+	m_RNG = 0x1fff;
+	m_CTL_buffer = 0;
+	//	m_PDC = 0;
+
+	/* initialize the energy/pitch/k states */
+	m_old_energy = m_new_energy = m_current_energy = m_target_energy = 0;
+	m_old_pitch = m_new_pitch = m_current_pitch = m_target_pitch = 0;
+	memset(m_old_k, 0, sizeof(m_old_k));
+	memset(m_new_k, 0, sizeof(m_new_k));
+	memset(m_current_k, 0, sizeof(m_current_k));
+	memset(m_target_k, 0, sizeof(m_target_k));
+
+	/* initialize the sample generators */
+	m_interp_count = m_sample_count = m_pitch_count = 0;
+	memset(m_x, 0, sizeof(m_x));
+	m_next_is_address = FALSE;
+	m_address = 0;
+	if (m_table != NULL)
+	{
+		/* legacy interface */
+		m_schedule_dummy_read = TRUE;
+	}
+	else
+	{
+		/* no dummy read! This makes bagman and ad2083 speech fail
+		 * with the new cycle and transition exact interfaces
+		 */
+		m_schedule_dummy_read = FALSE;
+	}
+	m_addr_bit = 0;
+
+
+
+}
+
+void tms5100_newsay(){
+
+  ptrAddr = sp_spk0352n9;
+  ptrBit = 0;
+
+}
+
+//  tms5100_get_sample();
+
+
+void main(){
+  INT16 i, sample; u8 ending=0;
+  // buffer?
+  tms5100_init();
+  tms5100_newsay();
+  // ptraddr and speech data array
+  //  m_IP=0;
+
+  while(1){
+    sample=  fiveoneprocess(&ending);
+    printf("%c",(sample+32768)>>8);
+    if (ending==1){
+      ending=0; tms5100_newsay();
+    }
+
+  //  for (i=0;i<32768;i++) printf("%c",(speechbuffer[i]+32768)>>8);
+  }
+}

@@ -75,8 +75,6 @@ void main(void)
 
   //  lpc_newsay(1);
   //  SAMINIT();
-    //  initializeSynthesizer();// includes call to init_parameters !!!! TUBE.C - TRM! STRIP_OUT
-    //  synthesize(); // - ????? 
   // test audio fill
   /*      for (x=0;x<32768;x++){
     audio_buffer[x]=rand()%32768;

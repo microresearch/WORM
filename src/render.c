@@ -274,7 +274,7 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	//		Output(3, X);
 	*howmany=Output(3);
 	//		*sample=((X)<<12)-28672; // check >>12???
-			*sample=((X-8)<<12); //1 byte
+	*sample=(((int16_t)(X)-8)<<12); //1 byte
 			
       } else
       {
@@ -284,7 +284,7 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	//	Output(4, X);
 	*howmany=Output(4);
 	//		*sample=((X)<<12)-28672; // check >>12???
-			*sample=((X-8)<<12); //1 byte
+	*sample=(((int16_t)(X)-8)<<12); //1 byte
 
       }
 
@@ -375,7 +375,7 @@ pos48280:
 		*howmany=Output(1);
 
 		//		*sample=((X&15)<<12)-28672; // check >>12??? .. but we can't output further one?
-				*sample=(((X&15)-8)<<12); //1 byte
+		*sample=((((int16_t)(X)&15)-8)<<12); //1 byte
 		//	*sample=(rand()%65536)-32768;
 
 		if (X!=0) goto pos48296;
@@ -499,7 +499,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 			// output the accumulated value
 						//			Output(0, A);
 			howmany=Output(0);
-			*sample=((A-8)<<12); //1 byte
+			*sample=(((int16_t)(A)-8)<<12); //1 byte
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;
