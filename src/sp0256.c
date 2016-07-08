@@ -1136,7 +1136,7 @@ void micro()
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     dada=adc_buffer[SELX]>>6;
+     dada=adc_buffer[SELX]>>6; //this is newsay
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
      m_lrq = 0; //from 8 bit write
    }

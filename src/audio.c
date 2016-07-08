@@ -81,10 +81,7 @@ VocoderInstance* vocoderz;
 Formlet *formy;
 Formant *formanty;
 
-genny* tms5220gen;
-genny* sp0256gen;
-genny* samgen;
-genny* tms5200gen;
+genny* allgen;
 
 biquad *newB;
 
@@ -106,6 +103,14 @@ u16 x,xx;
  sam_newsay(); // TEST!
  tms5200_init();
  tms5200_newsay();
+
+// malloc
+allgen=malloc(sizeof(genny));		
+allgen->samplepos=0.0f;
+
+newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
+
+
   /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
 	mdavocal_init(mdavocall);
 	mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
@@ -146,24 +151,6 @@ u16 x,xx;
 		  }
 		  }*/
 
-// initialize generators???? TODO 
-/// so for tms5220:
-
-// malloc
-tms5220gen=malloc(sizeof(genny));		
-tms5220gen->samplepos=0.0f;
-
-sp0256gen=malloc(sizeof(genny));		
-sp0256gen->samplepos=0.0f;
-
-samgen=malloc(sizeof(genny));		
-samgen->samplepos=0.0f;
-
-tms5200gen=malloc(sizeof(genny));		
-tms5200gen->samplepos=0.0f;
-
-
-newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
 
 }
 
@@ -531,33 +518,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   u8 speedy;
   //  float xx,yy;
 
-  // trigger to take care of but figure out basics step by step first!
-
-  //  u16 ending=loggy[adc_buffer[END]];
   u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
-  //  samplespeed=0.25f;
-
-  // older:PROCESS incoming audio and activate master_triger
-  // TODO:read in audio and process for trigger
-  // trigger will set samplepos=0.0f, writepos=0 and trigger=1
-  // but readpos only after we have written?
-  ////////////////////////////////////////////////////////////
-
-  // REDO this callback:
-
-  //
-  // what mode are we in/change of mode or parameters
-  // do we need to do anything to incoming audio //or// just store it 
-  // if we need trigger?
-
-  // any excitation to fulfill?
-
-  // how much speech data do we need to generate based on speed (in main.c)?
-  // max is 8xsz/2=8x32=256 samples 
-  // generate based on mode, trigger and params // inline - takes care of where we are in phonemes etc.
-  //
 
   // splitting input
 
@@ -570,8 +533,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  genny* generator[]={tms5220gen,NULL,sp0256gen,NULL,samgen,tms5200gen}; // or just as void/cast in function itself would make sense
-  x=generators[mode](generator[mode],sample_buffer,mono_buffer,samplespeed,sz/2); 
+
+  x=generators[mode](allgen,sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
       readpos=samplepos;

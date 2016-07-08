@@ -1150,7 +1150,7 @@ void micro()
  void sp0256_newsay(void){
    u8 dada;
    m_halted=1;
-   dada=0;
+   dada=0; // ???
    m_ald = ((dada&64) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }

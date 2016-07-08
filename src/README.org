@@ -2781,12 +2781,15 @@ sam_init();
 sam_newsay(); 
 sam_get_sample();
 
-
 ** 8/7
 
 - TODO:
 
-*do we we need seperate samplepos in audio.c for each generator?*
+*do we we need seperate samplepos in audio.c for each generator?* REMOVED///RE_TEST
+
+- check sanity interpol DONE - and need to fix audio.c
+
+- re-check sample size in sam
 
 - new 5100 roms below to decode and clean up all 5100 roms 
 
@@ -2794,11 +2797,13 @@ sam_get_sample();
 
 - or port tms5110x.c which should not be necessary
 
-- sp0256 vocabularies - and how works with 2 bits... re-acquaint
+- sp0256 roms and vocabularies - and how works with 2/3 bitshift re-acquaint - sp0256lap? ./sp0256 ... document this!
 
-- tubes.c and do we ignore nvp.c
+- tubes.c and do we ignore nvp.c ?
 
-// new/extra modes:
+- choose VOSIM etc...
+
+// new/extra modes -> maybe 32 modes:
 
 talkie and different tables/5100/52xx/sam single phonemes/low pass variants and change the low pass
 
@@ -2832,8 +2837,6 @@ upsample=interpolate - do we need filter as this is on output?
 /////
 
 - filter on interpolation and check interpolation???
-
-- what and how repeats function for TMS and SP0256
 
 - check CVs/DONE - PCB->check/orderTODO-DONE
 
@@ -2939,7 +2942,7 @@ klatt in docs:
 
 //////
 
-** 3/SAM - test/re-work
+** 3/SAM - test/re-work - still glitchy issue
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
 
@@ -2990,7 +2993,7 @@ default = 72
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
 cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH_DONE, port
-into generatorDONE, text to speech NRL->retroTTS/phoneme.c
+into generatorDONE, text to speech NRL->retroTTS/and/phoneme.c
 
 - dictionary for phonemes and longer words/vocab below -> so we can have banks (also with and without pitch bend or fixed or ...)
 
@@ -3057,6 +3060,8 @@ allophones 64 total inc. pauses
 
 vocab etc: 
 
+https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
+
 https://github.com/jas8mm/retroSpeak/blob/master/retroSpeak.py
 
 http://fddrsn.net/pcomp/examples/SP0256/sp0256code-allophones.html 
@@ -3065,7 +3070,6 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
-https://github.com/jas8mm/retroSpeak/blob/master/vocabulary.py
 
 ** +=> others from mame/mess TODO =
 
