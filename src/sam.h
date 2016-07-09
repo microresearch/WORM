@@ -23,8 +23,8 @@ void SetThroat(unsigned char _throat);
 void EnableSingmode();
 void EnableDebug();
 
-int sam_init();
-u8 sam_newsay();
+void sam_init();
+void sam_newsay();
 int SAMMain();
 u8 sam_get_sample(int16_t *newsample);
 

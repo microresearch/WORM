@@ -42,7 +42,7 @@ LDSCRIPT = stm32_flash.ld
 
 CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -I./LPC -I./vocoder -std=gnu99 \
 	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' \
-	-mthumb -ggdb\
+	-mthumb \
 	-mfpu=fpv4-sp-d16 \
 	-c -lm -lc -fno-common -O3 \
 	-mcpu=cortex-m4 \

@@ -2795,13 +2795,15 @@ sam_get_sample();
 
 - still need to compare to original 5100 code! - done on lap and appears close enough - tms5100x can be ported to arm if necessaryDONE
 
+*but need to add selection and vocab and tms5200x.c is now for 5100 - change easily back and test vs 5220 also*
+
 - or port tms5110x.c which should not be necessaryDONE
 
 - sp0256 roms and THEN vocabulariesDONE - and how works with 2/3 bitshift re-acquaint - sp0256lap? ./sp0256 ... document this!DONE
 
-///->DONE MARK
-
 - tube.c - crahsing on init or some clash somewhere????
+
+///->DONE MARK
 
 - do we ignore nvp.c - re-look at
 
@@ -2822,6 +2824,11 @@ talkie and different tables/5100/52xx/sam single phonemes/low pass variants and 
 - sp0256 vocabulary/dictionary/text to speech and other rombanks
 
 - sp0256 translated vocab from retrospeakDONE, make checks on the whole and worldlist also
+
+** 9/7
+
+- tube.c fixed and runs (wierd bug where some things only run if reset live - seems fixed - take out ccmdata and lots of other fixes)
+- possible bug where callback would run before we had inited - now we init all generators in main
 
 
 * important notes

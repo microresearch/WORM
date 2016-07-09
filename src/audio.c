@@ -70,106 +70,34 @@ int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
 //for vocoder
-int16_t modulator_sample_buffer[256];
-int16_t carrier_sample_buffer[256];
-int16_t output_sample_buffer[256];
+//int16_t modulator_sample_buffer[256];
+//int16_t carrier_sample_buffer[256];
+//int16_t output_sample_buffer[256];
 
 #define float float32_t
 
+float samplepos=0;//=genstruct->samplepos;
+int16_t samplel;//=genstruct->lastsample;
+int16_t lastval;//=genstruct->prevsample;
+
+
+/*
 mdavocal *mdavocall;
 mdavocoder *mdavocod;
 VocoderInstance* vocoderz;
 Formlet *formy;
 Formant *formanty;
-
-genny* allgen;
-
-biquad *newB;
-
-void Audio_Init(void)
-{
-float Fc,Q,peakGain;
-  const float Fs=32000.0f;// TODO
-  float a0,a1,a2,b1,b2,norm,V,K;
-  float *state[5][5];
-  uint32_t i;
-  int16_t *audio_ptr;
-u16 x,xx;
-
-// LPCAnalyzer_init();
-sp0256_init();
-lpc_init(); 
-simpleklatt_init();
-sam_init();
-sam_newsay(); // TEST!
-tms5200_init();
- tms5200_newsay();
- //tube_init();
- // tube_newsay();
-
-// malloc
-allgen=malloc(sizeof(genny));		
-allgen->samplepos=0.0f;
-
-//newB=BiQuad_new(LPF,1.0f,1000.0f,32000.0f,0.2f); // testing this for SAM
-
-
-  /*	mdavocall=(mdavocal *)malloc(sizeof(mdavocal));
-	mdavocal_init(mdavocall);
-	mdavocod=(mdavocoder *)malloc(sizeof(mdavocoder));
-	mdaVocoder_init(mdavocod);
-	vocoderz=instantiateVocoder();
-	formy=(Formlet *)malloc(sizeof(Formlet));
-	Formlet_init(formy, 110.0f);
-	formanty=(Formant *)malloc(sizeof(Formant));
-	Formant_init(formanty);
-	initbraidworm();
-	initvoicform();
-	init_simpleklatt();
-	init_nvp();*/ // STRIP_OUT
-
-	/* clear the buffer */
-	audio_ptr = audio_buffer;
-		i = AUDIO_BUFSZ;
-		while(i-- > 0)
-		*audio_ptr++ = 0;
-
-		/*
-		for (xx=0;xx<5;xx++){// five formants INIT
-		  for (x=0;x<5;x++){
-		    Fc=freq[xx][x];
-		    Q=qqq[xx][x];
-		    K = tanf(M_PI * Fc / Fs);
-		    norm = 1 / (1 + K / Q + K * K);
-		    a0 = K / Q * norm;
-		    a1 = 0;
-		    a2 = -a0;
-		    b1 = 2 * (K * K - 1) * norm;
-		    b2 = (1 - K / Q + K * K) * norm;
-
-		    coeffs[xx][x][0]=a0*mull[xx][x]; coeffs[xx][x][1]=a1*mull[xx][x]; coeffs[xx][x][2]=a2*mull[xx][x]; coeffs[xx][x][3]=-b1*mull[xx][x]; coeffs[xx][x][4]=-b2*mull[xx][x];
-		    /// can also just mult coeffs???? - TEST with and without TODO!
-		    state[xx][x] = (float*)malloc(4*sizeof(float));
-		    arm_biquad_cascade_df1_init_f32(&df[xx][x],1,coeffs[xx][x],state[xx][x]);
-		  }
-		  }*/
-
-
-}
-
+*/
 
 #define THRESH 32000
 #define THRESHLOW 30000
 
-u16 sp0256(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-float samplepos=genstruct->samplepos;
-int16_t samplel=genstruct->lastsample;
-int16_t lastval=genstruct->prevsample;
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
@@ -216,21 +144,15 @@ int16_t lastval=genstruct->prevsample;
    }
 
   // refill back counter etc.
- genstruct->samplepos=samplepos;
- genstruct->lastsample=samplel;
- genstruct->prevsample=lastval;
  return size;
 };
 
-u16 tubes(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-float samplepos=genstruct->samplepos;
-int16_t samplel=genstruct->lastsample;
-int16_t lastval=genstruct->prevsample;
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
@@ -277,24 +199,18 @@ int16_t lastval=genstruct->prevsample;
    }
 
   // refill back counter etc.
- genstruct->samplepos=samplepos;
- genstruct->lastsample=samplel;
- genstruct->prevsample=lastval;
  return size;
 };
 
 
-u16 sammy(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 x=0,readpos;
   static u8 howmany=0;
   float remainder;
-  float xx,xxx;
-  float tmpbuffer[32];
+  //  float xx,xxx;
+  //  float tmpbuffer[32];
 
-float samplepos=genstruct->samplepos;
-int16_t samplel=genstruct->lastsample;
-int16_t lastval=genstruct->prevsample;
   // lpc_running
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
@@ -357,21 +273,15 @@ int16_t lastval=genstruct->prevsample;
        }
 
   // refill back counter etc.
- genstruct->samplepos=samplepos;
- genstruct->lastsample=samplel;
- genstruct->prevsample=lastval;
  return size;
 }
 
-u16 tms5220talkie(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-float samplepos=genstruct->samplepos;
-int16_t samplel=genstruct->lastsample;
-int16_t lastval=genstruct->prevsample;
   // lpc_running
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
@@ -420,9 +330,6 @@ int16_t lastval=genstruct->prevsample;
    }
 
   // refill back counter etc.
- genstruct->samplepos=samplepos;
- genstruct->lastsample=samplel;
- genstruct->prevsample=lastval;
  return size;
 };
 
@@ -431,7 +338,7 @@ float flinbufferz[MONO_BUFSZ];
 float floutbuffer[MONO_BUFSZ];
 float floutbufferz[MONO_BUFSZ];
 
-u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params SELZ is pitch bend commentd now OUT
   //  klattrun(outgoing, size);
   u8 xx=0;
@@ -441,14 +348,11 @@ u16 fullklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float sam
      }
 };
 
-u16 tms5200mame(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-float samplepos=genstruct->samplepos;
-int16_t samplel=genstruct->lastsample;
-int16_t lastval=genstruct->prevsample;
   // lpc_running
 
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
@@ -497,15 +401,12 @@ int16_t lastval=genstruct->prevsample;
    }
 
   // refill back counter etc.
- genstruct->samplepos=samplepos;
- genstruct->lastsample=samplel;
- genstruct->prevsample=lastval;
  return size;
 };
 
 
 
-u16 simpleklatt(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+u16 simpleklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params - break down as above in tms, spo256 - pull out size
   dosimpleklattsamples(outgoing, size);
 };
@@ -550,10 +451,13 @@ inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *
 	}
 }
 
-extern u8 trigger;
+/*extern u8 trigger;
 extern u16 generated;
 extern u16 writepos;
 extern u8 mode; /// ????? TODO do we need these?
+*/
+
+u8 mode;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
@@ -561,13 +465,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //  static float eaten=0;
   //  static float samplepos=0.0f; 
   float samplespeed;
-  static float samplepos=0;
+  //  static float samplepos=0.0f;
   u8 x;
-  u16 readpos;
+  //  u16 readpos;
   u8 speedy;
   //  float xx,yy;
 
-  u16 ending=AUDIO_BUFSZ;
+  //  u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
 
@@ -580,21 +484,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=5;
+  mode=6; // checked=0,1,2,3,4,5,6 ALL 
 
-  u16 (*generators[])(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  u16 (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
+  // we don't really need to return size?
 
-    x=generators[mode](allgen,sample_buffer,mono_buffer,samplespeed,sz/2); 
-
-  /*    for (x=0;x<sz/2;x++){
-      readpos=samplepos;
-      mono_buffer[x]=audio_buffer[readpos];
-      //                mono_buffer[x]=rand()%65536;
-      samplepos+=samplespeed;
-      if (samplepos>=ending) samplepos=0.0f;    
-      }*/
-
+  x=generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

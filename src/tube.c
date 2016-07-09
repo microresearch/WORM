@@ -109,7 +109,7 @@
 #define FIR_CUTOFF                .00000001
 
 /*  PITCH VARIABLES  */
-#define PITCH_BASE                220.0
+#define PITCH_BASE                220.0f
 #define PITCH_OFFSET              3           /*  MIDDLE C = 0  */
 #define LOG_FACTOR                3.32193
 
@@ -120,6 +120,8 @@
 //#define VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
 #define VT_SCALE                  0.125     /*  2^(-3)  */
+//#define VT_SCALE                  1.0     /*  2^(-5)  */
+
 
 /*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
 #define OUTPUT_SCALE              0.25
@@ -131,15 +133,15 @@
 #define GAMMA_TOO_SMALL           3
 
 /*  CONSTANTS FOR NOISE GENERATOR  */
-#define FACTOR                    377.0
+#define FACTOR                    377.0f
 #define INITIAL_SEED              0.7892347
 
 /*  MAXIMUM SAMPLE VALUE  */
-#define RANGE_MAX                 32767.0
+#define RANGE_MAX                 32767.0f
 
 /*  MATH CONSTANTS  */
 #define TUBEPI                        3.1415927
-#define TWO_PI                    (2.0 * TUBEPI)
+#define TWO_PI                    (2.0f * TUBEPI)
 
 /*  FUNCTION RETURN CONSTANTS  */
 #define ERROR                     (-1)
@@ -152,7 +154,7 @@
 
 /*  SAMPLE RATE CONVERSION CONSTANTS  */
 #define ZERO_CROSSINGS            13                 /*  SRC CUTOFF FRQ      */
-#define LP_CUTOFF                 (11.0/13.0)        /*  (0.846 OF NYQUIST)  */
+#define LP_CUTOFF                 (11.0f/13.0f)        /*  (0.846 OF NYQUIST)  */
 
 #define N_BITS                    16
 #define L_BITS                    8
@@ -177,8 +179,8 @@
 #define BETA                      5.658        /*  kaiser window parameters  */
 #define IzeroEPSILON              1E-21 // was 21
 
-#define OUTPUT_SRATE_LOW          22050.0
-#define OUTPUT_SRATE_HIGH         44100.0
+#define OUTPUT_SRATE_LOW          22050.0f
+#define OUTPUT_SRATE_HIGH         44100.0f
 //#define BUFFER_SIZE               1024                 /*  ring buffer size  */
 
 //extern signed int audio_buffer[32768];
@@ -190,128 +192,51 @@
 
 /*  GLOBAL VARIABLES *********************************************************/
 
-float globglotpitch=0.0; // female
-
-/*  INPUT VARIABLES  */
-float  outputRate;                  /*  output sample rate (22.05, 44.1)  */
-float  controlRate;                 /*  1.0-1000.0 input tables/second (Hz)  */
-
-float volume;                      /*  master volume (0 - 60 dB)  */
-int waveform;                    /*  GS waveform type (0=PULSE, 1=SINE  */
-float tp;                          /*  % glottal pulse rise time  */
-float tnMin;                       /*  % glottal pulse fall time minimum  */
-float tnMax;                       /*  % glottal pulse fall time maximum  */
-float breathiness;                 /*  % glottal source breathiness  */
-
-float length;                      /*  nominal tube length (10 - 20 cm)  */
-float temperature;                 /*  tube temperature (25 - 40 C)  */
-float lossFactor;                  /*  junction loss factor in (0 - 5 %)  */
-
-float apScale;                     /*  aperture scl. radius (3.05 - 12 cm)  */
-float mouthCoef;                   /*  mouth aperture coefficient  */
-float noseCoef;                    /*  nose aperture coefficient  */
-
-float noseRadius[TOTAL_NASAL_SECTIONS];  /*  fixed nose radii (0 - 3 cm)  */
-
-float throatCutoff;                /*  throat lp cutoff (50 - nyquist Hz)  */
-float throatVol;                   /*  throat volume (0 - 48 dB) */
-
-int    modulation;                  /*  pulse mod. of noise (0=OFF, 1=ON)  */
-float mixOffset;                   /*  noise crossmix offset (30 - 60 dB)  */
+//static float globglotpitch=0.0f; // female
 
 
 /*  DERIVED VALUES  */
-int    controlPeriod;
-int    sampleRate;
-float actualTubeLength;            /*  actual length in cm  */
 
-float dampingFactor;               /*  calculated damping factor  */
-float crossmixFactor;              /*  calculated crossmix factor  */
+//// replace all of these with calcs from parameter_list below
+const int    controlPeriod=4869;
+const int    sampleRate=19476;
+const float nyquist= 9738.0;
+const float actualTubeLength=18.0;            /*  actual length in cm  */
+const float dampingFactor=0.985;               /*  calculated damping factor  */
+const float crossmixFactor=3.98;              /*  calculated crossmix factor  */
+const int    tableDiv1=154;
+const int    tableDiv2=317;
+const float tnLength=163.0;
+const float tnDelta=82.0;
+const float breathinessFactor=0.025;
+const float basicIncrement=0.026289;
+const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35, 1.96, 1.91, 1.3, 0.73};  /*  fixed nose radii (0 - 3 cm)  */
+const u8 pulsed=0;
+const float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
-//float wavetable[TABLE_LENGTH];
-float* wavetable;
 
-//float *wavetable;
-int    tableDiv1;
-int    tableDiv2;
-float tnLength;
-float tnDelta;
-float breathinessFactor;
-
-float basicIncrement;
-float currentPosition;
-
-/*  REFLECTION AND RADIATION FILTER MEMORY  */
-float a10, b11, a20, a21, b21;
-
-/*  NASAL REFLECTION AND RADIATION FILTER MEMORY  */
-float na10, nb11, na20, na21, nb21;
-
-/*  THROAT LOWPASS FILTER MEMORY, GAIN  */
-float tb1, ta0, throatGain;
-
-/*  FRICATION BANDPASS FILTER MEMORY  */
-float bpAlpha, bpBeta, bpGamma;
-
-/*  TEMPORARY SAMPLE STORAGE VALUES  */
-float maximumSampleValue = 0.0;
-long int numberSamples = 0;
-//FILE  *tempFilePtr;
-
-/*  MEMORY FOR TUBE AND TUBE COEFFICIENTS  */
-float oropharynx[TOTAL_SECTIONS][2][2];
-float oropharynx_coeff[TOTAL_COEFFICIENTS];
-
-float nasal[TOTAL_NASAL_SECTIONS][2][2];
-float nasal_coeff[TOTAL_NASAL_COEFFICIENTS];
-
-float alpha[TOTAL_ALPHA_COEFFICIENTS];
-int current_ptr = 1;
-int prev_ptr = 0;
-
-/*  MEMORY FOR FRICATION TAPS  */
-float fricationTap[TOTAL_FRIC_COEFFICIENTS];
-
-/*  VARIABLES FOR INTERPOLATION  */
-struct currentt{
-    float glotPitch;
-    float glotPitchDelta;
-    float glotVol;
-    float glotVolDelta;
-    float aspVol;
-    float aspVolDelta;
-    float fricVol;
-    float fricVolDelta;
-    float fricPos;
-    float fricPosDelta;
-    float fricCF;
-    float fricCFDelta;
-    float fricBW;
-    float fricBWDelta;
-    float radius[TOTAL_REGIONS];
-    float radiusDelta[TOTAL_REGIONS];
-    float velum;
-    float velumDelta;
-};
-
-struct currentt current;
+static float wavetable[TABLE_LENGTH];
+static float currentPosition;
+static float a10, b11, a20, a21, b21;
+static float na10, nb11, na20, na21, nb21;
+static float tb1, ta0, throatGain;
+static float bpAlpha, bpBeta, bpGamma;
+static float oropharynx[TOTAL_SECTIONS][2][2];
+static float oropharynx_coeff[TOTAL_COEFFICIENTS];
+static float nasal[TOTAL_NASAL_SECTIONS][2][2];
+static float nasal_coeff[TOTAL_NASAL_COEFFICIENTS];
+static float alpha[TOTAL_ALPHA_COEFFICIENTS];
+static u8 current_ptr = 1;
+static u8 prev_ptr = 0;
+static float fricationTap[TOTAL_FRIC_COEFFICIENTS];
 
 /*  VARIABLES FOR FIR LOWPASS FILTER  */
-//float FIRData[128], FIRCoef[128];
-float *FIRData, *FIRCoef;
+static float FIRData[256];
+static float FIRCoef[256];
+//float *FIRData, *FIRCoef;
 
-int FIRPtr, numberTaps;
+static u8 FIRPtr, numberTaps;
 
-/*  VARIABLES FOR SAMPLE RATE CONVERSION  */
-float sampleRateRatio;
-//float h[FILTER_LENGTH], deltaH[FILTER_LENGTH], buffer[BUFFER_SIZE];
-int fillPtr, emptyPtr = 0, padSize, fillSize;
-unsigned int timeRegisterIncrement, filterIncrement, phaseIncrement;
-unsigned int timeRegister = 0;
-
-/*  GLOBAL FUNCTIONS (LOCAL TO THIS FILE)  ***********************************/
-
-//int initializeSynthesizer(void);
 
 void initializeWavetable(void);
 float speedOfSound(float temperature);
@@ -348,21 +273,14 @@ void rationalApproximation(float number, int *order, int *numerator,
 float FIRFilter(float input, int needOutput);
 int increment(int pointer, int modulus);
 int decrement(int pointer, int modulus);
-//void initializeConversion(void);
-//void initializeFilter(void);
-float Izero(float x);
-//void initializeBuffer(void);
-//void dataFill(float data);
-//void dataEmpty(void);
 
 /////////////////////////////////////////////=???????
 
 // example input to convert to arrays in first INIT
 // and transcribe that list of vowels/frames
 
-float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
-float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
+static float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
 
 //float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
 
@@ -370,112 +288,6 @@ float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4
 
 
 
-void init_parameters(void){
-
-float glotPitch, glotVol, radius[TOTAL_REGIONS], velum, aspVol;
-float fricVol, fricPos, fricCF, fricBW;
-unsigned char i;
-
-// laststart=0;
- outputRate = 32000;
- controlRate = 4.0;
-
-// what happened to volume?
-volume = parameter_list[0];
-
-// glottal source waveform
-waveform = parameter_list[1];
-
-//      GET THE GLOTTAL PULSE RISE TIME (tp)  
-tp = parameter_list[2];
-  
-//      GET THE GLOTTAL PULSE FALL TIME MINIMUM (tnMin)  
-tnMin = parameter_list[3];
-  
-//      GET THE GLOTTAL PULSE FALL TIME MAXIMUM (tnMax)  
-tnMax = parameter_list[4];
-
-//      GET THE GLOTTAL SOURCE BREATHINESS  
-breathiness = parameter_list[5];
-
-//      GET THE NOMINAL TUBE LENGTH  
-length = parameter_list[6];
-
-//      GET THE TUBE TEMPERATURE  
-temperature = parameter_list[7];
-
-//      GET THE JUNCTION LOSS FACTOR  
-lossFactor = parameter_list[8];
-
-//      GET THE APERTURE SCALING RADIUS  
-apScale = parameter_list[9];
-
-//    GET THE MOUTH APERTURE COEFFICIENT  
-mouthCoef = parameter_list[10];
-
-//      GET THE NOSE APERTURE COEFFICIENT  
-noseCoef = parameter_list[11];
-
-//      GET THE NOSE RADII for how many? 6 
-noseRadius[1] = parameter_list[12]; // starts at 1 tho
-noseRadius[2] = parameter_list[13];
-noseRadius[3] = parameter_list[14];
-noseRadius[4] = parameter_list[15];
-noseRadius[5] = parameter_list[16];
-
-//      GET THE THROAT LOWPASS FREQUENCY CUTOFF  
-throatCutoff = parameter_list[17];
-
-//      GET THE THROAT VOLUME  
-throatVol = parameter_list[18];
-
-//      GET THE PULSE MODULATION OF NOISE FLAG  
-modulation = parameter_list[19];
-
-//      GET THE NOISE CROSSMIX OFFSET  
-mixOffset = parameter_list[20];
-
-// then read in frame - so we will have 2 inputtables!
-
-/*
-glotPitch = input_frame[0]+globglotpitch;
-glotVol = input_frame[1];
-aspVol = input_frame[2];
-fricVol = input_frame[3];
-fricPos = input_frame[4];
-fricCF = input_frame[5];
-fricBW = input_frame[6];
-
-
-for (i = 0; i < TOTAL_REGIONS; i++) radius[i] = input_frame[7+i];
-
-velum = input_frame[7+i];
-
-*/
-
-//ADD THE PARAMETERS TO THE INPUT LIST  
-//addInput(glotPitch, glotVol, aspVol, fricVol, fricPos, fricCF,fricBW, radius, velum);
-
-// printff("NUMMMMMM %d",numberInputTables);
-
-
-//FLOAT UP THE LAST INPUT TABLE, TO HELP INTERPOLATION CALCULATIONS  -- adds one
-/*if (numberInputTables > 0) {
-int lastTable = numberInputTables - 1;
-addInput(glotPitchAt(lastTable), glotVolAt(lastTable),
-aspVolAt(lastTable), fricVolAt(lastTable),
-fricPosAt(lastTable), fricCFAt(lastTable),
-fricBWAt(lastTable), radiiAt(lastTable),
-velumAt(lastTable));
-}*/
-
-// do as last:
-
-
-//    printff("NUMMMMMM %d",numberInputTables);
-
-
-}
 
 /*
 // parameters from input
@@ -526,57 +338,30 @@ velumAt(lastTable));
 -14.5	51.0	0.0	0.0	4.0	4500	500	0.8	0.8	1.78	1.78	0.2	0.2	0.4	0.0	1.0
 */
 
-
-
-float speedOfSound(float temperature)
-{
-    return (331.4 + (0.6 * temperature));
-}
-
 void tube_init(void)
 {
-    float nyquist;
 
-    init_parameters(); // reads our parameter array
-
-    /*  CALCULATE THE SAMPLE RATE, BASED ON NOMINAL
-	TUBE LENGTH AND SPEED OF SOUND  */
-	float c = speedOfSound(temperature);
-	controlPeriod =
-	    rintf((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
-	sampleRate = controlRate * controlPeriod;
-	actualTubeLength = (c * TOTAL_SECTIONS * 100.0) / sampleRate;
-	nyquist = (float)sampleRate / 2.0;
-
-    /*  CALCULATE THE BREATHINESS FACTOR  */
-    breathinessFactor = breathiness / 100.0;
-
-    /*  CALCULATE CROSSMIX FACTOR  */
-    crossmixFactor = 1.0 / amplitude(mixOffset);
-
-    /*  CALCULATE THE DAMPING FACTOR  */
-    dampingFactor = (1.0 - (lossFactor / 100.0));
 
     /*  INITIALIZE THE WAVE TABLE  */
-        initializeWavetable();
+            initializeWavetable();
 
     /*  INITIALIZE THE FIR FILTER  */
-        initializeFIR(FIR_BETA, FIR_GAMMA, FIR_CUTOFF);
+            initializeFIR(FIR_BETA, FIR_GAMMA, FIR_CUTOFF);
 
     /*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR MOUTH  */
-        initializeMouthCoefficients((nyquist - mouthCoef) / nyquist);
+            initializeMouthCoefficients((nyquist - parameter_list[10]) / nyquist);
 
     /*  INITIALIZE REFLECTION AND RADIATION FILTER COEFFICIENTS FOR NOSE  */
-        initializeNasalFilterCoefficients((nyquist - noseCoef) / nyquist);
+            initializeNasalFilterCoefficients((nyquist - parameter_list[11]) / nyquist);
 
     /*  INITIALIZE NASAL CAVITY FIXED SCATTERING COEFFICIENTS  */ 
-        initializeNasalCavity();
+            initializeNasalCavity();
 
     /*  INITIALIZE THE THROAT LOWPASS FILTER  */
-        initializeThroat();
+            initializeThroat();
 
     /*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-    //    initializeConversion(); // not now
+	    //        initializeConversion(); // not now
 
     //    return 1;
 }
@@ -587,19 +372,14 @@ void initializeWavetable(void)
 
 
     /*  ALLOCATE MEMORY FOR WAVETABLE  */
-    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
+    //    wavetable = (float *)calloc(TABLE_LENGTH, sizeof(float)); // TODO: as fixed array = 512 floats
 
 
     /*  CALCULATE WAVE TABLE PARAMETERS  */
-    tableDiv1 = rintf(TABLE_LENGTH * (tp / 100.0));
-    tableDiv2 = rintf(TABLE_LENGTH * ((tp + tnMax) / 100.0));
-    tnLength = tableDiv2 - tableDiv1;
-    tnDelta = rintf(TABLE_LENGTH * ((tnMax - tnMin) / 100.0));
-    basicIncrement = (float)TABLE_LENGTH / (float)sampleRate;
     currentPosition = 0;
 
     /*  INITIALIZE THE WAVETABLE WITH EITHER A GLOTTAL PULSE OR SINE TONE  */
-    if (waveform == PULSE) {
+    if (pulsed == PULSE) {
 	/*  CALCULATE RISE PORTION OF WAVE TABLE  */
 	for (i = 0; i < tableDiv1; i++) {
 	    float x = (float)i / (float)tableDiv1;
@@ -663,8 +443,8 @@ void initializeFIR(float beta, float gamma, float cutoff)
     numberTaps = (numberCoefficients * 2) - 1;
 
     /*  ALLOCATE MEMORY FOR DATA AND COEFFICIENTS  */
-        FIRData = (float *)calloc(numberTaps, sizeof(float)); // NOT FIXED as dependent on BETA!
-        FIRCoef = (float *)calloc(numberTaps, sizeof(float));
+    //        FIRData = (float *)calloc(numberTaps, sizeof(float)); // NOT FIXED as dependent on BETA!
+    //        FIRCoef = (float *)calloc(numberTaps, sizeof(float));
 
     /*  INITIALIZE THE COEFFICIENTS  */
     increment = (-1);
@@ -761,89 +541,36 @@ float nasalRadiationFilter(float input)
     return (output);
 }
 
-float glotPitchAt()
-{
-  return input_frame[0]+globglotpitch;
-}
-
-float glotVolAt()
-{
-  return input_frame[1];
-}
-
-float *radiiAt()
-{
-  return &input_frame[7];
-}
-
-float radiusAtRegion(u8 region)
-{
-  return input_frame[7+region];
-}
-
-float velumAt()
-{
-return input_frame[7+TOTAL_REGIONS];
-}
-
-float aspVolAt()
-{
-  return input_frame[2];
-}
-
-float fricVolAt()
-{
-  return input_frame[3];
-}
-
-float fricPosAt()
-{
-  return input_frame[4];
-}
-
-float fricCFAt()
-{
-  return input_frame[5];
-}
-
-float fricBWAt()
-{
-  return input_frame[6];
-}
-
 void tube_newsay(void){
   // what we need to reset
 
-  setControlRateParameters(); // TODO - just replace with straight array in
-
+  //  setControlRateParameters(); // TODO - just replace with straight array in
 }
 
 int16_t tube_get_sample(void)
 {
-  static int16_t j=0;
-  int16_t sample;
+  //  static int16_t j=0;
+  int16_t samplerr;
   float f0, ax, ah1, pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
-  
+  static float maximumSampleValue = 0.0f;
+      
     // do we have a new frame? -> newsay 
-    if (j>=controlPeriod) {
-      tube_newsay();
-      j=0;
-    }
-    f0 = frequency(current.glotPitch); // without interpol these are all the same?
-    ax = amplitude(current.glotVol);
-    ah1 = amplitude(current.aspVol);
-	    calculateTubeCoefficients();
-	    setFricationTaps();
-	    calculateBandpassCoefficients();
+    f0 = frequency(input_frame[0]); // without interpol these are all the same?
+    ax = amplitude(input_frame[1]);
+    ah1 = amplitude(input_frame[2]);
+    calculateTubeCoefficients();
+    setFricationTaps();
+    calculateBandpassCoefficients();
+    
 
 	    lp_noise = noiseFilter(noise());
-	    if (waveform == PULSE)		updateWavetable(ax);
+	    if (pulsed == PULSE)		updateWavetable(ax);
 	    pulse = oscillator(f0);
 	    pulsed_noise = lp_noise * pulse;
 	    pulse = ax * ((pulse * (1.0 - breathinessFactor)) +
 			  (pulsed_noise * breathinessFactor));
 
-	    if (modulation) {
+	    if (parameter_list[19]) {
 		crossmix = ax * crossmixFactor;
 		crossmix = (crossmix < 1.0) ? crossmix : 1.0;
 		signal = (pulsed_noise * crossmix) +
@@ -862,95 +589,16 @@ int16_t tube_get_sample(void)
 		maximumSampleValue = absoluteSampleValue;
 	    
 	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
-	    if (maximumSampleValue > 0)
-	      scale = (RANGE_MAX / maximumSampleValue);
-	    signal=signal*scale;
-	    sample=rintf(signal); 	 
-	    j++;
-	    //	     sample=rand()%32768;
-	    return sample;
+	    if (maximumSampleValue > 0.0f)
+	      //	      scale = (RANGE_MAX / maximumSampleValue);
+	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
+
+	    samplerr=signal*scale;
+
+	    //samplerr=rand()%32768;
+	    return samplerr;
 }
 
-void setControlRateParameters()
-{
-    u8 i;
-    current.glotPitch = glotPitchAt();
-
-    //    current.glotPitchDelta =
-    //	(glotPitchAt(pos) - current.glotPitch) / (float)controlPeriod;
-
-    current.glotVol = glotVolAt();
-    //    current.glotVolDelta =
-    //	(glotVolAt(pos) - current.glotVol) / (float)controlPeriod;
-
-    current.aspVol = aspVolAt();
-#if MATCH_DSP
-    current.aspVolDelta = 0.0;
-#else
-    current.aspVolDelta =
-	(aspVolAt(pos) - current.aspVol) / (float)controlPeriod;
-#endif
-
-    current.fricVol = fricVolAt();
-#if MATCH_DSP
-    current.fricVolDelta = 0.0;
-#else
-    current.fricVolDelta =
-	(fricVolAt(pos) - current.fricVol) / (float)controlPeriod;
-#endif
-
-    current.fricPos = fricPosAt();
-#if MATCH_DSP
-    current.fricPosDelta = 0.0;
-#else
-    current.fricPosDelta =
-	(fricPosAt(pos) - current.fricPos) / (float)controlPeriod;
-#endif
-
-    current.fricCF = fricCFAt();
-#if MATCH_DSP
-    current.fricCFDelta = 0.0;
-#else
-    current.fricCFDelta =
-	(fricCFAt(pos) - current.fricCF) / (float)controlPeriod;
-#endif
-
-    current.fricBW = fricBWAt();
-#if MATCH_DSP
-    current.fricBWDelta = 0.0;
-#else
-    current.fricBWDelta =
-	(fricBWAt(pos) - current.fricBW) / (float)controlPeriod;
-#endif
-
-    for (i = 0; i < TOTAL_REGIONS; i++) {
-      	current.radius[i] = radiusAtRegion(i);
-	//	current.radiusDelta[i] =
-	//	    (radiusAtRegion(pos,i) - current.radius[i]) /
-	//		(float)controlPeriod;
-    }
-
-    current.velum = velumAt();
-    //    current.velumDelta =
-    //	(velumAt(pos) - current.velum) / (float)controlPeriod;
-    
-}
-
-void sampleRateInterpolation(void)
-{
-    int i;
-
-    current.glotPitch += current.glotPitchDelta;
-    current.glotVol += current.glotVolDelta;
-    //    current.aspVol += current.aspVolDelta; // 0.0
-    //    current.fricVol += current.fricVolDelta; // 0.0
-    //    current.fricPos += current.fricPosDelta; // 0.0
-    //    current.fricCF += current.fricCFDelta;// 0.0
-    current.fricBW += current.fricBWDelta; // 0.0
-    for (i = 0; i < TOTAL_REGIONS; i++)
-	current.radius[i] += current.radiusDelta[i];
-    current.velum += current.velumDelta;
-}
 
 void initializeNasalCavity(void)
 {
@@ -967,17 +615,17 @@ void initializeNasalCavity(void)
 
     /*  CALCULATE THE FIXED COEFFICIENT FOR THE NOSE APERTURE  */
     radA2 = noseRadius[N6] * noseRadius[N6];
-    radB2 = apScale * apScale;
+    radB2 = parameter_list[9] * parameter_list[9];
     nasal_coeff[NC6] = (radA2 - radB2) / (radA2 + radB2);
 }
 
 
 void initializeThroat(void)
 {
-    ta0 = (throatCutoff * 2.0)/sampleRate;
+    ta0 = (parameter_list[17] * 2.0)/sampleRate;
     tb1 = 1.0 - ta0;
 
-    throatGain = amplitude(throatVol);
+    throatGain = amplitude(parameter_list[18]);
 }
 
 
@@ -989,27 +637,27 @@ void calculateTubeCoefficients(void)
 
     /*  CALCULATE COEFFICIENTS FOR THE OROPHARYNX  */
     for (i = 0; i < (TOTAL_REGIONS-1); i++) {
-	radA2 = current.radius[i] * current.radius[i];
-	radB2 = current.radius[i+1] * current.radius[i+1];
+      radA2 = input_frame[7+i] * input_frame[7+i];
+      radB2 = input_frame[8+i] * input_frame[8+i];
 	oropharynx_coeff[i] = (radA2 - radB2) / (radA2 + radB2);
     }	
 
     /*  CALCULATE THE COEFFICIENT FOR THE MOUTH APERTURE  */
-    radA2 = current.radius[R8] * current.radius[R8];
-    radB2 = apScale * apScale;
+    radA2 = input_frame[7+R8] * input_frame[7+R8];
+    radB2 = parameter_list[9] * parameter_list[9];
     oropharynx_coeff[C8] = (radA2 - radB2) / (radA2 + radB2);
 
     /*  CALCULATE ALPHA COEFFICIENTS FOR 3-WAY JUNCTION  */
     /*  NOTE:  SINCE JUNCTION IS IN MIDDLE OF REGION 4, r0_2 = r1_2  */
-    r0_2 = r1_2 = current.radius[R4] * current.radius[R4];
-    r2_2 = current.velum * current.velum;
+    r0_2 = r1_2 = input_frame[7+R4] * input_frame[7+R4];
+    r2_2 = input_frame[7+TOTAL_REGIONS] * input_frame[7+TOTAL_REGIONS];
     sum = 2.0 / (r0_2 + r1_2 + r2_2);
     alpha[LEFT] = sum * r0_2;
     alpha[RIGHT] = sum * r1_2;
     alpha[UPPER] = sum * r2_2;
 
     /*  AND 1ST NASAL PASSAGE COEFFICIENT  */
-    radA2 = current.velum * current.velum;
+    radA2 = input_frame[7+TOTAL_REGIONS] * input_frame[7+TOTAL_REGIONS];
     radB2 = noseRadius[N2] * noseRadius[N2];
     nasal_coeff[NC1] = (radA2 - radB2) / (radA2 + radB2);
 }
@@ -1018,12 +666,12 @@ void setFricationTaps(void)
 {
     int i, integerPart;
     float complement, remainder;
-    float fricationAmplitude = amplitude(current.fricVol);
+    float fricationAmplitude = amplitude(input_frame[3]);
 
 
     /*  CALCULATE POSITION REMAINDER AND COMPLEMENT  */
-    integerPart = (int)current.fricPos;
-    complement = current.fricPos - (float)integerPart;
+    integerPart = (int)input_frame[4];
+    complement = input_frame[4] - (float)integerPart;
     remainder = 1.0 - complement;
 
     /*  SET THE FRICATION TAPS  */
@@ -1044,8 +692,8 @@ void calculateBandpassCoefficients(void)
     float tanValue, cosValue;
 
 
-    tanValue = tanf((TUBEPI * current.fricBW) / sampleRate);
-    cosValue = cosf((2.0 * TUBEPI * current.fricCF) / sampleRate);
+    tanValue = tanf((TUBEPI * input_frame[6]) / sampleRate);
+    cosValue = cosf((2.0 * TUBEPI * input_frame[5]) / sampleRate);
 
     bpBeta = (1.0 - tanValue) / (2.0 * (1.0 + tanValue));
     bpGamma = (0.5 + bpBeta) * cosValue;
@@ -1468,23 +1116,3 @@ int decrement(int pointer, int modulus)
 	return(pointer);
 }
 
-
-float Izero(float x)
-{
-    float sum, u, halfx, temp;
-    int n;
-
-
-    sum = u = n = 1;
-    halfx = x / 2.0;
-
-    do {
-	temp = halfx / (float)n;
-	n += 1;
-	temp *= temp;
-	u *= temp;
-	sum += u;
-    } while (u >= (IzeroEPSILON * sum));
-
-    return(sum);
-}

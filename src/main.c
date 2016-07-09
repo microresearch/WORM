@@ -23,10 +23,12 @@
 #include "nsynth.h"
 #include "elements.h"
 #include "holmes.h"
-#include "sam.h"
+#include "saml.h"
 #include "tube.h"
 #include "LPC/lpc.h"
 #include "parwave.h"
+#include "sp0256.h"
+#include "tms5200x.h"
 
 
 /* DMA buffers for I2S */
@@ -47,14 +49,7 @@ __IO uint16_t adc_buffer[10];
       __asm__ __volatile__ ("nop\n\t":::"memory");		\
   } while (0)
 
-extern int16_t audio_buffer[AUDIO_BUFSZ];
 extern int errno;
-volatile u16 readpos=0;
-volatile u8 mode=0;
-volatile u8 trigger=0;
-volatile u8 maintrigger=0;
-volatile u16 generated=0;
-u16 writepos=0;
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
@@ -62,35 +57,56 @@ u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 
 
 void main(void)
 {
-  u16 count,x,xx;
-  u8 oldmode=0;
+  int16_t x;
+  
+// LPCAnalyzer_init();
+init_synth(); // which one? --> klatt rsynth !!!! RENAME!
+sp0256_init();
+lpc_init(); 
+simpleklatt_init();
+sam_init();
+sam_newsay(); // TEST!
+tms5200_init();
+tms5200_newsay();
+ delay(); // not really needed
+tube_init();
+// tube_newsay();
 
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
-  delay();
   I2S_Block_Init();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
-  init_synth(); // which one? --> klatt rsynth !!!!
-  Audio_Init();
+  //  Audio_Init(); not needed
+
+
+  //  tube_init();
+    //    tube_newsay();
+
+    //    initializeSynthesizer();
+      //   synthesize();
 
   //  lpc_newsay(1);
   //  SAMINIT();
   // test audio fill
-  /*      for (x=0;x<32768;x++){
-    audio_buffer[x]=rand()%32768;
-    }*/
+    /*          for (x=0;x<32768;x++){
+	  audio_buffer[x]=tube_get_sample();
+	  }*/
    // writepos=run_holmes(writepos); 
+
+  /*  for (x=0;x<32767;x++){
+	    audio_buffer[x]=tube_get_sample();
+	    }
+  */
 
   while(1)
     {
- 
-      //      /*
+  
+            
   // testing changing test_elm
       u8 axis=adc_buffer[SELX]>>8; // 16*3=48
       // change element, change length? leave stress as is 0
       test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
       test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
-      //      */
     
 
       //      oldmode=mode;    
@@ -188,7 +204,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 { 
   while(1){};
-}
+  }
+
 
 void MemManage_Handler(void)
 { 

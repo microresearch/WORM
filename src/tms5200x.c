@@ -115,7 +115,7 @@ static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5
 	/* these contain global status bits */
 	UINT8 m_speaking_now;     /* True only if actual speech is being generated right now. Is set when a speak vsm command happens OR when speak external happens and buffer low becomes nontrue; Is cleared when speech halts after the last stop frame or the last frame after talk status is otherwise cleared.*/
 	UINT8 m_speak_external;   /* If 1, DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
-	UINT8 m_talk_status;      /* If 1, TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; 
+UINT8 m_talk_status;      /* If 1, TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; */
 
 	/* these contain global status bits */
 	UINT8 m_previous_TALK_STATUS;      /* this is the OLD value of TALK_STATUS (i.e. previous value of m_SPEN|m_TALKD), needed for generating interrupts on a falling TALK_STATUS edge */
@@ -811,7 +811,7 @@ void tms5200_newsay(){
   m_talk_status = 1;
 
   //  ptrAddr = sp_parNICEe;
-  ptrAddr = sp_spk0352n9;
+  ptrAddr = sp_spk0352n9; // TODO ptr to const
   ptrBit = 0;
 
 };

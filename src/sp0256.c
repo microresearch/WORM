@@ -226,7 +226,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		f->per=f->per_orig+adc_buffer[SELY]>>5;
+		  f->per=f->per_orig+(adc_buffer[SELY]>>5);
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -1129,7 +1129,7 @@ void micro()
 }
 
  u16 sp0256_get_sample(void){
-   u16* output;
+   int16_t* output=0;
    u8 dada;
 
    u8 howmany=0;
