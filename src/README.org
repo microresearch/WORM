@@ -1,24 +1,20 @@
 * ERD/WORM dirty speech synth
 
-32k sample rate->48k?
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
 
-*we always need transition from previous phoneme for each mode (inc X/Y)!* - this can also be faked/transition in phoneme itself
+* TODO
 
-* TODO:
+- manual
 
-- generate - wrapper and structure and pointer to function calls...
+- collate worm quotes
 
-- clear naming scheme eg. for nvp algo:
+- image K worm scans
 
-init_nvp(void)
+- recordings
 
-generate_nvp(generator* nvp_generator, u16 size, int16_t* incoming, int16_t* outgoing)
-
-or:
-
-generate[x]->pointer to nvp and also generic struct to keep track of frames and so on...
-
-(but generator* should be void and cast)
+- check all parts order/test/build process-oven
 
 - satisfactory vocoder
 
@@ -29,7 +25,7 @@ generate[x]->pointer to nvp and also generic struct to keep track of frames and 
 
 - wormings algorithms. control over degree of randomness of movements
 
-* modes
+* past modes notes
 
 *MODE | IS? | FILES/DIR | BASED_ON | NOTES/TODO - to add to TODO from below*
 
@@ -2785,7 +2781,7 @@ sam_get_sample();
 
 - TODO:
 
-*do we we need seperate samplepos in audio.c for each generator?* REMOVED///RE_TEST
+*do we we need seperate samplepos in audio.c for each generator?* REMOVED///DONE
 
 - check sanity interpol DONE - and need to fix audio.c DONE-TESTED
 
@@ -2830,6 +2826,7 @@ talkie and different tables/5100/52xx/sam single phonemes/low pass variants and 
 - tube.c fixed and runs (wierd bug where some things only run if reset live - seems fixed - take out ccmdata and lots of other fixes)
 - possible bug where callback would run before we had inited - now we init all generators in main
 
+TODO: we don't need to return length from generators FIX
 
 * important notes
 
@@ -3007,7 +3004,6 @@ default = 72
 
 //// 
 
-
 ** 4/SP0256 
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
@@ -3104,7 +3100,6 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
-
 ** +=> others from mame/mess TODO =
 
 [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
@@ -3133,7 +3128,7 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
-** 5/TUBE - test!
+** 5/TUBE - 
 
 TRM tube notes assembled...
 
@@ -3154,7 +3149,7 @@ issues: generator and interpolation, linked list and generation of params, chang
 
 start with just one list = input_frame and do without interpolation, then implement as lastblah
 
-
+*working but need to do generation of new parameters and interpolation, also check audio rate interpolation*
 
 
 ** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
@@ -3169,7 +3164,7 @@ start with just one list = input_frame and do without interpolation, then implem
 
 SELX/SELY choose channel and setting, SELZ bandwidth SPEED as silence/no-pitch/pitch/external excitation
 
-what is excitation?
+what is excitation? INPUT?
 
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced
 
