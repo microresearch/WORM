@@ -136,6 +136,7 @@ smp_type srate, smp_type bandwidth)
     b->a2 = b2 /a0;
     b->a3 = a1 /a0;
     b->a4 = a2 /a0;
+    b->sn=sn; b->cs=cs; b->omega=omega;
 
     /* zero initial samples */
     b->x1 = b->x2 = 0;
@@ -143,5 +144,32 @@ smp_type srate, smp_type bandwidth)
 
     return b;
 }
-/* crc==3062280887, version==4, Sat Jul  7 00:03:23 2001 */
+
+biquad *BiQuad_reinit(biquad *b, smp_type bandwidth) // just for BPF and just for change in bandwidth
+// so we need to store omega
+{
+    smp_type alpha;
+    smp_type a0, a1, a2, b0, b1, b2;
+
+    /* setup variables */
+    alpha = b->sn * sinhf(M_LN2 /2 * bandwidth * b->omega /b->sn);
+
+        b0 = alpha;
+        b1 = 0;
+        b2 = -alpha;
+        a0 = 1 + alpha;
+        a1 = -2 * b->cs;
+        a2 = 1 - alpha;
+
+    /* precompute the coefficients */
+    b->a0 = b0 /a0;
+    b->a1 = b1 /a0;
+    b->a2 = b2 /a0;
+    b->a3 = a1 /a0;
+    b->a4 = a2 /a0;
+
+    /* zero initial samples */
+    //    b->x1 = b->x2 = 0;
+    //    b->y1 = b->y2 = 0;
+}
 

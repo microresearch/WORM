@@ -8,7 +8,7 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 - manual
 
-- collate worm quotes
+- collate worm quotes - Blake, alchemical
 
 - image K worm scans
 
@@ -2262,6 +2262,7 @@ and [[file:~/projects/ERD_modules/worm/docs/Csound6.05/Opcodes/fm4op.c]] which i
 - HMM look at - HTK// mage
 
 - warps vocoder: [[file:~/projects/ERD_modules/older/eurorack/warps/dsp/vocoder.cc::/%20Vocoder.][file:~/projects/ERD_modules/older/eurorack/warps/dsp/vocoder.cc::/ Vocoder.]]
+ no diff from parasites or at least only: limiter_.Process(out, 1.6f, size)
 
 test/compare all vocoders: mda (with excitation), LADSPA, borboom, own ARM FFT
 
@@ -2817,16 +2818,116 @@ talkie and different tables/5100/52xx/sam single phonemes/low pass variants and 
 
 - new 5100 roms below to decode and clean up all 5100 roms
 
-- sp0256 vocabulary/dictionary/text to speech and other rombanks
+- sp0256 vocabulary/dictionary/text to speechL NRL see below and other rombanks
 
 - sp0256 translated vocab from retrospeakDONE, make checks on the whole and worldlist also
 
 ** 9/7
 
 - tube.c fixed and runs (wierd bug where some things only run if reset live - seems fixed - take out ccmdata and lots of other fixes)
-- possible bug where callback would run before we had inited - now we init all generators in main
+- possible bug where callback would run before we had inited - now we init all generators in main!
 
-TODO: we don't need to return length from generators FIX
+*TODO:*
+
+*- we don't need to return length from generators FIX, also save function calls in generator and output x samples // or just 32 always*
+
+- look at interpolation and associated filter in tube.c
+
+** 11/7
+
+*more formant defs: http://bluehell.electro-music.com/modules/wren.formants*
+
+- channel vocoder voder / dudley = 10 bandpass (parallel) with bandwidth of 300 Hz
+
+pitch - voiced/unvoiced
+energy?
+stops?
+10 bandpass -
+
+from okita: 129-209, 196-317, 294-476, 431-698, 647-1047, 952-1541, 1295-2085, 1962-3175, 2942-4762, 4315-6984 HZ
+= 12dB/octave response. 
+
+- channelv.c added - questions are re-init of biquad coeffs with new
+  bandwidthDONE, value of Q is a question, db we can ignore...
+
+- ditch or not channel vocoder and move to port/test warps and maybe snokoder with arm_fft
+
+////
+
+on HW resolve where we have the most change from external CV=FAR LEFT - zero
+should be far right which has NO addition of CV - so do we need to invert no?
+
+
+*** bandpass
+
+what bandpass we have implemented: biquad.c, BBandPass from SC, bandpassx (owl-statevariable), bandpass in tube, arm_biquad_cascade_df1_f32:
+
+for arm where do we calculate co-effs? see DI code - we use freq, q and mult froms SC? (how qqq and mult relate to bandwidth?)
+
+mull we take from SC code: http://sccode.org/1-4Vk but how was that calculated and I guess qqq we must calculate somehow from this?
+
+SC is bandwidth in octaves, ~bpOctavesToRq = { arg octaves; (pow(2, octaves) - 1) / pow(2, octaves).sqrt }; *See and TEST collated_forms.h*
+
+tube:
+
+    output = 2.0 *
+	((bpAlpha * (input - xn2)) + (bpGamma * yn1) - (bpBeta * yn2));
+
+biquad.c = 12db/octave:
+
+    result = b->a0 * sample + b->a1 * b->x1 + b->a2 * b->x2 -
+        b->a3 * b->y1 - b->a4 * b->y2;
+
+bbandpass:
+
+y0 = inbuffer[i] + b1 * y1 + b2 * y2;
+outbuffer[i] = a0 * y0 + a1 * y1 + a2 * y2;
+y2 = y1;
+y1 = y0;
+
+
+bandpassx:
+
+  f = 2.0*M_PI*fc/32000.0f;
+  fb= q + q/(1.0 - f);
+
+  hp=sample-buf0;
+  bp = buf0 - buf1; 
+  buf0 = buf0 + f * (hp + fb * bp); 
+  buf1 = buf1 + f * (buf0 - buf1);
+
+arm: Each Biquad stage implements a second order filter using the difference equation:
+
+        y[n] = b0 * x[n] + b1 * x[n-1] + b2 * x[n-2] + a1 * y[n-1] + a2 * y[n-2]    
+
+this one is as SC above.
+
+other options: FFT-pvvoc?, wavelets
+
+*** vocoder implementations
+
+- mda:
+
+- ladspa:
+
+- borboom:
+
+// unimplemented or tested?
+
+- warps/snokoder(fftw?)
+
+*** env follower
+
+check follower in warps vocoder, followers in effect.c are a bit primitive...
+
+*** excitation/pitch following etc.
+
+vocoder oscillator in warps -> oscillator.cc and modulator.cc Vocoder: saw, pulse, noise
+
+*** params
+
+SELX: choice/freq of excitation/carrier, SELY: envelope skew/delay?, SELZ: morph channels
+
 
 * important notes
 

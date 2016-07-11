@@ -29,7 +29,7 @@
 #include "parwave.h"
 #include "sp0256.h"
 #include "tms5200x.h"
-
+#include "channelv.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -68,8 +68,8 @@ sam_init();
 sam_newsay(); // TEST!
 tms5200_init();
 tms5200_newsay();
- delay(); // not really needed
-tube_init();
+ channelv_init();
+ tube_init();
 // tube_newsay();
 
   ADC1_Init((uint16_t *)adc_buffer);

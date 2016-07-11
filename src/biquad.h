@@ -36,7 +36,7 @@ typedef float smp_type;
 /* this holds the data required to update samples thru a filter */
 typedef struct {
     smp_type a0, a1, a2, a3, a4;
-    smp_type x1, x2, y1, y2;
+  smp_type x1, x2, y1, y2, sn, cs, omega;
 }
 biquad;
 
@@ -45,6 +45,8 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
                           smp_type freq,             /* center frequency */
                           smp_type srate,            /* sampling rate */
                           smp_type bandwidth);       /* bandwidth in octaves */
+
+extern biquad *BiQuad_reinit(biquad *b, smp_type bandwidth);
 
 /* filter types */
 enum {
