@@ -2906,7 +2906,7 @@ other options: FFT-pvvoc?, wavelets
 
 *** vocoder implementations
 
-- mda:
+- mda: with excitation
 
 - ladspa:
 
@@ -2926,8 +2926,26 @@ vocoder oscillator in warps -> oscillator.cc and modulator.cc Vocoder: saw, puls
 
 *** params
 
-SELX: choice/freq of excitation/carrier, SELY: envelope skew/delay?, SELZ: morph channels
+SELX: choice/freq of excitation/carrier, SELY: envelope skew/delay?, SELZ: morph channels + also bandwidth for each channel somehere would be good
 
+* 12/7
+
+- channelv - square/glottal wave excitation as input perhaps - where to implement from? open vs. closed? vary frequency/ - as noise say/pitch
+
+list of sources, excitation in channelv: impulsive sourceDONE, square
+wave open and closeDONE, noiseDONE - all with filters, glottal
+sources, wavetable
+
+what are vocoder sources looking like in warps?
+
+  OSCILLATOR_SHAPE_TRIANGLE,
+  OSCILLATOR_SHAPE_SAW,
+  OSCILLATOR_SHAPE_PULSE,
+  OSCILLATOR_SHAPE_NOISE_LP
+
+- check all vocoder code and break down warps. snokoder?
+
+- worming in channelv
 
 * important notes
 
