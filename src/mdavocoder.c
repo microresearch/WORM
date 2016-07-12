@@ -188,5 +188,5 @@ void mdaVocoderprocess(mdavocoder* unit,float *input1, float *input2, float *out
     if(fabsf(unit->f[i][3])<1.0e-10 || fabsf(unit->f[i][7])<1.0e-10) 
       for(k=3; k<12; k++) unit->f[i][k] = 0.0f; //catch reson & envelope denormals
     
-      if(fabs(o)>10.0f) mdaVocodersuspend(unit); //catch 
+      //      if(fabs(o)>10.0f) mdaVocodersuspend(unit); //catch 
 }

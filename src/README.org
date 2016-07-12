@@ -2906,35 +2906,43 @@ other options: FFT-pvvoc?, wavelets
 
 *** vocoder implementations
 
-- mda: with excitation
+TESTING with square source...
 
-- ladspa:
+[mda: with excitation=mdavoc.c = mdavocal_init/mdavocal_process then
+  vocoder is mdavocoder.c - see effect.c... carrier bleed through and
+  poor quality as is]
 
-- borboom:
+- ladspa: vocode.c better results with smaller bleed through, how do we swap channels - compute first
 
-// unimplemented or tested?
+- borboom: in vocoder dir // windowed at 256 samples UN_TESTED
 
-- warps/snokoder(fftw?)
+// unimplemented or tested->
+
+- warps->96k?
+
+[snokoder(fftw?)NON-as is different/notes only]
 
 *** env follower
 
-check follower in warps vocoder, followers in effect.c are a bit primitive...
+check follower in warps vocoder.h , followers in effect.c are a bit primitive...
 
 *** excitation/pitch following etc.
 
 vocoder oscillator in warps -> oscillator.cc and modulator.cc Vocoder: saw, pulse, noise
 
+but no following of pitch
+
 *** params
 
 SELX: choice/freq of excitation/carrier, SELY: envelope skew/delay?, SELZ: morph channels + also bandwidth for each channel somehere would be good
 
-* 12/7
+** 12/7
 
 - channelv - square/glottal wave excitation as input perhaps - where to implement from? open vs. closed? vary frequency/ - as noise say/pitch
 
 list of sources, excitation in channelv: impulsive sourceDONE, square
 wave open and closeDONE, noiseDONE - all with filters, glottal
-sources, wavetable
+sources, wavetable (port out glottal sources from???)
 
 what are vocoder sources looking like in warps?
 
@@ -2943,9 +2951,23 @@ what are vocoder sources looking like in warps?
   OSCILLATOR_SHAPE_PULSE,
   OSCILLATOR_SHAPE_NOISE_LP
 
-- check all vocoder code and break down warps. snokoder?
+- check all vocoder code and break down warps.
 
-- worming in channelv
+- worming in channelv TO TEST
+
+- warps:  
+
+TIMBRE warps the connections between the modulator’s envelope
+followers and the carrier’s gain elements – effectively shifting up or
+down the formants extracted from the modulator signal. 
+
+As the ALGORITHM knob is turned clockwise, the release time of the envelope followers is increased.
+
+By turning the knob fully clockwise, the modulator signal is
+frozen. The carrier is filtered by whichever formants were present in
+the modulator signal before the knob reached this position.
+
+- thinking again what params we can use for morphing lpc_analysis/re-encoding?
 
 * important notes
 

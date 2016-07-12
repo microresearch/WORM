@@ -92,7 +92,7 @@ void vocoder_do_bandpasses(struct bandpass *bands, LADSPA_Data sample,
 
 /* Run a vocoder instance for a block of SampleCount samples. */
 
-// TODO: how to swap round channels/bands
+// TODO: how to swap round channels/bands as would need to compute this first
 
 void runVocoder(VocoderInstance *vocoder, float *formant, float *carrier, float *out, unsigned int SampleCount)
 {
@@ -123,6 +123,9 @@ void runVocoder(VocoderInstance *vocoder, float *formant, float *carrier, float 
 	  x = vocoder->bands_carrier[j].y * vocoder->bands_out[j].oldval;
 	  vocoder->portOutput[i] += x;
 	}
+
+      // store oldvals for each and then compute with morphed offset into this!
+
       vocoder->portOutput[i] *= 32.0f;
     }
 }

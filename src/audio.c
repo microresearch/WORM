@@ -81,11 +81,11 @@ float samplepos=0;//=genstruct->samplepos;
 int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
 
+extern mdavocal mdavocall;
+extern mdavocoder mdavocod;
+extern VocoderInstance* vocoderr;
 
 /*
-mdavocal *mdavocall;
-mdavocoder *mdavocod;
-VocoderInstance* vocoderz;
 Formlet *formy;
 Formant *formanty;
 */
@@ -418,6 +418,25 @@ u16 channelv(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   dochannelv(incoming,outgoing, size);
 };
 
+// testing various vocoder implementations:
+
+u16 testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // first without speed or any params - break down as above in tms, spo256 - pull out size
+//  dochannelv(incoming,outgoing, size);
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
+  int_to_floot(incoming,voicebuffer,size);
+  //  mdavocal_process(&mdavocall,voicebuffer, carrierbuffer, 32); // generate carrier from voice pitch etc.
+  dochannelvexcite(carrierbuffer,32);
+  //  void mdaVocoderprocess(mdavocoder* unit,float *input1, float *input2, float *output, int sampleFrames); - which way round? input1 voice
+  //  mdaVocoderprocess(&mdavocod,voicebuffer, carrierbuffer, otherbuffer, 32);
+
+  // runVocoder(VocoderInstance *vocoder, float *formant, float *carrier, float *out, unsigned int SampleCount)
+  runVocoder(vocoderr, voicebuffer, carrierbuffer, otherbuffer, size);
+
+  floot_to_int(outgoing,otherbuffer,size);
+};
+
+
 
 //u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
@@ -492,9 +511,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=7; // checked=0,1,2,3,4,5,6 ALL 
+  mode=8; // checked=0,1,2,3,4,5,6 ALL 
 
-  u16 (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  u16 (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
   // we don't really need to return size?
 
