@@ -19,9 +19,9 @@ typedef struct Band {
 
 
 typedef struct Filterbank{  
-  float tmp_[2][96];
-  float samples_[480];
-  float delay_buffer_[6144];
+  //  float tmp_[2][96];
+  float samples_[32];
+  //  float delay_buffer_[6144];
   Band band_[17];
 } Filterbank;
 

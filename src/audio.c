@@ -37,6 +37,7 @@ LINEIN/OUTL-filter
 #include "tube.h"
 #include "channelv.h"
 #include "svf.h"
+#include "wvocoder.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -426,11 +427,14 @@ u16 testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 //  dochannelv(incoming,outgoing, size);
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
   int_to_floot(incoming,voicebuffer,size);
-  //  dochannelvexcite(carrierbuffer,32);
+  dochannelvexcite(carrierbuffer,32);
 
   //  runVocoder(vocoderr, voicebuffer, carrierbuffer, otherbuffer, size);
   //void runSVFtest_(SVF* svf, float* incoming, float* outgoing, u8 band_size){
-  runBANDStest_(voicebuffer, otherbuffer, size);
+  //  runBANDStest_(voicebuffer, otherbuffer, size);
+
+  Vocoder_Process(voicebuffer, carrierbuffer, otherbuffer, size);
+
   floot_to_int(outgoing,otherbuffer,size);
 };
 

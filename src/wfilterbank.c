@@ -215,18 +215,18 @@ void mid_src_down_Init(SampleRate* sr){ // //  SampleRateConverter<SRC_UP, kLowF
   sr->delay=8;
 }
 
-SampleRate low_src_up_;
-SampleRate low_src_down_;
-SampleRate mid_src_down_;
-SampleRate mid_src_up_;
+//SampleRate low_src_up_;
+//SampleRate low_src_down_;
+//SampleRate mid_src_down_;
+//SampleRate mid_src_up_;
 
 ///////////////////////////////
 
 void FilterBank_Init(Filterbank *Filterbankk, float sample_rate) {
-  low_src_down_Init(&low_src_up_);
-  low_src_up_Init(&low_src_down_);
-  mid_src_down_Init(&mid_src_up_);
-  mid_src_up_Init(&mid_src_down_);
+  //  low_src_down_Init(&low_src_up_);
+  //  low_src_up_Init(&low_src_down_);
+  //  mid_src_down_Init(&mid_src_up_);
+  //  mid_src_up_Init(&mid_src_down_);
   
   int32_t max_delay = 0;
 float* samples = &(Filterbankk->samples_[0]); // ???
@@ -238,7 +238,8 @@ float* samples = &(Filterbankk->samples_[0]); // ???
 
 Band b = Filterbankk->band_[i]; ///????
 
-b.decimation_factor = (int32_t)(coefficients[0]);
+/*
+ b.decimation_factor = (int32_t)(coefficients[0]);
     
     if (b.decimation_factor != decimation_factor) {
       decimation_factor = b.decimation_factor;
@@ -249,26 +250,27 @@ b.decimation_factor = (int32_t)(coefficients[0]);
     b.sample_rate = sample_rate / (float)(b.decimation_factor);
     b.samples = samples;
     samples += kMaxFilterBankBlockSize / b.decimation_factor;
-    
+  
     b.delay = (int32_t)(coefficients[1]);
-    b.delay *= b.decimation_factor;
-    b.post_gain = coefficients[2];
+    b.delay *= b.decimation_factor;*/
+    b.post_gain = coefficients[0];
 
-    max_delay = max(max_delay, b.delay);
+    //    max_delay = max(max_delay, b.delay);
     for (int32_t pass = 0; pass < 2; ++pass) {
       SVF_Init(&b.svf[pass]);
-      set_f_fq(&b.svf[pass],coefficients[pass * 2 + 3],coefficients[pass * 2 + 4]);
+      set_f_fq(&b.svf[pass],coefficients[pass * 2 + 1],coefficients[pass * 2 + 2]);
     }
   }
   Filterbankk->band_[kNumBands].group = Filterbankk->band_[kNumBands - 1].group + 1;
-  max_delay = min(max_delay, (int32_t)(256));
+
+  /*  max_delay = min(max_delay, (int32_t)(256));
   float* delay_ptr = &Filterbankk->delay_buffer_[0];
   for (int32_t i = 0; i < kNumBands; ++i) {
     Band b = Filterbankk->band_[i];
     int32_t compensation = max_delay - b.delay;
     if (b.group == 0) {
       compensation -= kLowFactor * \
-	          (low_src_down_.delay + low_src_up_.delay);
+	(low_src_down_.delay + low_src_up_.delay);
 	      compensation -= mid_src_down_.delay;
 	      compensation -= mid_src_up_.delay;
     } else if (b.group == 1) {
@@ -278,19 +280,20 @@ b.decimation_factor = (int32_t)(coefficients[0]);
     compensation = max(compensation - b.decimation_factor / 2, (int32_t)(0));
     //void Pooled_Init(PooledDelayLine* delayline, float* ptr, int32_t delay) {
     Pooled_Init(&b.delay_line, delay_ptr, compensation / b.decimation_factor);
-    delay_ptr += b.delay_line.size_;
-  }
+    delay_ptr += b.delay_line.size_;*/
 }
+
 
 void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, size_t size) {
   //  mid_src_down_.Process(in, Filterbankk->tmp_[0], size);
   //  low_src_down_.Process(Filterbankk->tmp_[0], Filterbankk->tmp_[1], size / kMidFactor);
   
-  const float* sources[3] = {Filterbankk->tmp_[1], Filterbankk->tmp_[0], in };
+  //  const float* sources[3] = {Filterbankk->tmp_[1], Filterbankk->tmp_[0], in };
   for (int32_t i = 0; i < kNumBands; ++i) {
     Band b = Filterbankk->band_[i];
-    const size_t band_size = size / b.decimation_factor;
-    const float* input = sources[b.group];
+    const size_t band_size = size;// / b.decimation_factor;
+    //    const float* input = sources[b.group];
+    const float* input = in;
     
     for (int32_t pass = 0; pass < 2; ++pass) {
       const float* source = pass == 0 ? input : b.samples;
@@ -313,9 +316,20 @@ void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, size_t size) {
 }
 
 void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, size_t size) {
+
+  for (u8 i = 0; i < kNumBands; ++i) {
+    Band b = Filterbankk->band_[i];
+    
+    float* s = out;
+    for (u8 j = 0; j < size; ++j) {
+      s[j] += b.samples[j];
+    }
+  }
+
+  /*  
   float* buffers[3] = { Filterbankk->tmp_[1], Filterbankk->tmp_[0], out };
 
-  //  fill(&buffers[0][0], &buffers[0][size / band_[0].decimation_factor], 0.0f); // TODO
+    fill(&buffers[0][0], &buffers[0][size / band_[0].decimation_factor], 0.0f); // TODO
   for (int16_t i=0; i<size / Filterbankk->band_[0].decimation_factor; i++){
     buffers[0][i]=0.0f;
   }
@@ -336,5 +350,5 @@ void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, size_t size) {
 	//        mid_src_up_.Process(Filterbankk->tmp_[0], out, band_size);
       }
     }
-  }
+    }*/
 }

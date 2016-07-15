@@ -20,7 +20,6 @@ void SVF_Init(SVF* svf);
 void SVF_Init_();
 void BANDS_Init_();
 void runBANDStest_(float* incoming, float* outgoing, u8 band_size);
-
 void runSVFtest_(float* incoming, float* outgoing, u8 band_size);
 
 inline void set_f_fq(SVF* svf, float f, float fq) {

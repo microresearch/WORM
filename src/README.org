@@ -1049,9 +1049,7 @@ buffer is 1024,,,, functions: flushbuffer, datafill , *dataempty writes to temp 
 - implement generic wavetables, envelopes etc. for excitations and how might work with buffer
 - TRM portings DONE
 
-*- wormings, raw LSM tests, raw KLATT*
-
-- tie up formant filters maybe see https://github.com/4ms/SMR https://www.keil.com/pack/doc/CMSIS/DSP/html/group___g_e_q5_band.html
+- tie up formant filters maybe see https://www.keil.com/pack/doc/CMSIS/DSP/html/group___g_e_q5_band.html
 
 ** 3/12
 
@@ -1253,11 +1251,9 @@ TODO:
 - excitations and buffer fills/switches
 - trigger code
 - wormings and tables of min/max parameters for each mode - CONSTRAINTS
-- raw KLATT and LSM wormings
 - check CV allocations for new board and test!
 
 - trigger//when_mode_change in main -??? 
-- look at SMR??? https://github.com/4ms/SMR
 
 ** 14/12
 
@@ -2686,9 +2682,9 @@ TODO:
 
 - clean main.c and audio.c -> dump
 
-- 5110 - tables and pitch size // 5200 and test mess/mame code roughly for new speak and spell roms in lpc_reader
+- 5110 - tables and pitch size // 5200 and test mess/mame code roughly for new speak and spell roms in lpc_reader DONE
 
-- compare mess/mame 5220 code and talkie - port mess/mame code. compare basics in lpc_say
+- compare mess/mame 5220 code and talkie - port mess/mame code. compare basics in lpc_say DONE
 
 file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer, unsigned int size)]]
 
@@ -2996,7 +2992,6 @@ rates, SVF = state variable filter in stmlib, change in bandwidth would involve 
 
 - how works with 296e - bandwidth, 8/16 channels. do each channel bandwidth seperated, envelopes skewed,...
 
-
 ** 14-15/7
 
 - rejected Borsboom vocoder as poor quality
@@ -3005,34 +3000,15 @@ rates, SVF = state variable filter in stmlib, change in bandwidth would involve 
 
 - port WARPS... notes:
 
-svf is crossover/chamberlin and freqs:
-
-  fb__87_8000,
-  fb_110_8000,
-  fb_139_8000,
-  fb_175_8000,
-  fb_220_8000,
-  fb_277_8000,
-  fb_349_8000,
-  fb_440_8000,
-  fb_554_8000,
-  fb_698_8000,
-  fb_880_8000,
-  fb_1109_8000,
-  fb_1397_8000,
-  fb_1760_32000,
-  fb_2217_32000,
-  fb_2794_32000,
-  fb_3520_32000,
-  fb_4435_32000,
-  fb_5588_32000,
-  fb_7040_96000,
+svf is crossover/chamberlin and freqs are in table, compiles but needs to be tested *TO_TEST!*
 
 how to calculate 2 passes of frequency - filter_bank.py but there is also delays and gain there - can we do without delay (gain is simple)
 
+compiles without decimation down/upsampling but thus we will need to change coeff arrays! *TO_TEST!*
+
 - svf.c seems to work (though somehow 2 peaks with sine in bandpass???) - try with channelv as filter
 
-- channels in svf.c seems to work better than channelv - TODO: play with wormings through, and also set width properly in coeffs
+- channels in svf.c seems to work better than channelv - *TODO: play with wormings through*, [and also set width properly in coeffs]
 
 * important notes
 
@@ -3041,7 +3017,7 @@ vocoder what needs doing, all generators and each one) below in notes
 
 - all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have? also some issues with CCMDATA?
 
-- generators all for size not individual samples
+- generators WITHOUT SPEED for full size not individual samples, and return void so not pass back if not needed
 
 - interpolation/filters?
 
@@ -3050,6 +3026,12 @@ vocoder what needs doing, all generators and each one) below in notes
   we need to invert, no?
 
 - vocoder or not? maybe save for RAVEN with raven excitations?
+
+- triggers, threshold and repeat policy
+
+- wormings and grids of params HOW?
+
+- started with digitalker.c... to get to compile, where are ROMS to test, test on lap!
 
 * interpolations
 
@@ -3108,7 +3090,11 @@ panel is 002
 
 * MODES 13/6_+++ TODO:
 
-** 0/LPC/TMS5220 - decide if keep LPC or just TMS5200x.c!
+** 0/LPC/TMS5220 - decide if keep LPC/lpc.c which is talkie code or just use TMS5200x.c!
+
+- for TMS code we can have banks/vocabs/wordlists which use 5100, 5200 of 5220 coeffs/settings TODO!
+
+- 5100 voacb to clean up and test//5220 to test if it makes differences in a good way
 
 - cleanup new vocabulary// seems okay DONE
 
@@ -3122,13 +3108,24 @@ subdivide or get rid of say talko as is duplicates... TRIM TODO
 
 - pausing/breaks/repeat???
 
-- does it sound different if we use mame audio process code?
+*wormed morphings of pitch and chirp tables*
 
-[[file:~/mame2/src/emu/sound/tms5220.c::void%20tms5220_device::process(INT16%20*buffer,%20unsigned%20int%20size)][file:~/mame2/src/emu/sound/tms5220.c::void tms5220_device::process(INT16 *buffer, unsigned int size)]]
 
 ** 0.5 raw LPC/TMS5220 also to later wormings
 
-in lpc_say.c
+- in LPC/lpc_say.c we have random generation of LPC/5220 parameters
+
+Frame type  Energy Rpt Pitch   K1    K2   K3   K4   K5   K6   K7  K8  K9  K10 
+Voiced      xxxx   0  xxxxxx xxxxx xxxxx xxxx xxxx xxxx xxxx xxxx xxx xxx xxx 
+Unvoiced    xxxx   0  000000 xxxxx xxxxx xxxx xxxx 
+Repeated    xxxx   1  xxxxxx 
+Silence     0000 
+Stop code   1111
+
+from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
+
+*wormed morphings of pitch and chirp tables*
+
   
 ** 1/KLATT
 
@@ -3162,7 +3159,7 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 x sets param, y sets contour and z???
 
-/// bother with nvp: - how we get nvp.c array?
+/// bother with nvp: - how we get nvp.c array? 
 
 //////////////
 // see genparam.c -> how that works on commandline? test with wormings
@@ -3230,6 +3227,8 @@ default = 72
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
 cleanlyOK, new ROMS-BELOW_TODO/DONE-TEST, parameters and bends=PITCH_DONE, port
 into generatorDONE, text to speech NRL->retroTTS/and/phoneme.cIN PROGRESS MARIE
+
+ROMS to include? as some are in sporomstest.h
 
 [or... english2phoneme in speaky]
 
@@ -3310,12 +3309,9 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
-** [+=> others from mame/mess TODO =]
+** 4.5///[+=> others from mame/mess TODO =]
 
-[[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
-S14001A speech IC emulator]], 
-
-digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
+digitalker: [[file:~/mame2/src/emu/sound/digitalk.c]]
 
 	ROM_REGION( 0x10000, "digitalker", 0) /* 64k? for digitalker voice samples */
 	ROM_LOAD( "mblvsb2.2a",0x0000, 0x1000, NO_DUMP ) /* size may be wrong */
@@ -3337,6 +3333,9 @@ digitalker: [[file:~/mame/src/devices/sound/digitalk.cpp]]
 	ROM_LOAD( "igr_scorpion_32_a3.ic25", 0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
 	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
+
+- leave out [ [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
+S14001A speech IC emulator]] ]
 
 ** 5/TUBE - 
 
@@ -3364,46 +3363,40 @@ start with just one list = input_frame and do without interpolation, then implem
 
 ** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
 
-** 7/8channel vocoder TODO
+** 7/8channel vocoder TODO svf.c and channelv.c
 
-- 8 or 10 channels, unvoiced, pitch, controlling?
+- 16 channels in parallel , switch exciters: unvoiced, pitch, controlled...
 
-- which filter basis or FFT?
+- which filter basis or FFT? *now using svf*
 
-- what are channel frequencies and bandwidth?
+- what are channel frequencies and bandwidth? - see EMS2000 - bandwidth is fixed...
 
 SELX/SELY choose channel and setting, SELZ bandwidth SPEED as silence/no-pitch/pitch/external excitation
 
-what is excitation? INPUT?
+what is excitation? INPUT? as ONE option. one MODE, other mode is excitation from input
+
+worming through
 
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced
 
-changing bandwidth,,, see other codes...
+- changing bandwidth?
+
+- port from WARPS/ ownvocoder.c and how we can tweak this: different
+  bands, bandwidths even if coefficients are fixed, excitation
 
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
 - worm movements from paris python -> c-TESTING
 
-*- use audio_buffer which should be filled by all modes*
+** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code
 
-*** LPC parameter mode
+** XX+ any morphing of lpcanalysis code?
 
-- in LPC/lpc_say.c we have random generation of LPC/5220 parameters
+** XX+ various: klatt single phonemes, raw sp0256 coding, audio buffer, some low passes of above - so maybe 32 modes
 
-Frame type  Energy Rpt Pitch   K1    K2   K3   K4   K5   K6   K7  K8  K9  K10 
-Voiced      xxxx   0  xxxxxx xxxxx xxxxx xxxx xxxx xxxx xxxx xxxx xxx xxx xxx 
-Unvoiced    xxxx   0  000000 xxxxx xxxxx xxxx xxxx 
-Repeated    xxxx   1  xxxxxx 
-Silence     0000 
-Stop code   1111
+- use audio_buffer which should be filled by all modes
 
-from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
-
-
-** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code
-
-
-** any morphing of lpcanalysis code?
+** XXXXXX what will become RAVEN code - more glottal and wavetable based, tube based, more simulation/modelling XXXXX
 
 * hardware2
 

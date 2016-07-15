@@ -31,6 +31,7 @@
 #include "tms5200x.h"
 #include "channelv.h"
 #include "svf.h"
+#include "wvocoder.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -80,7 +81,7 @@ tms5200_newsay();
  vocoderr=instantiateVocoder();
 // tube_newsay();
  BANDS_Init_();
-
+ Vocoder_Init(32000.0f);
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
   I2S_Block_Init();

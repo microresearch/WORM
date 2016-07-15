@@ -2,6 +2,7 @@
 
 #include "audio.h"
 #include "wfilterbank.h"
+#include "wvocoder.h"
 
 #define CONSTRAIN(var, min, max) \
   if (var < (min)) { \
@@ -14,11 +15,7 @@
 typedef u8 bool;
 
 static float kFollowerGain; 
-
-
 const u8 kNumBands=16;
-
-
 
 typedef struct EnvelopeFollower {  
 float attack_;
@@ -29,7 +26,7 @@ float freeze_;
 } EnvelopeFollower;
 
 void EnvF_Init(EnvelopeFollower* env) {
-kFollowerGain = sqrtf(kNumBands);
+  kFollowerGain = sqrtf(kNumBands);
   env->envelope_ = 0.0f;
   env->freeze_ = false;
   env->attack_ = env->decay_ = 0.1f;
@@ -87,14 +84,6 @@ static Filterbank carrier_filter_bank_;
 
 EnvelopeFollower follower_[16];
   
-void Vocoder_Init(float sample_rate);
-
-void Vocoder_Process(
-		     const float* modulator,
-		     const float* carrier,
-		     float* out,
-		     size_t size);
-  
 void Vocoder_set_release_time(float release_time) {
   release_time_ = release_time;
 }
@@ -134,6 +123,7 @@ class Limiter {
 /// vocoder.c break down:
 
 // TODO - *******filter banks*, limiter?for later? -> all compiles but neeed finish wfilterbank and add limiter if necessary
+// left all decimation out for now... but means need calc new coeffs
 
 void Vocoder_Init(float sample_rate) {
   FilterBank_Init(&carrier_filter_bank_,sample_rate);
@@ -143,9 +133,6 @@ void Vocoder_Init(float sample_rate) {
   release_time_ = 0.5f;
   formant_shift_ = 0.5f;
   
-  BandGain zero;
-  zero.carrier = 0.0f;
-  zero.vocoder = 0.0f;
   for (x=0;x<kNumBands;x++){
     previous_gain_[x].carrier=0.0f;
     previous_gain_[x].vocoder=0.0f;
@@ -164,7 +151,7 @@ void Vocoder_Process(
     const float* modulator,
     const float* carrier,
     float* out,
-    size_t size) {
+    u8 size) {
   // Run through filter banks.
   FilterBank_Analyze(&modulator_filter_bank_, modulator, size);
   FilterBank_Analyze(&carrier_filter_bank_, carrier, size);
@@ -211,7 +198,7 @@ void Vocoder_Process(
   }
         
   for (int32_t i = 0; i < kNumBands; ++i) {
-    size_t band_size = size / modulator_filter_bank_.band_[i].decimation_factor;
+    size_t band_size = size;// / modulator_filter_bank_.band_[i].decimation_factor;
     const float step = 1.0f / (float)(band_size);
 
     float* carrier = carrier_filter_bank_.band_[i].samples;
