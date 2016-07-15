@@ -64,6 +64,8 @@ static const unsigned char m_rom[] __attribute__ ((section (".flash"))) = {0x0, 
 	ROM_REGION( 0x2000, "digitalker", 0 ) // DigiTalker ROM (same exact sound PCB as Scorpion (galaxian.c))
 	ROM_LOAD( "harem_h1+h2.ic25",  0x0000, 0x2000, CRC(279f923a) SHA1(166b1b625997766f0de7cc18af52c42268022fcb) )
 
+where else?
+
  */
 
 
