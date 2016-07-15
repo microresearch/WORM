@@ -36,6 +36,7 @@ LINEIN/OUTL-filter
 #include "tms5200x.h"
 #include "tube.h"
 #include "channelv.h"
+#include "svf.h"
 
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
@@ -418,21 +419,18 @@ u16 channelv(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   dochannelv(incoming,outgoing, size);
 };
 
-// testing various vocoder implementations:
+// testing various vocoder and filter implementations:
 
 u16 testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params - break down as above in tms, spo256 - pull out size
 //  dochannelv(incoming,outgoing, size);
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
   int_to_floot(incoming,voicebuffer,size);
-  //  mdavocal_process(&mdavocall,voicebuffer, carrierbuffer, 32); // generate carrier from voice pitch etc.
-  dochannelvexcite(carrierbuffer,32);
-  //  void mdaVocoderprocess(mdavocoder* unit,float *input1, float *input2, float *output, int sampleFrames); - which way round? input1 voice
-  //  mdaVocoderprocess(&mdavocod,voicebuffer, carrierbuffer, otherbuffer, 32);
+  //  dochannelvexcite(carrierbuffer,32);
 
-  // runVocoder(VocoderInstance *vocoder, float *formant, float *carrier, float *out, unsigned int SampleCount)
-  runVocoder(vocoderr, voicebuffer, carrierbuffer, otherbuffer, size);
-
+  //  runVocoder(vocoderr, voicebuffer, carrierbuffer, otherbuffer, size);
+  //void runSVFtest_(SVF* svf, float* incoming, float* outgoing, u8 band_size){
+  runBANDStest_(voicebuffer, otherbuffer, size);
   floot_to_int(outgoing,otherbuffer,size);
 };
 

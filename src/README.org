@@ -3001,7 +3001,7 @@ rates, SVF = state variable filter in stmlib, change in bandwidth would involve 
 
 - rejected Borsboom vocoder as poor quality
 
-- Designing with speech: sp0256 vocabs, digitalk, low pass on all...
+- Designing with speech... book: sp0256 vocabs, digitalk, low pass on all...
 
 - port WARPS... notes:
 
@@ -3028,16 +3028,16 @@ svf is crossover/chamberlin and freqs:
   fb_5588_32000,
   fb_7040_96000,
 
-how to calculate 2 passes of frequency
+how to calculate 2 passes of frequency - filter_bank.py but there is also delays and gain there - can we do without delay (gain is simple)
 
-** ////////////////////
+- svf.c seems to work (though somehow 2 peaks with sine in bandpass???) - try with channelv as filter
 
-// go over full todo and place somewhere clear here (eg. channel
-vocoder what needs doing, all generators and each one
+- channels in svf.c seems to work better than channelv - TODO: play with wormings through, and also set width properly in coeffs
 
 * important notes
 
-*- re-appraise all notes/progress!* WED NEXT WEEK!
+*- re-appraise all notes/progress!* WED NEXT WEEK! // go over full todo and place somewhere clear here (eg. channel
+vocoder what needs doing, all generators and each one) below in notes
 
 - all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have? also some issues with CCMDATA?
 

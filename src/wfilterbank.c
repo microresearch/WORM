@@ -84,8 +84,88 @@ float Pooled_ReadWrite(PooledDelayLine* delayline, float value) {
 //  SampleRateConverter<SRC_DOWN, kLowFactor, 48> low_src_down_;
 //  SampleRateConverter<SRC_UP, kLowFactor, 48> low_src_up_;
 
+// TODO process for each ///
+
+/*
+
+UP:
+
+  inline void Process(const float* in, float* out, size_t input_size) {
+    SRC_FIR<SRC_UP, ratio, filter_size> ir;
+    FilterState<N> x;
+    x.Load(x_);
+    while (input_size--) {
+      x.Push(*in++);
+      PolyphaseStage<K, filter_size> polyphase_stage;
+      polyphase_stage(out, x, ir);
+    }
+    x.Save(x_);
+  }
+
+  inline void Process(const float* in, float* out, size_t input_size) {
+    // When downsampling, the number of input samples must be a multiple
+    // of the downsampling ratio.
+    if ((input_size % ratio) != 0) {
+      return;
+    }
+
+    SRC_FIR<SRC_DOWN, ratio, filter_size> ir;
+    if (input_size >= 8 * filter_size) {
+      std::copy(&in[0], &in[N], &x_[N - 1]);
+      
+      // Generate the samples which require access to the history buffer.
+      for (int32_t i = 0; i < N; i += ratio) {
+        Accumulator<N, -1, 1, filter_size> accumulator;
+        *out++ = accumulator(&x_[N - 1 + i], ir);
+        in += ratio;
+        input_size -= ratio;
+      }
+        
+      // From now on, all the samples we need to access are located inside
+      // the input buffer passed as an argument, and since the filter
+      // is small, we can unroll the summation loop.
+      if ((input_size / ratio) & 1) {
+        while (input_size) {
+          Accumulator<N, -1, 1, filter_size> accumulator;
+          *out++ = accumulator(in, ir);
+          input_size -= ratio;
+          in += ratio;
+        }
+      } else {
+        while (input_size) {
+          Accumulator<N, -1, 1, filter_size> accumulator;
+          *out++ = accumulator(in, ir);
+          *out++ = accumulator(in + ratio, ir);
+          input_size -= 2 * ratio;
+          in += 2 * ratio;
+        }
+      }
+
+      // Copy last input samples to history buffer.
+      std::copy(&in[-N + 1], &in[0], &x_[0]);
+    } else {
+      // Variant which uses a circular buffer to store history.
+      while (input_size) {
+        for (int32_t i = 0; i < ratio; ++i) {
+          x_ptr_[0] = x_ptr_[N] = *in++;
+          --x_ptr_;
+          if (x_ptr_ < x_) {
+            x_ptr_ += N;
+          }
+        }
+        input_size -= ratio;
+
+        Accumulator<N, 1, 1, filter_size> accumulator;
+        *out++ = accumulator(&x_ptr_[1], ir);
+      }
+    }
+  }
+ 
+ */
+
 typedef struct SampleRate{
-  float x_[16];
+  float* x_ptr_;
+  float x_[32];
   int32_t delay;
 } SampleRate;
 
