@@ -6,7 +6,7 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 * TODO
 
-- manual
+- manual with worm insignia at top
 
 - collate worm quotes - Blake, alchemical
 
@@ -311,6 +311,24 @@ chip or algorithm ERD/WORM implements multiple speech codecs...
 
 for cv and knobs - as above so below.... mirroring...
 
+*** further worm quotes and worm poetry
+
+Blake/notes from Jung/Beddoes and other paris_worm texts->conqueror worm/anguish poems
+
+Technology buries us alive in order to re-place the site of execution
+which is the skin, under the earth. We are un-earth-worms.
+
+Basil Valentine: 4th key (p331 hermetic musuem): All flesh that is
+derived of earth, must be decomposed and again reduced to earth...
+
+I am your Rational Power O Albion & that Human Form
+You call Divine, is but a Worm seventy inches long
+That creeps forth in a night & is dried in the morning sun
+In fortuitous concourse of memorys accumulated & lost
+It plows the Earth in its own conceit, it overwhelms the Hills
+Beneath its winding labyrinths, till a stone of the brook
+Stops it in midst of its pride among its hills & rivers
+[William Blake. Jerusalem The Emanation of The Giant Albion]
 
 * discard
 
@@ -2798,13 +2816,11 @@ sam_get_sample();
 
 - sp0256 roms and THEN vocabulariesDONE - and how works with 2/3 bitshift re-acquaint - sp0256lap? ./sp0256 ... document this!DONE
 
-- tube.c - crahsing on init or some clash somewhere????
-
 ///->DONE MARK
 
-- do we ignore nvp.c - re-look at
+*- do we ignore nvp.c - re-look at*
 
-- recheck sam.c for uninitialised variable and sanity/sound?
+*- recheck sam.c for uninitialised variable and sanity/sound?*
 
 ////////////////////////////
 
@@ -2812,13 +2828,13 @@ sam_get_sample();
 
 // new/extra modes -> maybe 32 modes:
 
-talkie and different tables/5100/52xx/sam single phonemes/low pass variants and change the low pass
+talkie and different tables/5100/52xx/sam single phonemes and low pass variants and change the low pass
 
 /////EVENINGS:
 
 - new 5100 roms below to decode and clean up all 5100 roms
 
-- sp0256 vocabulary/dictionary/text to speechL NRL see below and other rombanks
+- sp0256 vocabulary/dictionary/text to speechL NRL see below MARIE and other rombanks
 
 - sp0256 translated vocab from retrospeakDONE, make checks on the whole and worldlist also
 
@@ -2850,13 +2866,7 @@ from okita: 129-209, 196-317, 294-476, 431-698, 647-1047, 952-1541, 1295-2085, 1
 - channelv.c added - questions are re-init of biquad coeffs with new
   bandwidthDONE, value of Q is a question, db we can ignore...
 
-- ditch or not channel vocoder and move to port/test warps and maybe snokoder with arm_fft
-
-////
-
-on HW resolve where we have the most change from external CV=FAR LEFT - zero
-should be far right which has NO addition of CV - so do we need to invert no?
-
+- ditch or not channel vocoder ???
 
 *** bandpass
 
@@ -2873,18 +2883,29 @@ tube:
     output = 2.0 *
 	((bpAlpha * (input - xn2)) + (bpGamma * yn1) - (bpBeta * yn2));
 
-biquad.c = 12db/octave:
+*biquad.c = 12db/octave:* USE?
 
     result = b->a0 * sample + b->a1 * b->x1 + b->a2 * b->x2 -
+
         b->a3 * b->y1 - b->a4 * b->y2;
+
+    /* shift x1 to x2, sample to x1 */
+    b->x2 = b->x1;
+    b->x1 = sample;
+
+    /* shift y1 to y2, result to y1 */
+    b->y2 = b->y1;
+    b->y1 = result;
+
 
 bbandpass:
 
 y0 = inbuffer[i] + b1 * y1 + b2 * y2;
-outbuffer[i] = a0 * y0 + a1 * y1 + a2 * y2;
+outbuffer[i] = a0 * y0  + a1 * y1 + a2 * y2;
 y2 = y1;
 y1 = y0;
 
+.. 
 
 bandpassx:
 
@@ -2898,9 +2919,9 @@ bandpassx:
 
 arm: Each Biquad stage implements a second order filter using the difference equation:
 
-        y[n] = b0 * x[n] + b1 * x[n-1] + b2 * x[n-2] + a1 * y[n-1] + a2 * y[n-2]    
+        y[n] = b0 * x[n] + b1 * x[n-1] + b2 * x[n-2]  + a1 * y[n-1] + a2 * y[n-2]    
 
-this one is as SC above.
+as biquad with different signs? hence +- business there?
 
 other options: FFT-pvvoc?, wavelets
 
@@ -2912,7 +2933,7 @@ TESTING with square source...
   vocoder is mdavocoder.c - see effect.c... carrier bleed through and
   poor quality as is]
 
-- ladspa: vocode.c better results with smaller bleed through, how do we swap channels - compute first
+- ladspa: vocode.c better results with smaller bleed through, how do we swap channels - compute first then swap, can we do bandwidth
 
 - borboom: in vocoder dir // windowed at 256 samples UN_TESTED
 
@@ -2967,11 +2988,68 @@ By turning the knob fully clockwise, the modulator signal is
 frozen. The carrier is filtered by whichever formants were present in
 the modulator signal before the knob reached this position.
 
+port looking tricky as lots of sample_rate conversion and templates to
+convert - set for 96k samplerate and vocoder filters at different
+rates, SVF = state variable filter in stmlib, change in bandwidth would involve lots of re-computing
+
 - thinking again what params we can use for morphing lpc_analysis/re-encoding?
+
+- how works with 296e - bandwidth, 8/16 channels. do each channel bandwidth seperated, envelopes skewed,...
+
+
+** 14-15/7
+
+- rejected Borsboom vocoder as poor quality
+
+- Designing with speech: sp0256 vocabs, digitalk, low pass on all...
+
+- port WARPS... notes:
+
+svf is crossover/chamberlin and freqs:
+
+  fb__87_8000,
+  fb_110_8000,
+  fb_139_8000,
+  fb_175_8000,
+  fb_220_8000,
+  fb_277_8000,
+  fb_349_8000,
+  fb_440_8000,
+  fb_554_8000,
+  fb_698_8000,
+  fb_880_8000,
+  fb_1109_8000,
+  fb_1397_8000,
+  fb_1760_32000,
+  fb_2217_32000,
+  fb_2794_32000,
+  fb_3520_32000,
+  fb_4435_32000,
+  fb_5588_32000,
+  fb_7040_96000,
+
+how to calculate 2 passes of frequency
+
+** ////////////////////
+
+// go over full todo and place somewhere clear here (eg. channel
+vocoder what needs doing, all generators and each one
 
 * important notes
 
-- all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have?
+*- re-appraise all notes/progress!* WED NEXT WEEK!
+
+- all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have? also some issues with CCMDATA?
+
+- generators all for size not individual samples
+
+- interpolation/filters?
+
+- on HW resolve where we have the most change from external CV=FAR
+  LEFT - zero should be far right which has NO addition of CV - so do
+  we need to invert, no?
+
+- vocoder or not? maybe save for RAVEN with raven excitations?
 
 * interpolations
 
@@ -3030,7 +3108,7 @@ panel is 002
 
 * MODES 13/6_+++ TODO:
 
-** 0/LPC/TMS5220
+** 0/LPC/TMS5220 - decide if keep LPC or just TMS5200x.c!
 
 - cleanup new vocabulary// seems okay DONE
 
@@ -3038,7 +3116,7 @@ panel is 002
 
 TOTALS: ti99 360, test 420, talko 191, male 206, large_male 403, acorn 165 = TOTAL: 1745 / 64 = 28 banks with some doubles/adds to make 32 banks
 
-subdivide or get rid of say talko as is duplicates...
+subdivide or get rid of say talko as is duplicates... TRIM TODO
  
 - banks of 64 words/phrases SELX/SELY, SELZ is nextperiod=pitch OR cutoff/start in some banks if we double up banks
 
@@ -3112,6 +3190,8 @@ klatt in docs:
 
 raw phoneme is a bit brittle and should maybe be abandoned - or somehow break to single functions and no parsing at all???
 
+- sp0256 vocab ported
+
 ///////
 
 .... details from: http://www.retrobits.net/atari/sam.shtml#ch1.1
@@ -3148,10 +3228,10 @@ default = 72
 ** 4/SP0256 
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
-cleanlyOK, new ROMS-BELOW_TODO, parameters and bends=PITCH_DONE, port
-into generatorDONE, text to speech NRL->retroTTS/and/phoneme.c:
+cleanlyOK, new ROMS-BELOW_TODO/DONE-TEST, parameters and bends=PITCH_DONE, port
+into generatorDONE, text to speech NRL->retroTTS/and/phoneme.cIN PROGRESS MARIE
 
-or... english2phoneme in speaky 
+[or... english2phoneme in speaky]
 
 and retroTTS has:
 
@@ -3177,15 +3257,11 @@ banks: allophones/64, new vocab phrases-012/019, these with certain bends x3=6, 
 
 ///
 
-time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones ours are short but we can run slower no? test again ???
+time phonemes, samplerate: http://www.cpcwiki.eu/index.php/SP0256_Allophones ours are short but we can run slower no? test again ???DONE
 
 10k samplerate?
 
-list/find roms: *we have AL2 which is generic allophones
-
-others dumped as HEX in LPC dir moved to sporoms
-
-////
+ROMS - see ROMS below:
 
  SP0256-019. This variant is found in the Odyssey 2's "The Voice"
  attachment. It has a number of game oriented phrases, as well as
@@ -3214,14 +3290,7 @@ http://wiki.intellivision.us/index.php?title=Resrom.asm
 
 intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sailor: zip in speaky toooo
 
-/////
-
-?????
-
 currah speech - voice [[file:~/mame/src/devices/bus/c64/currah_speech.cpp::/%20set_osc1%20-][file:~/mame/src/devices/bus/c64/currah_speech.cpp::/ set_osc1 -]]
-
-/////
-
 
 raw instructions and manipulation of parameters (also for dark int): http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
 
@@ -3241,7 +3310,7 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
-** +=> others from mame/mess TODO =
+** [+=> others from mame/mess TODO =]
 
 [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]], 
@@ -3333,6 +3402,8 @@ from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 ** plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code
 
+
+** any morphing of lpcanalysis code?
 
 * hardware2
 

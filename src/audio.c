@@ -19,7 +19,7 @@ LINEIN/OUTL-filter
 #include "audio.h"
 #include "effect.h"
 #include "klatt_phoneme.h"
-#include "mdavocoder.h"
+//#include "mdavocoder.h"
 #include "vocode.h"
 #include "vocoder/vocode.h"
 #include "scformant.h"
@@ -81,8 +81,8 @@ float samplepos=0;//=genstruct->samplepos;
 int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
 
-extern mdavocal mdavocall;
-extern mdavocoder mdavocod;
+//extern mdavocal mdavocall;
+//extern mdavocoder mdavocod;
 extern VocoderInstance* vocoderr;
 
 /*

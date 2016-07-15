@@ -4,31 +4,25 @@
 
 extern __IO uint16_t adc_buffer[10];
 
-
 // 10 channel v[oc]oder generator
 
 /* coeffs:
-
 from okita: 129-209=80bw 169, 196-317=121bw 256, 294-476=182bw 385, 431-698=267bw 564, 
-
 647-1047=400bw 847, 952-1541=589bw 1246, 1295-2085=790bw 1690, 1962-3175-1213bw 2568, 2942-4762=1820bw 3852, 4315-6984=2669bw 5650
 
+from serge res eq: 29,61,115,218,411,777,1.5k,2.8k,5.2k,11k
+
+from buchla 296: <100, 150, 250, 350, 500, 630, 800, 1k, 1.3k, 1.6k, 2k, 2.6k, 3.5k, 5k, 8k, >10k
 
 q=freqmiddle/bandwidth but this is not what we use here
-
 = 12dB/octave response. 
-
  */
 
 // conversion as in: collated_forms.h but what do we use for biquad = Q?
 // q is centre/bandwidth=169/80 = 2.112 in first instance TEST!
-
 // but bandwidth is -3db - we can maybe morph and stretch this bandwidth
-
 // use biquad.c as this is 12db/octave
-
 // keep as size samples for moment
-
 // maybe 16 channels so will change freq and Q
 
 static biquad* newB[10];

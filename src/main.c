@@ -55,8 +55,8 @@ const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30,
 
 u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  44, 8, 0, 1, 8, 0}; // ELM_LEN in holmes - but why do we need extra
 
-mdavocal mdavocall;
-mdavocoder mdavocod;
+//mdavocal mdavocall;
+//mdavocoder mdavocod;
 VocoderInstance* vocoderr;
 
 void main(void)
@@ -74,8 +74,8 @@ tms5200_init();
 tms5200_newsay();
  channelv_init();
  tube_init();
- mdavocal_init(&mdavocall);
- mdaVocoder_init(&mdavocod);
+ // mdavocal_init(&mdavocall);
+ // mdaVocoder_init(&mdavocod);
  vocoderr=instantiateVocoder();
 // tube_newsay();
 
