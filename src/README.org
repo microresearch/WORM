@@ -2998,15 +2998,21 @@ rates, SVF = state variable filter in stmlib, change in bandwidth would involve 
 
 - Designing with speech... book: sp0256 vocabs, digitalk, low pass on all...
 
-- port WARPS... notes:
+- port WARPS -> wvocoder.c and wfilterbank.c 
+
+notes:
 
 svf is crossover/chamberlin and freqs are in table, compiles but needs to be tested *TO_TEST!*
 
-how to calculate 2 passes of frequency - filter_bank.py but there is also delays and gain there - can we do without delay (gain is simple)
+how to calculate 2 passes of frequency - filter_bank.py but there is
+also delays and gain there - can we do without delay (gain is
+simple)-> *filter_my.py*
 
-compiles without decimation down/upsampling but thus we will need to change coeff arrays! *TO_TEST!*
+compiles without decimation down/upsampling but thus we will need to change coeff arraysDONE *TO_TEST!*
 
-- svf.c seems to work (though somehow 2 peaks with sine in bandpass???) - try with channelv as filter
+*swops channels in wvocoder.c*
+
+- svf.c seems to work (though somehow 2 peaks with sine in bandpass???) - DONE with channels in svf 
 
 - channels in svf.c seems to work better than channelv - *TODO: play with wormings through*, [and also set width properly in coeffs]
 
@@ -3031,7 +3037,8 @@ vocoder what needs doing, all generators and each one) below in notes
 
 - wormings and grids of params HOW?
 
-- started with digitalker.c... to get to compile, where are ROMS to test, test on lap!
+- started with digitalker.c... where are ROMS to test- we have some, TESTED on lap
+  samplerate is 9000 or so and we have repeats and new_say
 
 * interpolations
 
@@ -3311,7 +3318,8 @@ https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
 ** 4.5///[+=> others from mame/mess TODO =]
 
-digitalker: [[file:~/mame2/src/emu/sound/digitalk.c]]
+digitalker: [[file:~/mame2/src/emu/sound/digitalk.c]] IN PROGRESS above!
+WORKS on lap -> TODO ARM tests, extra roms, vocab and banks
 
 	ROM_REGION( 0x10000, "digitalker", 0) /* 64k? for digitalker voice samples */
 	ROM_LOAD( "mblvsb2.2a",0x0000, 0x1000, NO_DUMP ) /* size may be wrong */
@@ -3364,6 +3372,8 @@ start with just one list = input_frame and do without interpolation, then implem
 ** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
+
+- *swapping of channels*
 
 - 16 channels in parallel , switch exciters: unvoiced, pitch, controlled...
 
