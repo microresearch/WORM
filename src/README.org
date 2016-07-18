@@ -2996,7 +2996,7 @@ rates, SVF = state variable filter in stmlib, change in bandwidth would involve 
 
 - rejected Borsboom vocoder as poor quality
 
-- Designing with speech... book: sp0256 vocabs, digitalk, low pass on all...
+- Designing with speech... book: sp0256 vocabs, digitalk rom ref, low pass on all...
 
 - port WARPS -> wvocoder.c and wfilterbank.c 
 
@@ -3016,6 +3016,13 @@ compiles without decimation down/upsampling but thus we will need to change coef
 
 - channels in svf.c seems to work better than channelv - *TODO: play with wormings through*, [and also set width properly in coeffs]
 
+- started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
+  samplerate is 9000 or so and we have repeats and new_say
+
+** 18/7
+
+nvp.c notes before: TODO: length, interpolation, generators, voices, bending params such as pitch
+
 * important notes
 
 *- re-appraise all notes/progress!* WED NEXT WEEK! // go over full todo and place somewhere clear here (eg. channel
@@ -3034,9 +3041,6 @@ vocoder what needs doing, all generators and each one) below in notes
 - triggers, threshold and repeat policy
 
 - wormings and grids of params HOW?
-
-- started with digitalker.c... where are ROMS to test- we have some, TESTED on lap
-  samplerate is 9000 or so and we have repeats and new_say
 
 - what notes/code is for RAVEN?
 
@@ -3154,7 +3158,7 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 - pausing
 
-** 2/RAW_KLATT parameters -> simpleklatt/nvp - also to wormings
+** 2/RAW_KLATT parameters -> simpleklatt - also to wormings
 
 - port to generatorDONE -> to TEST! WORKING but needs tweaking, speed and triggers///alll!!
 
@@ -3165,8 +3169,6 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 - how we figure x/y/z and continuation of frames/reset...
 
 x sets param, y sets contour and z???
-
-/// bother with nvp: - how we get nvp.c array? 
 
 //////////////
 // see genparam.c -> how that works on commandline? test with wormings
@@ -3320,7 +3322,12 @@ https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
 === Digitalker 54104 
 
-what other roms? http://biosrhythm.com/?p=1206
+- started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
+  samplerate is 9000 or so and we have repeats and new_say *TO_TEST ON ARM*
+
+- *what other roms?* http://biosrhythm.com/?p=1206 and in book too?
+
+- what bends - pitch and repeat..
 
 digitalker: [[file:~/mame2/src/emu/sound/digitalk.c]] IN PROGRESS above!
 WORKS on lap -> TODO ARM tests, extra roms, vocab and banks
@@ -3390,6 +3397,48 @@ SELX/SELY choose channel and setting, SELZ bandwidth SPEED as silence/no-pitch/p
 what is excitation? INPUT? as ONE option. one MODE, other mode is excitation from input
 
 worming through
+
+** 8.5 nvp.c looking into
+
+TODO: duration and interpol?, pitch bending, TEST!
+
+PARAMS: which phoneme(there are 48), pitch, duration and interpol, which voice? stop frame params? NONE?
+
+how pitch and duration are more or less tied to phonemes or -> this is depending on stress...
+
+- phoneme length in samples at 32000? ipa.py:
+
+  phoneme['_duration']=phonemeDuration
+  phoneme['_fadeDuration']=phonemeFadeDuration
+
+  self._dll.speechPlayer_queueFrame(self._speechHandle,frame,int(minFrameDuration*(self.sampleRate/1000.0)),int(fadeDuration*(self.sampleRate/1000.0)),userIndex,purgeQueue)
+
+so for duration of 120 (sayHannah) we have 120*(32000/1000)=120*32= 3840 long vowels is 500*32=16000 samples (1/2 sec)
+
+/////
+
+previous notes:
+
+ipa.py calculates: phoneme times/duration->frameDuration,fadeDuration, pitch
+
+see also: test_midiSing.py and hannah:
+
+def queueFrame(self,frame,minFrameDuration,fadeDuration,userIndex=-1,purgeQueue=False):
+
+player.queueFrame(frame,//frame=120,fade=100)
+
+// how that translates to samplecount at samplerate=? test this and fade is fade across frame parameters?
+
+// other globals eg. 	_curPitch=118
+	_curVoice='Adam'
+	_curInflection=0.5
+	_curVolume=1.0
+	_curRate=1.0
+
+nvp: phoneme length from ipa.py 0 from 6 to 60, 50 to 100 in
+midi_sing... as param // so list all params:
+
+also multipliers and frame param over-rides for different voicesDONE
 
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced
 

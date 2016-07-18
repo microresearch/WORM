@@ -710,6 +710,7 @@ WRITE8_MEMBER( digitalker_data_w )
 }
 */
 
+/*
  void main(int argc, char *argv[]){
    u8 x; int xx;
    digitalk_init();
@@ -719,3 +720,4 @@ WRITE8_MEMBER( digitalker_data_w )
           printf("%c",xx>>8);
    }
  }
+*/
