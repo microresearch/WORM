@@ -12,5 +12,12 @@ typedef unsigned int uint32_t;
 typedef signed short int16_t;
 typedef unsigned short uint16_t;
 
+#include "math.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
+
+#define M_PI 3.14159
+
 #define TRUE 1
 #define FALSE 0

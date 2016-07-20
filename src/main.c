@@ -32,6 +32,9 @@
 #include "channelv.h"
 #include "svf.h"
 #include "wvocoder.h"
+#include "digitalker.h"
+#include "nvp.h"
+#include "samplerate.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -59,12 +62,12 @@ u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 
 
 //mdavocal mdavocall;
 //mdavocoder mdavocod;
-VocoderInstance* vocoderr;
+//VocoderInstance* vocoderr;
 
 void main(void)
 {
   int16_t x;
-  
+  // all generator inits
 // LPCAnalyzer_init();
 init_synth(); // which one? --> klatt rsynth !!!! RENAME!
 sp0256_init();
@@ -78,10 +81,15 @@ tms5200_newsay();
  tube_init();
  // mdavocal_init(&mdavocall);
  // mdaVocoder_init(&mdavocod);
- vocoderr=instantiateVocoder();
+ // vocoderr=instantiateVocoder();
 // tube_newsay();
  BANDS_Init_();
  Vocoder_Init(32000.0f);
+ digitalk_init();
+ digitalk_newsay(0);
+ nvp_init();
+ sample_rate_init();
+ ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
   I2S_Block_Init();

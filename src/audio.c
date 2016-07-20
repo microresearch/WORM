@@ -19,7 +19,7 @@ LINEIN/OUTL-filter
 #include "audio.h"
 #include "effect.h"
 #include "klatt_phoneme.h"
-//#include "mdavocoder.h"
+#include "mdavocoder.h"
 #include "vocode.h"
 #include "vocoder/vocode.h"
 #include "scformant.h"
@@ -27,7 +27,6 @@ LINEIN/OUTL-filter
 #include "voicform.h"
 #include "lpcansc.h"
 #include "parwave.h"
-#include "nvp.h"
 #include "lpc.h"
 #include "saml.h"
 #include "holmes.h"
@@ -38,7 +37,11 @@ LINEIN/OUTL-filter
 #include "channelv.h"
 #include "svf.h"
 #include "wvocoder.h"
+#include "digitalker.h"
+#include "nvp.h"
+#include "samplerate.h"
 
+/*
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
       {600, 1040, 2250, 2450, 2750},
       {400, 1620, 2400, 2800, 3100},
@@ -63,19 +66,15 @@ static const float mull[5][5] __attribute__ ((section (".flash"))) = {
     { 1, 0.1, 0.025118864315096, 0.03981071705535, 0.015848931924611}
   };
 
+*/
+
 arm_biquad_casd_df1_inst_f32 df[5][5] __attribute__ ((section (".ccmdata")));
 float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2} b1 and b2 negate
 
 extern __IO uint16_t adc_buffer[10];
 extern int16_t* buf16;
-//extern u8* datagenbuffer;
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
-
-//for vocoder
-//int16_t modulator_sample_buffer[256];
-//int16_t carrier_sample_buffer[256];
-//int16_t output_sample_buffer[256];
 
 #define float float32_t
 
@@ -84,8 +83,6 @@ int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
 
 //extern mdavocal mdavocall;
-//extern mdavocoder mdavocod;
-extern VocoderInstance* vocoderr;
 
 /*
 Formlet *formy;
@@ -95,7 +92,7 @@ Formant *formanty;
 #define THRESH 32000
 #define THRESHLOW 30000
 
-u16 sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
@@ -147,10 +144,9 @@ u16 sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
 
   // refill back counter etc.
- return size;
 };
 
-u16 tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
@@ -202,11 +198,10 @@ u16 tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
 
   // refill back counter etc.
- return size;
 };
 
 
-u16 sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 x=0,readpos;
   static u8 howmany=0;
@@ -276,10 +271,9 @@ u16 sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        }
 
   // refill back counter etc.
- return size;
 }
 
-u16 tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
@@ -333,15 +327,14 @@ u16 tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    }
 
   // refill back counter etc.
- return size;
 };
 
-float flinbuffer[MONO_BUFSZ];
-float flinbufferz[MONO_BUFSZ];
-float floutbuffer[MONO_BUFSZ];
-float floutbufferz[MONO_BUFSZ];
+//float flinbuffer[MONO_BUFSZ];
+//float flinbufferz[MONO_BUFSZ];
+//float floutbuffer[MONO_BUFSZ];
+//float floutbufferz[MONO_BUFSZ];
 
-u16 fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params SELZ is pitch bend commentd now OUT
   //  klattrun(outgoing, size);
   u8 xx=0;
@@ -351,7 +344,7 @@ u16 fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)
      }
 };
 
-u16 tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -404,37 +397,151 @@ u16 tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 
   // refill back counter etc.
- return size;
+};
+
+
+void nvpSR(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // test samplerate conversion
+  dosamplerate(incoming, outgoing, samplespeed, size);
+}
+
+void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // MODEL GENERATOR: TODO is speed and interpolation options
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  // lpc_running
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=(nvp_get_sample());//<<6)-32768; 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 nvp_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=(nvp_get_sample());//<<6)-32768; 
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 nvp_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
+};
+
+void digitalker(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // MODEL GENERATOR: TODO is speed and interpolation options
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  // lpc_running
+
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+  float tmpsamplespeed=samplespeed*32.0f;
+
+   if (tmpsamplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=(digitalk_get_sample());//<<6)-32768; 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=tmpsamplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=(digitalk_get_sample());//<<6)-32768; 
+
+       if (samplepos>=tmpsamplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+	 xx++;
+	 samplepos-=tmpsamplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
 };
 
 
 
-u16 simpleklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void simpleklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params - break down as above in tms, spo256 - pull out size
   dosimpleklattsamples(outgoing, size);
 };
 
 
-u16 channelv(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down as above in tms, spo256 - pull out size
+void channelv(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
   dochannelv(incoming,outgoing, size);
 };
 
 // testing various vocoder and filter implementations:
 
-u16 testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // first without speed or any params - break down as above in tms, spo256 - pull out size
-//  dochannelv(incoming,outgoing, size);
+void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  // NO SPEED as is live
+
+  //  dochannelv(incoming,outgoing, size);
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
   int_to_floot(incoming,voicebuffer,size);
   dochannelvexcite(carrierbuffer,32);
-
+//  mdavocal_process(&mdavocall, voicebuffer, carrierbuffer, 32);
   //  runVocoder(vocoderr, voicebuffer, carrierbuffer, otherbuffer, size);
   //void runSVFtest_(SVF* svf, float* incoming, float* outgoing, u8 band_size){
   //  runBANDStest_(voicebuffer, otherbuffer, size);
 
   Vocoder_Process(voicebuffer, carrierbuffer, otherbuffer, size); // wvocoder.c
-
   floot_to_int(outgoing,otherbuffer,size);
 };
 
@@ -513,13 +620,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=8; // checked=0,1,2,3,4,5,6 ALL 
+  mode=10; // checked=0,1,2,3,4,5,6,7,8
 
-  u16 (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
-  // we don't really need to return size?
-
-  x=generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
+  generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
 
   /*    for (x=0;x<sz/2;x++){ // STRIP_OUT

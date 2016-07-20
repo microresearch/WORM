@@ -161,7 +161,9 @@ void sam_newsay(void){
   //  for (x=0;x<256;x++) input[x]=0;
 ///    index=0;
     index=adc_buffer[SELZ]>>6;
-  strcpy(input,  sam_vocab[index]); // 64 as test 
+    strcpy(input,  sam_vocab[index]); // 64 as test CUT TODO!
+
+    //    strcpy(input,"AHBAE4NDUN.\x9b"); // 64 as test CUT TODO!
   //  index++;
   //  if (index>8) index=0;
     //    strcat(input,".\x9b");

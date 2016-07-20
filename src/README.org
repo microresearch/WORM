@@ -14,9 +14,7 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 - recordings
 
-- check all parts order/test/build process-oven
-
-- satisfactory vocoder
+- test/build process-oven
 
 - re-think how all works with excitation and resonance/process - what
   models don't work in this way (more classical speech synth), and
@@ -3025,63 +3023,42 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 
 ** 20/7 
 
-- digitalker to arm and extra vocab
-
 - latest wvocoder tests? WORKING - *TODO: formantshift to test and our own crossing, envelope stuff as param, noise and pitch/type of wave*
 
-- nvp.c tests and above... new mode as only move on next phoneme when is triggered
+- tested input from mdavoc.c but is kind of whiney always
 
-- singer.scm re-check if possible
+- digitalker to arm?DONE
+
+- nvp.c testsDONE with basic nvp_newsay and above... new mode as only move on next phoneme when is triggered
+
+- singer.scm re-check if possible CHECKED but is TOO complex 
+
+////////
 
 - final work plan and notes below
 
 * important notes
 
-*- re-appraise all notes/progress!* WED NEXT WEEK! // go over full todo and place somewhere clear here (eg. channel
-vocoder what needs doing, all generators and each one) below in notes
+- all generators write to audio_buffer which is re-used
 
-- all vocabs don't fit in FLASH so we need to trim here and/or use CCMData - how much we have? also some issues with CCMDATA?
+- all vocabs don't fit in FLASH so we need to trim here and/or use
+  CCMData - how much we have? also some issues with CCMDATA? - was too
+  little flash in stm32_flash.ld specified so now fixed but some commented out to speed up load
 
-- generators WITHOUT SPEED for full size not individual samples, and return void so not pass back if not needed
+define these vocabs and differentiate: vocabs based on phonemes (SAM
+and sp0256), and those on code (also sp0256, talkie and associated TMS series)
 
-- interpolation/filters?
+- interpolation/filters? example = tube.c, warps and samplerate.c/perry cook -> not sure if is worthwhile
 
 - on HW resolve where we have the most change from external CV=FAR
   LEFT - zero should be far right which has NO addition of CV - so do
-  we need to invert, no?
+  we need to invert, for SPEED not but for other params then maybe makes sense for PITCH say
 
 - triggers, threshold and repeat policy
 
 - wormings and grids of params HOW?
 
 - what notes/code is for RAVEN?
-
-* interpolations
-
-- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]]
-
-- linear interpol and filtering (freq?): http://stackoverflow.com/questions/1125666/how-do-you-do-bicubic-or-other-non-linear-interpolation-of-re-sampled-audio-da
-
-and: http://www.rockbox.org/tracker/12223?getfile=24000
-
-go linear!
-
-downsample=throw out samples (speed up)... lowpass first then decimate
-
-upsample=interpolate - do we need filter as this is on output?
-
-* SCHEDULE/TODO:
-
-*REPEATS/PAUSING/WORMING/VOCODING*
-
-- trigger in: is it filtered, what is the level, trigger must also go
-  off on down so not always triggering (if !triggered). trigger out from gamma is 5v?
-
-21/6 - TRIGGER In is set by THRESH in audio.c and works with geiger and USG
-
-/////
-
-- filter on interpolation 
 
 - worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN*
 
@@ -3091,19 +3068,31 @@ wt_waves is: 256*129=33024 bytes??? how is generated...
 
 ///////
 
-- finish LPC vocabulary - refine/clean upDONE  - DO BANKS
-
-- new sp0256-DONE and vocabTODO - report on both TMS-DONE and sp0256 ROMs // [digitalk/s14001a?]
-
-- test and evaluate all algos//plan modes// 
-
 - wormcode and how fits with modes// worm movements/// worming in wavetable
-
-- vocoder/channel vocoders
 
 - move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github
 
 - wrap up/ MANUAL/ production tests
+
+///////
+
+// so basics TODO is: vocabs and banks and so on, interpolation/filters, hw params, worming, clean up code, clean each mode, new modes...
+
+* interpolations
+
+- see tube.c original: [[file:~/projects/ERD_modules/worm/docs/temped/softwareTRM/tube.c]]
+
+- warps?
+
+- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]] - DONE but tests not so worthwhile?
+
+- linear interpol and filtering (freq?): http://stackoverflow.com/questions/1125666/how-do-you-do-bicubic-or-other-non-linear-interpolation-of-re-sampled-audio-da
+
+and: http://www.rockbox.org/tracker/12223?getfile=24000
+
+downsample=throw out samples (speed up)... lowpass first then decimate
+
+upsample=interpolate - do we need filter as this is on output?
  
 * any hardware notes
 
@@ -3119,7 +3108,9 @@ panel is 002
 
 - for TMS code we can have banks/vocabs/wordlists which use 5100, 5200 of 5220 coeffs/settings TODO!
 
-- 5100 voacb to clean up and test//5220 to test if it makes differences in a good way
+- 5100 vocab to clean up and test//5220 to test if it makes differences in a good way
+
+= spkspellroms.h *TODO*
 
 - cleanup new vocabulary// seems okay DONE
 
@@ -3333,9 +3324,11 @@ https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 ** 4.5// Digitalker 54104 
 
 - started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
-  samplerate is 9000 or so and we have repeats and new_say *TO_TEST ON ARM*
+  samplerate is 9000 or so and we have repeats and new_say *TO_TEST ON ARM DONE*
 
-- *what other roms?* http://biosrhythm.com/?p=1206 and in book too? COPYRIGHT!
+- also added primitive pitch bend
+
+- what other roms? http://biosrhythm.com/?p=1206 and in book too? COPYRIGHT!
 
 NOTES: MM52164SSR1, MM52164SSR2 and I even read recently about a MM52164SSR5 and MM52164SSR6...
 
@@ -3411,9 +3404,9 @@ what is excitation? INPUT? as ONE option. one MODE, other mode is excitation fro
 
 worming through
 
-** 8.5 nvp.c looking into
+** 8.5 nvp.c BASICS working with primitive newsay...
 
-TODO: duration and interpol?, pitch bending, TEST!
+*TODO: try out changed voice code, also some phoneme glitch somewhere in interpolation of parameters perhaps and we need to order phonemes*
 
 PARAMS: which phoneme(there are 48), pitch, duration and interpol, which voice? stop frame params? NONE?
 
@@ -3453,11 +3446,14 @@ midi_sing... as param // so list all params:
 
 also multipliers and frame param over-rides for different voicesDONE
 
-** 8.6 - nvp.c new mode as only move on next phoneme when is triggered
+** 8.6 - nvp.c new mode as only move on to next phoneme when is triggered
 
-** 8/9vocoder TODO q of excitation, pitch/unvoiced
+** 8/9vocoder TODO q of excitation, pitch/unvoiced -> wvocoder
 
-- changing bandwidth?
+- latest wvocoder tests? WORKING - *TODO: formantshift to testDONE? and our
+  own crossing, envelope stuff as param, noise and pitch/type of wave*
+
+- changing bandwidth - maybe some differing tables for bandwidths and different frequencies
 
 - port from WARPS/ ownvocoder.c and how we can tweak this: different
   bands, bandwidths even if coefficients are fixed, excitation

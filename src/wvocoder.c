@@ -1,8 +1,10 @@
-// slow port of elements of warps vocoder
+// port of elements of warps vocoder
 
 #include "audio.h"
 #include "wfilterbank.h"
 #include "wvocoder.h"
+
+extern __IO uint16_t adc_buffer[10];
 
 #define CONSTRAIN(var, min, max) \
   if (var < (min)) { \
@@ -168,6 +170,7 @@ void Vocoder_Process(
   }
   
   // Compute the amplitude (or modulation amount) in all bands.
+  formant_shift_=adc_buffer[SELY]/4096.0f;
   float formant_shift_amount = 2.0f * fabsf(formant_shift_ - 0.5f);
   formant_shift_amount *= (2.0f - formant_shift_amount);
   formant_shift_amount *= (2.0f - formant_shift_amount);

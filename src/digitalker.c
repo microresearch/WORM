@@ -9,11 +9,13 @@
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
-#include "forlap.h"
+//#include "forlap.h"
 
-
-//#include "audio.h"
+#include "audio.h"
 #include "digitalker.h"
+
+extern __IO uint16_t adc_buffer[10];
+
 
 typedef unsigned char UINT8;
 typedef signed char INT8;
@@ -21,6 +23,7 @@ typedef u16 UINT16;
 typedef int16_t INT16;
 typedef uint32_t UINT32;
 typedef int32_t INT32;
+
 
 static UINT16 m_bpos;
 static UINT16 m_apos;
@@ -382,7 +385,7 @@ void digitalker_step_mode_0()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id];
+	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);
 
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
@@ -435,7 +438,7 @@ void digitalker_step_mode_2()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id];
+	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);
 
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
@@ -497,7 +500,7 @@ void digitalker_step_mode_3()
 	UINT8 dac, apos, wpos;
 	int k, l;
 
-	m_pitch = pitch_vals[h & 0x1f];
+	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
 		m_cur_dac = 0;
@@ -582,19 +585,30 @@ void digitalk_init(void){
 		m_bpos = 0xffff;
 }
 
-static u8 alwayswhich;
+//static u8 alwayswhich;
 
-void digitalk_newsay(u8 which){
+void digitalk_newsay(){
+  u8 which=(adc_buffer[SELX]>>6)+1; // 65
+  //     u8 which =1;
   digitalker_start_command(which);
-  alwayswhich=which;
+  //  alwayswhich=which;
 }
+
+void digitalk_newsayarg(u8 which){
+  //  u8 which=adc_buffer[SELX]>>6; // 6 bits = 64
+  //  u8 which =1;
+  digitalker_start_command(which);
+  //  fprintf(stderr,"ALWAYS: %d\n",alwayswhich);
+  //  alwayswhich=which+1;
+}
+
 
 //void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 // does it repeat
 int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMPLES!
 
   //	stream_sample_t *sout = outputs[0];
-  int16_t sample;
+  int16_t sample; static int pp;//=m_pitch_pos;
   
   //	static int cpos = 0;
 
@@ -604,24 +618,38 @@ int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMPLES!
 	if(m_zero_count) {
 	  sample = 0;
 	  m_zero_count -= 1;
-		} 
+	}
 	else if(m_dac_index != 128) {// the rest here
 	    short v = m_dac[m_dac_index];
-	    int pp = m_pitch_pos;
-	    if (pp != m_pitch) { // keep this running
+	    //	    int pp = m_pitch_pos;
+	    if (pp==m_pitch)
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
 	      sample=v;
-	      pp+=1;
-	      //  return sample;
+	      pp++;
+	      return sample;
 	    }
-	    if(pp == m_pitch) {
-	      pp = 0;
-	      m_dac_index++;
-	    }
-	    if (pp!=m_pitch) m_pitch_pos = pp;
+	    //	    m_pitch_pos=pp;
+
+	    /*		while(cpos != samples && pp != m_pitch) {
+					sout[cpos++] = v;
+					pp++;
+				}
+				if(pp == m_pitch) {
+					pp = 0;
+					m_dac_index++;
+				}
+				m_pitch_pos = pp;*/
+
+
 	}
 	//	else  new say????
 	else {
-	  digitalk_newsay(alwayswhich);
+	  digitalk_newsay();
+	  sample=digitalk_get_sample();
 	}
 	return sample;
 	}
@@ -714,10 +742,10 @@ WRITE8_MEMBER( digitalker_data_w )
  void main(int argc, char *argv[]){
    u8 x; int xx;
    digitalk_init();
-   digitalk_newsay(atoi(argv[1]));
+   digitalk_newsayarg(atoi(argv[1]));
    while(1){
-     for (x=0;x<128;x++) xx=digitalk_get_sample();
+          for (x=0;x<128;x++)      xx=digitalk_get_sample();
           printf("%c",xx>>8);
    }
-   }*/
-
+   }
+*/

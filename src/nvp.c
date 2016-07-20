@@ -21,12 +21,17 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 #include "stm32f4xx.h"
 #include "audio.h"
 
+extern __IO uint16_t adc_buffer[10];
+
+
+//#include "forlap.h"
+
 /// below is from data.py in no particular order output by print.py - no order of phonemes but parameter data is ordered...
 
 // 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
 
 
-const float data[48][39]={
+const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
 { 290 , 610 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 60.0 , 45.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 290 , 610 , 2150 , 3300 , 3750 , 4900 , 50 , 80 , 60 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 0 , 0.75 },
 { 650.0 , 1430.0 , 2500.0 , 3300.0 , 3750.0 , 4900.0 , 250.0 , 200.0 , 116.6 , 76.5 , 178.0 , 250.0 , 200.0 , 1000.0 , 100.0 , 100.0 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
@@ -84,12 +89,6 @@ typedef unsigned char bool;
 #define false 0
 #define true 1
 
-inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
-	return oldVal+((newVal-oldVal)*curFadeRatio);
-}
-
-typedef float speechPlayer_frameParam_t;
-
 typedef struct {
   unsigned char index;
   float value;
@@ -105,6 +104,20 @@ voice benjie= { 9,{ {0,1.01,0},{1,1.02,0},{2,3770,1},{3,4110,1},{4,5000,1},{7,0.
 voice nullie= { 0,{ {0,1.01,0},{1,1.02,0},{2,3770,1},{3,4110,1},{4,5000,1},{7,0.9,0},{8,1.3,0},{36,0.7,0},{34,1.3,0}}};
 voice adam= {3,{ {8,1.3,0},{34,1.3,0},{36,0.85,0}}};
 voice caleb= {2,{ {38,1,1}, {37,0,1}}};
+
+// add singing voice:
+/*
+frame.preFormantGain=2.0
+frame.voiceAmplitude=1.0
+frame.vibratoPitchOffset=0.125
+frame.vibratoSpeed=5.5
+*/
+
+inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
+	return oldVal+((newVal-oldVal)*curFadeRatio);
+}
+
+typedef float speechPlayer_frameParam_t;
 
 typedef struct {
   // varying globally depending on voice - but we still need to interpolate 
@@ -134,7 +147,7 @@ typedef struct {
 
 const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
 
-speechPlayer_frame_t framer,oldframer, tempframer;
+speechPlayer_frame_t framer,oldframer, tempframe;
 
 const float PITWO=M_PI*2;
 
@@ -247,52 +260,16 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 		return calculateValueAtFadePosition(output,input,frame->parallelBypass);
 };
 
-speechPlayer_frame_t *framerr,*oldframerr, *tempframe;
-
-unsigned int generateSpeechWave(const speechPlayer_frame_t* frame, u16 sampleCount,u16 interpol, int16_t* sampleBuf) {
-
-  // TODO: samplecounternew as static and then get next frame from array when we hit length (which might change) and write to audio_buffer
-  // so length needs to be defined - but not interpolated
-		float val=0;
-		unsigned int i,j;
-		for(i=0;i<sampleCount;i++) {		  
-
-		  if (i<interpol){
-		    float curFadeRatio=(float)i/(interpol);
-		    for(j=0;j<speechPlayer_frame_numParams;++j) {
-		      ((float*)tempframe)[j]=calculateValueAtFadePosition(((float*)oldframerr)[j],((float*)frame)[j],curFadeRatio);  // should not be frame here but guess is same...
-			      }
- }
-
-		  // for pitch interpolates:
-
-		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
-		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
-		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
-		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
-
-				float voice=getNextVOICE(tempframe);
-				float cascadeOut=getNextCASC(tempframe,voice*tempframe->preFormantGain);
-				float fric=getNextNOISE(&lastValueTwo)*0.3*tempframe->fricationAmplitude;
-				float parallelOut=getNextPARALLEL(tempframe,fric*tempframe->preFormantGain);
-				float out=(cascadeOut+parallelOut)*tempframe->outputGain;
-				//				printf("%f\n",out);
-				sampleBuf[i]=out*4000;
-				
-				if (sampleBuf[i]>32767) sampleBuf[i]=32767;
-				if (sampleBuf[i]<-32767) sampleBuf[i]=-32767;
-		}
-		return sampleCount;
-	};
-
 
 void change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-float *indexy[39];
-
+float* indexy[39];
 
 void init_nvp(void){
   // set up frame, buffer, fill buffer and write as wav following other example votrax?
+     float *indexyy[39]={&framer.cf1, &framer.cf2, &framer.cf3, &framer.cf4, &framer.cf5, &framer.cf6, &framer.cfN0, &framer.cfNP,  &framer.cb1, &framer.cb2, &framer.cb3, &framer.cb4, &framer.cb5, &framer.cb6, &framer.cbN0, &framer.caNP, &framer.caNP, &framer.pf1, &framer.pf2, &framer.pf3, &framer.pf4, &framer.pf5, &framer.pf6, &framer.pb1, &framer.pb2, &framer.pb3, &framer.pb4, &framer.pb5, &framer.pb6, &framer.pa1, &framer.pa2, &framer.pa3, &framer.pa4, &framer.pa5, &framer.pa6, &framer.parallelBypass, &framer.fricationAmplitude, &framer.voiceAmplitude, &framer.aspirationAmplitude}; 
+
+     for (u8 x=0;x<39;x++) indexy[x]=indexyy[x];
 
   INITRES(&r1,0);
   INITRES(&r2,0);
@@ -309,23 +286,19 @@ void init_nvp(void){
   INITRES(&rr5,0);
   INITRES(&rr6,0);
 
-  framerr=&framer;
   //change_nvpparams(1.0, 1.0, 0.125, 5.5, 250.0, 2.0, 0, 1.0, 0); // envpitch=endVoicePitch is unused, 
-  change_nvpparams(framerr, 1.0, 1.0, 0, 0, 250.0, 1.0, 0, 1.0, 1.0); // envpitch=endVoicePitch is unused, 
-  framerr->preFormantGain=0;
+  change_nvpparams(&framer, 1.0, 1.0, 0, 0, 250.0, 1.0, 0, 1.0, 1.0); // envpitch=endVoicePitch is unused, 
+  framer.preFormantGain=0;
 
-  oldframerr=&oldframer;
-  tempframe=&tempframer;
 
    // this shouldn't change
   
-   float *indexy[39]={&framerr->cf1, &framerr->cf2, &framerr->cf3, &framerr->cf4, &framerr->cf5, &framerr->cf6, &framerr->cfN0, &framerr->cfNP,  &framerr->cb1, &framerr->cb2, &framerr->cb3, &framerr->cb4, &framerr->cb5, &framerr->cb6, &framerr->cbN0, &framerr->caNP, &framerr->caNP, &framerr->pf1, &framerr->pf2, &framerr->pf3, &framerr->pf4, &framerr->pf5, &framerr->pf6, &framerr->pb1, &framerr->pb2, &framerr->pb3, &framerr->pb4, &framerr->pb5, &framerr->pb6, &framerr->pa1, &framerr->pa2, &framerr->pa3, &framerr->pa4, &framerr->pa5, &framerr->pa6, &framerr->parallelBypass, &framerr->fricationAmplitude, &framerr->voiceAmplitude, &framerr->aspirationAmplitude}; 
 
    // voice or TEST!
-    framerr->preFormantGain=1.0;
-    framerr->vibratoPitchOffset=0.1;
-    framerr->vibratoSpeed=5.5;
-    framerr->voicePitch=150;
+    framer.preFormantGain=1.0;
+    framer.vibratoPitchOffset=0.1;
+    framer.vibratoSpeed=5.5;
+    framer.voicePitch=150;
 
     // copy into indexy
 
@@ -333,7 +306,7 @@ void init_nvp(void){
     *indexy[i]=data[0][i]; // TESTY!
   }
 
-  memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); // no interpol
+  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
 
 }
 
@@ -359,87 +332,30 @@ outputgain: frame.outputGain=2.0 unless we need silence!
 
   */
 
-  framerr->glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
-  framerr->voiceTurbulenceAmplitude=turby;
-  framerr->preFormantGain=prefgain;
-  framerr->vibratoPitchOffset=vpoffset;
-  framerr->vibratoSpeed=vspeed;
-  framerr->voicePitch=vpitch;
-  framerr->outputGain=outgain;
-  framerr->endVoicePitch=envpitch;
+  framer.glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+  framer.voiceTurbulenceAmplitude=turby;
+  framer.preFormantGain=prefgain;
+  framer.vibratoPitchOffset=vpoffset;
+  framer.vibratoSpeed=vspeed;
+  framer.voicePitch=vpitch;
+  framer.outputGain=outgain;
+  framer.endVoicePitch=envpitch;
 }
 
-void run_nvpframe(void){ // TODO: scheduling so most of this in generate above
-
-  int16_t framebuffer[1024]; 
-  int i;
-  //  fo = fopen("testnvp.pcm", "wb");
-  framerr=&framer;
-  oldframerr=&oldframer;
-  tempframe=&tempframer;
-
-  // TODO: this is init OR not?
-  
-  //   float *indexy[39]={&framerr->cf1, &framerr->cf2, &framerr->cf3, &framerr->cf4, &framerr->cf5, &framerr->cf6, &framerr->cfN0, &framerr->cfNP,  &framerr->cb1, &framerr->cb2, &framerr->cb3, &framerr->cb4, &framerr->cb5, &framerr->cb6, &framerr->cbN0, &framerr->caNP, &framerr->caNP, &framerr->pf1, &framerr->pf2, &framerr->pf3, &framerr->pf4, &framerr->pf5, &framerr->pf6, &framerr->pb1, &framerr->pb2, &framerr->pb3, &framerr->pb4, &framerr->pb5, &framerr->pb6, &framerr->pa1, &framerr->pa2, &framerr->pa3, &framerr->pa4, &framerr->pa5, &framerr->pa6, &framerr->parallelBypass, &framerr->fricationAmplitude, &framerr->voiceAmplitude, &framerr->aspirationAmplitude}; 
-
-   // test for one phrase TODO: remove
-  int c=0;
-  unsigned char sayhan[5]={38,38,13,31,31};
-
-    framerr->preFormantGain=1.0;
-    framerr->vibratoPitchOffset=0.1;
-    framerr->vibratoSpeed=5.5;
-    framerr->voicePitch=150;
-
-    while(c<5){
-
-      unsigned char random=rand()%48; 
-    
-    random=sayhan[c];
-    if (c==0) *indexy[37]=0;
-    else *indexy[37]=1;
-    if (c==2) framerr->voicePitch=100;
-    if (c==3) framerr->voicePitch=90;
-    if (c==4) framerr->preFormantGain=0;
-
-
-  for (i=0;i<39;i++){
-    *indexy[i]=data[random][i];
-  }
-
-
-// voice* voicey= &benjie;
- voice* voicey= &nullie;
- //  voice* voicey= &adam;
-
-  /// the howmany is the number of params we change!
- for (i=0;i<voicey->howmany;i++){
-      if (voicey->voices[i].override) *indexy[voicey->voices[i].index]=voicey->voices[i].value;
-      else *indexy[voicey->voices[i].index]*=voicey->voices[i].value;
- }
-
- if (c==0)   {
-   memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); // no interpol
-   framerr->preFormantGain=0;
- }
- else     framerr->preFormantGain=1.0;
-
-    c++;
-
-//still question of length of phoneme/number of frames/samples?
-
-// what are limits for phoneme length?
-
-// in ipa.py def calculatePhonemeTimes(phonemeList,baseSpeed) speed also to vary which is 1;;; or we use phonemetime as variable
-
-    generateSpeechWave(framerr,880,400,framebuffer); // why 880 and 400? is 880 size of frame or?
-
- memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); 
-    }
-   
-}
 
 static u16 this_frame_length, this_interpol;
+
+void nvp_newvoice(voice* voiced){
+
+ voice* voicey= voiced;
+ //  voice* voicey= &adam;
+
+ for (u8 i=0;i<voicey->howmany;i++){
+      if (voicey->voices[i].override) *indexy[voicey->voices[i].index]=voicey->voices[i].value;
+      else *indexy[voicey->voices[i].index]*=voicey->voices[i].value; // TODO apply during samples
+ }
+
+}
 
 void nvp_init(){
   init_nvp();
@@ -448,47 +364,77 @@ void nvp_init(){
 
 void nvp_newsay(){
     // what do we need to re_init?
+    // how do we choose next frame
+  //  static unsigned char random=0;
+  unsigned char random=(adc_buffer[SELX]>>6)%49;
+  if (random==0) *indexy[37]=0;
+  else {
+    // copy in frame
+  //  random++;
+  //  random=random%48;
+  for (u8 i=0;i<39;i++){
+    *indexy[i]=data[random-1][i];
+  }
+  }
+  // frame length, interpol sets to half that and pitch = SELY, SELZ,
+  this_frame_length=(4096-adc_buffer[SELY])<<3;
+  this_interpol=this_frame_length/2;
+  // pitch
 
 }
 
 int16_t nvp_get_sample(){
   float val=0;
-  unsigned int i,j;
+  unsigned int j;
   static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
-    memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); // old frame for interpol
-    // how do we choose next frame
-    unsigned char random=rand()%48;
-    // copy in frame
-  for (i=0;i<39;i++){
-    *indexy[i]=data[random][i];
-  }
-
+    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    nvp_newsay();
+    count=0;
   }// new frame - we also need to take care of pitch and pitch interpol
 
-  if (i<this_interpol){
-    float curFadeRatio=(float)i/(this_interpol);
+  if (count<this_interpol){
+    float curFadeRatio=(float)count/(this_interpol);
     for(j=0;j<speechPlayer_frame_numParams;++j) {
-      ((float*)tempframe)[j]=calculateValueAtFadePosition(((float*)oldframerr)[j],((float*)framerr)[j],curFadeRatio); 
+      //      (float*)tempframe[j]=calculateValueAtFadePosition((float*)&oldframer[j],(float*)&framer[j],curFadeRatio); 
+      ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
+
     }
   }
+    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
 
-		  // for pitch interpolates:
+  //  &tempframe=&framer;
+  // for pitch interpolates: but we just use our pitch here
 
 		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
 		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
 		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
 		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
+  tempframe.voicePitch=4096-adc_buffer[SELZ];
 
-  float voice=getNextVOICE(tempframe);
-  float cascadeOut=getNextCASC(tempframe,voice*tempframe->preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.3*tempframe->fricationAmplitude;
-  float parallelOut=getNextPARALLEL(tempframe,fric*tempframe->preFormantGain);
-  float out=(cascadeOut+parallelOut)*tempframe->outputGain;
+  float voice=getNextVOICE(&tempframe);
+  float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
+  float fric=getNextNOISE(&lastValueTwo)*0.3*tempframe.fricationAmplitude;
+  float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
+  float out=(cascadeOut+parallelOut)*tempframe.outputGain;
   //				printf("%f\n",out);
   //sampleBuf[i]=out*4000;
-  return out*4000.0f; 
-
+  //  out=rand()%32;
   count++;
+  out=out*4000.0f;
+  if (out>32000.0f) out=32000.0;
+  else if (out<-32000.0f) out=-32000.0;
+  return out; 
+
 }
+
+/*
+void main(){
+  nvp_init();
+  while(1){
+    int16_t vv=nvp_get_sample();
+    //    if (vv>32000 || vv<-32000) printf("%d\n",vv);
+ printf("%d\n",vv);
+  }
+  }*/

@@ -77,7 +77,14 @@ float speedOfSound(float temperature)
     return (331.4 + (0.6 * temperature));
 }
 
+float indexy[39];
+
+float testindex(){
+  return indexy[0];
+}
+
 void main(){
+  indexy={1.0,1.0}; 
   float x=0.0f;
   int y=0;
   int xx;
@@ -101,6 +108,10 @@ void main(){
   int sampleRate = 4.0 * controlPeriod;
 
   printf("controlperiod %d\n",controlPeriod);
+
+  float ind=testindex();
+
+  printf("indexy %f\n",ind);
 
 
 

@@ -20,13 +20,13 @@
 
 void mdavocal_init(mdavocal* unit) 
 {
-  unit->param[0] = 0.9f;  //Tracking Off / On / Quant
-  unit->param[1] = 0.90f;  //Pitch
-  unit->param[2] = 0.90f;  //Breath Noise
-  unit->param[3] = 0.90f;  //Voiced/Unvoiced Thresh
-  unit->param[4] = 0.95f;  //Max Freq
+  //  unit->param[0] = 0.5f;  //Tracking Off / On / Quant 0 1 2
+  unit->param[1] = 0.50f;  //Pitch
+  unit->param[2] = 0.20f;  //Breath Noise
+  unit->param[3] = 0.50f;  //Voiced/Unvoiced Thresh
+  unit->param[4] = 0.35f;  //Max Freq
 
-  unit->track = 0;
+  //  unit->track = 1;
   unit->pstep = unit->pmult = unit->sawbuf = unit->noise = unit->lenv = unit->henv = 0.0f;
   unit->lbuf0 = unit->lbuf1 = unit->lbuf2 = unit->lbuf3 = unit->lfreq = unit->vuv = unit->maxp = unit->minp = 0.0f;
   unit->root = 0.0;
@@ -35,9 +35,9 @@ void mdavocal_init(mdavocal* unit)
   fs = 32000.0f;
   ifs = 1.0f / fs;
 
-  unit->track = (int32_t)(2.99f * unit->param[0]);
-  unit->track = 1;
-  unit->pmult = (float)powf(1.0594631f, floor(48.0f * unit->param[1] - 24.0f));
+  //  unit->track = (int32_t)(2.99f * unit->param[0]);
+  unit->track = 2;
+  unit->pmult = (float)powf(1.0594631f, floor(48.0f * unit->param[1] - 24.0f)); // pitchx
   if(unit->track==0) unit->pstep = 110.0f * unit->pmult * ifs;
 
   unit->noise = 6.0f * unit->param[2];
