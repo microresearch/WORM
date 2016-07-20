@@ -433,7 +433,7 @@ u16 testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   //void runSVFtest_(SVF* svf, float* incoming, float* outgoing, u8 band_size){
   //  runBANDStest_(voicebuffer, otherbuffer, size);
 
-  Vocoder_Process(voicebuffer, carrierbuffer, otherbuffer, size);
+  Vocoder_Process(voicebuffer, carrierbuffer, otherbuffer, size); // wvocoder.c
 
   floot_to_int(outgoing,otherbuffer,size);
 };

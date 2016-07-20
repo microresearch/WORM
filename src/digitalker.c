@@ -719,5 +719,5 @@ WRITE8_MEMBER( digitalker_data_w )
      for (x=0;x<128;x++) xx=digitalk_get_sample();
           printf("%c",xx>>8);
    }
- }
-*/
+   }*/
+

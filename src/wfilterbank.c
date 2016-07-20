@@ -39,8 +39,8 @@
 const int32_t kLowFactor = 4;
 const int32_t kMidFactor = 3;
 const int32_t kDelayLineSize = 6144;
-const int32_t kMaxFilterBankBlockSize = 96;
-const int32_t kSampleMemorySize = 480;
+const int32_t kMaxFilterBankBlockSize = 32;
+//const int32_t kSampleMemorySize = 480;
 
 extern const u8 kNumBands;
 
@@ -90,7 +90,7 @@ float Pooled_ReadWrite(PooledDelayLine* delayline, float value) {
 
 UP:
 
-  inline void Process(const float* in, float* out, size_t input_size) {
+  inline void Process(const float* in, float* out, u8 input_size) {
     SRC_FIR<SRC_UP, ratio, filter_size> ir;
     FilterState<N> x;
     x.Load(x_);
@@ -102,7 +102,7 @@ UP:
     x.Save(x_);
   }
 
-  inline void Process(const float* in, float* out, size_t input_size) {
+  inline void Process(const float* in, float* out, u8 input_size) {
     // When downsampling, the number of input samples must be a multiple
     // of the downsampling ratio.
     if ((input_size % ratio) != 0) {
@@ -236,7 +236,7 @@ float* samples = &(Filterbankk->samples_[0]); // ???
   for (int32_t i = 0; i < kNumBands; ++i) {
     const float* coefficients = filter_bank_table[i];
 
-Band b = Filterbankk->band_[i]; ///????
+    Band* b = &Filterbankk->band_[i]; ///????
 
 /*
  b.decimation_factor = (int32_t)(coefficients[0]);
@@ -245,23 +245,23 @@ Band b = Filterbankk->band_[i]; ///????
       decimation_factor = b.decimation_factor;
       ++group;
     }
-    
-    b.group = group;
-    b.sample_rate = sample_rate / (float)(b.decimation_factor);
-    b.samples = samples;
-    samples += kMaxFilterBankBlockSize / b.decimation_factor;
+*/   
+//    b.group = group;
+    b->sample_rate = sample_rate;
+    b->samples = samples;
+    samples += kMaxFilterBankBlockSize;// / b.decimation_factor;
   
-    b.delay = (int32_t)(coefficients[1]);
-    b.delay *= b.decimation_factor;*/
-    b.post_gain = coefficients[0];
+    //    b.delay = (int32_t)(coefficients[1]);
+    //    b.delay *= b.decimation_factor;
+    b->post_gain = coefficients[0];
 
     //    max_delay = max(max_delay, b.delay);
     for (int32_t pass = 0; pass < 2; ++pass) {
-      SVF_Init(&b.svf[pass]);
-      set_f_fq(&b.svf[pass],coefficients[pass * 2 + 1],coefficients[pass * 2 + 2]);
+      SVF_Init(&b->svf[pass]);
+      set_f_fq(&b->svf[pass],coefficients[pass * 2 + 1],coefficients[pass * 2 + 2]);
     }
   }
-  Filterbankk->band_[kNumBands].group = Filterbankk->band_[kNumBands - 1].group + 1;
+  //  Filterbankk->band_[kNumBands]->group = Filterbankk->band_[kNumBands - 1]->group + 1;
 
   /*  max_delay = min(max_delay, (int32_t)(256));
   float* delay_ptr = &Filterbankk->delay_buffer_[0];
@@ -284,45 +284,46 @@ Band b = Filterbankk->band_[i]; ///????
 }
 
 
-void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, size_t size) {
+void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, u8 size) {
   //  mid_src_down_.Process(in, Filterbankk->tmp_[0], size);
   //  low_src_down_.Process(Filterbankk->tmp_[0], Filterbankk->tmp_[1], size / kMidFactor);
   
   //  const float* sources[3] = {Filterbankk->tmp_[1], Filterbankk->tmp_[0], in };
-  for (int32_t i = 0; i < kNumBands; ++i) {
-    Band b = Filterbankk->band_[i];
-    const size_t band_size = size;// / b.decimation_factor;
+  for (u8 i = 0; i < kNumBands; ++i) {
+    Band* b = &Filterbankk->band_[i];
+    const u8 band_size = size;// / b.decimation_factor;
     //    const float* input = sources[b.group];
     const float* input = in;
     
-    for (int32_t pass = 0; pass < 2; ++pass) {
-      const float* source = pass == 0 ? input : b.samples;
-      float* destination = b.samples;
+    for (u8 pass = 0; pass < 2; ++pass) {
+      const float* source = pass == 0 ? input : b->samples;
+      float* destination = b->samples;
       if (i == 0) {
-        SVF_Process(&b.svf[pass],source, destination, band_size, FILTER_MODE_LOW_PASS);
+        SVF_Process(&b->svf[pass],source, destination, band_size, FILTER_MODE_LOW_PASS);
       } else if (i == kNumBands - 1) {
-	SVF_Process(&b.svf[pass],source, destination, band_size, FILTER_MODE_HIGH_PASS);
+	SVF_Process(&b->svf[pass],source, destination, band_size, FILTER_MODE_HIGH_PASS);
       } else {
-	SVF_Process(&b.svf[pass],source, destination, band_size, FILTER_MODE_BAND_PASS_NORMALIZED);
+	SVF_Process(&b->svf[pass],source, destination, band_size, FILTER_MODE_BAND_PASS_NORMALIZED);
       }
     }
     // Apply post-gain
-    const float gain = b.post_gain;
-    float* output = b.samples;
-    for (size_t i = 0; i < band_size; ++i) {
+    const float gain = b->post_gain;
+    float* output = b->samples;
+    for (u8 i = 0; i < band_size; ++i) {
       output[i] *= gain;
     }
   }
 }
 
-void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, size_t size) {
+void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, u8 size) {
 
   for (u8 i = 0; i < kNumBands; ++i) {
-    Band b = Filterbankk->band_[i];
+    Band* b = &Filterbankk->band_[i];
     
     float* s = out;
     for (u8 j = 0; j < size; ++j) {
-      s[j] += b.samples[j];
+                  s[j] += b->samples[j];
+      //            s[j]=(float)(rand()%32768)/32768.0f;
     }
   }
 
@@ -337,9 +338,9 @@ void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, size_t size) {
   for (int32_t i = 0; i < kNumBands; ++i) {
     Band b = Filterbankk->band_[i];
     
-    size_t band_size = size / b.decimation_factor;
+    u8 band_size = size / b.decimation_factor;
     float* s = buffers[b.group];
-    for (size_t j = 0; j < band_size; ++j) {
+    for (u8 j = 0; j < band_size; ++j) {
       s[j] += Pooled_ReadWrite(&b.delay_line, b.samples[j]);
     }
     

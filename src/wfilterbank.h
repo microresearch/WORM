@@ -20,7 +20,7 @@ typedef struct Band {
 
 typedef struct Filterbank{  
   //  float tmp_[2][96];
-  float samples_[32];
+  float samples_[512]; // 32*16=512
   //  float delay_buffer_[6144];
   Band band_[17];
 } Filterbank;
@@ -28,5 +28,5 @@ typedef struct Filterbank{
 // functions
 
 void FilterBank_Init(Filterbank* Filterbankk, float sample_rate);
-void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, size_t size);
-void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, size_t size);
+void FilterBank_Synthesize(Filterbank *Filterbankk, float* out, u8 size);
+void FilterBank_Analyze(Filterbank *Filterbankk, const float* in, u8 size);
