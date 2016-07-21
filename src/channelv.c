@@ -44,7 +44,7 @@ static float square_source(u16 open, u16 closed){
     if (counter>=open) {oc=1;counter=0;}
   }
 
-  else if (oc==1){ // open
+  else if (oc==1){ // closed
     oot=-1.0;
     counter++;
     if (counter>=closed) {oc=0;counter=0;}
@@ -106,9 +106,11 @@ static float noise_source(){
 u16 nper;
 
 void dochannelvexcite(float* outgoing, u8 howmany){
-  u8 x;
-    for (x=0;x<howmany;x++){
-      outgoing[x]=square_source(40,adc_buffer[SELX]>>4);
+  u16 freq=adc_buffer[SELX]<<2; // needs some smoothing???
+  //  u16 freq=200;
+    for (u8 x=0;x<howmany;x++){
+      outgoing[x]=square_source(10,freq); // >>4 is 8 bits but still wobbles
+      //      outgoing[x]=square_source(10,200);
 }
 }
 

@@ -15,3 +15,4 @@ void RenderVowelFof(
   int16_t* buffer,
   size_t size, u16 param1,u16 param2, int16_t pitch_);
 
+int16_t fof_get_sample();

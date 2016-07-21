@@ -275,7 +275,6 @@ void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
 void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -405,6 +404,19 @@ void nvpSR(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   dosamplerate(incoming, outgoing, samplespeed, size);
 }
 
+void foffy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  for (u8 x=0;x<32;x++){
+    outgoing[x]=fof_get_sample();
+  }
+}
+
+void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
+  dochannelvexcite(carrierbuffer,size);
+  dovoicform(carrierbuffer, otherbuffer, size);
+  floot_to_int(outgoing,otherbuffer,size);
+}
+
 void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // MODEL GENERATOR: TODO is speed and interpolation options
   static u8 triggered=0;
@@ -431,7 +443,7 @@ void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 	 nvp_newsay(); // selector is in newsay
 	 triggered=1;
 	   }
-       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       else if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 
        xx++;
        samplepos+=samplespeed;
@@ -439,25 +451,24 @@ void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
-       samplel=(nvp_get_sample());//<<6)-32768; 
-
        if (samplepos>=samplespeed) {       
-	 outgoing[xx]=samplel;
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
 	 nvp_newsay(); // selector is in newsay
 	 triggered=1;
 	   }
-       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
+       else if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 samplel=(nvp_get_sample());//<<6)-32768; 
+	 outgoing[xx]=samplel;
 	 xx++;
 	 samplepos-=samplespeed;
        }
+       else samplel=(nvp_get_sample());//<<6)-32768; 
        samplepos+=1.0f;
      }
    }
 
-};
+}; // use this as NEW template
 
 void digitalker(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // MODEL GENERATOR: TODO is speed and interpolation options
@@ -620,9 +631,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=10; // checked=0,1,2,3,4,5,6,7,8
+  mode=13; // checked=0,1,2,3,4,5,6,7,8
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 
   generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

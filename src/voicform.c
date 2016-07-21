@@ -246,7 +246,7 @@ float doonezero(float sample){
 //  noiseEnv_.setRate( 0.001 );
 //  noiseEnv_.setTarget( 0.0 );
 
-unsigned char state_=0;
+unsigned char state_=1;
 float target_=0.0,rate_=0.001,value_=0.0;
 
 float doenvelope(){
@@ -279,6 +279,10 @@ float doenvelope(){
 
     void setTargets(filters_ *filter, float frequency, float radius, float gain)
     {
+      filter->startFrequency_ = filter->frequency_; // where we find these?
+  filter->startRadius_ = filter->radius_;
+  filter->startGain_ = filter->gain_;
+
   filter->dirty_ = 1;
   filter->targetFrequency_ = frequency;
   filter->targetRadius_ = radius;
@@ -295,12 +299,12 @@ float doenvelope(){
 
     void setResonance(filters_ *filter, float frequency, float radius )
 {
-  float radius_ = radius;
-  float frequency_ = frequency;
+  float temp, sint;
+  //  arm_sin_cos_f32(57.29578 * (TWO_PI * frequency / 32000), &sint, &temp); // not working DEGREES?
 
   filter->a_[2] = radius * radius;
   filter->a_[1] = -2.0 * radius * cosf( TWO_PI * frequency / 32000 ); // samplerate
-
+  //  filter->a_[1] = -2.0 * radius * temp; // samplerate
   // Use zeros at +- 1 and normalize the filter peak gain.
   filter->b_[0] = 0.5 - 0.5 * filter->a_[2];
   filter->b_[1] = 0.0;
@@ -324,11 +328,11 @@ float doenvelope(){
       frequency_ = filter->startFrequency_ + (filter->deltaFrequency_ * filter->sweepState_);
       gain_ = filter->startGain_ + (filter->deltaGain_ * filter->sweepState_);
     }
-    setResonance(filter, filter->frequency_, filter->radius_ ); //??? and get a b etc?
+    setResonance(filter, frequency_, radius_ ); //??? and get a b etc?
   }
 
-  float inputs_ = gain_ * input;
-  float lastFrame_ = filter->b_[0] * inputs_ + filter->b_[1] * filter->inputs_[1] + filter->b_[2] * filter->inputs_[2];
+  filter->inputs_[0] = gain_ * input;
+  float lastFrame_ = filter->b_[0] * filter->inputs_[0] + filter->b_[1] * filter->inputs_[1] + filter->b_[2] * filter->inputs_[2];
   lastFrame_ -= filter->a_[2] * filter->outputs_[2] + filter->a_[1] * filter->outputs_[1];
   filter->inputs_[2] = filter->inputs_[1];
   filter->inputs_[1] = filter->inputs_[0];
@@ -339,27 +343,54 @@ float doenvelope(){
     }
 
 filters_ filters[4];
+extern __IO uint16_t adc_buffer[10];
 
 
 void dovoicform(float* incoming, float *outgoing, unsigned char howmany){
 
+  /*  VoicForm.h :::
+
+      SingWave *voiced_;
+  Noise    noise_;
+  Envelope noiseEnv_;
+  FormSwep filters_[4];
+  OnePole  onepole_;
+  OneZero  onezero_;
+  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
+  temp += noiseEnv_.tick() * noise_.tick();
+  lastFrame_[0] = filters_[0].tick(temp);
+  lastFrame_[0] += filters_[1].tick(temp);
+  lastFrame_[0] += filters_[2].tick(temp);
+  lastFrame_[0] += filters_[3].tick(temp);*/
+
+
   // set other settings defined below - eg. gains on voiced and noiseEnv and change vibrato and onepole
   // test first all set first...
   // voiced is incoming or excitation
-
+  static u8 oldindex;
+  unsigned char index=adc_buffer[SELY]>>7; // which bphoneme? of 32
+  if (index!=oldindex){
+  setTargets(&filters[0],phonemeParameters[index][0][0],phonemeParameters[index][0][1], powf(10.0,phonemeParameters[index][0][2] / 20.0) );
+  setTargets(&filters[1],phonemeParameters[index][1][0],phonemeParameters[index][1][1], powf(10.0,phonemeParameters[index][1][2] / 20.0) );
+  setTargets(&filters[2],phonemeParameters[index][2][0],phonemeParameters[index][2][1], powf(10.0,phonemeParameters[index][2][2] / 20.0) );
+  setTargets(&filters[3],phonemeParameters[index][3][0],phonemeParameters[index][3][1], powf(10.0,phonemeParameters[index][3][2] / 20.0) );
+  }
+  oldindex=index;
 
   //loop over samples howmany
-  for (int i=0;i<howmany;i++){
-//  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
+  for (u8 i=0;i<howmany;i++){
+    //  temp = onepole_.tick( onezero_.tick( voiced_->tick() ) );
 //  temp += noiseEnv_.tick() * noise_.tick();
     float temp=doonepole(doonezero(incoming[i])); // in original (Singwave relying on FileLoop) is modulated etc
-    temp+=doenvelope()*(float)(rand()%32768-65536)/32678.0f; //noise env
+    //    temp+=doenvelope()*((float)(rand()%32768)/32678.0f); //noise env
+    //    float temp=incoming[i];
 // lastframe is sample
   float lastFrame_ = dofilter(&filters[0],temp);
   lastFrame_ += dofilter(&filters[1],temp);
   lastFrame_ += dofilter(&filters[2],temp);
   lastFrame_ += dofilter(&filters[3],temp);
-  outgoing[i]=lastFrame_;
+    outgoing[i]=lastFrame_;
+  //  outgoing[i]=temp;
 }
 }
 
@@ -367,16 +398,31 @@ void dovoicform(float* incoming, float *outgoing, unsigned char howmany){
 void initvoicform(){
 
 
-  for ( int i=0; i<4; i++ )  filters[i].sweepRate_=0.001;
-    
+  for ( int i=0; i<4; i++ )  {
+    filters[i].sweepRate_=0.001;
+     filters[i].frequency_ = 0.0;
+  filters[i].radius_ = 0.0;
+  filters[i].targetGain_ = 1.0;
+  filters[i].targetFrequency_ = 0.0;
+  filters[i].targetRadius_ = 0.0;
+  filters[i].deltaGain_ = 0.0;
+  filters[i].deltaFrequency_ = 0.0;
+  filters[i].deltaRadius_ = 0.0;
+  filters[i].sweepState_ = 0.0;
+  filters[i].sweepRate_ = 0.002;
+  }
+
   //  onezero_.setZero( -0.9 );
 
   // Normalize coefficients for unity gain. -0.9
-  b_0 = 1.0 / ((float) 1.0 - - 0.9); // 1.0 / 1.9
 
-  b_1 = -0.9 * 0.9; // 0.9 * 0.9
+  b_0 = 1.0 / ((float) 1.9); // 1.0 / 1.9
+
+  b_1 = 0.9 * b_0; // 0.9 * 0.9
 
   //  onepole_.setPole( 0.9 );
+
+
 
     b_ = 0.1f;
     a_ = -0.9f;
@@ -388,10 +434,10 @@ void initvoicform(){
 
     // initial phoneme and also what are other settings...
 
-    unsigned char index=0; // which phoneme?
+    unsigned char index=2; // which phoneme?
 
     setTargets(&filters[0],phonemeParameters[index][0][0],phonemeParameters[index][0][1], powf(10.0,phonemeParameters[index][0][2] / 20.0) );
     setTargets(&filters[1],phonemeParameters[index][1][0],phonemeParameters[index][1][1], powf(10.0,phonemeParameters[index][1][2] / 20.0) );
     setTargets(&filters[2],phonemeParameters[index][2][0],phonemeParameters[index][2][1], powf(10.0,phonemeParameters[index][2][2] / 20.0) );
-    setTargets(&filters[0],phonemeParameters[index][3][0],phonemeParameters[index][3][1], powf(10.0,phonemeParameters[index][3][2] / 20.0) );
+    setTargets(&filters[3],phonemeParameters[index][3][0],phonemeParameters[index][3][1], powf(10.0,phonemeParameters[index][3][2] / 20.0) );
 }

@@ -28,7 +28,7 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 #include <sys/unistd.h>
 
 typedef unsigned int u16;
-
+//#define float float32_t
 /// below is from data.py in no particular order output by print.py
 
 // 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
@@ -262,12 +262,14 @@ unsigned int generateSpeechWave(const speechPlayer_frame_t* frame, u16 sampleCou
 		unsigned int i,j;
 		for(i=0;i<sampleCount;i++) {		  
 
-		  if (i<interpol){
+		  		  if (i<interpol){
 		    float curFadeRatio=(float)i/(interpol);
 		    for(j=0;j<speechPlayer_frame_numParams;++j) {
-		      ((float*)tempframe)[j]=calculateValueAtFadePosition(((float*)oldframerr)[j],((float*)frame)[j],curFadeRatio); 
+		      ((float*)tempframe)[j]=calculateValueAtFadePosition(((float*)oldframerr)[j],((float*)&framer)[j],curFadeRatio); 
 			      }
- }
+			      }
+		  //		  memcpy(tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+
 
 		  // for pitch interpolates:
 
@@ -381,11 +383,12 @@ void main(void){
       unsigned char random=rand()%48; 
     
     random=sayhan[c];
-    if (c==0) *indexy[37]=0;
-    else *indexy[37]=1;
-    if (c==2) framerr->voicePitch=100;
-    if (c==3) framerr->voicePitch=90;
-    if (c==4) framerr->preFormantGain=0;
+    random=41;
+    //    if (c==0) *indexy[37]=0;
+    //    else *indexy[37]=1;
+    //    if (c==2) framerr->voicePitch=100;
+    //    if (c==3) framerr->voicePitch=90;
+    //    if (c==4) framerr->preFormantGain=0;
 
 
   for (i=0;i<39;i++){
@@ -402,12 +405,12 @@ void main(void){
       else *indexy[voicey->voices[i].index]*=voicey->voices[i].value;
  }
 
- if (c==0)   {
+ /* if (c==0)   {
    memcpy(oldframerr, framerr, sizeof(speechPlayer_frame_t)); 
    framerr->preFormantGain=0;
  }
  else     framerr->preFormantGain=1.0;
-
+ */
     c++;
 
 //still question of length of phoneme/number of frames/samples?

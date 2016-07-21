@@ -4,6 +4,8 @@
 
 // vosim//vowel/vowelfof
 
+extern __IO uint16_t adc_buffer[10];
+
 static uint32_t rng_state_;
 
 #define kNumOverlappingFof 3
@@ -990,6 +992,117 @@ int16_t InterpolateFormantParameter(
   c = c + ((d - c) * x_mix >> 16);
   return a + ((c - a) * y_mix >> 16);
 }
+
+int16_t fof_get_sample(){
+  uint8_t sync;
+  u16 param1=adc_buffer[SELX]<<3; 
+  u16 param2=adc_buffer[SELY]<<3; 
+  int16_t pitch_=adc_buffer[SELZ]<<1;
+  static u8 flagger=0;
+
+  if (flagger==1){
+    flagger=0;
+    return fof.prevous_sample;
+  }
+
+  phase_increment_ = ComputePhaseIncrement(pitch_);
+  uint16_t sine_gain = 0;
+  if (pitch_ >= (72 << 7)) {
+    uint32_t g = pitch_ - (72 << 7);
+    g *= 24;
+    if (g > 65535) {
+      g = 65535;
+    }
+    sine_gain = g;
+  }
+  
+  // This thing is running at SR / 2.
+    phase_increment_ <<= 1;
+  
+  int16_t previous_sample = fof.prevous_sample;
+  //  while (size) {
+    phase_ += phase_increment_;
+    int32_t sample = 0;
+    
+    if (sine_gain != 65535) {
+      for (size_t i = 0; i < kNumOverlappingFof; ++i) {
+        if (fof.envelope_phase[i] < 0x01000000) {
+          Fof* f = fof.fof[i];
+          int32_t s;
+          int32_t fof_set_sample = 0;
+          f[0].phase += f[0].phase_increment;
+          s = wav_sine[f[0].phase >> 24];
+          fof_set_sample += s * f[0].amplitude >> 16;
+        
+          f[1].phase += f[1].phase_increment;
+          s = wav_sine[f[1].phase >> 24];
+          fof_set_sample += s * f[1].amplitude >> 16;
+
+          f[2].phase += f[2].phase_increment;
+          s = wav_sine[f[2].phase >> 24];
+          fof_set_sample += s * f[2].amplitude >> 16;
+
+          f[3].phase += f[3].phase_increment;
+          s = wav_sine[f[3].phase >> 24];
+          fof_set_sample += s * f[3].amplitude >> 16;
+
+          f[4].phase += f[4].phase_increment;
+          s = wav_sine[f[4].phase >> 24];
+          fof_set_sample += s * f[4].amplitude >> 16;
+
+          sample += fof_set_sample * \
+              lut_fof_envelope[fof.envelope_phase[i] >> 14] >> 16;
+          fof.envelope_phase[i] += \
+              fof.envelope_phase_increment[i];
+        }
+      }
+      // Overlap a new set of grains.
+      if (phase_ < phase_increment_) {
+        size_t i = fof.lru_fof;
+        for (size_t j = 0; j < kNumFormants; ++j) {
+          fof.fof[i][j].phase_increment = ComputePhaseIncrement(
+              InterpolateFormantParameter(
+                  formant_f_data,
+                  param2,
+                  param1,
+                  j)) << 1;
+          fof.fof[i][j].amplitude = InterpolateFormantParameter(
+              formant_a_data,
+              param2,
+              param1,
+              j);
+          fof.fof[i][j].phase = 8192;
+        }
+        fof.envelope_phase[i] = 0;
+        fof.envelope_phase_increment[i] = 16384 + 8192;
+        // Make sure that the envelope duration does not exceed N periods.
+        // If this happens, this would cause a discontinuity as we only have
+        // N overlapping FOFs.
+        uint32_t period = phase_increment_ >> 8;
+        uint32_t limit = period / kNumOverlappingFof;
+        if (fof.envelope_phase_increment[i] <= limit) {
+          fof.envelope_phase_increment[i] = limit - 1;
+        }
+        fof.lru_fof = (i + 1) % kNumOverlappingFof;
+      }
+    }
+
+    int16_t sine = iInterpolate824(wav_sine, phase_) >> 1;
+    sample = Interpolate88(ws_moderate_overdrive, sample + 32768);
+    sample = Mix(sample, sine, sine_gain);
+
+    // here there are two samples:
+    flagger=1;
+    fof.prevous_sample = sample;
+    return ((previous_sample + sample) >> 1);
+    //    *buffer++ = (previous_sample + sample) >> 1;
+    //    *buffer++ = sample;
+    //    previous_sample = sample;
+    //    size -= 2;
+    //  }
+    //  fof.prevous_sample = previous_sample;
+}
+
 
 void RenderVowelFof(
   uint8_t sync,

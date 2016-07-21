@@ -1780,7 +1780,9 @@ not articulatory - Rodet 1984 singing/sines - CMJ_1984 in docs > see also FOF an
 
 and:
 
-Here is a FOF instrument based loosely on fof.c of Perry Cook and the article "Synthesis of the Singing Voice" by Bennett and Rodet in "Current Directions in Computer Music Research".
+Here is a FOF instrument based loosely on fof.c of Perry Cook and the
+article "Synthesis of the Singing Voice" by Bennett and Rodet in
+"Current Directions in Computer Music Research".
 
 (definstrument fofins (beg dur frq amp vib f0 a0 f1 a1 f2 a2 &optional ve ae)
   (let* ((start (floor (* beg *srate*)))
@@ -3023,7 +3025,7 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 
 ** 20/7 
 
-- latest wvocoder tests? WORKING - *TODO: formantshift to test and our own crossing, envelope stuff as param, noise and pitch/type of wave*
+- latest wvocoder tests? WORKING - *TODO: formantshift to testDONE and our own crossing, envelope stuff as param, noise and pitch/type of wave*
 
 - tested input from mdavoc.c but is kind of whiney always
 
@@ -3033,34 +3035,53 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 
 - singer.scm re-check if possible CHECKED but is TOO complex 
 
-////////
+- can we bend anything in LPCanalysis - LEAVE OUT as not
 
-- final work plan and notes below
+////////TODO:
 
-* important notes
+- final work plan and notes below: choose FOF/vowels, re-check trigger
+  concept, wormings and how that works, each mode
 
-- all generators write to audio_buffer which is re-used
+** 21/7
 
-- all vocabs don't fit in FLASH so we need to trim here and/or use
-  CCMData - how much we have? also some issues with CCMDATA? - was too
-  little flash in stm32_flash.ld specified so now fixed but some commented out to speed up load
+- trying to fix nvp.c glitchiness: NASALS=29,13,39 and give wierd resonance
+
+- decided on no filter in interpolation
+
+- working through FOF (braids) and voicform BELOW:
+
+*Q////* - voicform is glitchy on transitions as has to re-calc resonance in audio loop?
+
+- FOF -  braids - what is each FOF has different params/vowels? or multiple fof instances wormed?
+
+- voicform is old filter/formant model which we don't really want to use - 
+
+- VOSIM????
+
+* important notes-TODO
+
+- all generators write to audio_buffer which is re-used in some modes TODO
+
+- silence in each mode?
+
+- flash size: stm32_flash.ld specified so now fixedDONE but some commented out to speed up loadTODO
 
 define these vocabs and differentiate: vocabs based on phonemes (SAM
-and sp0256), and those on code (also sp0256, talkie and associated TMS series)
+and sp0256), and those on code (also sp0256, talkie and associated TMS series, nvp.c, ) + text_to_speech
 
-- interpolation/filters? example = tube.c, warps and samplerate.c/perry cook -> not sure if is worthwhile
+- interpolation/filters? example = tube.c, warps and samplerate.c/perry cookDONE -> not sure if is worthwhile
 
 - on HW resolve where we have the most change from external CV=FAR
   LEFT - zero should be far right which has NO addition of CV - so do
-  we need to invert, for SPEED not but for other params then maybe makes sense for PITCH say
+  we need to invert, for SPEED not but for other params then maybe makes sense for PITCH say PER CASE!
 
-- triggers, threshold and repeat policy
+- triggers, threshold and repeat policy???
 
 - wormings and grids of params HOW?
 
 - what notes/code is for RAVEN?
 
-- worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN*
+- worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN or NOT?*
 
 [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWaveMap(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWaveMap(]]
 
@@ -3095,6 +3116,7 @@ downsample=throw out samples (speed up)... lowpass first then decimate
 upsample=interpolate - do we need filter as this is on output?
  
 * any hardware notes
+
 
 latest smaller board is 003
 
@@ -3163,7 +3185,7 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 
 ** 2/RAW_KLATT parameters -> simpleklatt - also to wormings
 
-- port to generatorDONE -> to TEST! WORKING but needs tweaking, speed and triggers///alll!!
+- port to generatorDONE -> to TEST! WORKING but needs tweaking, speed and triggers///alll!! *TODO*
 
 - what changes/can change WITHIN the frame?
 
@@ -3406,7 +3428,7 @@ worming through
 
 ** 8.5 nvp.c BASICS working with primitive newsay...
 
-*TODO: try out changed voice code, also some phoneme glitch somewhere in interpolation of parameters perhaps and we need to order phonemes*
+*TODO: try out changed voice code+how to switch, also some phoneme glitch somewhere in interpolation??, silence and we need to order phonemes*
 
 PARAMS: which phoneme(there are 48), pitch, duration and interpol, which voice? stop frame params? NONE?
 
@@ -3447,6 +3469,7 @@ midi_sing... as param // so list all params:
 also multipliers and frame param over-rides for different voicesDONE
 
 ** 8.6 - nvp.c new mode as only move on to next phoneme when is triggered
+** 8.7 - nvp. vocab generated from python=new mode
 
 ** 8/9vocoder TODO q of excitation, pitch/unvoiced -> wvocoder
 
@@ -3462,11 +3485,9 @@ also multipliers and frame param over-rides for different voicesDONE
 
 - worm movements from paris python -> c-TESTING
 
-** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code
+** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code or HERE?
 
-** XX+ any morphing of lpcanalysis code?
-
-** XX+ various: klatt single phonemes, raw sp0256 coding, audio buffer, some low passes of above - so maybe 32 modes
+** XX+ various: klatt single phonemes with transitions, raw sp0256 coding, audio buffer re-workings, some low passes of above - so maybe 32 modes
 
 - use audio_buffer which should be filled by all modes
 

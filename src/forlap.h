@@ -17,7 +17,9 @@ typedef unsigned short uint16_t;
 #include "stdlib.h"
 #include "string.h"
 
-#define M_PI 3.14159
+//#define M_PI 3.14159
 
 #define TRUE 1
 #define FALSE 0
+
+#define float float32_t

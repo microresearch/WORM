@@ -4,6 +4,7 @@
 
 extern uint16_t adc_buffer[10];
 
+// modified for crow_coeffs and modify back -> what can be changed?
 
 /*
  *  LPCAnalysis.h
@@ -29,7 +30,7 @@ struct crowz crow_coeffz[2];
 typedef float LPCfloat;
 
 int windowsize;
-float * windowfunction; //can add later if start cross fading consecutive windows with hop
+//float * windowfunction; //can add later if start cross fading consecutive windows with hop
 float * inputty;
 int numpoles;
 //static int pos;
@@ -215,9 +216,9 @@ void zeroAll() {
   float mult,value;
 
     //rectangular window
-    for (i=0; i<windowsize;++i) {
+  /*    for (i=0; i<windowsize;++i) {
       windowfunction[i]= 1.0;
-    }
+      }*/
 
 
   //for (i=0; i<blocksize;++i) {
@@ -232,7 +233,7 @@ void zeroAll() {
 
 void LPCAnalysisinit(int _windowsize) {
   windowsize=_windowsize;
-  windowfunction=(float *)malloc(windowsize*sizeof(float));
+  //  windowfunction=(float *)malloc(windowsize*sizeof(float));
   inputty=(float *)malloc(windowsize*sizeof(float));
   coeff=(float *)malloc(windowsize*sizeof(float));
   last=(float *)malloc(windowsize*sizeof(float));

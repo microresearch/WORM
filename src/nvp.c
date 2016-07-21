@@ -45,7 +45,7 @@ const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 360 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 350 , 1800 , 2820 , 3300 , 3750 , 4900 , 200 , 90 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.366666666667 , 0.5 , 0.433333333333 , 0.433333333333 , 0.0 , 1.0 , 0 , 0.0 },
 { 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 210.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2880 , 3300 , 3750 , 4900 , 50 , 100 , 280 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
-{ 280 , 1700 , 2740 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1340 , 2470 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 280 , 1700 , 2740 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0.5 , 480 , 1340 , 2470 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 112.5 , 165.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1100 , 2150 , 3300 , 3750 , 4900 , 300 , 150 , 220 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 1.1 , 1.0 , 0 , 0.0 },
 { 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 330.0 , 90.0 , 187.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1600 , 2600 , 3300 , 3750 , 4900 , 300 , 120 , 250 , 250 , 200 , 1000 , 0 , 0.416666666667 , 0.416666666667 , 0.0 , 0.0 , 1.0 , 0.0 , 1.0 , 0 , 0.0 },
 { 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 90.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 220 , 1100 , 2080 , 3300 , 3750 , 4900 , 60 , 90 , 120 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.95 , 1.0 , 1.0 , 0.0 },
@@ -61,8 +61,8 @@ const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1290 , 2540 , 3300 , 3750 , 4900 , 200 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 , 0 , 0.0 },
 { 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 640 , 1230 , 2550 , 3300 , 3750 , 4900 , 80 , 70 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 250 , 200.0 , 55.0 , 75.0 , 105.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 400 , 1800 , 2570 , 3300 , 3750 , 4900 , 50 , 100 , 140 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
-{ 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
-{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.466666666667 , 0.4 , 0.4 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
+{ 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 225.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0.5 , 480 , 2000 , 2900 , 3300 , 3750 , 4900 , 40 , 300 , 300 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 75.0 , 225.0 , 250 , 200 , 1000 , 100 , 100 , 0.0 , 300 , 1840 , 2750 , 3300 , 3750 , 4900 , 200 , 100 , 300 , 250 , 200 , 1000 , 0.0 , 0.0 , 0.466 , 0.4 , 0.4 , 0.383, 0.0 , 1.0 , 0.0 , 0.0 },
 { 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 250 , 200.0 , 143.0 , 52.5 , 120.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 700 , 1220 , 2600 , 3300 , 3750 , 4900 , 130 , 70 , 160 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 110.0 , 45.0 , 82.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 500 , 1400 , 2300 , 3300 , 3750 , 4900 , 100 , 60 , 110 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 67.5 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 530 , 1680 , 2500 , 3300 , 3750 , 4900 , 60 , 90 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
@@ -73,7 +73,7 @@ const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 112.5 , 240.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 620 , 1660 , 2430 , 3300 , 3750 , 4900 , 70 , 150 , 320 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 250 , 200.0 , 49.5 , 150.0 , 300.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 2020 , 2960 , 3300 , 3750 , 4900 , 45 , 200 , 400 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 300 , 1990 , 2850 , 3300 , 3750 , 4900 , 250 , 200.0 , 275.0 , 120.0 , 247.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 300 , 1990 , 2650 , 3300 , 3750 , 4900 , 250 , 130 , 200 , 250 , 200 , 1000 , 0 , 0.8 , 0.633333333333 , 0.366666666667 , 0.383333333333 , 0.383333333333 , 0.0 , 1.0 , 0 , 0.0 },
-{ 472 , 1100 , 2130 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 150.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 1.0 , 480 , 1270 , 2130 , 3300 , 3750 , 4900 , 40 , 200 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
+{ 472 , 1100 , 2130 , 3300 , 3750 , 4900 , 450 , 216.0 , 44.0 , 150.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0.5 , 480 , 1270 , 2130 , 3300 , 3750 , 4900 , 40 , 200 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 250 , 200.0 , 88.0 , 52.5 , 52.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 540 , 1100 , 2300 , 3300 , 3750 , 4900 , 80 , 70 , 70 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 },
 { 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 250 , 200.0 , 66.0 , 60.0 , 127.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 270 , 1290 , 2540 , 3300 , 3750 , 4900 , 60 , 80 , 170 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.466666666667 , 0.633333333333 , 1.0 , 1.0 , 0.0 },
 { 320 , 1390 , 2530 , 3300 , 3750 , 4900 , 250 , 200.0 , 220.0 , 60.0 , 150.0 , 250 , 200 , 1000 , 100 , 100 , 0 , 320 , 1390 , 2530 , 3300 , 3750 , 5250 , 200 , 80 , 200 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.866666666667 , 0.0 , 1.0 , 0 , 0.0 },
@@ -82,7 +82,7 @@ const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 310 , 1050 , 1350 , 3300 , 3750 , 4900 , 250 , 200.0 , 77.0 , 75.0 , 112.5 , 250 , 200 , 1000 , 100 , 100 , 0 , 310 , 1050 , 2050 , 3300 , 3750 , 4900 , 70 , 100 , 150 , 250 , 200 , 1000 , 0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0 , 1.0 , 0.0 }
 };
 
-unsigned int sampleRRate=32000;
+unsigned int sampleRRate=16000;
 
 typedef unsigned char bool;
 
@@ -105,11 +105,11 @@ voice nullie= { 0,{ {0,1.01,0},{1,1.02,0},{2,3770,1},{3,4110,1},{4,5000,1},{7,0.
 voice adam= {3,{ {8,1.3,0},{34,1.3,0},{36,0.85,0}}};
 voice caleb= {2,{ {38,1,1}, {37,0,1}}};
 
-// add singing voice:
+// add singing voice but this is via setnvpparams
 /*
-frame.preFormantGain=2.0
-frame.voiceAmplitude=1.0
-frame.vibratoPitchOffset=0.125
+frame.preFormantGain=2.0 // 
+frame.voiceAmplitude=1.0 // 37
+frame.vibratoPitchOffset=0.125 
 frame.vibratoSpeed=5.5
 */
 
@@ -173,13 +173,13 @@ bool glottisOpen;
 float getNextVOICE(const speechPlayer_frame_t* frame) {
   float vibrato=(sinf(getNextFREQ(&lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1; // but we need diff instances of getNExtFREQ - DONE
   float voice=getNextFREQ(&lastCyclePosTwo,frame->voicePitch*vibrato);
-  float aspiration=getNextNOISE(&lastValueOne)*0.2; // again noise instancesDONE
+  float aspiration=getNextNOISE(&lastValueOne)*0.2f; // again noise instancesDONE
   float turbulence=aspiration*frame->voiceTurbulenceAmplitude;
   glottisOpen=voice>=frame->glottalOpenQuotient;
   if(glottisOpen) {
-    turbulence*=0.01;
+    turbulence*=0.01f;
   }
-  voice=(voice*2)-1;
+  voice=(voice*2)-1.0f;
   voice+=turbulence;
   voice*=frame->voiceAmplitude;
   aspiration*=frame->aspirationAmplitude;
@@ -204,8 +204,8 @@ reson rr1,rr2,rr3,rr4,rr5,rr6;
 void INITRES(reson *res, bool anti) {
 		res->anti=anti;
 		res->setOnce=false;
-		res->p1=0;
-		res->p2=0;
+		res->p1=0.0f;
+		res->p2=0.0f;
 };
 
 void setParamsRES(reson *res, float frequency, float bandwidth) {
@@ -214,7 +214,7 @@ void setParamsRES(reson *res, float frequency, float bandwidth) {
 			res->bandwidth=bandwidth;
 			float r=exp(-M_PI/sampleRRate*bandwidth);
 			res->c=-(r*r);
-			res->b=r*cosf(PITWO/sampleRRate*-frequency)*2.0;
+			res->b=r*cosf(PITWO/sampleRRate*-frequency)*2.0f;
 			res->a=1.0-res->b-res->c;
 			if(res->anti&&frequency!=0) {
 				res->a=1.0/res->a;
@@ -234,22 +234,21 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 };
 
 	float getNextCASC(const speechPlayer_frame_t* frame, float input) {
-		input/=2.0;
+		input/=2.0f;
 		float n0Output=resonateRES(&rN0,input,frame->cfN0,frame->cbN0);
 		float output;
 		output=calculateValueAtFadePosition(input,resonateRES(&rNP,n0Output,frame->cfNP,frame->cbNP),frame->caNP);
-		//		output=resonateRES(&rNP,n0Output,frame->cfNP,frame->cbNP);
-		    output=resonateRES(&r6,output,frame->cf6,frame->cb6);
-		    output=resonateRES(&r5,output,frame->cf5,frame->cb5);
-		    output=resonateRES(&r4,output,frame->cf4,frame->cb4);
-		    output=resonateRES(&r3,output,frame->cf3,frame->cb3);
-		    output=resonateRES(&r2,output,frame->cf2,frame->cb2);
-		    output=resonateRES(&r1,output,frame->cf1,frame->cb1);
+		output=resonateRES(&r6,output,frame->cf6,frame->cb6);
+		output=resonateRES(&r5,output,frame->cf5,frame->cb5);
+		output=resonateRES(&r4,output,frame->cf4,frame->cb4);
+		output=resonateRES(&r3,output,frame->cf3,frame->cb3);
+		output=resonateRES(&r2,output,frame->cf2,frame->cb2);
+		output=resonateRES(&r1,output,frame->cf1,frame->cb1);
 		return output;
 	};
 
 	float getNextPARALLEL(const speechPlayer_frame_t* frame, float input) {
-		input/=2.0;
+		input/=2.0f;
 		float output=0;
 		output+=(resonateRES(&rr1,input,frame->pf1,frame->pb1)-input)*frame->pa1;
 		output+=(resonateRES(&rr2,input,frame->pf2,frame->pb2)-input)*frame->pa2;
@@ -295,10 +294,10 @@ void init_nvp(void){
   
 
    // voice or TEST!
-    framer.preFormantGain=1.0;
+  framer.preFormantGain=0.6; // keep low-ish
     framer.vibratoPitchOffset=0.1;
     framer.vibratoSpeed=5.5;
-    framer.voicePitch=150;
+    //    framer.voicePitch=150;
 
     // copy into indexy
 
@@ -360,14 +359,15 @@ void nvp_newvoice(voice* voiced){
 void nvp_init(){
   init_nvp();
   this_frame_length=3840; this_interpol=1900;
+  nvp_newvoice(&caleb); // caleb, adam, nullie, benjie
 }
 
 void nvp_newsay(){
     // what do we need to re_init?
     // how do we choose next frame
-  //  static unsigned char random=0;
-  unsigned char random=(adc_buffer[SELX]>>6)%49;
-  if (random==0) *indexy[37]=0;
+  //    static unsigned char random=30;
+    unsigned char random=(adc_buffer[SELX]>>6)%49;
+    if (random==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
     // copy in frame
   //  random++;
@@ -377,7 +377,7 @@ void nvp_newsay(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-  this_frame_length=(4096-adc_buffer[SELY])<<3;
+  this_frame_length=(4096-adc_buffer[SELY])<<2;
   this_interpol=this_frame_length/2;
   // pitch
 
@@ -402,7 +402,7 @@ int16_t nvp_get_sample(){
 
     }
   }
-    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+  //      memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
 
   //  &tempframe=&framer;
   // for pitch interpolates: but we just use our pitch here
@@ -411,7 +411,7 @@ int16_t nvp_get_sample(){
 		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
 		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
 		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
-  tempframe.voicePitch=4096-adc_buffer[SELZ];
+  tempframe.voicePitch=2300-(adc_buffer[SELZ]>>1);
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);

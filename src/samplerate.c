@@ -10,7 +10,7 @@
 				   processing time is linearly related to this width */
 #define DELAY_SIZE 140
 
-#define USE_TABLE TRUE          /* this controls whether a linearly interpolated lookup
+#define USE_TABLE 1          /* this controls whether a linearly interpolated lookup
 				   table is used for sinc function calculation, or the
 				   sinc is calculated by floating point trig function calls.  */
 
@@ -149,3 +149,4 @@ last_time += 1;
 }
 //            factor  = initial_factor + (time_now * delta_factor);
 }
+

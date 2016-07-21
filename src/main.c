@@ -35,6 +35,9 @@
 #include "digitalker.h"
 #include "nvp.h"
 #include "samplerate.h"
+#include "braidworm.h"
+#include "voicform.h"
+
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -79,9 +82,6 @@ tms5200_init();
 tms5200_newsay();
  channelv_init();
  tube_init();
- // mdavocal_init(&mdavocall);
- // mdaVocoder_init(&mdavocod);
- // vocoderr=instantiateVocoder();
 // tube_newsay();
  BANDS_Init_();
  Vocoder_Init(32000.0f);
@@ -89,6 +89,10 @@ tms5200_newsay();
  digitalk_newsay(0);
  nvp_init();
  sample_rate_init();
+ initbraidworm(); // re_name
+ initvoicform();
+
+
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
