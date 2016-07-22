@@ -412,8 +412,9 @@ void foffy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
 void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
-  dochannelvexcite(carrierbuffer,size);
-  dovoicform(carrierbuffer, otherbuffer, size);
+  //  dochannelvexcite(carrierbuffer,size);
+    dovoicform(carrierbuffer, otherbuffer, size);
+  //  for (u8 xx=0;xx<32;xx++) otherbuffer[xx]=dosingwave();
   floot_to_int(outgoing,otherbuffer,size);
 }
 

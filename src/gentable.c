@@ -73,22 +73,30 @@ int n=256;                          /* Number of points */
     //    *s = (REAL *)emalloc(n * sizeof(REAL));
     //    *rev = (int *)emalloc(n * sizeof(int));
   
-printf("%d",nu);  
+ //printf("%d",nu);  
+
+ n=2048;
 
     for (i = 0; i < n; i++) {
         float arg = 2 * PI * i/n;
         float c = cos(arg);
         float s = sin(arg);
         int rev = bitrev(i, nu);
-//printf("%d, ",rev);
+	printf("%f, ",s);
     }
+
+    /*    StkFloat temp = 1.0 / TABLE_SIZE;
+    for ( unsigned long i=0; i<=TABLE_SIZE; i++ )
+      table_[i] = sin( TWO_PI * i * temp );
+      }*/
+
 
 for (i = 1; i < n/2; i++) {
 
 float arg = 2.0f * PI * (float)i / (float)n; // AS LOOKUP n/2=128
 float cc = cosf(arg);   /* These are different c,s than used in fft */
 float ss = sinf(arg);
-printf("%f, ",ss);
+//printf("%f, ",ss);
 }
 
 }

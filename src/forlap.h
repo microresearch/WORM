@@ -22,4 +22,4 @@ typedef unsigned short uint16_t;
 #define TRUE 1
 #define FALSE 0
 
-#define float float32_t
+//#define float float32_t

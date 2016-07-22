@@ -106,10 +106,10 @@ static float noise_source(){
 u16 nper;
 
 void dochannelvexcite(float* outgoing, u8 howmany){
-  u16 freq=adc_buffer[SELX]<<2; // needs some smoothing???
+  u16 freq=(adc_buffer[SELX]>>1)+40; // need as exponential
   //  u16 freq=200;
     for (u8 x=0;x<howmany;x++){
-      outgoing[x]=square_source(10,freq); // >>4 is 8 bits but still wobbles
+      outgoing[x]=square_source(10,freq);  // TODO: how we can vary width? - as ratio
       //      outgoing[x]=square_source(10,200);
 }
 }

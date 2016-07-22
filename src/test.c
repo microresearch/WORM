@@ -135,6 +135,32 @@ float testindex(){
   return indexy[0];
 }
 
+static unsigned char state_=1;
+static float target_=0.0,rate_=0.001;
+
+float doenvelope(){
+  static float value_=0.0;
+  if ( state_ ) {
+    if ( target_ > value_ ) {
+      value_ += rate_;
+      if ( value_ >= target_ ) {
+        value_ = target_;
+        state_ = 0;
+      }
+    }
+    else {
+      value_ -= rate_;
+      if ( value_ <= target_ ) {
+        value_ = target_;
+        state_ = 0;
+      }
+    }
+  }
+    return value_;
+   
+}
+
+
 void main(){
   //  indexy={1.0,1.0}; 
   float x=0.0f;
@@ -153,13 +179,14 @@ void main(){
 
   //  xx= (0x4000 << 3);
   //  printf("XXXX %d",xx);
-
+  target_=0.00000;
 
   for (y=0;y<39;y++){
+    x=doenvelope();
 
     //const float data[48][39]  __attribute__ ((section (".flash"))) ={
-    printf("DATA: %f, ",data[30][y]);
-  }
+    printf("DOENV: %f\n",x);
+    }
 
   float c = speedOfSound(32);
   int controlPeriod =    rint((c * 10 * 100.0) /(18.0 * 1.0));

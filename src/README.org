@@ -3044,9 +3044,11 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 
 ** 21/7
 
-- trying to fix nvp.c glitchiness: NASALS=29,13,39 and give wierd resonance
+- trying to fix nvp.c glitchiness: NASALS=29,13,39 give wierd resonance
 
 - decided on no filter in interpolation
+
+- *tube.c: where are we at: question of list of frames in earlier version and where this came from, how we manipulate?*
 
 - working through FOF (braids) and voicform BELOW:
 
@@ -3054,9 +3056,55 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 
 - FOF -  braids - what is each FOF has different params/vowels? or multiple fof instances wormed?
 
-- voicform is old filter/formant model which we don't really want to use - 
+- voicform is old filter/formant model which we don't really want to use... but sounds not so bad...
 
 - VOSIM????
+
+** 22/7
+
+voicform:
+
+- cleaning up voicform and seems to work TODO- singing excitation,
+  freq changes/multiplies, parallel or cascade option (both tested and
+  maybe keep as cascade)
+
+- for singwave we need:
+
+  FileLoop wave_;
+  Modulate modulator_;
+
+and for mod we need:   SineWave vibrato_;
+
+// have:
+  Noise noise_;
+  OnePole  filter_;
+
+
+// we have env:
+  Envelope envelope_;
+  Envelope pitchEnvelope_;
+
+
+///////
+
+- excitation in channelv - how to vary width of square...
+
+////
+
+- wormcode
+
+- tube.c collation of notes and test BELOW
+
+- vosim.fof etc
+
+- each mode now to clean/clear BELOW
+
+- clean up
+
+- tube.c and perry cook-singer - excitation question....
+
+[langton's ant, beeler worm, turmite]
+
 
 * important notes-TODO
 
@@ -3385,7 +3433,15 @@ WORKS on lap -> TODO ARM tests, extra roms, vocab and banks
 ///- leave out [ [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]] ]
 
-** 5/TUBE - 
+** 5/TUBE - tube.c
+
+*where are we at: question of list of frames in earlier version and where this came from, how we manipulate, all notes above?*
+
+*looks like frames are from: [[file:~/projects/ERD_modules/worm/docs/temped/diphones.degas]]*
+
+*also other frames in py-trm*
+
+*control rate interpolation of params by storing lastframe TODO!*
 
 TRM tube notes assembled...
 
@@ -3406,7 +3462,7 @@ issues: generator and interpolation, linked list and generation of params, chang
 
 start with just one list = input_frame and do without interpolation, then implement as lastblah
 
-*working but need to do generation of new parameters and interpolation, also check audio rate interpolation which we dont use*
+*working but need to do generation of new parameters and interpolation*
 
 ** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
 
