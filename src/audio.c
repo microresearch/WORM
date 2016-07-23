@@ -39,6 +39,7 @@ LINEIN/OUTL-filter
 #include "wvocoder.h"
 #include "digitalker.h"
 #include "nvp.h"
+#include "vosim.h"
 #include "samplerate.h"
 
 /*
@@ -84,10 +85,10 @@ int16_t lastval;//=genstruct->prevsample;
 
 //extern mdavocal mdavocall;
 
-/*
+
 Formlet *formy;
 Formant *formanty;
-*/
+
 
 #define THRESH 32000
 #define THRESHLOW 30000
@@ -410,12 +411,23 @@ void foffy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   }
 }
 
-void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // GENERAL TESTING!
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
-  //  dochannelvexcite(carrierbuffer,size);
-    dovoicform(carrierbuffer, otherbuffer, size);
+  //  dochannelvexcite(carrierbuffer,size); // voicform has own excitation
+  //    dovoicform(carrierbuffer, otherbuffer, size);
+  //Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* outbuffer){
+  //  Formlet_setfreq(formy,adc_buffer[SELY]);
+  //  Formlet_process(formy, 32, carrierbuffer,otherbuffer);
+  //    Formant_process(formanty, adc_buffer[SELX], adc_buffer[SELY], adc_buffer[SELZ], size, otherbuffer); // fundfreq: 440, formfreq: 1760, bwfreq>funfreq: 880 TODO- figure out where is best for these to lie/freq ranges
+  //  int_to_floot(incoming,voicebuffer,size);
+//  doVOSIM_SC(voicebuffer, otherbuffer,size); // needs float in for trigger
+
+  RenderVosim(incoming, outgoing, size, adc_buffer[SELX]<<3, adc_buffer[SELY]<<3, adc_buffer[SELZ]<<3); 
+
   //  for (u8 xx=0;xx<32;xx++) otherbuffer[xx]=dosingwave();
-  floot_to_int(outgoing,otherbuffer,size);
+
+
+  //  floot_to_int(outgoing,otherbuffer,size);
 }
 
 void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){

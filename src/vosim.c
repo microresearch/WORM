@@ -4,7 +4,7 @@
 #include <audio.h>
 #include "stm32f4xx.h"
 #include "arm_math.h"
-#include "klatt_phoneme.h"
+//#include "klatt_phoneme.h"
 
 
 extern int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); 
@@ -35,8 +35,8 @@ uint16_t mapPhaseInc(uint16_t input) {
 static float vosim;
 static 	float phase=0.f;
 static 	float prevtrig=0.f;
-static 	u16 nCycles=1;
-static 	u16 numberCurCycle=0;
+//static 	u16 nCycles=1;
+//static 	u16 numberCurCycle=0;
 static 	float prevsine;
 static 	float decay=0.5f;
 static 	float amp=1.0f;
@@ -161,73 +161,10 @@ void runflam(villager_generic* vill){ // single impulse sine*sine
 }
 */
 
-pair demandVOSIM_SC(u16 writepos,float freq,float nCycles,float nDecay){
-  u16 howmany=256; // fastest we need is 32*8=256
-  u16 out; 
-  float phaseinc = freq * 2.f * PII / 32000.0f;
-  u16 numberCycles = nCycles;
-  u16 number = numberCurCycle;
- 
-  for (u16 xx=0;xx<howmany;xx++){
 
-     writepos++;
-     if (writepos>=AUDIO_BUFSZ) writepos=0;
-  
-     float z = vosim;
-     float trigin = (float)((rand()%65536)-32768)/32768.0f; //TODO!
-
-     if(phase > 0.f && number <= numberCycles ){
-       float sine = sinf(phase);
-       vosim = (sine * sine) * amp;
-
-       if(prevsine >= 0.f && sine <= 0.f){
-	 number += 1;
-	 amp = amp * decay;
-       }
-
-       if(prevsine <= 0.f && sine >= 0.f){
-	 number += 1;
-	 amp = amp * decay;
-       }
-
-       prevsine = sine;
-       phase = phase + phaseinc;
-
-     }else if(trigin > 0.f && prevtrig <= 0.f){
-     //        else if(1){
-
-       numberCycles = nCycles;
-       decay = nDecay;
-       amp = 1.f;
-       number = 0;
-       phase=0;
-       float sine = sinf(phase);
-       vosim = (sine * sine) * amp;
-       prevsine = sine;
-       phase = phase + phaseinc;
-     }else if(number >= numberCycles){
-       phase = 0;
-       //       vosim = 0.f;
-     }
-     prevtrig = trigin;
-
-     // write the output
-     out = (float)z*32768.0f;
-
-     audio_buffer[writepos]=out; 
-
-  }
-  nCycles = numberCycles;
-  numberCurCycle = number;
-
-  pair r={256,writepos};
-  return r;
-}
+void doVOSIM_SC(float *in, float *out, u8 size){
 
 
-u16 runVOSIM_SC(u16 count){
-  u16 howmany=256; // fastest we need is 32*8=256
-  u16 out; 
   // so we need control of freq, cycles and decay... within bounds and from SELX, SELY..
   // trigger will come from INPUT!
   /*    float freq = 1500.0f; // reference figures as these work.
@@ -237,7 +174,7 @@ u16 runVOSIM_SC(u16 count){
   */
 
   float freq = (float)((adc_buffer[SELX])+100);//1500.0f; 
-  float nCycles = (float)((adc_buffer[SELY]>>4)+2);
+  float nCycles = (float)((adc_buffer[SELY]>>4)+2); // down to 8 bits = 256
   float nDecay = ((float)(adc_buffer[SELZ])/4096.0f); // TODO as SELZ!
   
   float phaseinc = freq * 2.f * PII / 32000.0f;
@@ -250,18 +187,20 @@ u16 runVOSIM_SC(u16 count){
   float phaseinc = freq * 2.f * PII / 32000.0f;
   */
   u16 numberCycles = nCycles;
-  u16 number = numberCurCycle;
+  static u16 number = 0; static float z=0.0f;
  
-  for (u16 xx=0;xx<howmany;xx++){
+  for (u8 xx=0;xx<size;xx++){
 
-     count++;
-     if (count>=AUDIO_BUFSZ) count=0;
+    //     count++;
+    //     if (count>=AUDIO_BUFSZ) count=0;
   
      float z = vosim;
-     float trigin = (float)((rand()%65536)-32768)/32768.0f; //TODO!
+     float trigin = in[xx];
 
      if(phase > 0.f && number <= numberCycles ){
-       float sine = sinf(phase);
+       //  float sine = sinf(phase);
+    float sine=arm_sin_f32(phase);
+
        vosim = (sine * sine) * amp;
 
        if(prevsine >= 0.f && sine <= 0.f){
@@ -281,29 +220,31 @@ u16 runVOSIM_SC(u16 count){
      else if(trigin > 0.f && prevtrig <= 0.f){
      //        else if(1){
 
-       numberCycles = nCycles;
+       //       numberCycles = nCycles;
        decay = nDecay;
        amp = 1.f;
        number = 0;
        phase=0;
-       float sine = sinf(phase);
+       //       float sine = sinf(phase);
+       float sine=arm_sin_f32(phase);
        vosim = (sine * sine) * amp;
        prevsine = sine;
        phase = phase + phaseinc;
-     }else if(number >= numberCycles){
+     }
+     else if(number >= numberCycles){
        phase = 0;
-       //       vosim = 0.f;
+       vosim = 0.f;
      }
      prevtrig = trigin;
 
      // write the output
-     out = (float)z*32768.0f;
+     out[xx] = (float)z*32768.0f;
 
-     audio_buffer[count]=out; 
+     //     audio_buffer[count]=out; 
 
   }
-  nCycles = numberCycles;
-  numberCurCycle = number;
-  return count;
+  //  nCycles = numberCycles;
+  //  numberCurCycle = number;
+  //  return vosim;
 }
 

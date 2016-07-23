@@ -37,6 +37,7 @@
 #include "samplerate.h"
 #include "braidworm.h"
 #include "voicform.h"
+#include "scformant.h"
 
 
 /* DMA buffers for I2S */
@@ -58,6 +59,8 @@ __IO uint16_t adc_buffer[10];
   } while (0)
 
 extern int errno;
+extern Formlet *formy;
+extern Formant *formanty;
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
@@ -90,8 +93,11 @@ tms5200_newsay();
  nvp_init();
  sample_rate_init();
  initbraidworm(); // re_name
- initvoicform();
-
+  initvoicform();
+  formy=malloc(sizeof(Formlet));
+  formanty=malloc(sizeof(Formant));
+  Formlet_init(formy);
+  Formant_init(formanty);
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);

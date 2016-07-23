@@ -353,15 +353,15 @@ M-x sclang-server-boot
 (C-x C-e eval)
 C-c C-s STOP!
 
-C-c C-c eval line or region
-
-C-c C-h searches for a help file 
-C-M-h switches to the Help browser 
-
 E copies the buffer, puts it in text mode and sclang-minor-mode, to
 enable you to edit the code parts to try out variations of the
 provided code in the help file. With C-M-h you can then return to the
 Help browser and browse further from the Help file.
+
+C-c C-c eval line or region
+
+C-c C-h searches for a help file 
+C-M-h switches to the Help browser 
 
 putting sc class files in /usr/local/share/SuperCollider/Extensions
 
@@ -795,7 +795,7 @@ also more formants at: https://github.com/supercollider-quarks/Vowel/blob/master
 
 need to remember how to convert db and bw!
 
-- formlet code = FOF - see also: http://composerprogrammer.com/teaching/supercollider/sctutorial/12.2%20Singing%20Voice%20Synthesis.html
+- formlet code = FOF.non - see also: http://composerprogrammer.com/teaching/supercollider/sctutorial/12.2%20Singing%20Voice%20Synthesis.html
 
 need to be able to change frequency
 
@@ -3065,25 +3065,12 @@ nvp.c notes before: TODO: length, interpolation, generators, voices, bending par
 voicform:
 
 - cleaning up voicform and seems to work TODO- singing excitation,
-  freq changes/multiplies, parallel or cascade option (both tested and
+  formant multipliers, parallel or cascade option (both tested and
   maybe keep as cascade)
 
-- for singwave we need:
+- working but needs sanity check + how to make it really sing - with vibrato?
 
-  FileLoop wave_;
-  Modulate modulator_;
-
-and for mod we need:   SineWave vibrato_;
-
-// have:
-  Noise noise_;
-  OnePole  filter_;
-
-
-// we have env:
-  Envelope envelope_;
-  Envelope pitchEnvelope_;
-
+- selx/sely and worming to add for all parameters
 
 ///////
 
@@ -3091,22 +3078,37 @@ and for mod we need:   SineWave vibrato_;
 
 ////
 
-- wormcode
+- wormcode prototype with constraining
 
 - tube.c collation of notes and test BELOW
 
-- vosim.fof etc
+- vosim, fof etc
 
 - each mode now to clean/clear BELOW
 
 - clean up
 
-- tube.c and perry cook-singer - excitation question....
-
 [langton's ant, beeler worm, turmite]
 
+** 23/7
+
+- scformlet fixed - is filter based
+
+*CHECK: blip.ar - fill out with same table in scformant.c, STARTED but not got so far*
+
+////
+
+scvosim, sc formantWORKING
+
+////
+
+TODO: rendervowel in braidworm and multiples of FOF in braidworm
 
 * important notes-TODO
+
+- abstract out constraint list->parameters and worm/selx/sely to this
+
+- input as excitation option for all source/filter models such as voicform, klatt, sam? which could use this?
 
 - all generators write to audio_buffer which is re-used in some modes TODO
 
@@ -3464,7 +3466,90 @@ start with just one list = input_frame and do without interpolation, then implem
 
 *working but need to do generation of new parameters and interpolation*
 
-** 6/choose vosim etc - 7- vosim/fof/vowgen/voicform-singwave other etc - ditch formant filters... which ones? not mutable...
+** 6.1 voicform
+
+- sanity check on all
+- parameterising X/Y?
+- different excitations/raw/tabled/input
+- maybe lose the straight white noise options or push these to one side of parameters
+- maybe different vowel and filter options -> eg. formlet which is also filter model!
+
+** 6.15 formlet from sc
+
+- fixed as decaytime should not be the same as attack. 
+
+- need to smooth filter as in SC!
+
+////
+
+SC notes:
+
+SynthDef(\voicesound6,{|voiced=1 freq= 440 amp=0.1 resonancescaling=5| 
+
+var formantfreqs, formantamps, formantbandwidths; //data for formants
+
+var periodicsource, aperiodicsource, source, output; 
+
+var vibrato; 
+
+var vibratonoise= LFNoise1.kr(10); 
+
+formantfreqs= [800,1150,2900,3900,4950]; //centre frequencies of formants
+
+formantamps= ([0 ,-6,-32,-20,-50]-6).dbamp; //peaks of formants
+
+formantbandwidths=[80,90,120,130,140];  //bandwidths
+
+//with vibrato up to quartertone, rate of vibrato around 6+-1 Hz
+
+//calculate vibrato in midi note (log frequency) domain; final .midicps takes it back to frequency
+
+//line generator delays onset of vibrato like a real singer
+
+vibrato= ((freq.cpsmidi)+(Line.kr(0.0,1.0,2.5)*SinOsc.kr(6+(1.0*vibratonoise),0,0.5))).midicps; 
+
+// low pass filter on Impulse to avoid high harmonics making it too bright
+
+periodicsource= LPF.ar(Impulse.ar(vibrato),5000);
+
+//pink noise drops off as frequency increases at -dB per octave,
+
+aperiodicsource= PinkNoise.ar(0.7);
+
+//take now as mixture of periodic and aperiodic
+
+source= (voiced*periodicsource)+((1.0-voiced)*aperiodicsource); 
+
+//the decaytime of the formlet is the filter's resonant decay time; a small bandwidth corresponds to a long decay (a 'ringing' filter). So I take the reciprocal of the formant bandwidth as an estimate of decaytime here, multiplied by a scaling factor for degree of resonance
+
+output= Mix(Formlet.ar(source, formantfreqs, 0.001, resonancescaling*formantbandwidths.reciprocal, formantamps))*10*amp; 
+
+Out.ar(0,output.dup)
+
+}).add
+
+)
+
+a= Synth(\voicesound6)
+
+//can now set to intermediate mixes of vowel and consonant 
+
+a.set(\voiced, 0.9)
+
+a.set(\resonancescaling, 20)
+
+a.set(\resonancescaling, 2)
+
+** 6.16 scformant working
+** 6.2 vosims
+
+-  which one? scvosim, braids + braids vowel
+
+sc vosim is vosim.c = strange parameters and ONE vosim TESTED
+braids RenderVosim is 2 vosims and can be increased but both have same delay characteristics TESTED
+braids rendervowel is 3 fofs and noise TEST
+
+** 6.3 fof = braids and try adding extra formants and shift these about
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
 

@@ -68,62 +68,53 @@ void BPFSC_process(BPFSC *unit, int inNumSamples, float* inbuffer, float* outbuf
   unit->m_y2 = y2;
 }
 
-void Formlet_init(Formlet* unit, float frequency){
+void Formlet_setfreq(Formlet *unit, float frequency){
   const float log001=logf(0.001);
   const float mRadiansPerSample=(2 * M_PI) /32000.0f;
-  unit->m_freq = frequency;
-  //  unit->m_bw = bandwidth;
-  unit->m_attackTime = 0.5f; // was both 0.001
-  unit->m_decayTime = 0.5f;
-  unit->m_b01 = 0.f;
-  unit->m_b02 = 0.f;
-  unit->m_y01 = 0.f;
-  unit->m_y02 = 0.f;
-  unit->m_b11 = 0.f;
-  unit->m_b12 = 0.f;
-  unit->m_y11 = 0.f;
-  unit->m_y12 = 0.f;
-
+  float b01,b02,b11,b12;
   float attackTime = unit->m_attackTime;
   float decayTime = unit->m_decayTime;
-
-  float y00;
-  float y10;
-  float y01 = unit->m_y01;
-  float y11 = unit->m_y11;
-  float y02 = unit->m_y02;
-  float y12 = unit->m_y12;
-  
-  float b01 = unit->m_b01;
-  float b11 = unit->m_b11;
-  float b02 = unit->m_b02;
-  float b12 = unit->m_b12;
-
-  float ffreq = unit->m_freq * mRadiansPerSample;
+  float ffreq = frequency * mRadiansPerSample;
   
   float R = decayTime == 0.f ? 0.f : expf(log001/(decayTime * 32000.0f));
   float twoR = 2.f * R;
   float R2 = R * R;
-  float cost = (twoR * cosf(ffreq)) / (1.f + R2);
+  float temp, sint;
+  //  arm_sin_cos_f32(57.29578 *ffreq, &sint, &temp); 
+    temp=arm_cos_f32(ffreq);
+  //  temp=cosf(ffreq);
+  //  float cost = (twoR * cosf(ffreq)) / (1.f + R2);
+  float cost = (twoR * temp) / (1.f + R2);
 
   b01 = twoR * cost;
   b02 = -R2;
   
-  R = attackTime == 0.f ? 0.f : expf(log001/(attackTime * 48000.0f));
+  R = attackTime == 0.f ? 0.f : expf(log001/(attackTime * 32000.0f));
   twoR = 2.f * R;
   R2 = R * R;
-  cost = (twoR * cosf(ffreq)) / (1.f + R2);
+  //cost = (twoR * cosf(ffreq)) / (1.f + R2);
+  cost = (twoR * temp) / (1.f + R2);
   b11 = twoR * cost;
   b12 = -R2;
+
+  // add slopes?
 
   unit->m_b01 = b01;
   unit->m_b02 = b02;
   unit->m_b11 = b11;
   unit->m_b12 = b12;
-  unit->m_y01 = y01;
-  unit->m_y02 = y02;
-  unit->m_y11 = y11;
-  unit->m_y12 = y12;
+}
+
+void Formlet_init(Formlet* unit){
+  //  unit->m_freq = frequency;
+  //  unit->m_bw = bandwidth;
+  unit->m_attackTime = 0.01f;
+  unit->m_decayTime = 0.5f;
+  unit->m_y01 = 0.f;
+  unit->m_y02 = 0.f;
+  unit->m_y11 = 0.f;
+  unit->m_y12 = 0.f;
+  Formlet_setfreq(unit,1000);
 }
 
 void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* outbuffer){
@@ -141,12 +132,12 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
   float b12 = unit->m_b12;
   float ain;
 
-  for (int i=0;i<inNumSamples;i++){
+  for (u8 i=0;i<inNumSamples;i++){
   ain = inbuffer[i];
   y00 = ain + b01 * y01 + b02 * y02;
   y10 = ain + b11 * y11 + b12 * y12;
-  outbuffer[i] = 0.25* ((y00 - y02) - (y10 - y12)); //was 0.25*
-
+    outbuffer[i] = 0.25* ((y00 - y02) - (y10 - y12)); //was 0.25*
+  //  outbuffer[i]=inbuffer[i];
   y02 = y01;
   y01 = y00;
   y12 = y11;

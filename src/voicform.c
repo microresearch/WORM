@@ -5,16 +5,33 @@
 
 #define TWO_PI  6.283185
 
-// tables
-
-// filters_[0].setTargets( Phonemes::formantFrequency(i, 0), Phonemes::formantRadius(i, 0), pow(10.0, Phonemes::formantGain(i, 0 ) / 20.0) );
-
-
 //formantfrequency=phonemeParameters[index][partial][0];
 // formantgain= phonemeParameters[index][partial][2];
 // formantradius= phonemeParameters[index][partial][1];
 // noisegain= phonemeGains[index][1];
 // voicegain= phonemeGains[index][0];
+
+// SELX, SELY, 
+
+/*
+ PARAMETER HEADER:
+
+   *excitation:*
+pitchenv
+voicegain=gainenv in set_frequency
+noisegain, noiserate, randomgain
+vibrato: vibratoGain0-1.0, vibratoRate???
+
+   *filters*
+formantfrequency -> multiplies
+//formantgain
+//formantradius (these from phoneme desc)
+
+notes from glossolalia:
+      voice.controlChange ( 4, offset + random() % 16 );= choose random phoneme of 16 so no noiseyyy?
+
+      voice.setUnVoiced ( random() % 5 == 0 ? 0.2 : 0.0); = noiseEnv_.setTarget(nGain)
+*/
 
 typedef struct 
 {
@@ -37,6 +54,8 @@ typedef struct
   float a_[3],b_[3];
 } filters_;
 
+// voice/unvoiced - unvoiced need reducing DONE
+
 const float phonemeGains[32][2]  __attribute__ ((section (".flash"))) =
   {{1.0, 0.0},    // eee
    {1.0, 0.0},    // ihh
@@ -58,12 +77,12 @@ const float phonemeGains[32][2]  __attribute__ ((section (".flash"))) =
    {1.0, 0.0},    // nng
    {1.0, 0.0},    // ngg
 
-   {0.0, 0.7},    // fff
-   {0.0, 0.7},    // sss
-   {0.0, 0.7},    // thh
-   {0.0, 0.7},    // shh
+   {0.0, 0.4},    // fff
+   {0.0, 0.4},    // sss
+   {0.0, 0.4},    // thh
+   {0.0, 0.4},    // shh
 
-   {0.0, 0.7},    // xxx
+   {0.0, 0.4},    // xxx
    {0.0, 0.1},    // hee
    {0.0, 0.1},    // hoo
    {0.0, 0.1},    // hah
@@ -73,10 +92,10 @@ const float phonemeGains[32][2]  __attribute__ ((section (".flash"))) =
    {1.0, 0.1},    // jjj
    {1.0, 0.1},    // ggg
 
-   {1.0, 1.0},    // vvv
-   {1.0, 1.0},    // zzz
-   {1.0, 1.0},    // thz
-   {1.0, 1.0}     // zhh
+   {1.0, 0.4},    // vvv
+   {1.0, 0.4},    // zzz
+   {1.0, 0.4},    // thz
+   {1.0, 0.4}     // zhh
   };
 
 const float phonemeParameters[32][4][3]  __attribute__ ((section (".flash"))) =
@@ -356,7 +375,7 @@ static float value_=0.0;
     void setResonance(filters_ *filter, float frequency, float radius )
 {
   float temp, sint;
-  arm_sin_cos_f32(57.29578 * (TWO_PI * frequency / 32000), &sint, &temp); // not working DEGREES?
+  arm_sin_cos_f32(57.29578 * (TWO_PI * frequency / 32000), &sint, &temp); 
 
   filter->a_[2] = radius * radius;
   //    filter->a_[1] = -2.0 * radius * cosf( TWO_PI * frequency / 32000.0f ); // samplerate
@@ -421,14 +440,17 @@ const float impuls20[]  __attribute__ ((section (".flash"))) ={0.99993896, 0.957
 //  vibrato_.setFrequency( 6.0 );
 
 
-float vibratoGain=0.04; 
+float vibratoGain=0.1; 
 float randomGain_=0.005;
 unsigned int noiseRate_;
 unsigned int noiseCounter_;
 
 #define TABLE_SIZEE 2048
 
+float vibratoRate=6.0;
+
 float dovibrato(){
+  vibratoRate=(float)adc_buffer[SELZ]/256.0;
   static float time_=0.0f;
   while ( time_ < 0.0 )
     time_ += TABLE_SIZEE;
@@ -441,7 +463,7 @@ float dovibrato(){
   tmp += ( alpha_ * ( sintables[ iIndex_ + 1 ] - tmp ) );
 
   // Increment time, which can be negative.
-  time_ += 6.0; // what is rate? - vibratoRATE?
+  time_ += vibratoRate; // what is rate? - vibratoRATE?
   return tmp;
 }
 
@@ -554,7 +576,7 @@ void setVoiced( StkFloat vGain ) { voiced_->setGainTarget(vGain); }; is in singw
   }
   oldindex=index;
 
-  float freqy=(float)adc_buffer[SELX]/8.0f; // say peak 500 hz = 4096/8
+  float freqy=(float)adc_buffer[SELX]/8; // say peak 500 hz = 4096/8
 
   set_frequency(freqy,1.0);
 

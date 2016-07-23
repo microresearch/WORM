@@ -1,7 +1,7 @@
 void initbraidworm(void);
 
 void RenderVosim(
-		 uint8_t sync, // sync was sync buffer now just signal
+		 int16_t* sync, // sync was sync buffer now just signal
 		 int16_t* buffer,
 		 size_t size, u16 param1,u16 param2, int16_t pitch_);
 
