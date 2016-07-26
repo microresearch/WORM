@@ -17,7 +17,8 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
 			syscalls.o audio.o vosim.o LPC/lpc.o effect.o biquad.o vocode.o\
 			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o tube.o channelv.o svf.o \
-			wvocoder.o wfilterbank.o digitalker.o nvp.o samplerate.o braidworm.o voicform.o scformant.o
+			wvocoder.o wfilterbank.o digitalker.o nvp.o samplerate.o braidworm.o voicform.o scformant.o \
+			ntube.o worming.o
 #			ownvocoder.o
 
 OBJECTS += \

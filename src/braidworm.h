@@ -6,7 +6,7 @@ void RenderVosim(
 		 size_t size, u16 param1,u16 param2, int16_t pitch_);
 
 void RenderVowel(
-    uint8_t sync,
+    uint16_t* sync,
     int16_t* buffer,
     size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_);
 

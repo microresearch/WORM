@@ -82,7 +82,7 @@ typedef struct
   float amp_gain0; /* G0 converted to linear gain              */
   int16_t num_samples; /* number of glottal samples */
   float sample_factor; /* multiplication factor for glottal samples */
-  int16_t *natural_samples; /* pointer to an array of glottal samples */
+  const int16_t *natural_samples; /* pointer to an array of glottal samples */
   uint16_t original_f0; /* original value of f0 not modified by flutter */
 
   resonator_t rnpp; /* internal storage for resonators */
@@ -116,5 +116,5 @@ void dosimpleklatt(void);
 void simpleklatt_init(void);
 void single_parwave(klatt_global_ptrr globals, int16_t* frame, u8 newframe, u16 samplenumber,u8 x, int16_t* outgoing);
 void dosimpleklattsamples(int16_t* outgoing, u8 size);
-
+void frame_init(klatt_global_ptrr globals, int16_t* frame);
 #endif

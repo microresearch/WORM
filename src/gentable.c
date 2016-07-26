@@ -48,14 +48,37 @@ int ipow(int a, int b)
 
 void main(void){
   int i;
-double sineIndexToPhase = twopi / kSineSize;
-for (i=0; i < kSineSize; ++i) {
-  double phase = i * sineIndexToPhase;
-  float d = sin(phase);
+const float kBadValue = 10000000.0f; // used in the secant table for values very close to 1/0
+//double sineIndexToPhase = twopi / kSineSize;
+  float gInvSine[kSineSize];
+  //for (i=0; i < kSineSize; ++i) {
+  //  double phase = i * sineIndexToPhase;
+  //  float d = sin(phase);
   //  gSine[i] = d;
   // printf("%f, ",d);
   // printf("%d, ",i);
- }
+	double sineIndexToPhase = twopi / kSineSize;
+	double pmf = (1L << 29) / twopi;
+	for (i=0; i <= kSineSize; ++i) {
+		double phase = i * sineIndexToPhase;
+		float d = sin(phase);
+		//		gSine[i] = d;
+		gInvSine[i] = 1. / d;
+		 }
+
+	gInvSine[0] = gInvSine[kSineSize/2] = gInvSine[kSineSize] = kBadValue;
+	int sz = kSineSize;
+	int sz2 = sz>>1;
+	for (i=1; i<=8; ++i) {
+		gInvSine[i] = gInvSine[sz-i] = kBadValue;
+		gInvSine[sz2-i] = gInvSine[sz2+i] = kBadValue;
+	}
+	for (i=0; i <= kSineSize; ++i) {
+  printf("%f, ",gInvSine[i]);
+	  
+	}
+
+
 
 int xx=ipow(2, ilog2(32000 / 15));
 // printf("log %d",xx);
@@ -82,7 +105,7 @@ int n=256;                          /* Number of points */
         float c = cos(arg);
         float s = sin(arg);
         int rev = bitrev(i, nu);
-	printf("%f, ",s);
+	//	printf("%f, ",s);
     }
 
     /*    StkFloat temp = 1.0 / TABLE_SIZE;

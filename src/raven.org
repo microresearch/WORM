@@ -301,7 +301,7 @@ VT: [[file:~/projects/ERD_modules/worm/docs/vtcalcs/src/vsyn_lib.c::void%20vowel
 
 klatt/klsyn - extractions from these and which exact code to use - nvp?
 
-in nvp there is no skew but is in klsyn:
+in nvp there is no skew but is in klsyn and also rsynth:
 
 klsyn: The variable 'sk', "skew to alternate periods", is the number
         of 25 microsecond increments to be added to and subtracted
@@ -312,7 +312,13 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 **** LPC inverse filter:
 
-This is accomplished by inverse-filtering the signal with the LPC, raising the parts of the spectrum which the LPC says are low, and lowering the parts which the LPC says are high. The end result, ideally, will be the source signal as if the person had no vocal tract at all.
+This is accomplished by inverse-filtering the signal with the LPC,
+raising the parts of the spectrum which the LPC says are low, and
+lowering the parts which the LPC says are high. The end result,
+ideally, will be the source signal as if the person had no vocal tract
+at all.
+
+from: http://savethevowels.org/praat/html/UsingPraatforLinguisticResearch.html
 
 http://doc.sccode.org/Classes/LPCAnalyzer.html
 
@@ -337,7 +343,7 @@ ApexSource01 {
 	}
 }
 
-
+- PORTED in latest worm code - but is glitchy
 
 *** TUBE/waveguide models and notes
 

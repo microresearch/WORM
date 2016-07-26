@@ -1,76 +1,82 @@
-// from SLUGens SC
+// from SLUGens.cpp SC
 
 //UGens by Nick Collins
 //SLUGens released under the GNU GPL as extensions for SuperCollider 3, by Nick Collins http://composerprogrammer.com/index.html
 
+// what is relation of number of tubes and samplerate?
 
-struct NTube : public Unit
-{
-	int numtubes;
-	float ** delayright, ** delayleft; //tubes
-	int position; //can be same for all lines!
-	int maxlength, modulo;
-	float delayconversion;
-	float f1in, f1out;	//averaging filters f1, f2 for frequency dependent losses; need a storage slot for previous values
-	float f2in, f2out;
+//average length of human male vocal tract 16.9cm (14.1cm adult female)  speed of sound 340.29 m/s. So delay of vocal tract is 
+//0.169/340.29 = 0.00049663522289812 seconds
+//0.0005*44100 is about 22 samples, so less than one sample per section of the throat if more than 22 measurements used! 
+//need higher sampling rate, or less sections in model
 
-	//convenience variables for copying particular input data
-	float * losses;
-	float * scattering;
-	float * delays;
+// or for 32000 we have 16 samples 
 
-	float * rightouts;
-	float * leftouts;
+// Length in seconds of each tube's paired delay line (i.e., each waveguide section, N of them). There must be at least 2 samples per length at the synthesis sampling rate. 
 
-};
+// but let's settle on say 4 tubes
+
+#include "audio.h"
+#include "ntube.h"
+#include <math.h>
+#include "arm_const_structs.h"
+
+
+// see NTube.schelp
+
+static float losses[5]={0.95, 1.0, 1.0, 1.0, 0.97};//N+1
+static float delays[4]={3, 3, 3, 3};//N - but delays in samples = length of tube which is????
+
+// so we have samplenumber/32000 gives us seconds. which * 340.29 m/s gives us length of section in metres
+// so for 4 we have 4/32000 =0.000125 =0.043 which is 4cm - 4 x 4 is human tract   ... for raven is 13cm = 4x3 say
+
+static float scatteringcoefficients[3]={0.01, 0.01, 0.01};//N-1 eg 0.01
+
+	//	float * losses= unit->losses;
+	//	float * scatteringcoefficients= unit->scattering;
+	//	float * delays= unit->delays;
+
 
 ////output= NTube.ar(input, loss, karray, delaylengtharray);
-void NTube_Ctor(NTube* unit) {
+void NTube_init(NTube* unit) {
 
-	int i,j;
+  u8 i; int j;
 
-	int numinputs = unit->mNumInputs;
-	int numtubes= (numinputs-1)/3;  //NOW 1+ (N+1) + N-1 + N 3N+1//WAS 1+1+N-1+N = 2N+1
+	//	const u8 numinputs = unit->mNumInputs;
+	const u8 numtubes=4; ///(numinputs-1)/3;  //NOW 1+ (N+1) + N-1 + N 3N+1//WAS 1+1+N-1+N = 2N+1
 	unit->numtubes= numtubes;
 
-	if(numtubes<2) {
-		printf("too few tubes! only %d \n", numtubes);
-		return;
-	}
-
-	unit->maxlength= 1024; //no frequencies below about 50 Hz for an individual section
+	unit->maxlength= 512; //no frequencies below about 50 Hz for an individual section - this can be reduced for 32k samplerate to say 512
 	unit->modulo= unit->maxlength-1;
 
-	unit->delayconversion= unit->mRate->mSampleRate; //multiplies delay time in seconds to make delay time in samples
+	//	unit->delayconversion= 32000.0f; //multiplies delay time in seconds to make delay time in samples
 
 	//printf("num tubes only %d and delayconversion %f \n", numtubes, unit->delayconversion);
 
-	unit->delayright= (float**)RTAlloc(unit->mWorld, numtubes * sizeof(float *));
-	unit->delayleft= (float**)RTAlloc(unit->mWorld, numtubes * sizeof(float *));
+	//	unit->delayright= (float**)malloc(numtubes * sizeof(float *));
+	//	unit->delayleft= (float**)malloc(numtubes * sizeof(float *));
 
 	for (i=0; i<numtubes; ++i) {
 
-		unit->delayright[i]= 	(float*)RTAlloc(unit->mWorld, unit->maxlength * sizeof(float));
-		unit->delayleft[i]= 	(float*)RTAlloc(unit->mWorld, unit->maxlength * sizeof(float));
+	  //	unit->delayright[i]= 	(float*)malloc(unit->maxlength * sizeof(float));
+	  //	unit->delayleft[i]= 	(float*)malloc(unit->maxlength * sizeof(float));
 
-
-		float * pointer1 = 	unit->delayright[i];
-		float * pointer2 = 	unit->delayleft[i];
+	  //		float * pointer1 = 	unit->delayright[i];
+	  //	float * pointer2 = 	unit->delayleft[i];
 
 
 		for (j=0; j<unit->maxlength; ++j) {
-			pointer1[j]= 0.0;
-			pointer2[j]= 0.0;
+			unit->delayright[i][j]= 0.0;
+			unit->delayleft[i][j]= 0.0;
 		}
-
 	}
 
-	unit->losses= (float*)RTAlloc(unit->mWorld, (numtubes+1) * sizeof(float));
-	unit->scattering= (float*)RTAlloc(unit->mWorld, (numtubes-1) * sizeof(float));
-	unit->delays= (float*)RTAlloc(unit->mWorld, numtubes * sizeof(float));
+	//	unit->losses= (float*)malloc((numtubes+1) * sizeof(float)); // fixed arrays
+	//	unit->scattering= (float*)malloc((numtubes-1) * sizeof(float));
+	//	unit->delays= (float*)malloc(numtubes * sizeof(float));
 
-	unit->rightouts= (float*)RTAlloc(unit->mWorld, numtubes * sizeof(float));
-	unit->leftouts= (float*)RTAlloc(unit->mWorld, numtubes * sizeof(float));
+	//	unit->rightouts= (float*)malloc(numtubes * sizeof(float));
+	//	unit->leftouts= (float*)malloc(numtubes * sizeof(float));
 
 
 	unit->position=0;
@@ -80,85 +86,53 @@ void NTube_Ctor(NTube* unit) {
 	unit->f2in=0.0;
 	unit->f2out=0.0;
 
-	SETCALC(NTube_next);
+	//	SETCALC(NTube_next);
 }
 
-void NTube_Dtor(NTube* unit) {
+void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
-	int i;
+	u8 i,j;
 
-	for (i=0; i<unit->numtubes; ++i) {
+	u8 numtubes= unit->numtubes;
 
-		RTFree(unit->mWorld, unit->delayright[i]);
-		RTFree(unit->mWorld, unit->delayleft[i]);
-
-	}
-
-	RTFree(unit->mWorld, unit->delayright);
-	RTFree(unit->mWorld, unit->delayleft);
-
-	RTFree(unit->mWorld, unit->scattering);
-	RTFree(unit->mWorld, unit->delays);
-	RTFree(unit->mWorld, unit->losses);
-
-
-	RTFree(unit->mWorld, unit->rightouts);
-	RTFree(unit->mWorld, unit->leftouts);
-
-}
-
-void NTube_next(NTube *unit, int inNumSamples) {
-
-	int i,j;
-
-	int numtubes= unit->numtubes;
-
-	//value to store
-	float * in= IN(0);
-	float * out= OUT(0);
-
-	float ** right= unit->delayright;
+	//	float ** right= unit->delayright;
 	int pos= unit->position;
-	float ** left= unit->delayleft;
+	//	float ** left= unit->delayleft;
 
 	//GET FREQUENCIES AND SCATTERING COEFFICIENTS
-	float * losses= unit->losses;
-	float * scatteringcoefficients= unit->scattering;
-	float * delays= unit->delays;
+	//	float * losses= unit->losses;
+	//	float * scatteringcoefficients= unit->scattering;
+	//	float * delays= unit->delays;
 
-	int arg=1;
+	//int arg=1;
 
 	//used to be single argument
 	//float loss= (float)ZIN0(1);
 
+	/*
 	for (i=0; i<(numtubes+1); ++i)	{
 
-		losses[i]= ZIN0(arg);
+	  losses[i]= ZIN0(arg); // TODO - losses array! = N+1 length
+	  ++arg;
+	  }*/
+
+	/*	for (i=0; i<(numtubes-1); ++i) {
+
+	  scatteringcoefficients[i]= ZIN0(arg); // TODO - scattering array = N-1 length check schelp
 		++arg;
-	}
+		}*/
 
-	//	for (i=0; i<(numtubes+1); ++i)	{
-	//
-	//		printf("loss %d is %f ",i, losses[i]);
-	//	}
-	//	printf("\n");
-
-	for (i=0; i<(numtubes-1); ++i) {
-
-		scatteringcoefficients[i]= ZIN0(arg);
-		++arg;
-	}
-
+	
 	int maxlength= unit->maxlength;
 	float maxlengthf= (float) maxlength;
 	float maxlengthfminus1= (float) (maxlength-1);
 	int modulo= unit->modulo;
+	/*
+		float delayconv= unit->delayconversion;
 
-	float delayconv= unit->delayconversion;
+		for (i=0; i<numtubes; ++i) {
 
-	for (i=0; i<numtubes; ++i) {
-
-		float delayinsec= ZIN0(arg);
+	  float delayinsec= ZIN0(arg); // TODO - delay array N
 		float delayinsamples= delayconv*delayinsec;
 
 		if(delayinsamples<0.0) delayinsamples=0.0;
@@ -168,7 +142,7 @@ void NTube_next(NTube *unit, int inNumSamples) {
 
 		//printf("delay %d is %f \n", i, delays[i]);
 		++arg;
-	}
+		}*/
 
 	//have to store filter state around loop; probably don't need to store output, but oh well
 	float f1in=unit->f1in;
@@ -192,30 +166,14 @@ void NTube_next(NTube *unit, int inNumSamples) {
 		for (j=0; j<numtubes; ++j) {
 
 			//calculate together since share position calculation, same delay length in each tube section
-			delayline= right[j];
-			delayline2= left[j];
+			delayline= unit->delayright[j];
+			delayline2= unit->delayleft[j];
 
-			past = fmod(pos+maxlengthf- delays[j], maxlengthf);
+			past = fmodf(pos+maxlengthf- delays[j], maxlengthf);
 
 			pos1= past; //round down
 			interp= past-pos1;
 			pos2= (pos1+1)&modulo;
-
-			//printf("check tube %d for sample %d where pos1 %d pos2 %d interp %f \n",j,i,pos1,pos2, interp);
-
-			//printf("%p %p \n",delayline, delayline2);
-
-			//int h;
-			//			for (h=0; h<maxlength; ++h) {
-			//				printf("%f ",delayline[h]);
-			//			}
-			//			printf("\n");
-			//			for (h=0; h<maxlength; ++h) {
-			//				printf("%f ",delayline2[h]);
-			//			}
-			//			printf("\n");
-			//
-			//linear interpolation to allow non sample frequencies
 			rightouts[j]= ((1.0-interp)*delayline[pos1]) + (interp*delayline[pos2]);
 			leftouts[j]= ((1.0-interp)*delayline2[pos1]) + (interp*delayline2[pos2]);
 
@@ -238,8 +196,10 @@ void NTube_next(NTube *unit, int inNumSamples) {
 		f2out= losses[numtubes]*(0.5*f2in+0.5*rightouts[numtubes-1]);
 		f2in= rightouts[numtubes-1];
 
-		delayline= right[0];
-		delayline2= left[numtubes-1];
+		///////
+
+		delayline= unit->delayright[0];
+		delayline2= unit->delayleft[numtubes-1];
 
 		delayline[pos]= in[i]+f1out;
 		delayline2[pos]= f2out;
@@ -253,8 +213,8 @@ void NTube_next(NTube *unit, int inNumSamples) {
 
 			float k = scatteringcoefficients[j];
 
-			delayline= right[j+1];
-			delayline2= left[j];
+			delayline= unit->delayright[j+1];
+			delayline2= unit->delayleft[j];
 
 
 			//version one: no internal friction, too long

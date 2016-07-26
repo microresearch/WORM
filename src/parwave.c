@@ -41,7 +41,7 @@ static float natural_source(klatt_global_ptrr);
 static void pitch_synch_par_reset(klatt_global_ptrr,int16_t*);
 static float gen_noise(klatt_global_ptrr);
 static float DBtoLIN(u16);
-static void frame_init(klatt_global_ptrr,int16_t*);
+//static void frame_init(klatt_global_ptrr,int16_t*);
 static float resonator(resonator_ptr, float);
 static float antiresonator(resonator_ptr, float);
 static void setabc(u16,u16,resonator_ptr,klatt_global_ptrr);
@@ -151,12 +151,13 @@ void single_parwave(klatt_global_ptrr globals, int16_t *frame, u8 newframe, u16 
     static float glotlast=0.0f;
     static float vlast=0.0f;
 
-  if (newframe==1){
-    frame_init(globals,frame);  /* get parameters for next frame of speech */
+    
+    if (newframe==1){
+      frame_init(globals,frame); 
     if (globals->f0_flutter != 0)
-      flutter(globals,frame);  /* add f0 flutter */
+      flutter(globals,frame);  
     globals->ns=0;
-  }
+    }
 
     /* Get low-passed random number for aspiration and frication noise */
 
@@ -376,43 +377,43 @@ void simple_parwave_init(klatt_global_ptrr globals)
 
 /** @brief Use parameters from the input frame to set up resonator coefficients.
   */
-static void frame_init(klatt_global_ptrr globals, int16_t* frame)
+void frame_init(klatt_global_ptrr globals, int16_t* frame)
 {
   globals->original_f0 = frame[0] / 10;
 
-  frame[1]  = frame[1] - 7;
+  /*  frame[1]  = frame[1] - 7;
   if (frame[1] < 0)   
   {
     frame[1] = 0;
-  }
+    }*/
 
   globals->amp_aspir = DBtoLIN(frame[18]) * 0.05;
   globals->amp_frica = DBtoLIN(frame[22]) * 0.25;
   globals->par_amp_voice = DBtoLIN(frame[38]);
   globals->amp_bypas = DBtoLIN(frame[37]) * 0.05;
-  frame[39] = frame[39] - 3;
+  /*  frame[39] = frame[39] - 3;
   if (frame[39] <= 0) 
   {
     frame[39] = 57;
-  }
+    }*/
   globals->amp_gain0 = DBtoLIN(frame[39]);
 
   /* Set coefficients of variable cascade resonators */
-
+  /*
   if (globals->nfcascade >= 8)    
   {
-    if (globals->samrate >= 16000) /* Inside Nyquist rate? */
+    if (globals->samrate >= 16000){
       setabc(7500,600,&(globals->r8c),globals);
     else
       globals->nfcascade = 6;
   }
   if (globals->nfcascade >= 7)    
   {
-    if (globals->samrate >= 16000) /* Inside Nyquist rate? */
+    //    if (globals->samrate >= 16000){
       setabc(6500,500,&(globals->r7c),globals);
-    else
-      globals->nfcascade = 6;
-  }
+    //    else
+    //      globals->nfcascade = 6;
+    //  }
   if (globals->nfcascade >= 6)    
   {
     setabc(frame[12],frame[13],&(globals->r6c),globals);
@@ -421,6 +422,7 @@ static void frame_init(klatt_global_ptrr globals, int16_t* frame)
   {
     setabc(frame[10],frame[11],&(globals->r5c),globals);
   }
+  (
   setabc(frame[8],frame[9],&(globals->r4c),globals);
   setabc(frame[6],frame[7],&(globals->r3c),globals);
   setabc(frame[4],frame[5],&(globals->r2c),globals);
@@ -687,7 +689,7 @@ static void setabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr globals)
 
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * cosf(2.0 * M_PI / globals->samrate * f) * 2.0;
+ rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * f) * 2.0;
  rp->a = 1.0 - rp->b - rp->c;
 }
 
@@ -703,7 +705,7 @@ static void setzeroabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr global
  /* First compute ordinary resonator coefficients */
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * cosf(2.0 * M_PI / globals->samrate * -f) * 2.0;
+ rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * -f) * 2.0;
  rp->a = 1.0 - rp->b - rp->c;
 
  if (f != 0) /* prevent a', b' and c' going to INF! */

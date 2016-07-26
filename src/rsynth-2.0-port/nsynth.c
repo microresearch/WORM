@@ -483,7 +483,8 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 		/* Set open phase of glottal period */
 		/* where  40 <= open phase <= 263 */
 
-		nopen = 4 * frame->Kopen;
+		nopen = 4 * frame->Kopen; // KLSYN->             nopen = T0*((float)Kopen/100) ;  /* Was   nopen = 4 * Kopen; */
+
 		if ((globals->glsource == IMPULSIVE) && (nopen > 263))
 		{
 			nopen = 263;

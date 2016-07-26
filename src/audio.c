@@ -41,6 +41,7 @@ LINEIN/OUTL-filter
 #include "nvp.h"
 #include "vosim.h"
 #include "samplerate.h"
+#include "ntube.h"
 
 /*
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
@@ -83,12 +84,11 @@ float samplepos=0;//=genstruct->samplepos;
 int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
 
-//extern mdavocal mdavocall;
-
-
+RLPF *RLPFer;
 Formlet *formy;
 Formant *formanty;
-
+Blip *blipper;
+NTube tuber;
 
 #define THRESH 32000
 #define THRESHLOW 30000
@@ -281,6 +281,8 @@ void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
   float remainder;
   // lpc_running
 
+  //  samplespeed=0.3;
+
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 
@@ -412,7 +414,7 @@ void foffy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 }
 
 void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // GENERAL TESTING!
-  float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
   //  dochannelvexcite(carrierbuffer,size); // voicform has own excitation
   //    dovoicform(carrierbuffer, otherbuffer, size);
   //Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* outbuffer){
@@ -422,12 +424,35 @@ void voicformy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   //  int_to_floot(incoming,voicebuffer,size);
 //  doVOSIM_SC(voicebuffer, otherbuffer,size); // needs float in for trigger
 
-  RenderVosim(incoming, outgoing, size, adc_buffer[SELX]<<3, adc_buffer[SELY]<<3, adc_buffer[SELZ]<<3); 
+//  RenderVosim(incoming, outgoing, size, adc_buffer[SELX]<<3, adc_buffer[SELY]<<3, adc_buffer[SELZ]<<1);// last is pITCH 
+//  RenderVowel(incoming, outgoing, size, adc_buffer[SELX]<<4, adc_buffer[SELY], adc_buffer[SELZ]>>2, adc_buffer[SPEED]<<3);// last is pITCH 
+  float freq=(float)(adc_buffer[SELX]>>4);
 
-  //  for (u8 xx=0;xx<32;xx++) otherbuffer[xx]=dosingwave();
+/*
 
+APEX:
+	*ar { arg fo=100, invQ=0.1, scale=1.4, mul=1;
+		var flow;
+		flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo);
+		^HPZ1.ar(flow, mul);   // +6 dB/octave caret ^ returns from the method
 
-  //  floot_to_int(outgoing,otherbuffer,size);
+ */
+
+// vocal/glottal source
+  Blip_do(blipper, carrierbuffer, size, freq,2,10000.0);
+  RLPF_do(RLPFer, carrierbuffer, voicebuffer, 100, 1.4f, 32, 0.001);
+  HPZ_do(carrierbuffer,otherbuffer,32);
+  //  Formlet_setfreq(formy,adc_buffer[SELY]>>2);
+  //  Formlet_process(formy, 32, otherbuffer,lastbuffer);
+  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+
+  /*  size_t vowel_index = param1 >> 12; // 4 bits?
+  uint16_t balance = param2 & 0x0fff; // 4096
+  uint16_t formant_shift = (200 + (param3)); // as 10 bits
+  */
+  //  for (u8 xx=0;xx<32;xx++) outgoing[xx]=incoming[xx];
+
+   floot_to_int(outgoing,lastbuffer,size);
 }
 
 void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -644,7 +669,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=13; // checked=0,1,2,3,4,5,6,7,8
+  mode=3; // checked=0,1,2,3,4,5,6,7,8
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
 

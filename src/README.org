@@ -8,13 +8,13 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 - manual with worm insignia at top
 
-- collate worm quotes - Blake, alchemical
+- collate worm quotes - Blake, alchemical - below
 
 - image K worm scans
 
 - recordings
 
-- test/build process-oven
+- try solderpaste build process-oven
 
 - re-think how all works with excitation and resonance/process - what
   models don't work in this way (more classical speech synth), and
@@ -254,8 +254,6 @@ void init_synth(void)
 
 *** other notes
 
-- in mage video - wheel for repeating phoneme loop selection to maybe implement // how this could work?
-
 - so klatt mode should just be that looping and maybe a stripped or
   reduced klatt without transitions as a seperate mode with more changes in pitch and so on
 
@@ -279,18 +277,6 @@ and nopen (=4x Kopen in the frame) cannot be > T0
 
 also case with Kskew to figure out... so need to implement these constraints
 
-*** collated from below TODO
-
-** own speech synth: worm.c
-
-- also what are differences between chips such as sp0256/votrax - (see patents)
-
-Following klatt:
-
-- excitation - voiced/unvoiced, changes in frequency of glottal pulses, white noise...
-- filtering - formants and zero poles (nasal), any tube modelling,
-  open and close of mouth - see latest book
-
 * worming
 
 - wormbounds x/y exerted on parameters + speed of worming z?
@@ -306,6 +292,8 @@ http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
 
 In contrast to other speech modules which make use of a single speech
 chip or algorithm ERD/WORM implements multiple speech codecs...
+
+*** diagram from image - follow other formats
 
 for cv and knobs - as above so below.... mirroring...
 
@@ -327,6 +315,16 @@ It plows the Earth in its own conceit, it overwhelms the Hills
 Beneath its winding labyrinths, till a stone of the brook
 Stops it in midst of its pride among its hills & rivers
 [William Blake. Jerusalem The Emanation of The Giant Albion]
+
+*** worm terms
+
+- compost as audio_buffer - also toggle writes to this on/off
+
+- inter-worming, cross-worming interbreedings of speech synthesis technologies
+
+*** specs:
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1 audio input, 1 audio output, 20mm deep. 
 
 * discard
 
@@ -393,39 +391,22 @@ i=0;
 x.play;
 
 
-*  Matlab/octave notes
+* Matlab/octave notes
 
 use wavwrite but always problems with:
 
 error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
 
 
-* TODO OLD!!!!
-
-- sort out memory allocationsDONE
-- basics of read/write head and speech integrationDONE
-- tests for each speech function/mode
-- vocoder 
-- integrate/test/new knob allocations when we have PCB DONE
-
-...///
-- port all speech algos 
-////
-- wormcode and klatt parameter limits
-- inverse filter/LPC??? for klatt
-- phoneme probabilities DONE
-- run_holmes see below
-
 * knobs
 
-#define MODE 3 // for pcb=2
-#define SELX 0 //3
-#define SPEED 2 //0
-#define SELZ/END 4 //4
-#define SELY 1 //1
+#define MODE 3 // for pcb=2 TOP
+#define SELX 0 //3 LEFT
+#define SPEED 2 //0 RIGHT
+#define SELZ/END 4 / LOWER RIGHT
+#define SELY 1 //1 // LOWER LEFT
 
-
-* modes so far imagined - say 32 total!
+* OLD modes so far imagined - say 32 total!
 
 0/klatt - single phoneme
 0.1/klatt - list of phonemes
@@ -700,8 +681,6 @@ speech can be greatly improved by using the glottal excitation
 waveform from a natural speaker, especially if it is the speaker on
 whose voice the synthesis is actually based. This may be obtained
 indirectly by inverse-filtering a vowel.
-
-HOW? - this function is in different klatt: [[file:~/Downloads/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::/*]]
 
 but we could use incoming samples as this? inverse filtering?
 
@@ -3094,17 +3073,98 @@ voicform:
 
 - scformlet fixed - is filter based
 
-*CHECK: blip.ar - fill out with same table in scformant.c, STARTED but not got so far*
-
-////
-
 scvosim, sc formantWORKING
 
-////
+TESTEDrendervowel in braidworm and multiples of FOF in braidworm
 
-TODO: rendervowel in braidworm and multiples of FOF in braidworm
+SC blip.ar as vocal source - see above with filtering - is crackling?????FIXED
+
+from apex: 	
+
+*ar { arg fo=100, invQ=0.1, scale=1.4, mul=1;
+var flow;
+flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo); // resonant low pass of BLIP signal: Band Limited ImPulse generator.
+^HPZ1.ar(flow, mul);   // +6 dB/octave // high pass?
+	}
+}
+
+** 25/7
+
+- blip.ar problem was wrong length of sine tableFIXED
+- why HP after LPin sc example -> 6db radiation effect after glottis but is boost rather than filter?WORKS NOW
+
+- to add all muls for SC operators, DONE for some and now example from apex in audio.c and scformant.c DONE
+
+- worm and param templating of constraints STARTED in worming.c below..
+
+** 26/7
+
+- TODO: inverse filtering of incoming using LPC
+
+
+*** ntube
+
+- port ntube.c some of which is in raven: see also [[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class::%20NTube][file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class:: NTube]]
+
+- ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
+
+*** 2d wavetable notes:
+
+how is implemented in braids: - *LEAVE FOR RAVEN or NOT?*
+
+[[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWaveMap(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWaveMap(]]
+
+wt_waves is: 256*129?=33024 bytes??? how is generated... is data from waves.bin dumped
+
+WMAP is a two-dimensional implementation of wavetable synthesis. 256
+waveforms have been laid out in a 16×16 grid, so that adjacent
+waveforms are similar sounding. The TIMBRE parameter scans the table
+in the X direction, and the COLOR parameter scans the table in the Y
+direction, with smooth interpolation across the two directions.
+
+but also wt_map array
+
+
+->>>>>compare these synthetic (not source/filter) approaches for abstraction out into worm.c:
+
+- rendervowel/braidworm = 3 formant generation by lookup into 2 very
+  small sine table followed by square, trigger makes consonant and then this runs for 160
+  frames (of how many samples?), before we go back into vowel... it is
+  a random consonant: 
+
+- compare to scformant - 3 phase lookup into large sine table
+
+- SAM/render.c: 2 phase lookup for voiced - how is unvoiced working - strange sampleTable in RenderTabs.h
+
+A =   A1 * sin ( f1 * t ) +
+      A2 * sin ( f2 * t ) +
+      A3 * rect( f3 * t ) // in SAM as in rendervowel
+
+
+*** WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types
+
+- try out ideas in worm_movement.c on lap
+
+- we have both speed and number of times we run the worm across parameters, in simpleklatt is slow or noisy
+
+- 2 sets of speeds, offsetx, offsety - some kind of scaling would also be nice...
+
+TODO: test on lap differentr worm movements...
+
+///
+
+but also how we add worms sans malloc ... and how we set number of worms... start with one worm and params for now
+
+SPEED= worm speed/and type?
+SELX/Y = offset
 
 * important notes-TODO
+
+- compost as audio_buffer - also toggle writes to this on/off
+
+- see paper notes for abstracting out of excitation and filter for
+  cross-worming, interbreeding of synthesis technologies - NOTE: if we
+  use input as excitation then we need to *live inverse filter using LPC: TODO how 0 lpcanalysis sc code to try*
 
 - abstract out constraint list->parameters and worm/selx/sely to this
 
@@ -3139,9 +3199,9 @@ wt_waves is: 256*129=33024 bytes??? how is generated...
 
 ///////
 
-- wormcode and how fits with modes// worm movements/// worming in wavetable
+- wormcode and how fits with modes// worm movements
 
-- move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github
+- move out rom data from github -> xxx_roms.h eg. 256_roms.h, and clean all github of copyright?
 
 - wrap up/ MANUAL/ production tests
 
@@ -3165,14 +3225,6 @@ downsample=throw out samples (speed up)... lowpass first then decimate
 
 upsample=interpolate - do we need filter as this is on output?
  
-* any hardware notes
-
-
-latest smaller board is 003
-
-panel is 002
-
-- all panel parts fit//TODO: test new pcbs...
 
 * MODES 13/6_+++ TODO:
 
@@ -3211,7 +3263,7 @@ Stop code   1111
 
 from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
-*wormed morphings of pitch and chirp tables*
++ morph data we have from ROMS, and also generation of new data on this model...
 
 ** 1/KLATT
 
@@ -3221,9 +3273,9 @@ from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 Todo speed etc... triggers
 
-we need maybe length of sentence, and x,y for phoneme and position (but also stress and dur for each phoneme?)
-
-- added basic pitch shift to test at the moment????
+we need maybe length of sentence, and x,y for phoneme and position
+(but also stress and dur for each phoneme?) - trigger will take care
+of length
 
 and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
 
@@ -3232,6 +3284,41 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 - fill in other KLATT params from top notes
 
 - pausing
+
+*** relevant Klatt notes from above:
+
+- why is casc/nfcascade set so low/as 2 in def_pars.c
+
+- from command line options: flutter, base F0, tilt db, msec per
+  frame, number of formants in cascade - but default is parallel, impulse glottal source bool // holmes =
+  -S <d> [1] Speed (1.0 is 'normal') -K <lg> [1] Parameter filter
+  'fraction'
+
+- for example we can vary base (as top in holmes) dynamically, also values like duration we can alter
+
+*- we can also vary Kskew HOW? - also in klsyn there are changes like:* 
+
+nopen = T0*((float)Kopen/100) TO TEST!
+
+also note varying samplerates in nsynth for:
+
+
+        if (nfcascade >= 8) {
+            resonc8();          /* Do not use unless samrat = 16000 */
+            casc_next_in = r8c_1;
+        }
+
+        if (nfcascade >= 7) {
+            resonc7();          /* Do not use unless samrat = 16000 */
+            casc_next_in = r7c_1;
+        }
+
+        if (nfcascade >= 6) {
+            resonc6();          /* Do not use unless long vocal tract or */
+            casc_next_in = r6c_1;       /* samrat increased */
+        }
+
+which is taken care of but see if we vary
 
 ** 2/RAW_KLATT parameters -> simpleklatt - also to wormings
 
@@ -3545,11 +3632,24 @@ a.set(\resonancescaling, 2)
 
 -  which one? scvosim, braids + braids vowel
 
-sc vosim is vosim.c = strange parameters and ONE vosim TESTED
-braids RenderVosim is 2 vosims and can be increased but both have same delay characteristics TESTED
-braids rendervowel is 3 fofs and noise TEST
+sc vosim is vosim.c = strange parameters and ONE vosim TESTED ok
+//braids RenderVosim is 2 vosims and can be increased but both have same delay characteristics TESTED-not so interesting or not working?
+braids rendervowel is 3 fofs and noise TEST-removed triggering and noise and seems okay - maybe tweak
 
 ** 6.3 fof = braids and try adding extra formants and shift these about
+** 6.6 *** ntube
+
+- ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
+
+see :
+
+http://sal-slhs.webhost.uits.arizona.edu/sites/default/files/STH1996.pdf p11 - for x-ray data
+
+this should also be in APEX stuff but they use different scheme to check out...
+
+karray= Array.fill(43,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); // straight from x ray data in that pdf but we can't afford all...
+delayarray= Array.fill(44,{0.00049663522289812/44.0}); 
+
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
 
@@ -3583,6 +3683,8 @@ how pitch and duration are more or less tied to phonemes or -> this is depending
   self._dll.speechPlayer_queueFrame(self._speechHandle,frame,int(minFrameDuration*(self.sampleRate/1000.0)),int(fadeDuration*(self.sampleRate/1000.0)),userIndex,purgeQueue)
 
 so for duration of 120 (sayHannah) we have 120*(32000/1000)=120*32= 3840 long vowels is 500*32=16000 samples (1/2 sec)
+
+nvp is very similar to SLP/simple_parwave...
 
 /////
 
@@ -3630,11 +3732,25 @@ also multipliers and frame param over-rides for different voicesDONE
 
 ** XX+ various: klatt single phonemes with transitions, raw sp0256 coding, audio buffer re-workings, some low passes of above - so maybe 32 modes
 
-- use audio_buffer which should be filled by all modes
+** XX+ use audio_buffer which should be filled by all modes
 
 ** XXXXXX what will become RAVEN code - more glottal and wavetable based, tube based, more simulation/modelling XXXXX
 
 * hardware2
+
+- all panel parts fit//TODO: test new pcbs...
+
+latest hardware checks out on: pots and CVS, TEST - incoming audioFINE
+
+specs: -12v 18mA, +12v 110mA
+
+///
+
+extent of value 0-63 on pots->
+
+SELX hits 64, test all-> all except SELZ and SPEED hit 64 - SELZ=62, SPEED=63 constrain to 63 TODO!
+
+////
 
 - check panel etc. PCB order DONE
 
@@ -3734,4 +3850,183 @@ The "012" designation indicates an SP0256 programmed with Mattel's Resident ROM 
 http://wiki.intellivision.us/index.php?title=Resrom.asm
 
 intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sailor: zip in speaky toooo
+
+* raven notes from here - see and summarise raven.org TODO
+
+NEW- crow LPC (how to reduce length of co-effs), crow glottis model, worm tubes, worm wavetable
+
+- RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3482666/
+
+- what is klanK again?
+
+sort out from here and from raven.org :
+
+1] what are models here: mass/glottis models // tube models // additional radiation and effects?
+
+2] what is the data (lengths, diameters, forces, equations)?
+
+3] what code can we work with and what did we get working so far? 
+
+4] how it can be modified towards worms and techniques here?
+
+*** what are the potential models for crow/raven vocalisation simulation:
+
+- LPC from recordings (collected) or HMM? - base excitation - wavetable excitation
+- formant model (excitation source and frequencies?)
+- tube/physical models listed: also useful for other work:
+
+1. Kelly-Lochbaum model: https://ccrma.stanford.edu/~jos/pasp/Singing_Kelly_Lochbaum_Vocal_Tract.html -> Perry Cook (refs/code? PRCThesis.pdf)
+2. tube resonance model - TRM - see tube.c
+3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis only
+4. waveguide model - transmission line? - perry cook/ lochbaum??? .. tube?
+5. APEX model = 2-D vocal tract articulation... same as SC ntube!
+
+*** first LPC breakdown (also in first section on modes above)
+
+// work on laptop LPC test
+
+- talkie is LPC: notes // LPC/lpc.c
+
+- lpcanalyzer | lpcanalysiss.c :
+
+Linear predictive coding analysis on any arbitrary input signal. The
+spectrum of the input signal is modeled, and used to filter the
+source. This works most successfully if the source is spectrally flat
+to begin with, ie, an impulse train ( Impulse UGen ) or white noise (
+WhiteNoise UGen ).
+
+[[file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::*%20LPCAnalysis.cpp][file:~/sc3-plugins/source/NCAnalysisUGens/LPCAnalysis.cpp::* LPCAnalysis.cpp]] is there  and LPCsynth: 
+
+[[file:~/sc3-plugins/source/JoshUGens/JoshUGens.cpp::void%20LPCSynth_next_k(LPCSynth%20*unit,%20int%20inNumSamples)][file:~/sc3-plugins/source/JoshUGens/JoshUGens.cpp::void LPCSynth_next_k(LPCSynth *unit, int inNumSamples)]]
+
+- LPC: [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
+
+- lpc dir from SLP book - TODO: run commandline tests from docs/SLP,
+  fix mallocs, work in or probably discard as would need lots more
+  work
+
+- https://github.com/freedv/codec2/blob/master/src/lpc.c
+
+- JAN/UNIANAL
+
+- docs/lpc-1.0
+
+
+
+***
+
+ - N.H.Fletcher Bird song- a quantitative model. J. Theo. Biology, 135:455–481, 1988 specifically raven model
+
+[- return to Hitchcock/trautonium notes]
+
+- find and condense crow voice pdf and others
+
+- run through all models noted above// code bases:
+
+impulse/excitation: klattsyn/klglot88(?), praat, lfgen to fix and
+parametrise, singer/SPASM based on what we have (which
+is?-singer.ins/scm), SC example above, LPC, vtsynth(can we re-code?)
+
+// abstract models: 1or2 mass model, LF, impulses/oscillators, wavetable, LPC inverse filtered, Rosenberg-C, R++/Veldhuis
+
+tract/tube/formant: klatt, praat, tube.c/TRM, ntube/sc, lots of formant/bandpass options, LPC, singer/SPASM see above
+
+// models: formant, tube/waveguide/mesh/transmission line, LPC
+
+- Synthesis of Voiced Sounds From a Two-Mass Model of the Vocal
+  Cords - Ishizaka and Flanagan
+
+- tested: snd ~/projects/ERD_modules/worm/docs/singer.scm but have to save as wav to play later
+
+- py-trm has wavetable: [[file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/%20Calculates%20the%20initial%20glottal%20pulse%20and%20stores%20it%20in%20the%20wavetable,%20for%20use%20in%20the%20oscillator.][file:~/projects/ERD_modules/worm/docs/py-trm/gnuspeech/Tube/wavetable.c::/ Calculates the initial glottal pulse and stores it in the wavetable, for use in the oscillator.]]
+
+but we have this in our tube.c also here! IGNORE
+
+- lfgen.c - generates something but waveform looks strange/noisy -
+  now as little endian and changed way saved now so is unsigned int but still most of wave is negative... WHY?
+
+tests on - flowgen_shimmer in shimmer in docs - Fant model WORKING -
+see raven/also vowel there is okay filter-wise!
+
+- raven wavetable (see braids:
+
+[[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWavetables(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWavetables(]] )
+
+excitation is raven wavetable with incoming (eg. voice) as LPC filter to apply
+
+(also inverse filtering to output residual could be done seperately)
+
+*** GLOTTAL (or excitation) MODELS:
+
+- Klatt / klsyn - which one and where to look? check nvp also
+- tube.c wavetable model
+- praat - mass model
+
+- lfgen in progress - still to fix?
+
+- flowgen_shimmer in voice_synth in docs - Fant model WORKING
+
+- http://homepage.univie.ac.at/christian.herbst//python/glottal_air_flow_models_8py_source.html = KLGLOTT88 and Rosenberg
+
+now as *glottalair.py* and writing wav file - seems working -> port to C (also Rosenberg tests in lfgen.c are working)
+
+- others: wavetable, formants a la SINGER/SPASM with two glottal
+  oscillators and vibrato -> where? check VOICFORM again, LPC
+
+- plague model (where we find clean code?)
+
+*** TRACHEA MODELS:
+
+- formants/artificial filtering (Klatt)
+- vocoder style fixed channels
+- tube.c - articulatory
+- praat - ??where??
+- ntube.c from SC TODO (see also twotube model there)
+
+- Perry Cook/SPASM - digital waveguide ladder filter
+
+[[file:~/projects/ERD_modules/worm/docs/singer.scm::%3B%3B%3B%20Perry%20Cook's%20physical%20model%20of%20the%20vocal%20tract%20as%20described%20in:][file:~/projects/ERD_modules/worm/docs/singer.scm::;;; Perry Cook's physical model of the vocal tract as described in:]] 
+
+- Coker - digital transmission line
+
+- elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
+
+
+*** other approaches completely
+
+- FOF/CHANT etc...
+- VOSIM
+- LPC
+- HMM?
+
+*** ///////
+
+find synsrc for LF and Rosenberg - can't find
+
+http://www.mattmontag.com/projects-page/academic/speech
+
+NOTES:
+
+    First, the glottal pulse is perturbed with noise to simulate air
+    turbulence ("breathiness") at the glottis. Importantly, this noise
+    is not applied to the entire glottal signal, but only in the
+    positive region where the glottis is open and air flow is present.
+    Second, the pitch and amplitude envelope for the speech was
+    manipulated to add a small random inflection and natural energy
+    decay at the release of vocal stress.  Third, two or three sharp,
+    quiet "startup pulses" are inserted at the beginning of the
+    glottal pulse train, which represents a subtle glottal fricative
+    at the onset of the vowel. This aids in the realism of the vocal
+    attack.  Fourth, the signal was low passed with a zero at nyquist
+    to reduce high frequency ringing.
+
+
+
+http://www.mattmontag.com/projects/speech/speechproduction.m
+
+*** /////
+
+how we can work with these models towards crow voice. pointers:
+
+papers: Fletcher(1988), Smyth and Smith (2002)
 

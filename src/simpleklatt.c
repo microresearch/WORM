@@ -1,10 +1,14 @@
 /* from docs/klatt simple klatt */
 
+// testing now with worming interface!
+
 #include "audio.h"
 #include "stdlib.h"
 #include "stdint.h"
 #include <stdio.h>
 #include "parwave.h"
+#include "worming.h"
+
 
 /* for default sampled glottal excitation waveform */
 
@@ -22,7 +26,11 @@
   flag raw_flag;
   flag raw_type;
 
-  static int16_t natural_samples[NUMBER_OF_SAMPLES]=
+//  static int16_t frame[40];
+extern __IO uint16_t adc_buffer[10];
+
+
+  static const int16_t natural_samples[NUMBER_OF_SAMPLES]=
   {
     -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
     605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,
@@ -33,20 +41,36 @@
     -1891,-1045,-1600,-1462,-1384,-1261,-949,-730
   };
 
-// these are constraints see klatt_params
+// these are constraints see klatt_params - TODO as a struct - in progress
 
-int16_t val[40]= {1000, 0, 497, 0, 739, 0, 2772, 0, 3364, 0, 4170, 0, 4000, 0, 0, 0, 200, 40, 0, 40, 0, 20, 0, 0, 53, 44, 79, 70, 52, 95, 44, 56, 34, 80, 0, 80, 0, 0, 27, 70};
+// ref here:
+
+
+
+int16_t val[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 int16_t mins[40]= {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
 int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
 int16_t dir[40]= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 
+static wormedparamset simpleklattset={40,
+    {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60},
+    {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0},
+{4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60}
+  };
+
+wormy* straightwormy;
+
 void simpleklatt_init(void){
+
+  straightwormy=addworm(10.0f,10.0f,100.0f, 100.0f, straightworm);
+
 
   globals = (klatt_global_ptrr)malloc(sizeof(klatt_global_tt));
   //  frame = (klatt_frame_ptrr)malloc(sizeof(klatt_frame_tt));
   //  framer framezz[40];
+  //  frame_init(globals,simpleklattset.val); 
 
   globals->synthesis_model = 1; // all_parallel
  globals->samrate = 32000;
@@ -60,10 +84,10 @@ void simpleklatt_init(void){
 
 unsigned char y;
 
- for (y=0;y<40;y++){
-   //     framezz[y].val=val[y];
+ for (y=0;y<40;y++){ // init frame
+   //        frame[y]=simpleklattset.val[y];
 	dir[y]=rand()%3;
-    }
+	}
 
 
 // or this could be 32 for audio.c frame
@@ -71,6 +95,16 @@ unsigned char y;
 globals->nspfr = (globals->samrate * nmspf_def) / 1000; // number of samples per frame = 320000 /1000 = 320
 simple_parwave_init(globals);
 }
+
+void generate_worm_frame(){
+  // there is both speed of the worm and how many times we run frame per worm
+  // eg.
+
+  for (int16_t x=0;x<adc_buffer[SPEED]>>4; x++){
+  wormvaluedint(&simpleklattset,straightwormy, 1.0, 0, 0, 10); // paramset, worm, speed/float, offsetx/float, offsety/float, wormparam
+  }
+}
+
 
 void generate_new_frame(int16_t* frame){
 unsigned char y;
@@ -101,23 +135,23 @@ unsigned char y;
       // copy it:
       frame[y]=val[y];
       
-  }
+      }
 
-}
+      }
 
 void dosimpleklattsamples(int16_t* outgoing, u8 size){
   u8 x=0;
   static short samplenumber=0;
   static u8 newframe=1;
-  static int16_t frame[40];
   while(x<size){
  
     // is it a new frame? - generate new frame
     if (newframe==1){
-      generate_new_frame(frame);
+            generate_worm_frame();
+      //                  generate_new_frame(frame);
     }
 
-    single_parwave(globals,frame,newframe,samplenumber,x,outgoing);
+    single_parwave(globals,simpleklattset.val,newframe,samplenumber,x,outgoing);
     //    outgoing[x]=rand()%32768;
 
     if (newframe==1) newframe=0;
@@ -131,6 +165,10 @@ void dosimpleklattsamples(int16_t* outgoing, u8 size){
   }
 }
 
+
+
+/////
+/*
 void dosimpleklatt(void){
 unsigned char y;
 // put frame together from wormings
@@ -164,3 +202,4 @@ unsigned char y;
 //simple_parwave(globals, frame);
 
 }
+*/

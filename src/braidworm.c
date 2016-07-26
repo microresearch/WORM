@@ -772,17 +772,17 @@ void RenderVosim( // 2 vosims
   while (size--) {
     phase_ += phase_increment_;
 
-    /*        if (*sync>0 && oldsync<0) { // primitive TODO
+            if (*sync>0 && oldsync<0) { // primitive TODO
           phase_ = 0;
         }
-	oldsync=*sync; sync++;*/
+	oldsync=*sync; sync++;
 
     int32_t sample = 16384 + 8192; // subtract below
     vow.formant_phase[0] += vow.formant_increment[0];
     sample += iInterpolate824(wav_sine, vow.formant_phase[0]) >> 1;
     
     vow.formant_phase[1] += vow.formant_increment[1];
-    sample += iInterpolate824(wav_sine, vow.formant_phase[1]) >> 2;
+    sample += iInterpolate824(wav_sine, vow.formant_phase[1]) >> 2; // was >> 2????
     
     sample = sample * (iInterpolate824(lut_bell, phase_) >> 1) >> 15;
     if (phase_ < phase_increment_) {
@@ -825,33 +825,35 @@ const PhonemeDefinition consonant_data[8] = {
 
 
 void RenderVowel(
-    uint8_t sync,
+    int16_t* sync,
     int16_t* buffer,
-    size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_) {
+    size_t size, u16 param1,u16 param2,u16 param3, int16_t pitch_) { // sync is unused?
   uint32_t phase_increment_;
 
   phase_increment_ = ComputePhaseIncrement(pitch_);
+    static int16_t oldsync;
 
 
   size_t vowel_index = param1 >> 12; // 4 bits?
   uint16_t balance = param2 & 0x0fff; // 4096
   uint16_t formant_shift = (200 + (param3)); // as 10 bits
-  if (strike_) {
-    strike_ = false;
-    vow.consonant_frames = 160;
-    uint16_t index = (GetSample() + 1) & 7;
-    for (size_t i = 0; i < 3; ++i) {
+  if (*sync>0 && oldsync<0) { // primitive TODO -> implement as new_say!
+    //  if (strike_) { /// strike is trigger!
+    //    strike_ = false;
+    /*    vow.consonant_frames = 160;
+    uint16_t index = (GetSample() + 1) & 7; // random index?
+        for (size_t i = 0; i < 3; ++i) {
       vow.formant_increment[i] = \
 	(uint32_t)(consonant_data[index].formant_frequency[i]) *	\
           0x1000 * formant_shift;
       vow.formant_amplitude[i] = consonant_data[index].formant_amplitude[i];
     }
-    vow.noise = index >= 6 ? 4095 : 0;
+    vow.noise = index >= 6 ? 4095 : 0;*/
   }
-  
+  /*	oldsync=*sync; sync++;
   if (vow.consonant_frames) {
     --vow.consonant_frames;
-  } else {
+    } else {*/
     for (size_t i = 0; i < 3; ++i) {
       vow.formant_increment[i] = 
           (vowels_data[vowel_index].formant_frequency[i] * (0x1000 - balance) + \
@@ -862,7 +864,7 @@ void RenderVowel(
            vowels_data[vowel_index + 1].formant_amplitude[i] * balance) >> 12;
     }
     vow.noise = 0;
-  }
+    //  }
   int32_t noise = vow.noise;
   
   while (size--) {
