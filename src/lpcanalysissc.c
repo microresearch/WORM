@@ -164,6 +164,42 @@ void calculatePoles() {
 }
 
 
+void calculatePredicted(float * target, int startpos, int num) {
+	int i,j;
+
+	int basepos,posnow;
+
+	for(i=0; i<num; ++i) {
+
+		basepos= startpos+i+windowsize-1; //-1 since coefficients for previous values starts here
+
+		float sum=0.0;
+
+		for(j=0; j<numpoles; ++j) {
+		  posnow= (basepos-j)%windowsize;
+
+			//where is pos used?
+		  sum += last[posnow]*coeff[j]; 
+
+		  //      for (n=0;n<=k-1;n++) lp[i] = lp[i] -c[j+n]*lp[i-n-1];  // predicted signal lp[i]= // lpcana.c
+
+		}
+		
+		//			G=1.0f; // TEST!
+
+		//		sum= sum*G; //scale factor G calculated by squaring energy E below
+		sum= (G*1.0)-sum; //scale factor G calculated by squaring energy E below
+
+		last[startpos+i]=sum;
+
+		//ZXP(out)=
+		//		target[i]+= sum*windowfunction[startpos+i];
+		target[i]= sum; // why += and zeroing necessary TODO!
+		//		target[i]=source[i];
+	}
+
+}
+
 void calculateOutput(float * source, float * target, int startpos, int num) {
 	int i,j;
 
@@ -179,7 +215,9 @@ void calculateOutput(float * source, float * target, int startpos, int num) {
 		  posnow= (basepos-j)%windowsize;
 
 			//where is pos used?
-		  sum += last[posnow]*coeff[j]; //was coeff i
+		  sum -= last[posnow]*coeff[j]; 
+
+
 		}
 		
 		//			G=1.0f; // TEST!
@@ -190,11 +228,13 @@ void calculateOutput(float * source, float * target, int startpos, int num) {
 
 		//ZXP(out)=
 		//		target[i]+= sum*windowfunction[startpos+i];
-		target[i]+= sum;
+		//		target[i]+= sum; // why += and zeroing necessary TODO!
+		target[i]= sum; // why += and zeroing necessary TODO!
 		//		target[i]=source[i];
 	}
 
 }
+
 
 
 void zeroAll() {
@@ -284,8 +324,8 @@ void LPCAnalyzer_init() {
 
 //blocksize MUST be less than or equal to windowsize
 
+// void update(float * newinput, float * newsource, float * output, int numSamples, int p) {
 void update(float * newinput, float * newsource, float * output, int numSamples, int p) {
-
   int i, pos=0;
   static u16 countex=0;
   u8 select=adc_buffer[SELY]>>11;
@@ -301,7 +341,7 @@ void update(float * newinput, float * newsource, float * output, int numSamples,
 			//	calculateOutput(newsource, output, windowsize, 0);
 	
 		//update
-		if (adc_buffer[SELX]<2000){ //TODO: freeze!
+				if (adc_buffer[SELX]<2000){ //TODO: freeze!
 		  numpoles=p;
 		//				calculatePoles(); // TEST!
 				
@@ -316,13 +356,13 @@ void update(float * newinput, float * newsource, float * output, int numSamples,
 			  countex++;
 			  if (countex==crow_coeffz[select].crowlength) countex=0;
 			}
-			G=crow_coeffz[select].crowy[countex];
+			G=crow_coeffz[select].crowy[countex]; 
 			//			G=1.0f;
 			  countex++;
 			  if (countex==crow_coeffz[select].crowlength) countex=0;
 			//			counter+=numpoles;
 				
-		}
+			}
 
 	//return output;
 }
@@ -341,10 +381,37 @@ void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int
 	for (int i=0; i<inNumSamples; ++i) {
 		out[i]= 0.0;
 	}
-
-	update(inoriginal, indriver, out, inNumSamples, p);
+	
+	update(inoriginal, indriver, out, inNumSamples, p); // THIS ONE FOR CROWS
 }
 
+void update_error(float * newinput, float * output, int numSamples, int p) {
 
+  int i, pos=0;
+  static u16 countex=0;
+  u8 select=adc_buffer[SELY]>>11;
 
+  for (i=0; i<numSamples;++i) {
+    inputty[pos++]= newinput[i];
+  }
 
+  calculatePredicted(output, 0, numSamples);
+
+  //	calculateOutput(newsource, output, windowsize, 0);
+	
+		//update
+  numpoles=p;
+  calculatePoles(); // TEST!
+
+  // we need to subtract predicted output from output and return this as ertr
+
+  for (i=0; i<numSamples;++i) {
+    //           output[i]= newinput[i]-output[i];
+  }
+}
+			  
+void LPCAnalyzer_errorsamples(float *inoriginal, float *out, int p, int inNumSamples) {
+  float iiin[32];
+  update_error(inoriginal, out, inNumSamples, p); // THIS ONE FOR CROWS
+  //  calculateOutput(iiin, out, 0, inNumSamples);
+}

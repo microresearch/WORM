@@ -611,6 +611,16 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 //};
 
 
+void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
+    int_to_floot(incoming,voicebuffer,size);
+    //void LPCAnalyzer_errorsamples(float *inoriginal, float *out, int p, int inNumSamples);
+        LPCAnalyzer_errorsamples(voicebuffer, lastbuffer, 10, size);
+    //    out from float to int
+   floot_to_int(outgoing,lastbuffer,size);
+};
+
+
 
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
@@ -669,9 +679,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=3; // checked=0,1,2,3,4,5,6,7,8
+  mode=14; // checked=0,1,2,3,4,5,6,7,8
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy};//,klatt,rawklatt,SAM,tubes,channelvocoder,vocoder};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy,lpc_error};
 
   generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

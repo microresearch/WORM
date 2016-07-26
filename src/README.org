@@ -3099,8 +3099,9 @@ flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo); // resonant lo
 
 ** 26/7
 
-- TODO: inverse filtering of incoming using LPC
+- TODO: inverse filtering of incoming using LPC: lpcanalysis just works on windows
 
+- close to fixing but need to clean up all and test with (maybe different) filter after inverse/LPC action
 
 *** ntube
 
@@ -3138,7 +3139,7 @@ but also wt_map array
 
 A =   A1 * sin ( f1 * t ) +
       A2 * sin ( f2 * t ) +
-      A3 * rect( f3 * t ) // in SAM as in rendervowel
+      A3 * rect( f3 * t ) // in SAM as in rendervowel1
 
 
 *** WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types

@@ -12,7 +12,7 @@
 
 // gcc -std=c99 lpcforlap.c -o sclpc -lm -lsndfile
 
-// 
+//  ./sclpc .././raven_rec/mysinglecrow.wav  
 
 
  */
@@ -165,10 +165,10 @@ void calculatePoles() {
 	for(i=0; i<numpoles; ++i) {
 		//coeff[numpoles-1-i]=a[i+1];
 		coeff[i]=a[i+1];
-		printf(",%f",a[i+1]);
+		//				printf(",%f",a[i+1]);
 
 	}
-	printf(", %f",G);
+	//			printf(", %f",G);
 
 	//MUST CHECK gain?
 
@@ -203,6 +203,40 @@ void calculateOutput(float * source, float * target, int startpos, int num) {
 	}
 
 }
+
+void printOutput(int startpos, int num) {
+	int i,j;
+
+	int basepos,posnow;
+
+	for(i=0; i<num; ++i) {
+
+		basepos= startpos+i+windowsize-1; //-1 since coefficients for previous values starts here
+
+		float sum=0.0;
+
+		for(j=0; j<numpoles; ++j) {
+			posnow= (basepos-j)%windowsize;
+
+			//where is pos used?
+			sum -= last[posnow]*coeff[j]; //was coeff i
+		  //      for (n=0;n<=k-1;n++) lp[i] = lp[i] -c[j+n]*lp[i-n-1];  // predicted from lpcana.c
+
+			printf("posnow %d lastpos[] %f coeff %f SUM:%f\n",posnow, last[posnow], coeff[j],sum);		
+		}
+
+		//		sum= G*source[i]-sum; //scale factor G calculated by squaring energy E below
+		//		sum= (G*1.0)-sum; //scale factor G calculated by squaring energy E below
+		sum=-sum;
+
+		last[startpos+i]=sum;
+		//ZXP(out)=
+		//		target[i]+= sum*windowfunction[startpos+i];
+
+	}
+
+}
+
 
 
 void zeroAll() {
@@ -393,6 +427,7 @@ void main(int argc, char * argv []){
 
 		numpoles=10;
 		calculatePoles();
+		printOutput(10,32);
 		count++;
 		} ;
 		printf("\n\n TOTAL: %d \n\n",count);
