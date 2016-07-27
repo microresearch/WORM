@@ -221,15 +221,16 @@ void printOutput(int startpos, int num) {
 			//where is pos used?
 			sum -= last[posnow]*coeff[j]; //was coeff i
 		  //      for (n=0;n<=k-1;n++) lp[i] = lp[i] -c[j+n]*lp[i-n-1];  // predicted from lpcana.c
-
-			printf("posnow %d lastpos[] %f coeff %f SUM:%f\n",posnow, last[posnow], coeff[j],sum);		
+			
+			printf("basepos %d startpos %d posnow %d lastpos[] %f coeff %f SUM:%f\n",basepos, startpos, posnow, last[posnow], coeff[j],sum);		
 		}
 
 		//		sum= G*source[i]-sum; //scale factor G calculated by squaring energy E below
 		//		sum= (G*1.0)-sum; //scale factor G calculated by squaring energy E below
-		sum=-sum;
+		sum=G*1-sum;
 
 		last[startpos+i]=sum;
+		printf("IIII %d\n",i); 
 		//ZXP(out)=
 		//		target[i]+= sum*windowfunction[startpos+i];
 
@@ -333,7 +334,7 @@ void update(float * newinput, float * newsource, float * output, int numSamples,
 
 			inputty[pos++]= newinput[i];
 		}
-
+b
 		//output up to here
 		calculateOutput(newsource, output, windowsize-left, left);
 
@@ -408,7 +409,7 @@ void main(int argc, char * argv []){
 		puts (sf_strerror (NULL)) ;
 		} ;
 
-	printf ("# Channels %d, Sample rate %d\n", sfinfo.channels, sfinfo.samplerate) ;
+	//	printf ("# Channels %d, Sample rate %d\n", sfinfo.channels, sfinfo.samplerate) ;
 
 	LPCAnalyzer_init();
 
@@ -427,10 +428,10 @@ void main(int argc, char * argv []){
 
 		numpoles=10;
 		calculatePoles();
-		printOutput(10,32);
+		printOutput(0,32);
 		count++;
 		} ;
-		printf("\n\n TOTAL: %d \n\n",count);
+	//		printf("\n\n TOTAL: %d \n\n",count);
 
 	sf_close (infile) ;
 

@@ -617,7 +617,7 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
     //void LPCAnalyzer_errorsamples(float *inoriginal, float *out, int p, int inNumSamples);
         LPCAnalyzer_errorsamples(voicebuffer, lastbuffer, 10, size);
     //    out from float to int
-   floot_to_int(outgoing,lastbuffer,size);
+	floot_to_int(outgoing,lastbuffer,size);
 };
 
 

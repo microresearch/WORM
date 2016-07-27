@@ -24,9 +24,9 @@ uint8_t byte_rev[256];
 
 extern uint16_t adc_buffer[10];
 
-#include "vocab_testroms.h"
+//#include "vocab_testroms.h"
 //#include "vocab_custom.h"
-#include "vocab_talko.h"
+//#include "vocab_talko.h"
 //#include "vocab_ti99.h"
 //#include "vocab_large_male.h"
 //#include "vocab_acorn.h"
@@ -160,7 +160,7 @@ void lpc_newsay(void)
 {
 	/* initialize ROM pointers */
   //ptrAddr = wordlist_parsec[(adc_buffer[SELX]>>6)%22]; /// 64 vocab! - but still maybe jitter and with -10v fix we hit 62 or 63 max
-  ptrAddr=wordlist_talko[(adc_buffer[SELX]>>6)]; /// 64 vocab! - but still maybe jitter and with -10v fix we hit 62 or 63 max
+  //  ptrAddr=wordlist_talko[(adc_buffer[SELX]>>6)]; /// 64 vocab! - but still maybe jitter and with -10v fix we hit 62 or 63 max
  // for banks 3 bits is 8 in this case 4 is 16 test here -> SELX gives us only 15 which is fine as we don;t hit 4096
   //  ptrAddr=sp_parNICE2;
       //	ptrAddr = sp_D003_0;

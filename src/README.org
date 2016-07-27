@@ -3097,11 +3097,14 @@ flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo); // resonant lo
 
 - worm and param templating of constraints STARTED in worming.c below..
 
-** 26/7
+** 26/7 // 27/7
 
-- TODO: inverse filtering of incoming using LPC: lpcanalysis just works on windows
+- TODO: inverse filtering of incoming using LPC: lpcanalysis just works on windows // renamed to lpcanalysis.c
 
 - close to fixing but need to clean up all and test with (maybe different) filter after inverse/LPC action
+
+- trying now to follow residual scheme from schelp for LPC but still
+  is too close to original which may be due to too small window size?
 
 *** ntube
 
