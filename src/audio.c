@@ -613,11 +613,23 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
 void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
-    int_to_floot(incoming,voicebuffer,size);
+//(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
+
+//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]);
+//  do_impulse(carrierbuffer, 32, 125);
+  int_to_floot(incoming,voicebuffer,size);
     //void LPCAnalyzer_errorsamples(float *inoriginal, float *out, int p, int inNumSamples);
-        LPCAnalyzer_errorsamples(voicebuffer, lastbuffer, 10, size);
+    //        LPCAnalyzer_errorsamples(voicebuffer, lastbuffer, 10, size);
+
+  //  LPCAnalyzer_cross(voicebuffer, carrierbuffer,otherbuffer, 10, size);
+  //  do_delay(voicebuffer, lastbuffer, 256, 32);
+  /*  for (u8 i=0;i<size;i++){
+        lastbuffer[i]=lastbuffer[i]-otherbuffer[i];
+	}
+  */	
     //    out from float to int
-	floot_to_int(outgoing,lastbuffer,size);
+  LPCAnalysis_update(voicebuffer,lastbuffer,size);
+  floot_to_int(outgoing,lastbuffer,size);
 };
 
 

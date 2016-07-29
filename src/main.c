@@ -39,6 +39,7 @@
 #include "voicform.h"
 #include "scformant.h"
 #include "ntube.h"
+#include "lpcansc.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];

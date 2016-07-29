@@ -106,7 +106,7 @@ void Formlet_setfreq(Formlet *unit, float frequency){
 }
 
 void Formlet_init(Formlet* unit){
-  //  unit->m_freq = frequency;
+ //  unit->m_freq = frequency;
   //  unit->m_bw = bandwidth;
   unit->m_attackTime = 0.01f;
   unit->m_decayTime = 0.5f;

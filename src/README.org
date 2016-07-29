@@ -3097,22 +3097,38 @@ flow = RLPF.ar(Blip.ar(fo, mul: 10000), scale*fo, invQ, invQ/fo); // resonant lo
 
 - worm and param templating of constraints STARTED in worming.c below..
 
-** 26/7 // 27/7
+** 26/7 // 27/7 // 28/7 // 29/7
 
 - TODO: inverse filtering of incoming using LPC: lpcanalysis just works on windows // renamed to lpcanalysis.c
 
 - close to fixing but need to clean up all and test with (maybe different) filter after inverse/LPC action
 
 - trying now to follow residual scheme from schelp for LPC but still
-  is too close to original which may be due to too small window size?
+  is too close to original which may be due to too small window size -
+  this is confirmed by tests in praat,,, so we need inc. window
+  size... for klatt window size is 8ms which is 256 samples 
 
-*** ntube
+for tms5220 frame period is 20 or 25 ms which is 800 samples for 25ms
+
+// REDO sc codeDONE,tested but need port do_pulse and delay buffer, 
+
+// look at praat code again, other lpc codes, lpc vocoder and morphs lpc coeffs but that doesn't work!
+
+FURTHER:
+
+[[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
+
+rt_lpc
+
+still no luck with inverse filtering
+
+* ntube
 
 - port ntube.c some of which is in raven: see also [[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class::%20NTube][file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class:: NTube]]
 
 - ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
 
-*** 2d wavetable notes:
+* 2d wavetable notes:
 
 how is implemented in braids: - *LEAVE FOR RAVEN or NOT?*
 
@@ -3145,7 +3161,7 @@ A =   A1 * sin ( f1 * t ) +
       A3 * rect( f3 * t ) // in SAM as in rendervowel1
 
 
-*** WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types
+* WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types
 
 - try out ideas in worm_movement.c on lap
 
@@ -3153,14 +3169,14 @@ A =   A1 * sin ( f1 * t ) +
 
 - 2 sets of speeds, offsetx, offsety - some kind of scaling would also be nice...
 
-TODO: test on lap differentr worm movements...
-
-///
-
 but also how we add worms sans malloc ... and how we set number of worms... start with one worm and params for now
 
 SPEED= worm speed/and type?
 SELX/Y = offset
+
+
+TODO: test on lap different worm movements...
+
 
 * important notes-TODO
 
@@ -3641,7 +3657,7 @@ sc vosim is vosim.c = strange parameters and ONE vosim TESTED ok
 braids rendervowel is 3 fofs and noise TEST-removed triggering and noise and seems okay - maybe tweak
 
 ** 6.3 fof = braids and try adding extra formants and shift these about
-** 6.6 *** ntube
+** 6.6 *** ntube // see also notes above!
 
 - ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
 
@@ -3854,6 +3870,18 @@ The "012" designation indicates an SP0256 programmed with Mattel's Resident ROM 
 http://wiki.intellivision.us/index.php?title=Resrom.asm
 
 intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sailor: zip in speaky toooo
+
+* using praat.
+
+http://savethevowels.org/praat/html/UsingPraatforLinguisticResearch.html
+
+** for LPC/inverse filtering
+
+- import sound file -raw as in open or wav as in lonmg sound file and then extract sound
+
+- highlight sound and select formants and lpc
+
+- for LPC inverse filter select sound and lpc and then can select inverse filter
 
 * raven notes from here - see and summarise raven.org TODO
 
