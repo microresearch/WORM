@@ -615,20 +615,10 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
 //(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
 
-//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]);
-//  do_impulse(carrierbuffer, 32, 125);
+  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
   int_to_floot(incoming,voicebuffer,size);
-    //void LPCAnalyzer_errorsamples(float *inoriginal, float *out, int p, int inNumSamples);
-    //        LPCAnalyzer_errorsamples(voicebuffer, lastbuffer, 10, size);
-
-  //  LPCAnalyzer_cross(voicebuffer, carrierbuffer,otherbuffer, 10, size);
-  //  do_delay(voicebuffer, lastbuffer, 256, 32);
-  /*  for (u8 i=0;i<size;i++){
-        lastbuffer[i]=lastbuffer[i]-otherbuffer[i];
-	}
-  */	
-    //    out from float to int
-  LPCAnalysis_update(voicebuffer,lastbuffer,size);
+  //  LPC_cross(voicebuffer,carrierbuffer, lastbuffer,size);
+    LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
   floot_to_int(outgoing,lastbuffer,size);
 };
 

@@ -3120,7 +3120,12 @@ FURTHER:
 
 rt_lpc
 
-still no luck with inverse filtering
+still no luck with inverse filtering 
+
+** 30/7
+
+- lpc4.c inverse filtering and cross-over done - CAN also do pitch
+  tracking and shifting/lagging based on fitlpc.c and associated code
 
 * ntube
 
