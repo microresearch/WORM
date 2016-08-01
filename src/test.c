@@ -270,6 +270,9 @@ void main(){
   int16_t sample_buffer[32];
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
 
+  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
+
+
   y=128;
 
   //  xx= (0x4000 << 3);

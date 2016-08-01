@@ -8,7 +8,7 @@
 #define twopi 6.28318530717952646f
 #define PI      3.14159265358979324
 
-const int kSineSize = 8192;
+const int kSineSize = 511; // was 8192 for inv sine business
 
 unsigned bitrev(unsigned int k, int nu)
 /* register unsigned k; * Number to reverse the bits of */
@@ -51,6 +51,7 @@ void main(void){
 const float kBadValue = 10000000.0f; // used in the secant table for values very close to 1/0
 //double sineIndexToPhase = twopi / kSineSize;
   float gInvSine[kSineSize];
+  float gSine[kSineSize];
   //for (i=0; i < kSineSize; ++i) {
   //  double phase = i * sineIndexToPhase;
   //  float d = sin(phase);
@@ -62,8 +63,8 @@ const float kBadValue = 10000000.0f; // used in the secant table for values very
 	for (i=0; i <= kSineSize; ++i) {
 		double phase = i * sineIndexToPhase;
 		float d = sin(phase);
-		//		gSine[i] = d;
-		gInvSine[i] = 1. / d;
+		gSine[i] = d;
+				//		gInvSine[i] = 1. / d;
 		 }
 
 	gInvSine[0] = gInvSine[kSineSize/2] = gInvSine[kSineSize] = kBadValue;
@@ -74,8 +75,8 @@ const float kBadValue = 10000000.0f; // used in the secant table for values very
 		gInvSine[sz2-i] = gInvSine[sz2+i] = kBadValue;
 	}
 	for (i=0; i <= kSineSize; ++i) {
-  printf("%f, ",gInvSine[i]);
-	  
+	  //  printf("%f, ",gInvSine[i]);
+	    printf("%f, ",gSine[i]);
 	}
 
 

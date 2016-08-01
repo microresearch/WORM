@@ -2209,10 +2209,10 @@ cleaning up but priority is: basic phoneme round for PARIS and cleanups, LPC and
 ** 25/5 RE_APPRAISE for JUNE 20 release
 
 - how much to port to raven, most needing excitation so LPC but for
-  vocoder we need excitation. for raven also add phase vocoder cross
-  synthesis
+  vocoder we need excitation. [for raven also add phase vocoder cross
+  synthesis]
 
-so for RAVEN we have: glottis/wavetable and physical modelling, phase vocoder cross, LPC cross, klanK, all notes on paper and above!
+so for RAVEN we have: glottis/wavetable and physical modelling, LPC cross, klanK, all notes on paper and above!
 
 how to resolve vocoder - switched noise/oscillator(pitch) and voice in? or???
 
@@ -3118,14 +3118,72 @@ FURTHER:
 
 [[file:~/projects/ERD_modules/worm/docs/Csound6.05/util/lpanal.c::lpanal.c:]]
 
-rt_lpc
-
-still no luck with inverse filtering 
-
 ** 30/7
 
 - lpc4.c inverse filtering and cross-over done - CAN also do pitch
-  tracking and shifting/lagging based on fitlpc.c and associated code
+  tracking and shifting/lagging based on fitlpc.c and associated
+  code - pitch is from auto-correlation
+
+** 31/7 notebook notes
+
+- MITTalk/dectalk/klattalk - lists of targets in appendix tables
+
+- for wavetable glottal pulse is 5ms long which at 32k sample rate is 160 samples
+
+- that worming of param changes timing also wormed so is not
+  quantized. also wormings can be triggered... interpol parameters a
+  la klsyn ... also worm = X/Y and time change...
+
+- interpolation of parameters in all cases where this is not handled by the model
+
+** 1/8 - TODO
+
+- what figures we get into lpc - how high is float - yes is in region -1 to 1
+
+- re-test votrax/sc01 - now if we playback at higher samplerate is kind of intelligible at least in 8 bit version:
+
+[ play -t raw --bits 8 --channels 1 --encoding unsigned-integer --rate 48000 test ] is kind of intelligible 
+
+we also write 16 bit; testvotrax.pcm which seems work at higher rates
+
+/////////
+
+- interpol wavetable as source
+
+- check klatt params
+
+- try LPCraw with other filter models and also pitch track from autocorrelation
+
+- extra worms
+
+- physical models of raven
+
+- own primitive wormy synthesis model as suggested by votrax, dirty synth above...
+
+* TODO from 1 AUG:
+
+- pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this with other filters
+
+- ntubes injection of white noise. LPF on reflection. how close to use for singer.scm model
+
+- describe all modes and raven work
+
+- extra types of worm
+
+- basic wormed wavetables and 2d wormed wavetables
+
+- text to speech/phoneme and re-mapping of this for sp0256 and SAM...
+
+- start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
+
+source/filter model we have sources as: input straight (fine for
+oscillation or noise in), inverse filtered in, inv in as triggered
+wavetable, inverse filtered audio bufer, audio buffer (and toggle off
+write on use of audio buffer), physical glottal model, stored
+wavetable as in raven, generators eg. pulse, square, and original
+(eg. TMS, Klatt)
+
+- generation of say raven wavetables using LPC/inverse filtering - lpcforlap.c
 
 * ntube
 
@@ -3288,7 +3346,9 @@ Stop code   1111
 
 from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
-+ morph data we have from ROMS, and also generation of new data on this model...
++ morph data we have from ROMS(only works in time), and also generation of new data on this model...
+
+mix and match with ROM data, transpose coeffs on time co-ordinate (stored in stack), freeze them...
 
 ** 1/KLATT
 
@@ -3557,6 +3617,8 @@ S14001A speech IC emulator]] ]
 
 *control rate interpolation of params by storing lastframe TODO!*
 
+tube and ntube: open tube=reflection with inversion(mouth), closed=without inversion (but glottis opens and closes!)
+
 TRM tube notes assembled...
 
 seems to work but lots of messiness with mallocs and possibly slow to adjust:
@@ -3691,6 +3753,16 @@ SELX/SELY choose channel and setting, SELZ bandwidth SPEED as silence/no-pitch/p
 what is excitation? INPUT? as ONE option. one MODE, other mode is excitation from input
 
 worming through
+
+** 8.1 LPC vocoder/source - crossover with different sources and pitch following/off on ...
+
+potential also for live TMS/LPC recodings with pitch or add manual pitch:=
+
+lookups and how this could work based on : using encoder - calc.m and
+  romgen from talkie with freemat and online convertor - use 8 KHz 16
+  bit mono recordings to encode words for lpc.c
+
+pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs in time
 
 ** 8.5 nvp.c BASICS working with primitive newsay...
 

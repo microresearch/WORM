@@ -369,6 +369,8 @@ void main(int argc, char * argv []){
 	{	
 	  //	  LPCAnalysis_update(input, pout, output, CHUNKSIZE, P_MAX);//
 	  //	  LPC_cross(input, pout, output, CHUNKSIZE);
+	  //	  printf("SAMPLE %f", input[16]);
+
 	  LPC_residual(input,output, CHUNKSIZE);
 	  sf_writef_float (outfile, output, readcount) ;
 	  //		sf_writef_double (outfile, output, readcount) ;
