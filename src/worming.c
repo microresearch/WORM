@@ -25,8 +25,8 @@ float runiform(float a, float b){
 }
 
 void rrr(float ranger, xy* rrrr){
- rrrr->x= (runiform(ranger/-2, ranger/2)); 
- rrrr->y= (runiform(ranger/-2, ranger/2)); 
+ rrrr->x= (runiform(ranger/-2.0f, ranger/2.0f)); 
+ rrrr->y= (runiform(ranger/-2.0f, ranger/2.0f)); 
 }
 
 void normalize(xy* loc){
@@ -58,12 +58,12 @@ void checkbound(xy* in,float boundx,float boundy, float minx, float miny){
 
   // x bounds
 
-  if ( (int)in->x > boundx) in->x=minx;
+  if (in->x > boundx) in->x=minx; // was int comparison before
   if (in->x < minx) in->x=boundx;
 
   // y bounds
 
-  if ( (int)in->y > boundy) in->y=miny;
+  if (in->y > boundy) in->y=miny;
   if (in->y < miny) in->y=boundy;
 }
 
@@ -103,7 +103,7 @@ void angleworm(struct wormy *worms, float addx, float addy){
 
 }
 
-void wanderworm(struct wormy *worms, float addx, float addy){
+void wanderworm(struct wormy *worms, float addx, float addy, u8 param){
   float x=worms->wloc.x;
   float y=worms->wloc.y;
   xy acc;
@@ -111,8 +111,8 @@ void wanderworm(struct wormy *worms, float addx, float addy){
 
   // do movements and copy back
 
-  acc.x=worms->acc.x+runiform(-2,2);
-  acc.y=worms->acc.y+runiform(-2,2);
+  acc.x=worms->acc.x+runiform((float)-param,(float)param); // TODO [param here
+  acc.y=worms->acc.y+runiform((float)-param,(float)param);
 
   normalize(&acc);
 
@@ -139,13 +139,28 @@ wormy* addworm(float x, float y, float boundx, float boundy, void(*functiony)(st
   worm->wloc.x=x;
   worm->wloc.y=y;
   worm->speed=1;
-  worm->maxspeed=2.0;
+  worm->maxspeed=12.0;
   worm->acc.x=0;worm->vel.x=0;
   worm->acc.y=0;worm->vel.y=0;
   worm->dir.x=2;worm->dir.y=4;
   worm->wormfunction=functiony;
   return worm;
 }
+
+void addwormsans(wormy* worm, float x, float y, float boundx, float boundy, void(*functiony)(struct wormy *worms, float addx, float addy, u8 param)){
+  //  wormy* worm = malloc(sizeof(wormy));
+  worm->boundx=boundx;
+  worm->boundy=boundx;
+  worm->wloc.x=x;
+  worm->wloc.y=y;
+  worm->speed=1;
+  worm->maxspeed=12.0;
+  worm->acc.x=0;worm->vel.x=0;
+  worm->acc.y=0;worm->vel.y=0;
+  worm->dir.x=2;worm->dir.y=4;
+  worm->wormfunction=functiony;
+}
+
 
 /*
 worming of params:
@@ -186,6 +201,26 @@ u8 wormvaluedint(wormedparamset* wormset, wormy* wormyy, float speed, u8 offsetx
   //  printf("xloc: %d yval: %d wormval %f\n", xloc, wormset->val[xloc], wormyy->wloc.y); 
   return xloc;
 }
+
+void wormunfloat(wormy* wormyy, float speed, u8 param, float *x, float *y){ // for worm as float and no constraints
+  //  float x,y;
+  wormyy->speed=speed;
+  wormyy->wormfunction(wormyy,0.0,0.0, param);
+  *x=(wormyy->wloc.x-100.0f)/100.0f;
+  *y=(wormyy->wloc.y-100.0f)/100.0f;
+//  printf("%f %f\n", x, y); 
+}
+
+float wormonefloat(wormy* wormyy, float speed, u8 param, float limit){ // for worm as float and no constraints
+  wormyy->speed=speed;
+  wormyy->boundy=wormyy->boundx=limit;
+  wormyy->wormfunction(wormyy,0.0,0.0, param);
+  //  *x=(wormyy->wloc.x-100.0f)/100.0f;
+  float y=wormyy->wloc.y;
+  return y;
+//  printf("%f %f\n", x, y); 
+}
+
 
 /*void main(void){
   int x;

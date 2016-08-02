@@ -23,9 +23,13 @@ typedef struct wormy {
 }wormy;
 
 
-// lost the worms
-
+// list the worms
+void wanderworm(struct wormy *worms, float addx, float addy,u8 param);
 void straightworm(struct wormy *worms, float addx, float addy, u8 param);
-
+void wormunfloat(wormy* wormyy, float speed, u8 param, float *x, float *y);
 u8 wormvaluedint(wormedparamset* wormset, wormy* wormyy, float speed, u8 offsetx, int16_t offsety, u8 param); //for uints
 wormy* addworm(float x, float y, float boundx, float boundy, void(*functiony)(struct wormy *worms, float boundx, float boundy, u8 param)); // but we need worm functions here
+
+float wormonefloat(wormy* wormyy, float speed, u8 param, float limit);
+
+void addwormsans(wormy* wormy, float x, float y, float boundx, float boundy, void(*functiony)(struct wormy *worms, float boundx, float boundy, u8 param)); // but we need worm functions here

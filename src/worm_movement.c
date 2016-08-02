@@ -109,13 +109,13 @@ checkbound(xy* in,float boundx,float boundy){
 
   // x bounds
 
-  if ( (int)in->x > boundx) in->x=0.0f;
-  if (in->x < 0) in->x=boundx;
+  if (in->x > boundx) in->x=0.0f;
+  if (in->x < 0.0f) in->x=boundx;
 
   // y bounds
 
-  if ( (int)in->y > boundy) in->y=0.0f;
-  if (in->y < 0) in->y=boundy;
+  if (in->y > boundy) in->y=0.0f;
+  if (in->y < 0.0f) in->y=boundy;
 }
 
 // >>>>>>>>>>>>>>>>what are the worms? straightworm,seekworm,squiggleworm,angleworm.wanderworm
@@ -188,7 +188,7 @@ wormy* addworm(float x, float y, void(*functiony)(struct wormy *worms, float bou
   worm->wloc.x=x;
   worm->wloc.y=y;
   worm->speed=1;
-  worm->maxspeed=2.0;
+  worm->maxspeed=12.0;
   worm->acc.x=0;worm->vel.x=0;
   worm->acc.y=0;worm->vel.y=0;
   worm->dir.x=2;worm->dir.y=4;
@@ -246,11 +246,32 @@ void wormvaluedint(wormedparamset* wormset, wormy* wormyy, float speed, u8 offse
   printf("xloc: %d yval: %d wormval %f\n", xloc, wormset->val[xloc], wormyy->wloc.y); 
 }
 
+void wormunfloat(wormy* wormyy, float speed){ // for worm as float and no constraints
+  float x,y;
+  wormyy->speed=speed;
+  wormyy->wormfunction(wormyy,200.0,200.0);
+  x=(wormyy->wloc.x-100.0f)/100.0;
+y=(wormyy->wloc.y-100.0f)/100.0;
+  printf("%f %f\n", x, y); 
+}
+
+void wwormunfloat(wormy* wormyy, float speed, float param, float *x, float *y){ // for worm as float and no constraints
+  //  float x,y;
+  wormyy->speed=speed;
+  wormyy->wormfunction(wormyy,200.0,200.0);
+  *x=(wormyy->wloc.x-100.0f)/100.0;
+  *y=(wormyy->wloc.y-100.0f)/100.0;
+//  printf("%f %f\n", x, y); 
+}
+
+
 void main(void){
-  int x;
-  //  wormy* wanderingwormy=addworm(99.2f,99.2f,wanderworm);
+  int xx;
+  // wormy* wanderingwormy=addworm(99.2f,99.2f,wanderworm);
 
   // init simpleklatt parameters
+
+  float x,y;
 
   wormedparamset simpleklatt={40,
     {1000, 0, 497, 0, 739, 0, 2772, 0, 3364, 0, 4170, 0, 4000, 0, 0, 0, 200, 40, 0, 40, 0, 20, 0, 0, 53, 44, 79, 70, 52, 95, 44, 56, 34, 80, 0, 80, 0, 0, 27, 70},
@@ -258,11 +279,12 @@ void main(void){
 {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60}
   };
 
-  wormy* this=addworm(10.0f, 10.0f, straightworm); // add start loc
-  for (x=0;x<100;x++){
+  wormy* this=addworm(100.1f, 100.1f, wanderworm); // add start loc
+  for (xx=0;xx<10000;xx++){
     //        this->wormfunction(this, 100.0, 100.0); // and speed?
 	//        printf("%f %f\n", this->wloc.x,this->wloc.y); 
-        wormvaluedint(&simpleklatt,this, 4.0, 0, 0);
-
+    //        wormvaluedint(&simpleklatt,this, 4.0, 0, 0);
+    wwormunfloat(this, 12.0, 10,&x,&y);
+    printf("%f %f\n", x, y); 
   }
 }

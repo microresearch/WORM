@@ -3136,7 +3136,7 @@ FURTHER:
 
 - interpolation of parameters in all cases where this is not handled by the model
 
-** 1/8 - TODO
+** 1/8 // 2/8 - TODO +
 
 - what figures we get into lpc - how high is float - yes is in region -1 to 1
 
@@ -3146,23 +3146,49 @@ FURTHER:
 
 we also write 16 bit; testvotrax.pcm which seems work at higher rates
 
+- interpol wavetable as source - DONE - TO PORT and  (inlining, speed inc and remove filter creation stuff)
+
 /////////
 
-- interpol wavetable as source
+- generate crow wavetables (praat?) - we also need sets of crow LPCs - larger windows... what is windowsize again in lpc? *128*
 
-- check klatt params
+// workflow for wavetables: praat inverse filter, audacity, dump to float? how to fix lengths? 32k samplerate
+
+how long is klatt wavetable ? in the example there are 100 sample but we can always set this...
+
+note that sampled_source is not in rsynth code but in
+simpleklatt/parwave (where is this from?)... check also klsyn - this
+doesn't have it /// but klsyn does have triangular and square sources...
+
+need to collate all of klatt sources/parameters and code bases...
+
+- check klatt params: rsynth, nvp, simpleklatt:
+
+nfcascade (how man cascading resonators): rsynth=2?, nvp=6 resonators
+all pre-set, simpleklatt=parwave/we set to ALL PARALLEL so NO
+cascade...
+
+- worming of wavetables - basic 1d worm movementDONE, also worm AS
+  wavetable well more just as sound generation - it fills a
+  wavetable/audio buffer TESTED but needs be slower
+
+- added experimental crow wavetable but could be a bit slower...
+
+//////
 
 - try LPCraw with other filter models and also pitch track from autocorrelation
 
-- extra worms
+- extra worm types
 
-- physical models of raven
+- physical/other models of raven
 
-- own primitive wormy synthesis model as suggested by votrax, dirty synth above...
+- own primitive wormy synthesis model as suggested by votrax, ugly synth: https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
+
+- text to speech/phoneme and re-mapping of this for sp0256 and SAM...
 
 * TODO from 1 AUG:
 
-- pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this with other filters
+- pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this source with other filters
 
 - ntubes injection of white noise. LPF on reflection. how close to use for singer.scm model
 
@@ -3170,9 +3196,7 @@ we also write 16 bit; testvotrax.pcm which seems work at higher rates
 
 - extra types of worm
 
-- basic wormed wavetables and 2d wormed wavetables
-
-- text to speech/phoneme and re-mapping of this for sp0256 and SAM...
+- basic wormed wavetablesDONE and 2d wormed wavetables
 
 - start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
 
@@ -3183,7 +3207,22 @@ write on use of audio buffer), physical glottal model, stored
 wavetable as in raven, generators eg. pulse, square, and original
 (eg. TMS, Klatt)
 
-- generation of say raven wavetables using LPC/inverse filtering - lpcforlap.c
+- generation of say raven wavetables using LPC/inverse filtering - lpcforlap.c and praat
+
+->>>>>compare these synthetic (not source/filter) approaches for abstraction out into worm.c (also sco1/votrax and dirty model)
+
+- rendervowel/braidworm = 3 formant generation by lookup into 2 very
+  small sine table followed by square, trigger makes consonant and then this runs for 160
+  frames (of how many samples?), before we go back into vowel... it is
+  a random consonant: 
+
+- compare to scformant - 3 phase lookup into large sine table
+
+- SAM/render.c: 2 phase lookup for voiced - how is unvoiced working - strange sampleTable in RenderTabs.h
+
+A =   A1 * sin ( f1 * t ) +
+      A2 * sin ( f2 * t ) +
+      A3 * rect( f3 * t ) // in SAM as in rendervowel1
 
 * ntube
 
@@ -3205,24 +3244,7 @@ waveforms are similar sounding. The TIMBRE parameter scans the table
 in the X direction, and the COLOR parameter scans the table in the Y
 direction, with smooth interpolation across the two directions.
 
-but also wt_map array
-
-
-->>>>>compare these synthetic (not source/filter) approaches for abstraction out into worm.c:
-
-- rendervowel/braidworm = 3 formant generation by lookup into 2 very
-  small sine table followed by square, trigger makes consonant and then this runs for 160
-  frames (of how many samples?), before we go back into vowel... it is
-  a random consonant: 
-
-- compare to scformant - 3 phase lookup into large sine table
-
-- SAM/render.c: 2 phase lookup for voiced - how is unvoiced working - strange sampleTable in RenderTabs.h
-
-A =   A1 * sin ( f1 * t ) +
-      A2 * sin ( f2 * t ) +
-      A3 * rect( f3 * t ) // in SAM as in rendervowel1
-
+but also wt_map array - how is that generated?
 
 * WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types
 
@@ -3952,9 +3974,9 @@ intellivoice game roms - intv.cpp // also 10 bit business there -> tron solar sa
 
 http://savethevowels.org/praat/html/UsingPraatforLinguisticResearch.html
 
-** for LPC/inverse filtering
+** for LPC/inverse filtering//praat
 
-- import sound file -raw as in open or wav as in lonmg sound file and then extract sound
+- import sound file -raw as in open or wav as in long sound file and then extract sound
 
 - highlight sound and select formants and lpc
 

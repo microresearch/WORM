@@ -42,6 +42,8 @@ LINEIN/OUTL-filter
 #include "vosim.h"
 #include "samplerate.h"
 #include "ntube.h"
+#include "wavetable.h"
+#include "worming.h"
 
 /*
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
@@ -89,6 +91,8 @@ Formlet *formy;
 Formant *formanty;
 Blip *blipper;
 NTube tuber;
+Wavetable wavtable;
+wormy myworm;
 
 #define THRESH 32000
 #define THRESHLOW 30000
@@ -610,7 +614,6 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 //    floot_to_int(mono_buffer,floutbuffer,size);
 //};
 
-
 void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
 //(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
@@ -622,8 +625,30 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   floot_to_int(outgoing,lastbuffer,size);
 };
 
+void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float lastbuffer[32];
+  dowavetable(lastbuffer, &wavtable, adc_buffer[SELX], size);
+  floot_to_int(outgoing,lastbuffer,size);
+}  
+
+void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float lastbuffer[32];
+  dowormwavetable(lastbuffer, &wavtable, adc_buffer[SELX], size);
+  floot_to_int(outgoing,lastbuffer,size);
+}  
 
 
+//void wormunfloat(wormy* wormyy, float speed, float param, float *x, float *y){ // for worm as float and no constraints
+void wormas_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float lastbuffer[32]; float x,y,speed; u8 param;
+  speed=(float)adc_buffer[SELX]/1024.0f;
+  param=adc_buffer[SELY]>>4;
+  for (u8 xx=0;xx<size;xx++){
+    wormunfloat(&myworm, speed, param, &x, &y); // needs to be slower
+    lastbuffer[xx]=y;
+  }
+  floot_to_int(outgoing,lastbuffer,size);
+}
 
 void audio_split_stereo(int16_t sz, int16_t *src, int16_t *ldst, int16_t *rdst)
 {
@@ -681,9 +706,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=14; // checked=0,1,2,3,4,5,6,7,8
+  mode=17; // checked=0,1,2,3,4,5,6,7,8
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy,lpc_error};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy,lpc_error, test_wave, wormas_wave, test_worm_wave};
 
   generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

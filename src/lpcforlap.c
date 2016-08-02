@@ -3,6 +3,8 @@
 #include <sndfile.h>
 #include "forlap.h"
 
+//  gcc -std=c99 lpcforlap.c -o sclpc -lm -lsndfile -g   
+
 // 44100 so 0.005 seconds would be 220 samples - close to 256 
 
 /* fix on parameters-below, check coeff calc and filter calc (delay), printfs in lpcana, fitlpc !!!
