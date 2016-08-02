@@ -1,41 +1,11 @@
 #include <stdio.h>
 
-static char *Ascii[] =
-	{
-"nUWl ","stAArt AXv hEHdER ","stAArt AXv tEHkst ","EHnd AXv tEHkst ",
-"EHnd AXv trAEnsmIHSHAXn",
-"EHnkwAYr ","AEk ","bEHl ","bAEkspEYs ","tAEb ","lIHnIYfIYd ",
-"vERtIHkAXl tAEb ","fAOrmfIYd ","kAErAYj rIYtERn ","SHIHft AWt ",
-"SHIHft IHn ","dIHlIYt ","dIHvIHs kAAntrAAl wAHn ","dIHvIHs kAAntrAAl tUW ",
-"dIHvIHs kAAntrAAl THrIY ","dIHvIHs kAAntrAAl fOWr ","nAEk ","sIHnk ",
-"EHnd tEHkst blAAk ","kAEnsEHl ","EHnd AXv mEHsIHj ","sUWbstIHtUWt ",
-"EHskEYp ","fAYEHld sIYpERAEtER ","grUWp sIYpERAEtER ","rIYkAOrd sIYpERAEtER ",
-"yUWnIHt sIYpERAEtER ","spEYs ","EHksklAEmEYSHAXn mAArk ","dAHbl kwOWt ",
-"nUWmbER sAYn ","dAAlER sAYn ","pERsEHnt ","AEmpERsAEnd ","kwOWt ",
-"OWpEHn pEHrEHn ","klOWz pEHrEHn ","AEstEHrIHsk ","plAHs ","kAAmmAX ",
-"mIHnAHs ","pIYrIYAAd ","slAESH ",
-
-"zIHrOW ","wAHn ","tUW ","THrIY ","fOWr ",
-"fAYv ","sIHks ","sEHvAXn ","EYt ","nAYn ",
-
-"kAAlAXn ","sEHmIHkAAlAXn ","lEHs DHAEn ","EHkwAXl sAYn ","grEYtER DHAEn ",
-"kwEHsCHAXn mAArk ","AEt sAYn ",
-
-"EY ","bIY ","sIY ","dIY ","IY ","EHf ","jIY  ",
-"EYtCH ","AY ","jEY ","kEY ","EHl ","EHm ","EHn ","AA ","pIY ",
-"kw ","AAr ","EHz ","tIY ","AHw ","vIY ",
-"dAHblyUWw ","EHks ","wAYIY ","zIY ",
-
-"lEHft brAEkEHt ","bAEkslAESH ","rAYt brAEkEHt ","kAErEHt ",
-"AHndERskAOr ","AEpAAstrAAfIH ",
-
-"EY ","bIY ","sIY ","dIY ","IY ","EHf ","jIY  ",
-"EYtCH ","AY ","jEY ","kEY ","EHl ","EHm ","EHn ","AA ","pIY ",
-"kw ","AAr ","EHz ","tIY ","AHw ","vIY ",
-"dAHblyUWw ","EHks ","wAYIY ","zIY ",
-
-"lEHft brEYs ","vERtIHkAXl bAAr ","rAYt brEYs ","tAYld ","dEHl ",
-	};
+/* Integer code representations of the phoneme spelling of ascii characters.
+*/
+static char *Ascii[] = 
+{
+ "32 9 34 41 ", "26 18 5 37 18 41 11 23 41 30 3 19 10 41 ", "26 18 5 37 18 41 11 23 41 18 3 20 26 18 41 ", "3 32 19 41 11 23 41 18 3 20 26 18 41 ", "3 32 19 41 11 23 41 18 37 4 32 26 31 1 28 11 32 ", "3 32 20 35 13 37 41 ", "4 20 41 ", "17 3 34 41 ", "17 4 20 26 16 2 26 41 ", "18 4 17 41 ", "34 1 32 0 22 0 19 41 ", "23 10 18 1 20 11 34 41 18 4 17 41 ", "22 6 37 31 22 0 19 41 ", "20 4 37 13 39 41 37 0 18 10 32 41 ", "28 1 22 18 41 14 18 41 ", "28 1 22 18 41 1 32 41 ", "19 1 34 0 18 41 ", "19 1 23 1 26 41 20 5 32 18 37 5 34 41 35 12 32 41 ", "19 1 23 1 26 41 20 5 32 18 37 5 34 41 18 9 41 ", "19 1 23 1 26 41 20 5 32 18 37 5 34 41 24 37 0 41 ", "19 1 23 1 26 41 20 5 32 18 37 5 34 41 22 7 37 41 ", "32 4 20 41 ", "26 1 32 20 41 ", "3 32 19 41 18 3 20 26 18 41 17 34 5 20 41 ", "20 4 32 26 3 34 41 ", "3 32 19 41 11 23 41 31 3 26 1 39 41 ", "26 9 17 26 18 1 18 9 18 41 ", "3 26 20 2 16 41 ", "22 13 3 34 19 41 26 0 16 10 4 18 10 41 ", "21 37 9 16 41 26 0 16 10 4 18 10 41 ", "37 0 20 6 37 19 41 26 0 16 10 4 18 10 41 ", "36 9 32 1 18 41 26 0 16 10 4 18 10 41 ", "26 16 2 26 41 ", "3 20 26 20 34 4 31 2 28 11 32 41 31 5 37 20 41 ", "19 12 17 34 41 20 35 7 18 41 ", "32 9 31 17 10 41 26 13 32 41 ", "19 5 34 10 41 26 13 32 41 ", "16 10 26 3 32 18 41 ", "4 31 16 10 26 4 32 19 41 ", "20 35 7 18 41 ", "7 16 3 32 41 16 3 37 3 32 41 ", "20 34 7 27 41 16 3 37 3 32 41 ", "4 26 18 3 37 1 26 20 41 ", "16 34 12 26 41 ", "20 5 31 31 11 41 ", "31 1 32 12 26 41 ", "16 0 37 0 5 19 41 ", "26 34 4 28 41 ", "27 1 37 7 41 ", "35 12 32 41 ", "18 9 41 ", "24 37 0 41 ", "22 7 37 41 ", "22 13 23 41 ", "26 1 20 26 41 ", "26 3 23 11 32 41 ", "2 18 41 ", "32 13 32 41 ", "20 5 34 11 32 41 ", "26 3 31 1 20 5 34 11 32 41 ", "34 3 26 41 25 4 32 41 ", "3 20 35 11 34 41 26 13 32 41 ", "21 37 2 18 10 41 25 4 32 41 ", "20 35 3 26 38 11 32 41 31 5 37 20 41 ", "4 18 41 26 13 32 41 ", "2 41 ", "17 0 41 ", "26 0 41 ", "19 0 41 ", "0 41 ", "3 22 41 ", "39 0 41 41 ", "2 18 38 41 ", "13 41 ", "39 2 41 ", "20 2 41 ", "3 34 41 ", "3 31 41 ", "3 32 41 ", "5 41 ", "16 0 41 ", "20 35 41 ", "5 37 41 ", "3 27 41 ", "18 0 41 ", "12 35 41 ", "23 0 41 ", "19 12 17 34 36 9 35 41 ", "3 20 26 41 ", "35 13 0 41 ", "27 0 41 ", "34 3 22 18 41 17 37 4 20 3 18 41 ", "17 4 20 26 34 4 28 41 ", "37 13 18 41 17 37 4 20 3 18 41 ", "20 4 37 3 18 41 ", "12 32 19 10 26 20 6 37 41 ", "4 16 5 26 18 37 5 22 1 41 ", "2 41 ", "17 0 41 ", "26 0 41 ", "19 0 41 ", "0 41 ", "3 22 41 ", "39 0 41 41 ", "2 18 38 41 ", "13 41 ", "39 2 41 ", "20 2 41 ", "3 34 41 ", "3 31 41 ", "3 32 41 ", "5 41 ", "16 0 41 ", "20 35 41 ", "5 37 41 ", "3 27 41 ", "18 0 41 ", "12 35 41 ", "23 0 41 ", "19 12 17 34 36 9 35 41 ", "3 20 26 41 ", "35 13 0 41 ", "27 0 41 ", "34 3 22 18 41 17 37 2 26 41 ", "23 10 18 1 20 11 34 41 17 5 37 41 ", "37 13 18 41 17 37 2 26 41 ", "18 13 34 19 41 ", "19 3 34 41 ",
+};
 
 say_ascii(character)
 	int character;

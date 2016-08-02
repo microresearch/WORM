@@ -1,37 +1,29 @@
 
 from en_US_rules import Rules
+import phoneme_map
 
-phonemes = [
-		"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v",
-		"TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", ""
-]
+#Using a map that maps phonemes to integer codes, converts the phonemes in phoneme rules
+#as defined in en_US_rules.py into integer codes. Outputs the rules in C code format to
+#be used as the rules in english.c in english2phoneme.
 
 new_rules = {}
 
-def make_map(phonemes):
-	phoneme_map = {}
-	for i,phoneme in enumerate(phonemes):
-		phoneme_map[phoneme] = str(i)
-	print(phoneme_map)
-	return phoneme_map
-
+#Convert phonemes in rules to integer codes corresponding
+#to the phonemes
 def replace_phonemes(phoneme_map):
-#	print(Rules)
 	for rule in Rules:
-#		print(rule)
-#		print(Rules[rule])
 		for i,elem in enumerate(Rules[rule]):
 			to_transform = elem[3].split()
 			transformed = ""
 			for phoneme in to_transform:
 				transformed += phoneme_map[phoneme]
+				transformed += " "
 			temp = list(elem)
 			temp[3] = transformed
 			elem = tuple(temp)
 			Rules[rule][i]=elem
-#			print(elem)
-#	print(Rules)
 
+#Write elem to output in correct format
 def output_helper(output, elem):
 	if elem == "":
 		output += "Anything"
@@ -41,12 +33,12 @@ def output_helper(output, elem):
 		output += "\"" + elem + "\""
 	return output
 
+#Output transformed rules in C format. Output to be written to newfile.txt,
+#and then copied over to english.c in english2phoneme
 def output_C_format():
 	file=open("newfile.txt","w")
 	output = ""
-#	print(Rules)
 	for rule in Rules:
-#		print(rule)
 		output += "static Rule "
 		if rule == "punctuation":
 			output += "punct"
@@ -70,6 +62,6 @@ def output_C_format():
 		output += "{Anything, 0, Anything, Silent}};\n\n"
 	file.write(output)
 
-phoneme_map = make_map(phonemes)
+phoneme_map = phoneme_map.make_map()
 replace_phonemes(phoneme_map)
 output_C_format()

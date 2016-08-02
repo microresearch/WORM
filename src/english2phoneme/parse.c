@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define MAX_LENGTH 128
+#define MAX_PHONEME_LENGTH 3
 
 static FILE *In_file;
 static FILE *Out_file;
@@ -11,6 +12,7 @@ static int Char, Char1, Char2, Char3;
 static int input_count;
 static int input_length;
 static char *input_array;
+static char *output_array[MAX_LENGTH];
 
 int output_count = 0;
 
@@ -19,88 +21,92 @@ int output_count = 0;
 **	int argc;
 **	char *argv[];
 **
-**	This is the main program.  It takes up to two file names (input
-**	and output)  and translates the input file to phoneme codes
-**	(see english.c) on the output file.
+**	This is the main program. It translates each argument into an integer code,
+**  where each integer maps to a phoneme. Populates an output array, where each
+**  elem is an integer code for a corresponding phoneme in the input Returns the
+**  number of phonemes in the input.
 */
 main(argc, argv)
 	int argc;
 	char *argv[];
 	{
-//	if (argc > 3)
-//		{
-//		fputs("Usage: PHONEME [infile [outfile]]\n", stderr);
-//		//exit();
-//		}
-//
-//	if (argc == 1)
-//		{
-//		fputs("Enter english text:\n", stderr);
-//		}
-//
-//	if (argc > 1)
-//		{
-//		In_file = fopen(argv[1], "r");
-//		if (In_file == 0)
-//			{
-//			fputs("Error: Cannot open input file.\n", stderr);
-//			fputs("Usage: PHONEME [infile [outfile]]\n", stderr);
-//			//exit();
-//			}
-//		}
-//	else
-//		In_file = stdin;
-//
-//	if (argc > 2)
-//		{
-//		Out_file = fopen(argv[2], "w");
-//		if (Out_file == 0)
-//			{
-//			fputs("Error: Cannot create output file.\n", stderr);
-//			fputs("Usage: PHONEME [infile [outfile]]\n", stderr);
-//			//exit();
-//			}
-//		}
-//	else
-//		Out_file = stdout;
-//
-//	xlate_file();
+ 
+  //allocate space for the output
+  char output[MAX_LENGTH][MAX_PHONEME_LENGTH];
+  for(int i = 0; i < MAX_LENGTH; i++){
+    output_array[i] = output[i];
+  }
   
-  text2speech(argv[0],argv[1],argv[2]); //????
+  //allocate space for the input
+  int num_words = argc - 1;
+  int input_size = 0;
+  int space_count = 0;
+  for(int i = 0; i < num_words; i++){
+      input_size += strlen(argv[1 + i]);
+      space_count += 1;
+  }
+  char input[input_size + space_count];
+  
+  //initialize input array to given arguments
+  int index = 0;
+  for(int i = 0; i < num_words; i++){
+      char *word = argv[1 + i];
+      for(int j = 0; j < strlen(word); j++){
+        input[index] = word[j];
+        index += 1;
+      }
+      input[index] = ' ';
+      index += 1;
+  }
+  input[index] = EOF;
+  
+  //transform text to integer code phonemes
+  int output_count = text2speech(input_size + space_count,input,output);
+  for(int i = 0; i < output_count; i++){
+      for(int j = 0; j < strlen(output_array[i]); j++){
+         printf("%c", output_array[i][j]);
+      }
+      printf("\n");
+  }
+  return output_count;
 	}
 
-text2speech(int input_len, char *input, int *output){
-  //run xlate on input
-  //change response from string to int
-  //return int array mapping sound
-  //xlate_file(); change so input is correct
+/*
+** Transforms text to integer code phonemes.
+*/
+text2speech(int input_len, char *input){
   input_array = input;
-  input_length = 0;
+  input_length = input_len;
   input_count = 0;
-  output_array = output;
   xlate_file();
   return output_count;
 }
 
-//instead of outputting to file, add to array in integer form
-outchar(int chr){
-  int x = chr - '0'
-  output_array[output_count] = x;
-  output_count++;
+/*
+** Add one character (digit of integer) to output array
+*/
+outchar(int chr, int index){
+  output_array[output_count][index] = chr;
 }
 
+/*
+** Add space-delimited string of integers to output array,
+** such that each integer is an element in the output array.
+*/
 outstring(string)
 	char *string;
 	{
-	while (*string != '\0')
-		outchar(*string++);
+	while (*string != '\0'){
+    int index = 0;
+    while(*string != ' '){
+      outchar(*string++, index);
+      index++;
+    }
+    output_array[output_count][index] = '\0';
+    output_count++;
+    *string++;
+  }
 	}
-
-/*outchar(chr)
-	int chr;
-	{
-	fputc(chr,Out_file);
-	}*/
 
 
 int makeupper(character)
@@ -117,7 +123,7 @@ new_char()
 	/*
 	If the cache is full of newline, time to prime the look-ahead
 	again.  If an EOF is found, fill the remainder of the queue with
-	EOF's.
+	EOF's. Read chars from input array.
 	*/
 	if (Char == '\n'  && Char1 == '\n' && Char2 == '\n' && Char3 == '\n')
 		{	/* prime the pump again */
@@ -177,66 +183,10 @@ new_char()
 	return Char;
 }
 
-//new_char()
-//	{
-//	/*
-//	If the cache is full of newline, time to prime the look-ahead
-//	again.  If an EOF is found, fill the remainder of the queue with
-//	EOF's.
-//	*/
-//	if (Char == '\n'  && Char1 == '\n' && Char2 == '\n' && Char3 == '\n')
-//		{	/* prime the pump again */
-//		Char = getc(In_file);
-//		if (Char == EOF)
-//			{
-//			Char1 = EOF;
-//			Char2 = EOF;
-//			Char3 = EOF;
-//			return Char;
-//			}
-//		if (Char == '\n')
-//			return Char;
-//
-//		Char1 = getc(In_file);
-//		if (Char1 == EOF)
-//			{
-//			Char2 = EOF;
-//			Char3 = EOF;
-//			return Char;
-//			}
-//		if (Char1 == '\n')
-//			return Char;
-//
-//		Char2 = getc(In_file);
-//		if (Char2 == EOF)
-//			{
-//			Char3 = EOF;
-//			return Char;
-//			}
-//		if (Char2 == '\n')
-//			return Char;
-//
-//		Char3 = getc(In_file);
-//		}
-//	else
-//		{
-//		/*
-//		Buffer not full of newline, shuffle the characters and
-//		either get a new one or propagate a newline or EOF.
-//		*/
-//		Char = Char1;
-//		Char1 = Char2;
-//		Char2 = Char3;
-//		if (Char3 != '\n' && Char3 != EOF)
-//			Char3 = getc(In_file);
-//		}
-//	return Char;
-//	}
-
 /*
 ** xlate_file()
 **
-**	This is the input file translator.  It sets up the first character
+**	This is the input file (now input array) translator.  It sets up the first character
 **	and uses it to determine what kind of text follows.
 */
 xlate_file()
@@ -265,6 +215,10 @@ xlate_file()
 
 have_dollars()
 	{
+  
+  fprintf(stderr, "Cannot read monetary values. Please enter alpha text.\n");
+  exit(1);
+  
 	long int value;
 
 	value = 0L;
@@ -334,9 +288,9 @@ have_dollars()
 
 have_special()
 	{
-	if (Char == '\n')
+	/*if (Char == '\n')
 		outchar('\n');
-	else
+	else*/
 	if (!isspace(Char))
 		say_ascii(Char);
 
@@ -347,6 +301,8 @@ have_special()
 
 have_number()
 	{
+  fprintf(stderr, "Cannot read numerical values. Please enter alpha text.\n");
+  exit(1);
 	long int value;
 	int lastdigit;
 
