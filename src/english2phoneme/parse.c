@@ -3,39 +3,73 @@
 #include <string.h>
 
 #define MAX_LENGTH 128
-#define MAX_PHONEME_LENGTH 3
 
-static FILE *In_file;
-static FILE *Out_file;
+//static FILE *In_file;
+//static FILE *Out_file;
 
 static int Char, Char1, Char2, Char3;
 static int input_count;
 static int input_length;
 static char *input_array;
-static char *output_array[MAX_LENGTH];
-
+char output_array[MAX_LENGTH];
 int output_count = 0;
 
-/*
-** main(argc, argv)
-**	int argc;
-**	char *argv[];
-**
-**	This is the main program. It translates each argument into an integer code,
-**  where each integer maps to a phoneme. Populates an output array, where each
-**  elem is an integer code for a corresponding phoneme in the input Returns the
-**  number of phonemes in the input.
+static const char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
+
+// remap this index 0->42 to the 256 phonemes which are
+
+/*NRLIPAtoSPO256 = { 'AA':'AA', 'AE':'AE', 'AH':'AX AX', 'AO':'AO', 'AW':'AW',  'AX':'AX',
+                   'AY':'AY', 'b':'BB1', 'CH':'CH',  'd':'DD1', 'DH':'DH1', 'EH':'EH',
+                   'ER':'ER1','EY':'EY', 'f':'FF',   'g':'GG2', 'h':'HH1',  'IH':'IH',
+                   'IY':'IY', 'j':'JH',  'k':'KK1',  'l':'LL',  'm':'MM',   'n':'NN1',
+                   'NG':'NG', 'OW':'OW', 'OY':'OY',  'p':'PP',  'r':'RR1',  's':'SS',
+                   'SH':'SH', 't':'TT1', 'TH':'TH',  'UH':'UH',  'UW':'UW2','v':'VV',
+                   'w':'WW', 'WH':'WH', 'y':'YY1', 'z':'ZZ', 'ZH':'ZH', 'PAUSE':'PA4' };*/
+
+// but what are numbers for 256
+/* 
+
+
+IY, 0, IH, 1, EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
+
 */
-main(argc, argv)
+
+/*    _allophones = { 'PA1':0, 'PA2':1, 'PA3':2, 'PA4':3, 'PA5':4, 'OY':5, 'AY':6, 'EH':7, 
+             'KK3':8, 'PP':9, 'JH':10, 'NN1':11, 'IH':12, 'TT2':13, 'RR1':14, 'AX':15, 
+             'MM':16, 'TT1':17, 'DH1':18, 'IY':19, 'EY':20, 'DD1':21, 'UW1':22, 'AO':23, 
+             'AA':24, 'YY2':25, 'AE':26, 'HH1':27, 'BB1':28, 'TH':29, 'UH':30, 'UW2':31, 
+             'AW':32, 'DD2':33, 'GG3':34, 'VV':35, 'GG1':36, 'SH':37, 'ZH':38, 'RR2':39, 
+             'FF':40, 'KK2':41, 'KK1':42, 'ZZ':43, 'NG':44, 'LL':45, 'WW':46, 'XR':47, 
+             'WH':48, 'YY1':49, 'CH':50, 'ER1':51, 'ER2':52, 'OW':53, 'DH2':54, 'SS':55, 
+             'NN2':56, 'HH2':57, 'OR':58, 'AR':59, 'YR':60, 'GG2':61, 'EL':62, 'BB2':63 };*/
+
+static const char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX?
+
+void xlate_word(char word[]);
+void spell_word(char word[]);
+void say_ascii(int character);
+void xlate_file();
+int text2speech(int input_len, char *input, char *output);
+void have_number();
+void have_letter();
+void have_special();
+void say_cardinal(long int value);
+void say_ordinal(long int value);
+void outnum(const char* ooo);
+
+/*
+void main(argc, argv)
 	int argc;
 	char *argv[];
 	{
  
   //allocate space for the output
-  char output[MAX_LENGTH][MAX_PHONEME_LENGTH];
-  for(int i = 0; i < MAX_LENGTH; i++){
-    output_array[i] = output[i];
-  }
+	  char output[MAX_LENGTH];
+	  //	  char output[MAX_LENGTH*MAX_PHONEME_LENGTH];
+
+	  //	  for(int i = 0; i < MAX_LENGTH; i++){
+	  //    output_array[i] = output[i];
+	  //    }
   
   //allocate space for the input
   int num_words = argc - 1;
@@ -49,76 +83,76 @@ main(argc, argv)
   
   //initialize input array to given arguments
   int index = 0;
-  for(int i = 0; i < num_words; i++){
-      char *word = argv[1 + i];
-      for(int j = 0; j < strlen(word); j++){
-        input[index] = word[j];
-        index += 1;
-      }
-      input[index] = ' ';
-      index += 1;
-  }
-  input[index] = EOF;
+
+  //  input[index] = EOF;
+
+  static char TTSinarray[64]={"testing "};
+ static char TTSoutarray[128];
+
+ TTSinarray[8]=EOF;
+  //  u8 TTSlength= text2speechfor256(9,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+
+
+  //  printf("INEDX %d in %c\n\n", index, input[4]);
+
   
   //transform text to integer code phonemes
-  int output_count = text2speech(input_size + space_count,input,output);
+  int output_count = text2speechfor256(9,TTSinarray,TTSoutarray);
   for(int i = 0; i < output_count; i++){
-      for(int j = 0; j < strlen(output_array[i]); j++){
-         printf("%c", output_array[i][j]);
-      }
-      printf("\n");
+    //    for(int j = 0; j < strlen(output[i]); j++){
+             printf("%d, ", TTSoutarray[i]);
+	     //	      }
+	     //      printf("\n");
   }
-  return output_count;
-	}
+  //  return output_count;
+  }
+*/
 
 /*
 ** Transforms text to integer code phonemes.
 */
-text2speech(int input_len, char *input){
+int text2speech(int input_len, char *input, char *output){
   input_array = input;
   input_length = input_len;
-  input_count = 0;
+  input_count = 0; output_count=0;
   xlate_file();
+  for (char i=0;i<output_count;i++){
+    output[i]=output_array[i]; 
+  }
   return output_count;
 }
 
-/*
-** Add one character (digit of integer) to output array
-*/
-outchar(int chr, int index){
-  output_array[output_count][index] = chr;
-}
-
-/*
-** Add space-delimited string of integers to output array,
-** such that each integer is an element in the output array.
-*/
-outstring(string)
-	char *string;
-	{
-	while (*string != '\0'){
-    int index = 0;
-    while(*string != ' '){
-      outchar(*string++, index);
-      index++;
-    }
-    output_array[output_count][index] = '\0';
-    output_count++;
-    *string++;
-  }
+int text2speechfor256(int input_len, char *input, char *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  xlate_file();
+  //      output_count=10;
+  for (char i=0;i<output_count;i++){
+        output[i]=remap256[output_array[i]];
+	if (output_array[i]==12){
+	  output_array[++i]=12;
+	  output_count++;
 	}
-
+	//       output[i]=remap256[rand()%43];
+  }
+  return output_count;
+}
 
 int makeupper(character)
 	int character;
 	{
-	if (islower(character))
-		return toupper(character);
+	  //	  if (islower(character)){
+	  if (character >= 'a' && character <= 'z'){
+	      character -= ('a' - 'A');
+	return character;
+
+		  }
 	else
 		return character;
 	}
 
-new_char()
+int new_char()
 	{
 	/*
 	If the cache is full of newline, time to prime the look-ahead
@@ -189,7 +223,7 @@ new_char()
 **	This is the input file (now input array) translator.  It sets up the first character
 **	and uses it to determine what kind of text follows.
 */
-xlate_file()
+void xlate_file()
 	{
 	/* Prime the queue */
 	Char = '\n';
@@ -205,88 +239,16 @@ xlate_file()
 		else
 		if (isalpha(Char) || Char == '\'')
 			have_letter();
-		else
-		if (Char == '$' && isdigit(Char1))
-			have_dollars();
+		//		else
+		  //	if (Char == '$' && isdigit(Char1))
+		  //	have_dollars();
 		else
 			have_special();
 		}
 	}
 
-have_dollars()
-	{
-  
-  fprintf(stderr, "Cannot read monetary values. Please enter alpha text.\n");
-  exit(1);
-  
-	long int value;
 
-	value = 0L;
-	for (new_char() ; isdigit(Char) || Char == ',' ; new_char())
-		{
-		if (Char != ',')
-			value = 10 * value + (Char-'0');
-		}
-
-	say_cardinal(value);	/* Say number of whole dollars */
-
-	/* Found a character that is a non-digit and non-comma */
-
-	/* Check for no decimal or no cents digits */
-	if (Char != '.' || !isdigit(Char1))
-		{
-		if (value == 1L)
-			outstring("dAAlER ");
-		else
-			outstring("dAAlAArz ");
-		return;
-		}
-
-	/* We have '.' followed by a digit */
-
-	new_char();	/* Skip the period */
-
-	/* If it is ".dd " say as " DOLLARS AND n CENTS " */
-	if (isdigit(Char1) && !isdigit(Char2))
-		{
-		if (value == 1L)
-			outstring("dAAlER ");
-		else
-			outstring("dAAlAArz ");
-		if (Char == '0' && Char1 == '0')
-			{
-			new_char();	/* Skip tens digit */
-			new_char();	/* Skip units digit */
-			return;
-			}
-
-		outstring("AAnd ");
-		value = (Char-'0')*10 + Char1-'0';
-		say_cardinal(value);
-
-		if (value == 1L)
-			outstring("sEHnt ");
-		else
-			outstring("sEHnts ");
-		new_char();	/* Used Char (tens digit) */
-		new_char();	/* Used Char1 (units digit) */
-		return;
-		}
-
-	/* Otherwise say as "n POINT ddd DOLLARS " */
-
-	outstring("pOYnt ");
-	for ( ; isdigit(Char) ; new_char())
-		{
-		say_ascii(Char);
-		}
-
-	outstring("dAAlAArz ");
-
-	return;
-	}
-
-have_special()
+void have_special()
 	{
 	/*if (Char == '\n')
 		outchar('\n');
@@ -299,10 +261,10 @@ have_special()
 	}
 
 
-have_number()
+void have_number()
 	{
-  fprintf(stderr, "Cannot read numerical values. Please enter alpha text.\n");
-  exit(1);
+	  //  fprintf(stderr, "Cannot read numerical values. Please enter alpha text.\n");
+	  //  exit(1);
 	long int value;
 	int lastdigit;
 
@@ -374,7 +336,8 @@ have_number()
 	/* Recognize decimal points */
 	if (Char == '.' && isdigit(Char1))
 		{
-		outstring("pOYnt ");
+		  //		outstring("pOYnt ");
+		  outnum(poynt);
 		for (new_char() ; isdigit(Char) ; new_char())
 			{
 			say_ascii(Char);
@@ -394,8 +357,9 @@ have_number()
 	return;
 	}
 
+void abbrev(char buff[]);
 
-have_letter()
+void have_letter()
 	{
 	char buff[MAX_LENGTH];
 	int count;
@@ -441,8 +405,7 @@ have_letter()
 	}
 
 /* Handle abbreviations.  Text in buff was followed by '.' */
-abbrev(buff)
-	char buff[];
+void abbrev(char buff[])
 	{
 	if (strcmp(buff, " DR ") == 0)
 		{

@@ -2,6 +2,10 @@
 
 #include "sp0256.h"
 #include "audio.h"
+#include "english2phoneme/TTS.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 
 //#include "256_roms.h"
 
@@ -1128,6 +1132,9 @@ void micro()
 	}
 }
 
+void     sp0256_newsayTTS();
+
+
  u16 sp0256_get_sample(void){
    int16_t* output=0;
    u8 dada;
@@ -1136,9 +1143,11 @@ void micro()
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     dada=adc_buffer[SELX]>>6; //this is newsay
-     m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
-     m_lrq = 0; //from 8 bit write
+     //     dada=adc_buffer[SELX]>>6; //this is newsay
+	       sp0256_newsayTTS();
+     //     sp0256_newsay();
+	  //     m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+	  //     m_lrq = 0; //from 8 bit write
    }
 
    micro();
@@ -1149,10 +1158,34 @@ void micro()
    return *output;
  }
 
+ // for text to speech we need out array, length and index...
+
+ static char TTSinarray[64]="test";
+ static char TTSoutarray[128];
+ static u8 TTSindex=0;
+ static u8 TTSlength=0;
+
  void sp0256_newsay(void){
    u8 dada;
-   m_halted=1;
+   //   m_halted=1;
    dada=adc_buffer[SELX]>>6;
+   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+ }
+
+ void sp0256_newsayTTS(void){
+   u8 dada;
+   //   m_halted=1;
+
+   // how do we get phrase into inarray - with SELX and SELY
+   dada=TTSoutarray[TTSindex];
+   TTSindex++;
+   if (TTSindex>=TTSlength) {
+     TTSindex=0;
+     TTSinarray[4]=EOF;
+     TTSlength= text2speechfor256(4,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+   }
+
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
@@ -1160,4 +1193,7 @@ void micro()
  void sp0256_init(void){
    sp0256_iinit();
    reset();
+     TTSindex=0;
+     TTSinarray[4]=EOF;
+     TTSlength= text2speechfor256(4,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
  }

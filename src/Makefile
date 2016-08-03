@@ -9,6 +9,7 @@ CC      = $(PRG_PREFIX)gcc
 LD      = $(PRG_PREFIX)gcc
 
 rsynth-portDIR	= ./rsynth-2.0-port
+ttsd= ./english2phoneme
 
 # Object files
 OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
@@ -18,8 +19,9 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			syscalls.o audio.o LPC/lpc.o effect.o biquad.o vocode.o\
 			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o tube.o channelv.o svf.o \
 			wvocoder.o wfilterbank.o digitalker.o nvp.o samplerate.o braidworm.o voicform.o scformant.o \
-			ntube.o worming.o lpc4.o wavetable.o
-#			ownvocoder.o
+			ntube.o worming.o lpc4.o wavetable.o \
+			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o
+ #			ownvocoder.o
 
 OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\
@@ -50,7 +52,7 @@ CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -I./LP
 	-c -lm -lc -fno-common -O2 \
 	-mcpu=cortex-m4 \
 	-mfloat-abi=hard \
-	-fsingle-precision-constant
+	-fsingle-precision-constant -fsigned-char
 
 
 AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard

@@ -1,4 +1,4 @@
-from en_US_rules import Ascii_codes
+from en_US_rules import miscy
 import phoneme_map
 
 #Using a map that maps phonemes to integer codes, converts the phoneme representation
@@ -8,7 +8,7 @@ new_ascii = []
 
 #Fills new_ascii with integer code representation of Ascii_codes
 def replace_phonemes(phoneme_map):
-	for elem in Ascii_codes:
+	for elem in miscy:
 		new_ascii.append(transform_string(elem))
 
 #Given a string of phonemes, returns the integer code representaion of that string
@@ -20,14 +20,14 @@ def transform_string(phoneme_string):
 		if phoneme_string[i].isupper():
 			new_string += phoneme_map[phoneme_string[i:i+2]]
 			i += 2
-			new_string += " "
+			new_string += ","
 		elif phoneme_string[i] == " ":
 			new_string += phoneme_map["PAUSE"]
-			new_string += " "
+			new_string += ",-1,"
 			i += 1
 		else:
 			new_string += phoneme_map[phoneme_string[i]]
-			new_string += " "
+			new_string += ","
 			i += 1
 	return new_string
 
@@ -36,14 +36,17 @@ def transform_string(phoneme_string):
 def output_C_format():
 	file=open("newasciifile.txt","w")
 	output = "static char *Ascii[] = \n{\n"
+        count=0
 	for code in new_ascii:
-		output += " \""
+                count=count+1
+		output += "{"
 		output += code
-		output += "\","
-	output += "\n};"
+                output += "},"
 	file.write(output)
+        print output
+        print count
 	return output
 
 phoneme_map = phoneme_map.make_map()
 replace_phonemes(phoneme_map)
-print(output_C_format())
+output_C_format()

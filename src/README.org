@@ -3152,7 +3152,7 @@ we also write 16 bit; testvotrax.pcm which seems work at higher rates
 
 - generate crow wavetables (praat?) - we also need sets of crow LPCs - larger windows... what is windowsize again in lpc? *128*
 
-// workflow for wavetables: praat inverse filter, audacity, dump to float? how to fix lengths? 32k samplerate
+// workflow for wavetables: praat inverse filter, audacity, dump to float using dumpwave.c but we need 32k samplerate
 
 how long is klatt wavetable ? in the example there are 100 sample but we can always set this...
 
@@ -3174,17 +3174,19 @@ cascade...
 
 - added experimental crow wavetable but could be a bit slower...
 
-//////
+** 3/8 TODO:
+
+- how 2d wavetable can be working
 
 - try LPCraw with other filter models and also pitch track from autocorrelation
 
-- extra worm types
+- extra worm types ported
 
-- physical/other models of raven
+[- physical/other models of raven] - - describe all modes and raven work
 
 - own primitive wormy synthesis model as suggested by votrax, ugly synth: https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
 
-- text to speech/phoneme and re-mapping of this for sp0256 and SAM...
+- test/encapsulate text to speech/phonemeTTS and re-mapping of this for: sp0256, SAM, klatt,,, what are other phoneme modes?
 
 * TODO from 1 AUG:
 
@@ -3192,11 +3194,7 @@ cascade...
 
 - ntubes injection of white noise. LPF on reflection. how close to use for singer.scm model
 
-- describe all modes and raven work
-
-- extra types of worm
-
-- basic wormed wavetablesDONE and 2d wormed wavetables
+- 2d wormed wavetables
 
 - start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
 
@@ -3206,8 +3204,6 @@ wavetable, inverse filtered audio bufer, audio buffer (and toggle off
 write on use of audio buffer), physical glottal model, stored
 wavetable as in raven, generators eg. pulse, square, and original
 (eg. TMS, Klatt)
-
-- generation of say raven wavetables using LPC/inverse filtering - lpcforlap.c and praat
 
 ->>>>>compare these synthetic (not source/filter) approaches for abstraction out into worm.c (also sco1/votrax and dirty model)
 
@@ -3504,7 +3500,7 @@ default = 72
 
 TODO: check repeat bit and end of allophoneOK, fix 0x1000 offset
 cleanlyOK, new ROMS-BELOW_TODO/DONE-TEST, parameters and bends=PITCH_DONE, port
-into generatorDONE, text to speech NRL->retroTTS/and/phoneme.cIN PROGRESS MARIE
+into generatorDONE, text to speech NRL->retroTTS/and/phoneme.cIN PROGRESS MARIE DONE TO TEST
 
 ROMS to include? as some are in sporomstest.h
 

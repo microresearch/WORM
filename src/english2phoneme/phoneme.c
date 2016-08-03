@@ -39,12 +39,24 @@
 **		+	One of E, I or Y (a "front" vowel)
 */
 
-typedef char *Rule[4];	/* A rule is four character pointers */
+//typedef char *Rule[4];	/* A rule is four character pointers */
+
+typedef struct{
+  char *rulee[3];
+  char oot[8];
+} Rule;
+
+#define MAX_LENGTH 128
 
 extern Rule *Rules[];	/* An array of pointers to rules */
 
-extern int *output_array; /*Array of ints to output*/
+extern char output_array[MAX_LENGTH]; /*Array of ints to output*/
 extern int output_count; /*Count of ints currently in output array*/
+
+int leftmatch(char* pattern, char* context);
+int rightmatch(char* pattern, char* context);
+int find_rule(char word[], int index, Rule *rules);
+
 
 int isvowel(chr)
 	char chr;
@@ -56,11 +68,10 @@ int isvowel(chr)
 int isconsonant(chr)
 	char chr;
 	{
-	return (isupper(chr) && !isvowel(chr));
+	return (chr >= 'A' && chr <= 'Z' && !isvowel(chr));
 	}
 
-xlate_word(word)
-	char word[];
+void xlate_word(char word[])
 	{
 	int index;	/* Current position in word */
 	int type;	/* First letter of match part */
@@ -68,8 +79,9 @@ xlate_word(word)
 	index = 1;	/* Skip the initial blank */
 	do
 		{
-		if (isupper(word[index]))
-			type = word[index] - 'A' + 1;
+//		if (isupper(word[index]))
+  if (word[index] >= 'A' && word[index] <= 'Z')
+    			type = word[index] - 'A' + 1;
 		else
 			type = 0;
 
@@ -78,7 +90,18 @@ xlate_word(word)
 	while (word[index] != '\0');
 	}
 
-find_rule(word, index, rules)
+void outnum(const char* ooo){
+  // run through until we get to -1 end
+  while (*ooo != -1){
+//    printf("%d ", *ooo);
+    output_array[output_count]=*ooo;
+    output_count++;
+   ooo++;
+  }
+}
+
+
+int find_rule(word, index, rules)
 	char word[];
 	int index;
 	Rule *rules;
@@ -90,12 +113,11 @@ find_rule(word, index, rules)
 	for (;;)	/* Search for the rule */
 		{
 		rule = rules++;
-		match = (*rule)[1];
+		match = (*rule).rulee[1];
 
 		if (match == 0)	/* bad symbol! */
 			{
-			fprintf(stderr,
-"Error: Can't find rule for: '%c' in \"%s\"\n", word[index], word);
+//			fprintf(stderr,"Error: Can't find rule for: '%c' in \"%s\"\n", word[index], word);
 			return index+1;	/* Skip it! */
 			}
 
@@ -111,8 +133,8 @@ find_rule(word, index, rules)
 printf("\nWord: \"%s\", Index:%4d, Trying: \"%s/%s/%s\" = \"%s\"\n",
     word, index, (*rule)[0], (*rule)[1], (*rule)[2], (*rule)[3]);
 */
-		left = (*rule)[0];
-		right = (*rule)[2];
+		left = (*rule).rulee[0];
+		right = (*rule).rulee[2];
 
 		if (!leftmatch(left, &word[index-1]))
 			continue;
@@ -124,17 +146,18 @@ printf("leftmatch(\"%s\",\"...%c\") succeded!\n", left, word[index-1]);
 /*
 printf("rightmatch(\"%s\",\"%s\") succeded!\n", right, &word[remainder]);
 */
-		output = (*rule)[3];
+//		output = (*rule)[3];
 /*
 printf("Success: ");
 */
-		outstring(output);
+//		outstring(output);
+		outnum((*rule).oot);
 		return remainder;
 		}
 	}
 
 
-leftmatch(pattern, context)
+int leftmatch(pattern, context)
 	char *pattern;	/* first char of pattern to match in text */
 	char *context;	/* last char of text to be matched */
 	{
@@ -205,7 +228,7 @@ leftmatch(pattern, context)
 
 		case '%':
 		default:
-			fprintf(stderr, "Bad char in left rule: '%c'\n", *pat);
+//			fprintf(stderr, "Bad char in left rule: '%c'\n", *pat);
 			return FALSE;
 			}
 		}
@@ -214,7 +237,7 @@ leftmatch(pattern, context)
 	}
 
 
-rightmatch(pattern, context)
+int rightmatch(pattern, context)
 	char *pattern;	/* first char of pattern to match in text */
 	char *context;	/* last char of text to be matched */
 	{
@@ -320,7 +343,7 @@ rightmatch(pattern, context)
 			return FALSE;
 
 		default:
-			fprintf(stderr, "Bad char in right rule:'%c'\n", *pat);
+//			fprintf(stderr, "Bad char in right rule:'%c'\n", *pat);
 			return FALSE;
 			}
 		}

@@ -14,10 +14,10 @@ def replace_phonemes(phoneme_map):
 	for rule in Rules:
 		for i,elem in enumerate(Rules[rule]):
 			to_transform = elem[3].split()
-			transformed = ""
+			transformed = []
 			for phoneme in to_transform:
-				transformed += phoneme_map[phoneme]
-				transformed += " "
+				transformed.append(phoneme_map[phoneme])
+#				transformed += " "
 			temp = list(elem)
 			temp[3] = transformed
 			elem = tuple(temp)
@@ -46,21 +46,26 @@ def output_C_format():
 			output += rule
 		output += "_rules[] = {"
 		for elem in Rules[rule]:
-			output += "{"
+			output += "{{"
 			output = output_helper(output, elem[0])
 			output += ", "
 			output += "\"" + elem[1] + "\"" + ","
 			output = output_helper(output, elem[2])
-			output += ", "
+			output += ", " # if its not the last elem
 			if elem == "":
-				output += "Silent"
+				output += "{-2}"
 			elif elem == " ":
 				output += "Pause"
 			else:
-				output += "\"" + elem[3] + "\""
+		#		output += "\"" + elem[3] + "\""
+                                output+="},{"
+                                for item in elem[3]:
+                                        output+=item+","
+                                output+="-1}"
 			output += "},\n"
-		output += "{Anything, 0, Anything, Silent}};\n\n"
+		output += "{{Anything, 0, Anything} {-2}}};\n\n"
 	file.write(output)
+        print(output)
 
 phoneme_map = phoneme_map.make_map()
 replace_phonemes(phoneme_map)

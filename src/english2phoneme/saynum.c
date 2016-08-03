@@ -12,77 +12,82 @@
 **
 */
 
-static char *Cardinals[] = 
-	{
-	"zIHrOW ",	"wAHn ",	"tUW ",		"THrIY ",
-	"fOWr ",	"fAYv ",	"sIHks ",	"sEHvAXn ",
-	"EYt ",		"nAYn ",		
-	"tEHn ",	"IYlEHvAXn ",	"twEHlv ",	"THERtIYn ",
-	"fOWrtIYn ",	"fIHftIYn ", 	"sIHkstIYn ",	"sEHvEHntIYn ",
-	"EYtIYn ",	"nAYntIYn "
-	} ;
+void outnum(const char* ooo);
 
-static char *Twenties[] = 
-	{
-	"twEHntIY ",	"THERtIY ",	"fAOrtIY ",	"fIHftIY ",
-	"sIHkstIY ",	"sEHvEHntIY ",	"EYtIY ",	"nAYntIY "
-	} ;
+static const char mayn[20] __attribute__ ((section (".flash"))) ={31,13,32,12,26,41,-1};
 
-static char *Ordinals[] = 
-	{
-	"zIHrOWEHTH ",	"fERst ",	"sEHkAHnd ",	"THERd ",
-	"fOWrTH ",	"fIHfTH ",	"sIHksTH ",	"sEHvEHnTH ",
-	"EYtTH ",	"nAYnTH ",		
-	"tEHnTH ",	"IYlEHvEHnTH ",	"twEHlvTH ",	"THERtIYnTH ",
-	"fAOrtIYnTH ",	"fIHftIYnTH ", 	"sIHkstIYnTH ",	"sEHvEHntIYnTH ",
-	"EYtIYnTH ",	"nAYntIYnTH "
-	} ;
+static const char infin[20] __attribute__ ((section (".flash"))) ={1,32,22,1,32,1,18,0,41,-1};
 
-static char *Ord_twenties[] = 
-	{
-	"twEHntIYEHTH ","THERtIYEHTH ",	"fOWrtIYEHTH ",	"fIHftIYEHTH ",
-	"sIHkstIYEHTH ","sEHvEHntIYEHTH ","EYtIYEHTH ",	"nAYntIYEHTH "
-	} ;
+static const char bihl[20] __attribute__ ((section (".flash"))) ={17,1,34,0,11,32,41,-1};
+
+static const char end[20] __attribute__ ((section (".flash"))) ={4,32,19,41,-1};
+
+static const char mil[20] __attribute__ ((section (".flash"))) ={31,1,34,0,11,32,-1};
+
+static const char thaw[20] __attribute__ ((section (".flash"))) ={24,14,27,4,32,19,41,-1};
+
+static const char hahn[20] __attribute__ ((section (".flash"))) ={30,12,32,19,37,3,19,41,-1};
+
+static const char Cardinals[20][20] __attribute__ ((section (".flash"))) ={
+  {27,1,37,7,41,-1},{35,12,32,41,-1},{18,9,41,-1},{24,37,0,41,-1},{22,7,37,41,-1},{22,13,23,41,-1},{26,1,20,26,41,-1},{26,3,23,11,32,41,-1},{2,18,41,-1},{32,13,32,41,-1},{18,3,32,41,-1},{0,34,3,23,11,32,41,-1},{18,35,3,34,23,41,-1},{24,10,18,0,32,41,-1},{22,7,37,18,0,32,41,-1},{22,1,22,18,0,32,41,-1},{26,1,20,26,18,0,32,41,-1},{26,3,23,3,32,18,0,32,41,-1},{2,18,0,32,41,-1},{32,13,32,18,0,32,41,-1}
+};
+
+static const char Twenties[8][20] __attribute__ ((section (".flash"))) = {
+  {18,35,3,32,18,0,41,-1},{24,10,18,0,41,-1},{22,6,37,18,0,41,-1},{22,1,22,18,0,41,-1},{26,1,20,26,18,0,41,-1},{26,3,23,3,32,18,0,41,-1},{2,18,0,41,-1},{32,13,32,18,0,41,-1}
+  };
+
+static const char Ordinals[20][20]  __attribute__ ((section (".flash"))) = {
+  {27,1,37,7,3,24,41,-1},{22,10,26,18,41,-1},{26,3,20,12,32,19,41,-1},{24,10,19,41,-1},{22,7,37,24,41,-1},{22,1,22,24,41,-1},{26,1,20,26,24,41,-1},{26,3,23,3,32,24,41,-1},{2,18,24,41,-1},{32,13,32,24,41,-1},{18,3,32,24,41,-1},{0,34,3,23,3,32,24,41,-1},{18,35,3,34,23,24,41,-1},{24,10,18,0,32,24,41,-1},{22,6,37,18,0,32,24,41,-1},{22,1,22,18,0,32,24,41,-1},{26,1,20,26,18,0,32,24,41,-1},{26,3,23,3,32,18,0,32,24,41,-1},{2,18,0,32,24,41,-1},{32,13,32,18,0,32,24,41,-1}
+};
+
+static const char Ord_twenties[8][20]  __attribute__ ((section (".flash"))) = {
+  {18,35,3,32,18,0,3,24,41,-1},{24,10,18,0,3,24,41,-1},{22,7,37,18,0,3,24,41,-1},{22,1,22,18,0,3,24,41,-1},{26,1,20,26,18,0,3,24,41,-1},{26,3,23,3,32,18,0,3,24,41,-1},{2,18,0,3,24,41,-1},{32,13,32,18,0,3,24,41,-1}
+};
 
 
 /*
 ** Translate a number to phonemes.  This version is for CARDINAL numbers.
 **	 Note: this is recursive.
 */
-say_cardinal(value)
-	long int value;
+void say_cardinal(long int value)
 	{
 	if (value < 0)
 		{
-		outstring("mAYnAHs ");
+		  //		outstring("mAYnAHs ");
+		  outnum(mayn);
 		value = (-value);
 		if (value < 0)	/* Overflow!  -32768 */
 			{
-			outstring("IHnfIHnIHtIY ");
-			return;
+			  //			outstring("IHnfIHnIHtIY ");
+			  outnum(infin);
+			  return;
 			}
 		}
 
 	if (value >= 1000000000L)	/* Billions */
 		{
 		say_cardinal(value/1000000000L);
-		outstring("bIHlIYAXn ");
+		//		outstring("bIHlIYAXn ");
+		  outnum(bihl);
 		value = value % 1000000000;
 		if (value == 0)
 			return;		/* Even billion */
-		if (value < 100)	/* as in THREE BILLION AND FIVE */
-			outstring("AEnd ");
+				if (value < 100)	/* as in THREE BILLION AND FIVE */
+		//			outstring("AEnd ");
+				  outnum(end);
 		}
 
 	if (value >= 1000000L)	/* Millions */
 		{
 		say_cardinal(value/1000000L);
-		outstring("mIHlIYAXn ");
+		//		outstring("mIHlIYAXn ");
+		outnum(mil);
 		value = value % 1000000L;
 		if (value == 0)
 			return;		/* Even million */
 		if (value < 100)	/* as in THREE MILLION AND FIVE */
-			outstring("AEnd ");
+		  outnum(end);
+		  //			outstring("AEnd ");
 		}
 
 	/* Thousands 1000..1099 2000..99999 */
@@ -90,18 +95,21 @@ say_cardinal(value)
 	if ((value >= 1000L && value <= 1099L) || value >= 2000L)
 		{
 		say_cardinal(value/1000L);
-		outstring("THAWzAEnd ");
+		//		outstring("THAWzAEnd ");
+		outnum(thaw);
 		value = value % 1000L;
 		if (value == 0)
 			return;		/* Even thousand */
-		if (value < 100)	/* as in THREE THOUSAND AND FIVE */
-			outstring("AEnd ");
+				if (value < 100)	/* as in THREE THOUSAND AND FIVE */
+				  outnum(end);
+		  //	outstring("AEnd ");
 		}
 
 	if (value >= 100L)
 		{
-		outstring(Cardinals[value/100]);
-		outstring("hAHndrEHd ");
+		  outnum(Cardinals[value/100]);
+		//		outstring("hAHndrEHd ");
+		  outnum(hahn);
 		value = value % 100;
 		if (value == 0)
 			return;		/* Even hundred */
@@ -109,13 +117,13 @@ say_cardinal(value)
 
 	if (value >= 20)
 		{
-		outstring(Twenties[(value-20)/ 10]);
+		  outnum(Twenties[(value-20)/ 10]);
 		value = value % 10;
 		if (value == 0)
 			return;		/* Even ten */
 		}
 
-	outstring(Cardinals[value]);
+	outnum(Cardinals[value]);
 	return;
 	} 
 
@@ -124,17 +132,18 @@ say_cardinal(value)
 ** Translate a number to phonemes.  This version is for ORDINAL numbers.
 **	 Note: this is recursive.
 */
-say_ordinal(value)
-	long int value;
+void say_ordinal(long int value)
 	{
 
 	if (value < 0)
 		{
-		outstring("mAHnAXs ");
+		  //		outstring("mAHnAXs ");
+		  outnum(mayn);
 		value = (-value);
 		if (value < 0)	/* Overflow!  -32768 */
 			{
-			outstring("IHnfIHnIHtIY ");
+			  //			outstring("IHnfIHnIHtIY ");
+		  outnum(infin);
 			return;
 			}
 		}
@@ -145,12 +154,15 @@ say_ordinal(value)
 		value = value % 1000000000;
 		if (value == 0)
 			{
-			outstring("bIHlIYAXnTH ");
+			  //		outstring("bIHlIYAXnTH ");
+			  outnum(bihl);
 			return;		/* Even billion */
 			}
-		outstring("bIHlIYAXn ");
-		if (value < 100)	/* as in THREE BILLION AND FIVE */
-			outstring("AEnd ");
+		  outnum(bihl);
+		//		outstring("bIHlIYAXn ");
+				if (value < 100)	/* as in THREE BILLION AND FIVE */
+				  		  outnum(end);
+		  //	  //			outstring("AEnd ");
 		}
 
 	if (value >= 1000000L)	/* Millions */
@@ -159,12 +171,15 @@ say_ordinal(value)
 		value = value % 1000000L;
 		if (value == 0)
 			{
-			outstring("mIHlIYAXnTH ");
+			  //			outstring("mIHlIYAXnTH ");
+		  outnum(mil);
 			return;		/* Even million */
 			}
-		outstring("mIHlIYAXn ");
-		if (value < 100)	/* as in THREE MILLION AND FIVE */
-			outstring("AEnd ");
+		//		outstring("mIHlIYAXn ");
+		outnum(mil);
+				if (value < 100)	/* as in THREE MILLION AND FIVE */
+				  		  outnum(end);
+		  //	outstring("AEnd ");
 		}
 
 	/* Thousands 1000..1099 2000..99999 */
@@ -175,37 +190,41 @@ say_ordinal(value)
 		value = value % 1000L;
 		if (value == 0)
 			{
-			outstring("THAWzAEndTH ");
+			  //	outstring("THAWzAEndTH ");
+		  outnum(thaw);
 			return;		/* Even thousand */
 			}
-		outstring("THAWzAEnd ");
-		if (value < 100)	/* as in THREE THOUSAND AND FIVE */
-			outstring("AEnd ");
+		//		outstring("THAWzAEnd ");
+				if (value < 100)	/* as in THREE THOUSAND AND FIVE */
+		  outnum(end);
+		  //			outstring("AEnd ");
 		}
 
 	if (value >= 100L)
 		{
-		outstring(Cardinals[value/100]);
+		  outnum(Cardinals[value/100]);
 		value = value % 100;
 		if (value == 0)
 			{
-			outstring("hAHndrEHdTH ");
+			  //	outstring("hAHndrEHdTH ");
+			  		  outnum(hahn);
 			return;		/* Even hundred */
 			}
-		outstring("hAHndrEHd ");
+		//		outstring("hAHndrEHd ");
+		  outnum(hahn);
 		}
 
 	if (value >= 20)
 		{
 		if ((value%10) == 0)
 			{
-			outstring(Ord_twenties[(value-20)/ 10]);
+			  outnum(Ord_twenties[(value-20)/ 10]);
 			return;		/* Even ten */
 			}
-		outstring(Twenties[(value-20)/ 10]);
+		outnum(Twenties[(value-20)/ 10]);
 		value = value % 10;
 		}
 
-	outstring(Ordinals[value]);
+	outnum(Ordinals[value]);
 	return;
 	} 

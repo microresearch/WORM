@@ -88,7 +88,12 @@ static char Silent[] = "";	/* No phonemes */
 #define RIGHT_PART	2
 #define OUT_PART	3
 
-typedef char *Rule[4];	/* Rule is an array of 4 character pointers */
+//typedef char *Rule[4];	/* Rule is an array of 4 character pointers */
+
+typedef struct{
+  char *rule[3];
+  signed char[8];
+} Rule;
 
 /*0 = Punctuation */
 /*

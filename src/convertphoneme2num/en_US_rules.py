@@ -585,3 +585,35 @@ Ascii_codes = [
 
 "lEHft brEYs ","vERtIHkAXl bAAr ","rAYt brEYs ","tAYld ","dEHl "
     ]
+
+Cardinals = 	[
+	"zIHrOW ",	"wAHn ",	"tUW ",		"THrIY ",
+	"fOWr ",	"fAYv ",	"sIHks ",	"sEHvAXn ",
+	"EYt ",		"nAYn ",		
+	"tEHn ",	"IYlEHvAXn ",	"twEHlv ",	"THERtIYn ",
+	"fOWrtIYn ",	"fIHftIYn ", 	"sIHkstIYn ",	"sEHvEHntIYn ",
+	"EYtIYn ",	"nAYntIYn "
+	]
+
+Twenties =	[
+	"twEHntIY ",	"THERtIY ",	"fAOrtIY ",	"fIHftIY ",
+	"sIHkstIY ",	"sEHvEHntIY ",	"EYtIY ",	"nAYntIY "
+	]
+
+Ordinals =	[
+	"zIHrOWEHTH ",	"fERst ",	"sEHkAHnd ",	"THERd ",
+	"fOWrTH ",	"fIHfTH ",	"sIHksTH ",	"sEHvEHnTH ",
+	"EYtTH ",	"nAYnTH ",		
+	"tEHnTH ",	"IYlEHvEHnTH ",	"twEHlvTH ",	"THERtIYnTH ",
+	"fAOrtIYnTH ",	"fIHftIYnTH ", 	"sIHkstIYnTH ",	"sEHvEHntIYnTH ",
+	"EYtIYnTH ",	"nAYntIYnTH "
+	]
+
+Ord_twenties = 	[
+	"twEHntIYEHTH ","THERtIYEHTH ",	"fOWrtIYEHTH ",	"fIHftIYEHTH ",
+	"sIHkstIYEHTH ","sEHvEHntIYEHTH ","EYtIYEHTH ",	"nAYntIYEHTH "
+	]
+
+miscy = [
+"mAYnAHs ", "IHnfIHnIHtIY ", "bIHlIYAXn ", "AEnd ", "mIHlIYAXn", "AEnd ", "THAWzAEnd ", "hAHndrEHd "
+]
