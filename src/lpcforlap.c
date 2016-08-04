@@ -100,6 +100,12 @@ void calculateDurbPoles(){ // into coeffs
 		//		printf("SUM: %f,,,,\n", R[i]);
 	}
 
+
+	/// NEW pitch work
+	//	float max=0;
+	//	for (i=0;i<=P_MAX;
+
+
     LPCfloat error = R[0];
 
     for (i = 0; i < P_MAX; i++) {

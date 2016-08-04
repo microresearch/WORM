@@ -154,7 +154,7 @@ void addwormsans(wormy* worm, float x, float y, float boundx, float boundy, void
   worm->wloc.x=x;
   worm->wloc.y=y;
   worm->speed=1;
-  worm->maxspeed=12.0;
+  worm->maxspeed=2.0;
   worm->acc.x=0;worm->vel.x=0;
   worm->acc.y=0;worm->vel.y=0;
   worm->dir.x=2;worm->dir.y=4;
@@ -216,7 +216,7 @@ float wormonefloat(wormy* wormyy, float speed, u8 param, float limit){ // for wo
   wormyy->boundy=wormyy->boundx=limit;
   wormyy->wormfunction(wormyy,0.0,0.0, param);
   //  *x=(wormyy->wloc.x-100.0f)/100.0f;
-  float y=wormyy->wloc.y;
+  float y=wormyy->wloc.x;
   return y;
 //  printf("%f %f\n", x, y); 
 }

@@ -598,8 +598,6 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   floot_to_int(outgoing,otherbuffer,size);
 };
 
-
-
 //u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
@@ -617,12 +615,13 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
 //(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
-
-  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
+//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
+//  dowormwavetable(carrierbuffer, &wavtable, adc_buffer[SELX], size);
   int_to_floot(incoming,voicebuffer,size);
   //  LPC_cross(voicebuffer,carrierbuffer, lastbuffer,size);
-    LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
-  floot_to_int(outgoing,lastbuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  //  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+    floot_to_int(outgoing,lastbuffer,size);
 };
 
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -632,8 +631,9 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 }  
 
 void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  float lastbuffer[32];
-  dowormwavetable(lastbuffer, &wavtable, adc_buffer[SELX], size);
+  float lastbuffer[32], otherbuffer[32];
+  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -706,7 +706,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=17; // checked=0,1,2,3,4,5,6,7,8
+  mode=14; // checked=0,1,2,3,4,5,6,7,8 17 is last
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 

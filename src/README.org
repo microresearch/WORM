@@ -3178,9 +3178,9 @@ cascade...
 
 - how 2d wavetable can be working?
 
-- try LPCraw with other filter models and also pitch track from autocorrelation
+- LPC pitch track from autocorrelation - HOW?
 
-- extra worm types ported
+- extra worm types ported: we have so far: waveworm, straightworm, wanderworm, squiggleworm // TODO: is angleworm and think on more - eigenworm 
 
 [- physical/other models of raven] - - describe all modes and raven work
 
@@ -3195,13 +3195,22 @@ TODO: selection of ascii for TTS, worm writing for TTS also - see TTS section be
 - test/encapsulate text to speech/phonemeTTS-DONE 
 
 - re-mapping of this for: sp0256-DONE, SAM-DONE, klatt-more complex and see also ipa.py, nvp-, tube.cTODO when finish this
- 
+
+- ntubes tested fine with wormed wavetable and SELZ for mid-tube scattering... can extend this - differing excitations
+
+- ntubes injection of white noise?. LPF on reflection???DONE but?
+  ///how close to use for singer.scm model -> excitation differences
+  and more tubes
+
+- try LPCraw with other filter models - tried so far with NTUBE
+
+** 5/8
+
+eigenworm wavetable !
 
 * TODO from 1 AUG:
 
 - pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this source with other filters
-
-- ntubes injection of white noise. LPF on reflection. how close to use for singer.scm model
 
 - 2d wormed wavetables
 
@@ -3240,12 +3249,6 @@ TODO:
 - mapping for SAM, for klatt, for tube?
 
 - worm writing to TTS...
-
-* ntube
-
-- port ntube.c some of which is in raven: see also [[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class::%20NTube][file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class:: NTube]]
-
-- ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
 
 * 2d wavetable notes:
 
@@ -3768,6 +3771,12 @@ braids rendervowel is 3 fofs and noise TEST-removed triggering and noise and see
 ** 6.3 fof = braids and try adding extra formants and shift these about
 ** 6.6 *** ntube // see also notes above!
 
+
+/// [[file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void%20NTube_next(NTube%20*unit,%20int%20inNumSamples)%20{][file:~/sc3-plugins/source/SLUGens/SLUGens.cpp::void NTube_next(NTube *unit, int inNumSamples) {]]
+
+
+- port ntube.c some of which is in raven: see also [[file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class::%20NTube][file:~/sc3-plugins/source/SLUGens/sc/HelpSource/Classes/NTube.schelp::class:: NTube]]
+
 - ntube port is kind of working but had to reduce size for mallocs// best to replace the mallocs-DONE - TODO to tweak co-effs
 
 see :
@@ -3778,6 +3787,8 @@ this should also be in APEX stuff but they use different scheme to check out...
 
 karray= Array.fill(43,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); // straight from x ray data in that pdf but we can't afford all...
 delayarray= Array.fill(44,{0.00049663522289812/44.0}); 
+
+
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
 

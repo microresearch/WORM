@@ -29,3 +29,4 @@ void HPZ_do(float* in, float* out, int inNumSamples);
 
 void RLPF_init(RLPF* unit);
 void RLPF_do(RLPF* unit, float* in, float* out, float freq, float reson, int inNumSamples, float mul);
+void RLPF_do_single(RLPF* unit, float* in, float* out, float freq, float reson, float mul);

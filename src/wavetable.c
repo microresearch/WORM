@@ -31,7 +31,7 @@ typedef struct {
 
 typedef struct _Wavetable {
   TRMFIRFilter *FIRFilter;
-    float *wavetable;
+    const float *wavetable;
     float basicIncrement;
     float currentPosition;
 int16_t length;
@@ -108,10 +108,10 @@ extern wormy myworm;
 inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
 {
   //    wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wavetable->basicIncrement));
-  float speed=(float)adc_buffer[SELX]/4096.0f; 
+  float speed=(float)adc_buffer[SELX]/40960.0f; 
   u8 param=adc_buffer[SELY]/128; 
-  float wm=wormonefloat(&myworm, speed, param, 512.0f);
-wavetable->currentPosition = mod0(wm,wavetable->length);
+  float wm=wormonefloat(&myworm, speed, param, (float)wavetable->length);
+  wavetable->currentPosition = wm;//mod0(wm,wavetable->length);
 }
 
 

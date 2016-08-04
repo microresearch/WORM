@@ -14,6 +14,7 @@ typedef struct wormy {
   xy acc;
   xy vel;
   xy dir;
+  int16_t counter;
   float boundx,boundy;
   float speed; // is it float?
   float maxspeed;

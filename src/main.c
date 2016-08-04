@@ -108,7 +108,7 @@ tms5200_newsay();
   Blip_init(blipper);
   RLPF_init(RLPFer);
   NTube_init(&tuber);
-  wavetable_init(&wavtable, crowtable, 142); // now last arg as length of table
+  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
   addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
 
  ////////

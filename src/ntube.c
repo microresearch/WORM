@@ -18,19 +18,33 @@
 
 #include "audio.h"
 #include "ntube.h"
+#include "scformant.h"
 #include <math.h>
 #include "arm_const_structs.h"
 
+extern RLPF *RLPFer; // TODO - do not re-use this instance
+
+
+extern __IO uint16_t adc_buffer[10];
+
+inline float somenoise(){
+float xx=(float) ( 0.5 * rand() / (RAND_MAX + 0.5) - 0.5 );
+ return xx;
+}
 
 // see NTube.schelp
+//{(NTube.ar(WhiteNoise.ar*SinOsc.ar(0.5),`[0.97, 1.0, 1.0, 1.0, 0.97], `[0.5,MouseY.kr(-1.0,1.0),0.2],`([0.01,0.02,0.01,0.005]*MouseX.kr(0.01,1.0)))*0.1).dup}.play
+//
 
 static float losses[5]={0.95, 1.0, 1.0, 1.0, 0.97};//N+1
-static float delays[4]={3, 3, 3, 3};//N - but delays in samples = length of tube which is????
+static float scatteringcoefficients[3]={0.5, 0.01, 0.2};//N-1 eg 0.01 // try vary second option -1 to +1
+static float delays[4]={3, 3, 3, 3};//N - but delays in samples not seconds = length of tube which is????
+
+// try as just 2 tubes. we can make this one just with setting ___ as XX
 
 // so we have samplenumber/32000 gives us seconds. which * 340.29 m/s gives us length of section in metres
 // so for 4 we have 4/32000 =0.000125 =0.043 which is 4cm - 4 x 4 is human tract   ... for raven is 13cm = 4x3 say
 
-static float scatteringcoefficients[3]={0.01, 0.01, 0.01};//N-1 eg 0.01
 
 	//	float * losses= unit->losses;
 	//	float * scatteringcoefficients= unit->scattering;
@@ -43,7 +57,7 @@ void NTube_init(NTube* unit) {
   u8 i; int j;
 
 	//	const u8 numinputs = unit->mNumInputs;
-	const u8 numtubes=4; ///(numinputs-1)/3;  //NOW 1+ (N+1) + N-1 + N 3N+1//WAS 1+1+N-1+N = 2N+1
+	const u8 numtubes=4; ///(numinputs-1)/3;  //NOW 1+ (N+1) + N-1 + N 3N+1//WAS 1+1+N-1+N = 2N+1 TRY as 2 NOW TEST!
 	unit->numtubes= numtubes;
 
 	unit->maxlength= 512; //no frequencies below about 50 Hz for an individual section - this can be reduced for 32k samplerate to say 512
@@ -122,6 +136,7 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 		++arg;
 		}*/
 
+	scatteringcoefficients[1]=((float)adc_buffer[SELZ]/2048.0f)-1.0f;
 	
 	int maxlength= unit->maxlength;
 	float maxlengthf= (float) maxlength;
@@ -184,7 +199,7 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
 
 		//output value
-		out[i]=rightouts[numtubes-1];
+		out[i]=rightouts[numtubes-1]; // last of the rightouts
 
 		//including filters at the ends:
 
@@ -196,18 +211,20 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 		f2out= losses[numtubes]*(0.5*f2in+0.5*rightouts[numtubes-1]);
 		f2in= rightouts[numtubes-1];
 
+		//// and if we LPF f2out?
+		RLPF_do_single(RLPFer, &f2out, &f2out, 100, 1.4f, 0.001);
+  
+
 		///////
 
 		delayline= unit->delayright[0];
 		delayline2= unit->delayleft[numtubes-1];
 
-		delayline[pos]= in[i]+f1out;
+		delayline[pos]= in[i]+f1out; 
 		delayline2[pos]= f2out;
 
-		//then update all other ins via numtubes-1 scattering junctions
-
-
-		//printf("got to here 2! %d \n",i);
+		// then update all other ins via numtubes-1 scattering junctions
+		// this is where we can choose to add white noise of GAIN SPEED? TODO!
 
 		for (j=0; j<(numtubes-1); ++j) {
 
@@ -223,7 +240,8 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
 			float loss= losses[j+1];
 			//always a loss at interface to avoid continual recirculation; separate internal loss parameter?
-			delayline[pos]= rightouts[j]*(1+k)+ (loss*(-k)*leftouts[j+1]);
+			if (j==1) delayline[pos]= rightouts[j]*(1+k)+ (loss*(-k)*leftouts[j+1]);//+somenoise(); 
+			else delayline[pos]= rightouts[j]*(1+k)+ (loss*(-k)*leftouts[j+1]); // is this reflection -k so last would be out ?
 			delayline2[pos]= (rightouts[j]*k*loss)+ ((1-k)*leftouts[j+1]);
 
 

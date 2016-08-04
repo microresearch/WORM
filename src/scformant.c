@@ -142,6 +142,46 @@ void RLPF_init(RLPF* unit)
 	unit->m_reson = 0.1;
 }
 
+void RLPF_do_single(RLPF* unit, float* in, float* out, float freq, float reson, float mul)
+{
+	float y0;
+	float y1 = unit->m_y1;
+	float y2 = unit->m_y2;
+	float a0 = unit->m_a0;
+	float b1 = unit->m_b1;
+	float b2 = unit->m_b2;
+
+	if (freq != unit->m_freq || reson != unit->m_reson) {
+		float qres = sc_max(0.001f, reson);
+		float pfreq = freq * RADPS; // freq * mRadiansPerSample; radianspers=2pi/32000 sample rate
+
+		float D = tanf(pfreq * qres * 0.5f);
+		float C = ((1.f-D)/(1.f+D));
+		//		float cosf = cos(pfreq);
+		float cosf=arm_cos_f32(pfreq);
+		b1 = (1.0 + C) * cosf;
+		b2 = -C;
+		a0 = (1.0 + C - b1) * .25;
+
+		y0 = a0 * *in + b1 * y1 + b2 * y2;
+		*out = (y0 + 2.0 * y1 + y2)*mul;
+		y2 = y1;
+		y1 = y0;
+
+		unit->m_freq = freq;
+		unit->m_reson = reson;
+		unit->m_a0 = a0;
+		unit->m_b1 = b1;
+		unit->m_b2 = b2;
+	} else {
+		y0 = a0 * *in + b1 * y1 + b2 * y2;
+		*out = (y0 + 2.0 * y1 + y2)*mul;
+		y2 = y1;
+		y1 = y0;
+	}
+	unit->m_y1 = y1;
+	unit->m_y2 = y2;
+}
 
 void RLPF_do(RLPF* unit, float* in, float* out, float freq, float reson, int inNumSamples, float mul)
 {
