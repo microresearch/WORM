@@ -2,17 +2,20 @@
 #include "samvocab.h"
 #include "render.h"
 #include "SamTabs.h"
+#include "english2phoneme/TTS.h"
 #include <stdio.h>
 
 extern __IO uint16_t adc_buffer[10];
 
 char input[256];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
+char tmpinput[128];
 
 //  char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
 
-const char* phoneme_list[54]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q"}; 
+const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; 
+
 
 //unsigned char phoneme_array[2][16]; // 16 and potential stresses
 
@@ -160,8 +163,8 @@ void sam_newsay(void){
 
   //  for (x=0;x<256;x++) input[x]=0;
 ///    index=0;
-    index=adc_buffer[SELZ]>>6;
-    strcpy(input,  sam_vocab[index]); // 64 as test CUT TODO!
+//    index=adc_buffer[SELZ]>>6;
+    //strcpy(input,  sam_vocab[index]); // 64 as test CUT TODO! - we have 1344 in vocab needs to end each with .\x9b
 
     //    strcpy(input,"AHBAE4NDUN.\x9b"); // 64 as test CUT TODO!
   //  index++;
@@ -186,8 +189,22 @@ void sam_newsay(void){
   //  input[x+1]='.';
   //  input[x+2]=0x9b;
 
+    ////////////////////////
+    // for TTS we need to put together phrase from vocab?
+    ////////////////////////
+  static char TTSinarray[64]="testing one two three";
+    static char teststring[128];
+    TTSinarray[21]=EOF;
+    char ttslength=text2speechforSAM(21, TTSinarray, tmpinput);
+    teststring[0] = '\0';
 
-  Parser1(); // if we don't parse then reject and do what?
+    for (u8 x=0;x<ttslength;x++){
+      strcat(teststring,phoneme_list[tmpinput[x]]);
+    }
+    strcat(teststring,".\x9b");
+    strcpy(input,teststring);
+    
+    if (!Parser1()) return; // if we don't parse then reject and do what? TODO!
   Parser2();
   CopyStress();
   SetPhonemeLength();

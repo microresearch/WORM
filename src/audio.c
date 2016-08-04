@@ -706,9 +706,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=2; // checked=0,1,2,3,4,5,6,7,8
+  mode=17; // checked=0,1,2,3,4,5,6,7,8
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie,fullklatt,sp0256,simpleklatt,sammy,tms5200mame,tubes, channelv,testvoc,digitalker,nvp,nvpSR,foffy,voicformy,lpc_error, test_wave, wormas_wave, test_worm_wave};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 
   generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

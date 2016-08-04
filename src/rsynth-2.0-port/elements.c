@@ -21,3 +21,11 @@ char *Ep_name[nEparm] =
  "a5", "a6", "ab", "av",
  "avc", "asp", "af"
 };
+
+/*
+void main(void){
+  unsigned char x;
+  for (x=0;x<num_Elements;x++){
+    printf("%s %d,  ",Elements[x].name, x);
+  }
+  }*/

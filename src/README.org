@@ -595,7 +595,7 @@ next bit is stress?
 
 stress is either 0,1,2 or 3
 
-so we have phoneme_num//dur//stress and 1/6/0 seems to be ending (twice??) *TODO* make that array which is test_elm
+so we have phoneme_num (0-60?)//dur//stress and 1/6/0 seems to be ending (twice??) *TODO* make that array which is test_elm
 
 - also need to get rid of pwavebuffer and write straight IN DONE
 
@@ -3172,11 +3172,11 @@ cascade...
   wavetable well more just as sound generation - it fills a
   wavetable/audio buffer TESTED but needs be slower
 
-- added experimental crow wavetable but could be a bit slower...
+- added experimental crow wavetable but could be a bit slower... NEED MORE WAVETABLES
 
 ** 3/8 TODO:
 
-- how 2d wavetable can be working
+- how 2d wavetable can be working?
 
 - try LPCraw with other filter models and also pitch track from autocorrelation
 
@@ -3186,7 +3186,16 @@ cascade...
 
 - own primitive wormy synthesis model as suggested by votrax, ugly synth: https://batchloaf.wordpress.com/2012/09/21/ugly-speech-synthesis-in-c/
 
-- test/encapsulate text to speech/phonemeTTS and re-mapping of this for: sp0256, SAM, klatt,,, what are other phoneme modes?
+TODO: selection of ascii for TTS, worm writing for TTS also - see TTS section below
+
+[note added -fsigned-char to makefile as by default char is unsigned]
+
+** 4/8:
+
+- test/encapsulate text to speech/phonemeTTS-DONE 
+
+- re-mapping of this for: sp0256-DONE, SAM-DONE, klatt-more complex and see also ipa.py, nvp-, tube.cTODO when finish this
+ 
 
 * TODO from 1 AUG:
 
@@ -3219,6 +3228,18 @@ wavetable as in raven, generators eg. pulse, square, and original
 A =   A1 * sin ( f1 * t ) +
       A2 * sin ( f2 * t ) +
       A3 * rect( f3 * t ) // in SAM as in rendervowel1
+
+* TTS
+
+in english2phoneme with convert... dir as python re-mappings...
+
+TODO:
+
+- SELX/SELY for text - what characters?
+
+- mapping for SAM, for klatt, for tube?
+
+- worm writing to TTS...
 
 * ntube
 
@@ -3331,7 +3352,7 @@ upsample=interpolate - do we need filter as this is on output?
 
 ** 0/LPC/TMS5220 - decide if keep LPC/lpc.c which is talkie code or just use TMS5200x.c!
 
-- for TMS code we can have banks/vocabs/wordlists which use 5100, 5200 of 5220 coeffs/settings TODO!
+- for TMS code we can have banks/vocabs/wordlists which use 5100, 5200 or 5220 coeffs/settings TODO!
 
 - 5100 vocab to clean up and test//5220 to test if it makes differences in a good way
 
@@ -3366,7 +3387,7 @@ from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 + morph data we have from ROMS(only works in time), and also generation of new data on this model...
 
-mix and match with ROM data, transpose coeffs on time co-ordinate (stored in stack), freeze them...
+++ mix and match with ROM data, transpose coeffs on time co-ordinate (stored in stack), freeze them...
 
 ** 1/KLATT
 
@@ -3448,6 +3469,7 @@ klatt in docs:
 
 //////
 
+** 2.5 do we want klatt which has say phoneme to next transitions
 ** 3/SAM - test/re-work - still glitchy issue
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
@@ -3627,6 +3649,8 @@ S14001A speech IC emulator]] ]
 
 ** 5/TUBE - tube.c
 
+do we want phonemes here?
+
 *where are we at: question of list of frames in earlier version and where this came from, how we manipulate, all notes above?*
 
 *looks like frames are from: [[file:~/projects/ERD_modules/worm/docs/temped/diphones.degas]]*
@@ -3754,7 +3778,6 @@ this should also be in APEX stuff but they use different scheme to check out...
 
 karray= Array.fill(43,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); // straight from x ray data in that pdf but we can't afford all...
 delayarray= Array.fill(44,{0.00049663522289812/44.0}); 
-
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
 

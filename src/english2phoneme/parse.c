@@ -26,15 +26,11 @@ static const char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 1
                    'SH':'SH', 't':'TT1', 'TH':'TH',  'UH':'UH',  'UW':'UW2','v':'VV',
                    'w':'WW', 'WH':'WH', 'y':'YY1', 'z':'ZZ', 'ZH':'ZH', 'PAUSE':'PA4' };*/
 
-// but what are numbers for 256
 /* 
 
+// but what are numbers for sp0256
 
-IY, 0, IH, 1, EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
-
-*/
-
-/*    _allophones = { 'PA1':0, 'PA2':1, 'PA3':2, 'PA4':3, 'PA5':4, 'OY':5, 'AY':6, 'EH':7, 
+    _allophones = { 'PA1':0, 'PA2':1, 'PA3':2, 'PA4':3, 'PA5':4, 'OY':5, 'AY':6, 'EH':7, 
              'KK3':8, 'PP':9, 'JH':10, 'NN1':11, 'IH':12, 'TT2':13, 'RR1':14, 'AX':15, 
              'MM':16, 'TT1':17, 'DH1':18, 'IY':19, 'EY':20, 'DD1':21, 'UW1':22, 'AO':23, 
              'AA':24, 'YY2':25, 'AE':26, 'HH1':27, 'BB1':28, 'TH':29, 'UH':30, 'UW2':31, 
@@ -43,7 +39,37 @@ IY, 0, IH, 1, EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX
              'WH':48, 'YY1':49, 'CH':50, 'ER1':51, 'ER2':52, 'OW':53, 'DH2':54, 'SS':55, 
              'NN2':56, 'HH2':57, 'OR':58, 'AR':59, 'YR':60, 'GG2':61, 'EL':62, 'BB2':63 };*/
 
-static const char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX?
+/* SAM:
+
+const char* phoneme_list[54]={0"IY", 1"IH", 2"EH", 3"AE", 4"AA", 5"AH", 6"AO", 7"OH", 8"UH", 9"UX", 10"ER", 11"AX", 12"IX", 13"EY", 14"AY", 15"OY", 16"AW", 17"OW", 18"UW", 19"R", 20"L", 21"W", 22"WH", 23"Y", 24"M", 25"N", 26"NX", 27"B", 28"D", 29"G", 30"J", 31"Z", 32"ZH", 33"V", 34"DH", 35"S", 36"SH", 37"F", 38"TH", 39"P", 40"T", 41"K", 42"CH", 43"/H", 44"YX", 45"WX", 46"RX", 47"LX", 48"/X", 49"DX", 50"UL", 51"UM", 52"UN", 53"Q"}; 
+
+most *X are all special cases?
+
+ */
+
+
+//NRL: IY, 0, IH, 1, EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
+
+//NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
+
+//KLATT: END 0,  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
+
+static const char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence?
+
+static const char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13, 2, 3, 4, 6, 17, 8, 18, 10, 11, 5, 14, 16, 15, 39, 27, 40, 28, 41, 29, 37, 33, 38, 34, 35, 31, 36, 32, 43, 24, 25, 26, 20, 21, 23, 19, 42, 30, 22, 54, 54};
+
+//static const char remapklatt[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, 48, AO, OW, UH, UW, 54, AX, AH, AY, 56, OY, 2, 11, 5, 14, 8, 17, 23, 29 , 24, 31, 25, 33, 26, 35, 28, 20, 21, 22, 40, 44, 45, 43, 36, 38, WH, PAUSE, 0};
+
+// 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
+
+//static const char remapnvp[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""};
+
+//static const char remaptubes[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""}; // see diphones.degas
+
+// klatt/nvp
+
+// tubes
+
 
 void xlate_word(char word[]);
 void spell_word(char word[]);
@@ -138,6 +164,19 @@ int text2speechfor256(int input_len, char *input, char *output){
   }
   return output_count;
 }
+
+int text2speechforSAM(int input_len, char *input, char *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  xlate_file();
+  //      output_count=10;
+  for (char i=0;i<output_count;i++){
+        output[i]=remapsam[output_array[i]];
+	}
+  return output_count;
+}
+
 
 int makeupper(character)
 	int character;
