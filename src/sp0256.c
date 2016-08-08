@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 
-//#include "256_roms.h"
+//#include "256_roms.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
 
 extern uint16_t adc_buffer[10];
 
@@ -1132,7 +1132,7 @@ void micro()
 	}
 }
 
-void     sp0256_newsayTTS();
+void sp0256_newsayTTS();
 
 
  u16 sp0256_get_sample(void){

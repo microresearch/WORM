@@ -270,7 +270,12 @@ void main(){
   int16_t sample_buffer[32];
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
 
-  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
+  //  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
+
+  for (y=0;y<3200;y++){
+    x=sinf(y);
+    printf("sinf(%d)=%f\n",y,x);
+  }
 
 
   y=128;
@@ -288,7 +293,7 @@ void main(){
   Formlet_process(formy, 32, carrierbuffer,otherbuffer);
   for (y=0;y<32;y++){
     //   carrierbuffer[y]=(float)rand()/32768.0f;
-    printf("%f %f\n",otherbuffer[y],carrierbuffer[y]);
+    //    printf("%f %f\n",otherbuffer[y],carrierbuffer[y]);
   }
 
 
@@ -304,11 +309,11 @@ void main(){
   int controlPeriod =    rint((c * 10 * 100.0) /(18.0 * 1.0));
   int sampleRate = 4.0 * controlPeriod;
 
-  printf("controlperiod %d\n",controlPeriod);
+  //  printf("controlperiod %d\n",controlPeriod);
 
   float ind=testindex();
 
-  printf("indexy %f\n",ind);
+  //  printf("indexy %f\n",ind);
 
 
 

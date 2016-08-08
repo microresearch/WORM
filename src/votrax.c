@@ -53,7 +53,7 @@ const unsigned int PHI_CLOCK_BIT = 3;     // 3 according to timing diagram
 #define CLEAR_LINE	0	/* clear (a fired, held or pulsed) line */
 #define ASSERT_LINE 1 /* assert an interrupt immediately */
 #define BIT(x,n) (((x)>>(n))&1)
-#define SAMPLE 32000 // samle_freq = /clok/16???
+#define SAMPLE 80000 // samle_freq = /clok/16??? master is 1.28 MHz /16=80000
 #define TEMP_HACKS      (1)
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -410,10 +410,11 @@ void update_subphoneme_clock_period()
 
 		// we have PhonemeLengths[m_phoneme] in ms so how many clocks is that
 		// ms * clock/1000
-		m_subphoneme_period =PhonemeLengths[m_phoneme]*(m_master_clock_freq/10000);
+		//		m_subphoneme_period =PhonemeLengths[m_phoneme]*(m_master_clock_freq/10000);
 
 	//	m_subphoneme_period=PhonemeLengths[m_phoneme];
 		ppp=(unsigned int)(ceil(period * (double)(m_master_clock_freq)));
+		ppp=PhonemeLengths[m_phoneme]*(m_master_clock_freq/20000);
 
 		//		printf("ms length %d calc_period %d new_calc %d",m_latch_80, ppp,m_subphoneme_period);
 }
@@ -1125,7 +1126,7 @@ void sound_stream_update(int samples)
 			//			printf("nnxx %d\n", noise_clock_rising);
 			// compute final noise out signal
 			noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
-			noise_out_digital = rand()%2;
+			//			noise_out_digital = rand()%2;
 						//	printf("nn %d\n", noise_out_digital);
 		} // end of curclock
 
@@ -1473,14 +1474,14 @@ void main(void){
     for (counter=0;counter<55;counter++){
   //  while(1){
 
-      //          int data=votrax[counter];
-          int data=wowoo[counter];
+      int data=votrax[counter];
+      //          int data=wowoo[counter];
 	  //	  	  data=counter;
     //    data=rand()%255;
 	  //		  data=0x1f;
 	  m_phoneme = data & 0x3f;
 
-	  const unsigned char *rom = m_rom + ((m_phoneme << 3));
+	  //	  const unsigned char *rom = m_rom + ((m_phoneme << 3));
 
 	  //          printf("STROBE %s (F1=%d F2=%d FC=%d F3=%d F2Q=%d VA=%d FA=%d CL=%d CLD=%d VD=%d PAC=%d PH=%d)\n",  		 s_phoneme_table[m_phoneme],  		rom[0] , rom[1] , rom[2] , rom[3] , rom[4] , rom[5] , rom[6] ,  		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
 
@@ -1500,7 +1501,7 @@ void main(void){
   //  printf("PPP %d\n",rom[7]*8);
   //    m_latch_80=rom[7]&0x7f;
 
-  //         update_subphoneme_clock_period();
+  update_subphoneme_clock_period();
   //ppp=PhonemeLengths[m_phoneme]*32;
 
     sound_stream_update(ppp); // length is ms which is 32 samples per ms 

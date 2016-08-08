@@ -291,7 +291,9 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
 
 In contrast to other speech modules which make use of a single speech
-chip or algorithm ERD/WORM implements multiple speech codecs...
+chip or algorithm, ERD/WORM implements multiple speech codecs...
+
+wormtable synthesis
 
 *** diagram from image - follow other formats
 
@@ -3206,13 +3208,56 @@ TODO: selection of ascii for TTS, worm writing for TTS also - see TTS section be
 
 ** 5/8
 
-eigenworm wavetable !
+- maybe not such a steep LPF on the reflection in ntube or leave it out (was better)...DONE
+
+- eigenworm wavetable ! but can't find data so far
+
+** 8/8
+
+- sc01 doesn't work but can be used as a base maybe?
+
+- what were other sp0256 roms? 012 and 019 - game phrases
+
+- where was decimation/filter? in wavetable: sample = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i); 
+
+this is downsampling/throw away samples so in our case this speeds things up?
+
+- angular worms DONE
+
+///
+
+TODO: test in speed up code same doFIR filter as above
+
+
+- quick rsynth tests with more tubes?
+
+*- constraint in worming - how far they can increment through wavetable and clean up worming a bit for multiple worm refs*
+
+- ntube notes in  notebook + later notes: what is ntubes area function of?
+
+--> k(scattering coeffs) is k= (Z1-Z0)/(Z1+Z0)-  k= (areas[i]-areas[i+1])/(areas[i]+areas[i+1])})
+ see ntube notes below
+
+
+- worm through the tubes is like expand and contract sinusoidally - so
+  like travelling wave through the 4 tubes we have... extent of that
+  expansion/contraction and speed of...
+
+test this with sine DONE but could be cleaner
+
+- where do we have cosf and sinf to speed up in ARM code!
+
+- in worm movement what is direction = xy vector and how we can change
+  this for angle and magnitude?DONE new worms added but whether these make sense -> check into wormy codeDONE and test with wavetables TODO
+
+- all notes/raven progress noted
+
+- 2d wormed wavetables->raven, worm, human voice?
 
 * TODO from 1 AUG:
 
 - pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this source with other filters
 
-- 2d wormed wavetables
 
 - start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
 
@@ -3785,10 +3830,51 @@ http://sal-slhs.webhost.uits.arizona.edu/sites/default/files/STH1996.pdf p11 - f
 
 this should also be in APEX stuff but they use different scheme to check out...
 
+
+//1-D vocal tract model: data for Ah sound for cross-sectional areas of vocal tract (see http://www-users.york.ac.uk/~dtm3/vocaltract.html and
+associated publications)
+//a=FileReader.read("/Users/nickcollins/Desktop/VowelAreaFunctions/MRI/JASAPaper/A-bart.txt"); 
+//
+//b= Array.fill(a.size.div(2),{|i| a[2*i][0]}); 
+//b.size
+//c= b[0..43].asFloat
+
+//run at higher sampling rate? 
+
+(
+var areassource= [ 0.45, 0.2, 0.26, 0.21, 0.32, 0.3, 0.33, 1.05, 1.12, 0.85, 0.63, 0.39, 0.26, 0.28, 0.23, 0.32, 0.29, 0.28, 0.4, 0.66, 1.2, 1.05,
+1.62, 2.09, 2.56, 2.78, 2.86, 3.02, 3.75, 4.6, 5.09, 6.02, 6.55, 6.29, 6.27, 5.94, 5.28, 4.7, 3.87, 4.13, 4.25, 4.27, 4.69, 5.03 ];
+var areas; 
+var loss, karray, delayarray; 
+
+//convert to sequence of k 
+
+//average length of human male vocal tract 16.9cm (14.1cm adult female)  speed of sound 340.29 m/s. So delay of vocal tract is 
+//0.169/340.29 = 0.00049663522289812 seconds
+//0.0005*44100 is about 22 samples, so less than one sample per section of the throat if more than 22 measurements used! 
+//need higher sampling rate, or less sections in model
+
+//Loy p347, p358, Kelly Lochbaum junctions used in TubeN
+//k= (Z1-Z0)/(Z1+Z0); //Z inversely proportional to A 
+//k= ((A0-A1)/(A0A1))/((A0+A1)/(A0A1)) ie similar relation for Z 
+
+//take every 4th
+areas= Array.fill(11,{|i| areassource[4*i]}); 
+
+//about 2 samples delay for each section! 
+
+loss=0.99; 
+
+karray= Array.fill(10,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); 
+
+///
+
 karray= Array.fill(43,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); // straight from x ray data in that pdf but we can't afford all...
 delayarray= Array.fill(44,{0.00049663522289812/44.0}); 
 
-
+singing: Main differences are having a nose (3-port unction) which allows singing
+nasals as M and N , noise injection in constrictions for allowing fricatives
+and a glottal wave for LFmodel excitation. 
 
 ** 7/8channel vocoder TODO svf.c and channelv.c
 

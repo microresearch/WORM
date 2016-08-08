@@ -136,7 +136,7 @@ upperPosition = mod0(lowerPosition + 1, , wavetable->length);
                               (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
 
         //  Put value through FIR filter
-        sample = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i); // TODO!
+        sample = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i);
     }
     outgoing[ii]=sample;
     //  Since we decimate, take only the second output value

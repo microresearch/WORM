@@ -37,7 +37,7 @@ float xx=(float) ( 0.5 * rand() / (RAND_MAX + 0.5) - 0.5 );
 //
 
 static float losses[5]={0.95, 1.0, 1.0, 1.0, 0.97};//N+1
-static float scatteringcoefficients[3]={0.5, 0.01, 0.2};//N-1 eg 0.01 // try vary second option -1 to +1
+static float scatteringcoefficients[3]={0.5, 0.01, 0.2};//N-1 eg 0.01 // try vary second option -1 to +1 THIS IS K
 static float delays[4]={3, 3, 3, 3};//N - but delays in samples not seconds = length of tube which is????
 
 // try as just 2 tubes. we can make this one just with setting ___ as XX
@@ -105,7 +105,7 @@ void NTube_init(NTube* unit) {
 
 void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
-	u8 i,j;
+  u8 i,j; static float count=0.0f; 
 
 	u8 numtubes= unit->numtubes;
 
@@ -136,8 +136,13 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 		++arg;
 		}*/
 
-	scatteringcoefficients[1]=((float)adc_buffer[SELZ]/2048.0f)-1.0f;
+	//	scatteringcoefficients[1]=((float)adc_buffer[SELZ]/2048.0f)-1.0f; 
+
+	// try this as worming??? there are 3 coeffs - values are -1 to 1 
 	
+	scatteringcoefficients[(int)count%3]=sinf((float)count)*0.8f;
+	count+=(float)adc_buffer[SPEED]/4096.0f;
+
 	int maxlength= unit->maxlength;
 	float maxlengthf= (float) maxlength;
 	float maxlengthfminus1= (float) (maxlength-1);
@@ -212,10 +217,7 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 		f2in= rightouts[numtubes-1];
 
 		//// and if we LPF f2out?
-		RLPF_do_single(RLPFer, &f2out, &f2out, 100, 1.4f, 0.001);
-  
-
-		///////
+		//		RLPF_do_single(RLPFer, &f2out, &f2out, 100, 1.4f, 0.001);
 
 		delayline= unit->delayright[0];
 		delayline2= unit->delayleft[numtubes-1];
