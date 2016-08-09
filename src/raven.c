@@ -1,5 +1,5 @@
 /*
- *  based on balloon1.cpp
+ *  based on balloon1.cpp - LF model...
 
 See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf
 

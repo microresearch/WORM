@@ -1828,7 +1828,7 @@ so this is locsig=reverb of one pole (1.0) of amplitude-env of oscil at freq-env
 *it is closest to tube.c as ntube/vt... ? are more generic waveguide!*
 
 and lua code: this code is incomplete as doesn't have LF (Liljen/Fant)
-glottal stuff nor tract model, but maybe we can make sense of some parameters for our tube.c
+or any glottal stuff nor tract model, but maybe we can make sense of some parameters for our tube.c
 
 - voicform? and tables we have in collated_forms
 
@@ -1878,7 +1878,7 @@ UNIANAL in JAN seems to work well - need to dig further in eg. how many frames, 
 
 residual energy is for whole frame?
 
-excitation: [[file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::void%20GeneratePulses%20(float%20fEnergy,%20short%20swPitch,%20short%20swSamplesToDo,][file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::void GeneratePulses (float fEnergy, short swPitch, short swSamplesToDo,]]
+excitation: [[file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL/src/synth.c::void%20GeneratePulses%20(float%20fEnergy,%20short%20swPitch,%20short%20swSamplesToDo,][file:~/projects/ERD_modules/worm/docs/JAN/UNIANAL_LPC/UNIANAL/src/synth.c::void GeneratePulses (float fEnergy, short swPitch, short swSamplesToDo,]]
 
 *- HMM look at - HTK// mage*
 
@@ -2025,7 +2025,7 @@ and there is flutter in this parwave but also in the klatt/parwave we use:
 
 [[file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file:%20PARWAVE.CPP][file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file: PARWAVE.CPP]]
 
-// g(t) = at2 - bf , for 0 < t < On T0 = 0 , for O<y ^ < t < Tn
+// g(t) = at2 - bf , for 0 < t < On T0 = 0 , for O<y ^ < t < Tn ???
 
 so maybe just to extract glottal excitation from parwave and use ... 
 
@@ -2201,8 +2201,6 @@ LPC tests, wavetable and excitation inputs across modes, just clean up for PARIS
 excitation is raven wavetable with incoming (eg. voice) as LPC filter to apply
 
 (also inverse filtering to output residual could be done seperately)
-
-*but raven will become seperate module*
 
 ////
 
@@ -2594,7 +2592,7 @@ PRINT #2:CHR$(100)
 now trying to add hook DONE
 
 ** 29/6
-
+/////????? WHERE? in vocab_testroms
 - added hook and dumps all (126,127 are empty?)
 
 TODO:
@@ -2728,10 +2726,6 @@ SAM
 - added bends to pitch and speed internally in render.c (not audio.c as we leave that for the moment)
 
 - crashing on new vocab and other changes in newsay - is crash in vocab or...
-
-others
-
-- cleaned up vocabs for TMS/LPC but these are all too big - see below
 
 ** 7/7
 
@@ -3166,9 +3160,9 @@ need to collate all of klatt sources/parameters and code bases...
 
 - check klatt params: rsynth, nvp, simpleklatt:
 
-nfcascade (how man cascading resonators): rsynth=2?, nvp=6 resonators
-all pre-set, simpleklatt=parwave/we set to ALL PARALLEL so NO
-cascade...
+nfcascade (how man cascading resonators): rsynth=2 but defaults to 5?,
+nvp=6 resonators all pre-set, simpleklatt=parwave/we set to ALL
+PARALLEL so NO cascade...
 
 - worming of wavetables - basic 1d worm movementDONE, also worm AS
   wavetable well more just as sound generation - it fills a
@@ -3228,9 +3222,6 @@ this is downsampling/throw away samples so in our case this speeds things up?
 
 TODO: test in speed up code same doFIR filter as above
 
-
-- quick rsynth tests with more tubes?
-
 *- constraint in worming - how far they can increment through wavetable and clean up worming a bit for multiple worm refs*
 
 - ntube notes in  notebook + later notes: what is ntubes area function of?
@@ -3245,19 +3236,38 @@ TODO: test in speed up code same doFIR filter as above
 
 test this with sine DONE but could be cleaner
 
-- where do we have cosf and sinf to speed up in ARM code!
+*- where do we have cosf and sinf to speed up in ARM code!*
 
 - in worm movement what is direction = xy vector and how we can change
   this for angle and magnitude?DONE new worms added but whether these make sense -> check into wormy codeDONE and test with wavetables TODO
 
-- all notes/raven progress noted
+** 9/8 TODO - towards stock take of whole project so to speak...
 
-- 2d wormed wavetables->raven, worm, human voice?
+- all above notes ported into TODO for each mode below and cleaned up/checked and as modes.org file
+
+- also general TODO eg. text decimation interpol, cosf and sinf speedups, triggerQ, our own synthetic mode?
+
+- also general model for division of potential sources/and/filters and knobs throughout
+
+- all notes/raven progress noted BELOW - nearly done
+
+- what we leave out so far: dynklank?, spasm/singer still as open question, collated_forms.h and bandpassing
+
+/////concrete TODO:
+
+- 2d wormed wavetables->raven, worm, human voice - see notes below,
+  morphing between-number of peaks is frequency dependent, use klatt
+  historical files maybe also..
+
+- pitch tracking code from autocorrelationWHERE? - is not directly possible in lpc auto stuff but...
+
+pitch in UNIANAL which could also look at again also with HOWTO,,, https://ccrma.stanford.edu/workshops/dsp2008/prc/Week1Labs/Filter1/pitch.c
+
+and: http://read.pudn.com/downloads115/sourcecode/speech/488885/%E4%BD%95%E5%BB%89%E6%AF%85%E7%9A%84%E5%9F%BA%E4%BA%8E%E5%80%92%E8%B0%B1%E5%9F%BA%E9%9F%B3%E6%B7%B7%E5%90%88%E5%8F%82%E6%95%B0%E8%AF%9D%E8%80%85%E8%AF%86%E5%88%AB%E7%A8%8B%E5%BA%8F/pitchdetect.cpp__.htm
 
 * TODO from 1 AUG:
 
 - pitch and wavetable on trigger (SELZ as we use incoming audio) for LPC source and try this source with other filters
-
 
 - start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
 
@@ -3297,7 +3307,7 @@ TODO:
 
 * 2d wavetable notes:
 
-how is implemented in braids: - *LEAVE FOR RAVEN or NOT?*
+how is implemented in braids: 
 
 [[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWaveMap(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWaveMap(]]
 
@@ -3310,6 +3320,24 @@ in the X direction, and the COLOR parameter scans the table in the Y
 direction, with smooth interpolation across the two directions.
 
 but also wt_map array - how is that generated?
+
+AGAIN:
+
+wavetable = wt_waves is 129 samples tables 256x of these
+
+samples from "real" samples!
+
+void DigitalOscillator::RenderWaveMap(
+
+takes 2 indexes into wt_waves which is our wavetables (checked out that is as described with like male female voices etc...)
+
+      uint16_t wave_index = \
+          (wave_coordinate[0] + i) * 16 + (wave_coordinate[1] + j);
+      wave[i][j] = wt_waves + wt_map[wave_index] * 129;
+
+wt_map is like 16x16 lookup into these - but how????
+
+*For our wavetable we can do simple 2d as simple set of tables as we move through these worm-like X and Y*
 
 * WORMINGs: worming.c and testing in simpleklatt, in worm_movement test new worm types
 
@@ -3324,17 +3352,16 @@ but also how we add worms sans malloc ... and how we set number of worms... star
 SPEED= worm speed/and type?
 SELX/Y = offset
 
-
 TODO: test on lap different worm movements...
 
 
-* important notes-TODO
+* important general notes-TODO
 
 - compost as audio_buffer - also toggle writes to this on/off
 
 - see paper notes for abstracting out of excitation and filter for
   cross-worming, interbreeding of synthesis technologies - NOTE: if we
-  use input as excitation then we need to *live inverse filter using LPC: TODO how 0 lpcanalysis sc code to try*
+  use input as excitation then we need to *live inverse filter using LPC: DONE*
 
 - abstract out constraint list->parameters and worm/selx/sely to this
 
@@ -3357,15 +3384,6 @@ and sp0256), and those on code (also sp0256, talkie and associated TMS series, n
 
 - triggers, threshold and repeat policy???
 
-- wormings and grids of params HOW?
-
-- what notes/code is for RAVEN?
-
-- worm wavetable-2d?-> how is implemented in braids: - *LEAVE FOR RAVEN or NOT?*
-
-[[file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void%20DigitalOscillator::RenderWaveMap(][file:~/projects/ERD_modules/older/eurorack/braids/digital_oscillator.cc::void DigitalOscillator::RenderWaveMap(]]
-
-wt_waves is: 256*129=33024 bytes??? how is generated...
 
 ///////
 
@@ -3402,7 +3420,9 @@ upsample=interpolate - do we need filter as this is on output?
 
 - for TMS code we can have banks/vocabs/wordlists which use 5100, 5200 or 5220 coeffs/settings TODO!
 
-- 5100 vocab to clean up and test//5220 to test if it makes differences in a good way
+- we have allophones also *NEED to check and list all that we have* - TTS also for these ALLOPHONES! TODO!
+
+- *5100 vocab to clean up and test//5220 to test if it makes differences in a good way*
 
 = spkspellroms.h *TODO*
 
@@ -3439,6 +3459,8 @@ from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 ** 1/KLATT
 
+- inverse filtered source
+
 - SELZ is pitch bend DONEbutcommented, and pulled down to single sample, put phoneme sel in main
 
 - SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!TODO
@@ -3458,6 +3480,8 @@ and/or another klatt mode for similar but basic single klatt with more modulatio
 - pausing
 
 *** relevant Klatt notes from above:
+
+
 
 - why is casc/nfcascade set so low/as 2 in def_pars.c
 
@@ -3517,7 +3541,11 @@ klatt in docs:
 
 //////
 
+
 ** 2.5 do we want klatt which has say phoneme to next transitions
+
+also TTS?
+
 ** 3/SAM - test/re-work - still glitchy issue
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
@@ -3894,6 +3922,10 @@ worming through
 
 ** 8.1 LPC vocoder/source - crossover with different sources and pitch following/off on ...
 
+*lpc4.c now!*
+
+wavetable and other insources and live LPC filter from IN! also window size variable?
+
 potential also for live TMS/LPC recodings with pitch or add manual pitch:=
 
 lookups and how this could work based on : using encoder - calc.m and
@@ -3963,7 +3995,7 @@ also multipliers and frame param over-rides for different voicesDONE
 
 - worm movements from paris python -> c-TESTING
 
-** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters - for RAVEN code or HERE?
+** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters (bbandpass all)
 
 ** XX+ various: klatt single phonemes with transitions, raw sp0256 coding, audio buffer re-workings, some low passes of above - so maybe 32 modes
 
@@ -4104,7 +4136,7 @@ NEW- crow LPC (how to reduce length of co-effs), crow glottis model, worm tubes,
 
 - RAVENs??? vocal tract length of 13 cm in ravens: formants: http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3482666/
 
-- what is klanK again?
+- what is klanK again? how differs dynklank?
 
 sort out from here and from raven.org :
 
@@ -4277,3 +4309,24 @@ how we can work with these models towards crow voice. pointers:
 
 papers: Fletcher(1988), Smyth and Smith (2002)
 
+*** raven.org etc.
+
+- vocal fry notes there and skew eg. skew in klsyn
+
+- 2mass IF model - balloon -> raven.c - DOUBLE issue, IF_final.m, 
+
+- plague model
+
+- LF - lfgen.c=more rosenberg well rest is commented out, flowgen_shimmer
+
+- Rosenberg - matlab, glottalair.py
+
+R++ and others????
+
+*- all as wavetables inc. Fletcher...*
+
+Gardner: Continuous model for vocal fold oscillations to study the effect of feedback
+
+Herzel: MergelletalJASA99.pdf
+
+Titze: 

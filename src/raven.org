@@ -20,7 +20,7 @@ approaches are:
 
 - papers and glottal models towards crow voice - tubes are not so important as modelling source. what are models?
 
-2 mass model? Ishizaka and Flanagan: IF_C = hellostkx and IF_final.m 
+2 mass model? Ishizaka and Flanagan: IF_C = hellostkx???? and IF_final.m 
 
 model in Fletcher? and in Smyth and Smith: Bernoulli and waveguide
 
