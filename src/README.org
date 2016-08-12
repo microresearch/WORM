@@ -3245,11 +3245,9 @@ test this with sine DONE but could be cleaner
 
 - all above notes ported into TODO for each mode below and cleaned up/checked and as modes.org file
 
-- also general TODO eg. text decimation interpol, cosf and sinf speedups, triggerQ, our own synthetic mode?
+- also general TODO eg. text decimation interpol tests, cosf and sinf speedups, triggerQ, our own synthetic mode?
 
 - also general model for division of potential sources/and/filters and knobs throughout
-
-- all notes/raven progress noted BELOW - nearly done
 
 - what we leave out so far: dynklank?, spasm/singer still as open question, collated_forms.h and bandpassing
 
@@ -3259,11 +3257,40 @@ test this with sine DONE but could be cleaner
   morphing between-number of peaks is frequency dependent, use klatt
   historical files maybe also..
 
+we need to derive and edit wavetables first: real raven, real human,
+historical speech synth models, glottal models as below with varying parameters...
+
 - pitch tracking code from autocorrelationWHERE? - is not directly possible in lpc auto stuff but...
 
 pitch in UNIANAL which could also look at again also with HOWTO,,, https://ccrma.stanford.edu/workshops/dsp2008/prc/Week1Labs/Filter1/pitch.c
 
 and: http://read.pudn.com/downloads115/sourcecode/speech/488885/%E4%BD%95%E5%BB%89%E6%AF%85%E7%9A%84%E5%9F%BA%E4%BA%8E%E5%80%92%E8%B0%B1%E5%9F%BA%E9%9F%B3%E6%B7%B7%E5%90%88%E5%8F%82%E6%95%B0%E8%AF%9D%E8%80%85%E8%AF%86%E5%88%AB%E7%A8%8B%E5%BA%8F/pitchdetect.cpp__.htm
+
+** 11/8
+
+- single tube model -> pluck.c now in raven.c testedDONE
+
+
+** 12/8
+
+pitch track, raven/glottis models, decimation filter tests, generate and collect wavetables
+
+///
+
+- raven/syrinx/glottis models below to work through:
+
+Ishizaka Flanagan=IF: raven.c - question of parameters and double but could be used for wavetables????
+
+LF and others: lfgen.c = now test code in lfgen2.c is working 
+Rosenberg in lfgen
+
+glottalair.py = klglot88? PORTED
+
+shimmer=FANT -> port?
+
+[raven_model.py // praat/artsynth ]
+
+TODO: compile all possible sources!
 
 * TODO from 1 AUG:
 
@@ -3356,6 +3383,8 @@ TODO: test on lap different worm movements...
 
 
 * important general notes-TODO
+
+- for excitation 1v per octave
 
 - compost as audio_buffer - also toggle writes to this on/off
 
@@ -4313,11 +4342,11 @@ papers: Fletcher(1988), Smyth and Smith (2002)
 
 - vocal fry notes there and skew eg. skew in klsyn
 
-- 2mass IF model - balloon -> raven.c - DOUBLE issue, IF_final.m, 
+- 2mass IF model - balloon -> raven.c= makes audio but need to tweak settings - DOUBLE issue, IF_final.m
 
 - plague model
 
-- LF - lfgen.c=more rosenberg well rest is commented out, flowgen_shimmer
+- LF - lfgen.c=more rosenberg well rest is commented out but can be tested, flowgen_shimmer
 
 - Rosenberg - matlab, glottalair.py
 
@@ -4330,3 +4359,13 @@ Gardner: Continuous model for vocal fold oscillations to study the effect of fee
 Herzel: MergelletalJASA99.pdf
 
 Titze: 
+
+* hardware test code:
+
+- We need to test:
+
+1/ each poti extent and CVs
+2/ audio in
+3/ audio out - patch out
+
+Q is to test WITHOUT all connections - program/audio out say mode=1

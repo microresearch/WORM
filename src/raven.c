@@ -1,223 +1,421 @@
-/*
- *  based on balloon1.cpp - LF model...
+ /*
+  *  based on balloon1.cpp - LF model...
 
-See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf
-
- */
-#include <stdio.h>
-#include "math.h"
-
-// forlap: 
-
-// port below, and one tube for raven trachea - from twotube to onetube SC code: SLUGens.cpp
-// or maybe replace with pluck.c code  from JOS: https://ccrma.stanford.edu/~jos/pmudw/pluck.c
-
-////output= TwoTube.ar(input, scatteringcoefficient,lossfactor,d1length,d2length);
-
-// setting up
-
-FILE *fo;
-
-int d1length=3; // what is d1length measured in??? relates to length in mm, speed sound and samplerate I guess...
-int d2length=4; // what is d1length measured in??? relates to length in mm, speed sound and samplerate I guess...
-
-// delay = round( L * fs / c); = say for 70mm = 0.07 * 32000 (here) / 347.23   // speed of sound (m/sec)
-
-float lossfactor=0.9;
-
-float delay1right[7]; //->d1length of floats
-float delay1left[7];//=>d1length of floats
-
-float delay2right[7]; //->d1length of floats
-float delay2left[7];//=>d1length of floats
-
-
-void OneTube_init(void){
-	int i;
-
-	//initialise to zeroes!
-	for (i=0; i<d1length; ++i) {
-		delay1right[i]= 0.0;
-		delay1left[i]= 0.0;
-		delay2right[i]= 0.0;
-		delay2left[i]= 0.0;
-
-	}
-}
-
-float f1in= 0.0;
-float f1out= 0.0;
-float f2in= 0.0;
-float f2out= 0.0;
-
-int d1rightpos= 0;
-int d1leftpos= 0;
-int d2rightpos= 0;
-int d2leftpos= 0;
-
-
-void OneTube_next(float *inn, int inNumSamples) {
-
-	int i;
-
-	//value to store
-	float * in = inn;//= IN(0);
-	//	float * out;//= OUT(0);
-	float k= 0.9;// (float)ZIN0(1); //scattering coefficient updated at control rate?
-	float loss= lossfactor;
-
-	float * d1right= delay1right;
-	float * d1left= delay1left;
-	float * d2right= delay2right;
-	float * d2left= delay2left;
-
-	//have to store filter state around loop; probably don't need to store output, but oh well
-
-	for (i=0; i<inNumSamples; ++i) {
-
-		//update outs of all delays
-		float d1rightout= d1right[d1rightpos];
-		float d1leftout= d1left[d1leftpos];
-		float d2rightout= d2right[d2rightpos];
-		float d2leftout= d2left[d2leftpos];
-
-		//output value
-		//		out[i]=d1rightout;
-
-
-		signed int s16=(signed int)(d1rightout*32768.0);
-		//		signed int s16=(signed int)(in[i]*32768.0);
-		//		printf("d1out %d in  %d \n",s16, (signed int)(in[i]*32768.0));
-	       fwrite(&s16,2,1,fo);
-
-		//update all filters
-		f1out= loss*0.5*(f1in+d1leftout);
-		f1in= d1leftout;
-
-		f2out= loss*(0.5*f2in+0.5*d2rightout);
-		f2in= d2rightout;
-
-		//calculate inputs of all delays
-		d1right[d1rightpos]= in[i]+f1out;
-		d2right[d2rightpos]= d1rightout*(1+k)+ ((-k)*d2leftout);
-		d2left[d2leftpos]= f2out;
-		//		d1left[d1leftpos]= d1rightout*k+ ((1-k)*d2leftout);
-		d1left[d1leftpos]= d1rightout*k;//+ ((1-k)*d2leftout); FIX!
-
-		//update delay line position pointers
-
-		d1rightpos= (d1rightpos+1)%d1length;
-		d2rightpos= (d2rightpos+1)%d2length;
-		d1leftpos= (d1leftpos+1)%d1length;
-		d2leftpos= (d2leftpos+1)%d2length;
-	}
-}
-
-double computeSample(double pressure_in);
-void clearOld();
-
-double ps;		//subglottal pressure
-double r1;		//damping factor
-double r2;
-double m1;		//mass
-double m2;
-double k1;		//spring constant
-double k2;
-double k12;		//coupling spring constant
-double d1;		//glottal width
-double d2;
-double lg;		//glottal length
-double aida;		//nonlinearity coefficient
-double S;			//subglottal surface area
-double Ag01;		//nominal glottal area, with mass at rest position
-double Ag02;
-double pm1Prev;	//pressure at previous time step
-double pm2Prev;
-double x1Prev;	//displacement at previous time step
-double x1PrevPrev;//displacement at previous time step to the previous one
-double x2Prev;
-double x2PrevPrev;
-double gain;		//after-market gain
-double uPrev;		//previous flow value
-double Fs;		//calculation sampling rate, not actual audio output sample rate
-
-
-void init(){
-
-  // adapt these settings for potential raven voice
-
-  // from MATLAB code: also there is pressure envelope there
-
-  /*
-
-p=0;        %relative output pressure, 
-rho = 1.14; %kg/m^3 mass density
-v = 1.85e-5; %N*s/m^2 greek new: air shear viscosity
-lg = 1.63e-2; %m glottal length
-
-twod = 3e-5; %m, glottal width 2d1
-d1=twod/2; %1.5000e-005
-d2=d1;
-m = 4.4e-5/90; %kg, glottal mass // why /90 - otherwise accords for human glottis
-m1=m; %4.8889e-007
-m2=m;
-k12=0.04; %coupling spring constant
-k = 0.09; %N/m, spring constant
-k1=k;
-k2=k1;
-aida=1000000.01; %non-linearity factor
-r = 0.0001*sqrt(m*k); %damper constant, N*s/m
-r1=r*1;
-r2=r1; %2.0976e-008
-%Ag0 = 5e-6; %m^2 glottal area at rest = 5mm^2=5e-6
-Ag0 = 5e-9; %m^2 glottal area at rest
-S = 5e-5; %m^2 output area (vocal tract end)
-%S = 5e-4; %m^2 output area (vocal tract end)
+ See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf - measurements
 
   */
+ #include <stdio.h>
+ #include "math.h"
+ #include <stdlib.h>
+ #include <sys/stat.h>
+ #include <sys/times.h>
+ #include <sys/unistd.h>
 
-  /* raven details (see kahrs.pdf and zacarelli)
+ // forlap: 
 
-kahrs: 
+ // port below, and one tube for raven trachea - from twotube to onetube SC code: SLUGens.cpp
+ // or maybe replace with pluck.c code  from JOS: https://ccrma.stanford.edu/~jos/pmudw/pluck.c
 
-from zacarelli we have:
+ ////output= TwoTube.ar(input, scatteringcoefficient,lossfactor,d1length,d2length);
 
-stiffness (g ms−2)	k1, k2	22.0×10−3
-damping constant (g ms−1)	r1, r2	1.2×10−3
-coupling constant (g ms−2)	kc	6.0×10−3
+ // setting up
 
-but not sure how to convert between????
+ FILE *fo;
 
-m1/m2=glottal mass - 3.848451000647498e-6 - 0.00000384 /90
+ int d1length=3; // what is d1length measured in??? relates to length in mm, speed sound and samplerate I guess...
+ int d2length=4; // what is d1length measured in??? relates to length in mm, speed sound and samplerate I guess...
 
-k1/k2-spring constant N/m - 3.11 ???
-k12=coupling spring constant ???
+ // delay = round( L * fs / c); = say for 70mm = 0.07 * 32000 (here) / 347.23   // speed of sound (m/sec)
 
-d1/d2=glottal width 2dl /2??? diameter is 7mm  say 2mm now or is this *thickness?* 1e-4 - from fletcher is 100 micrometer
-r1/r2 = 0.0001*sqrt(m*k); %damper constant, N*s/m - 1.386e-7 // but depends on K spring constant can vary 0.0001
+ double lossfactor=0.9;
 
-Ag0 = 5e-9; %m^2 glottal area at rest - 2mm say at rest= 3.14mm 3.14e-6
-S = 5e-5; %m^2 output area (vocal tract end) - 20mm diameter BEAK 314mm = 0.000314
+ //just need delay1 for one TUBE!!
 
-lg= 1.63e-2; %m glottal length - say 7mm=7e-3
+ double delay1right[7]; //->d1length of doubles
+ double delay1left[7];//=>d1length of doubles
+
+ double delay2right[7]; //->d1length of doubles
+ double delay2left[7];//=>d1length of doubles
+
+ void donoise(short *out, int numSamples){
+   int x;
+   for (x=0;x<numSamples;x++){
+     double xx=(double) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
+     out[x]=xx*8000.0;
+   }
+ }
+
+
+ void do_impulse(short* out, int numSamples, int freq){ //- so for 256 samples we have freq 125 for impulse
+     // from Impulse->LFUGens.cpp
+   int i;
+   static double phase =0.0f;
+   double z, freqinc;
+   freqinc=0.00003125 * freq;
+
+   for (i=0; i<numSamples;++i) {
+     if (phase >= 1.f) {
+       phase -= 1.f;
+       z = 1.f;
+     } else {
+       z = 0.f;
+     }
+     phase += freqinc; // punch in freq is freqmul=1/32000 = 0.00003125 * 1000 (32000/32) = 0.03125
+     out[i]=z*32768.0f;
+     //    fwrite(&out[i],2,1,fo);
+
+   }
+ }
+
+
+ void OneTube_init(void){
+	 int i;
+
+	 //initialise to zeroes!
+	 for (i=0; i<d1length; ++i) {
+		 delay1right[i]= 0.0;
+		 delay1left[i]= 0.0;
+		 delay2right[i]= 0.0;
+		 delay2left[i]= 0.0;
+
+	 }
+ }
+
+ double f1in= 0.0;
+ double f1out= 0.0;
+ double f2in= 0.0;
+ double f2out= 0.0;
+
+ int d1rightpos= 0;
+ int d1leftpos= 0;
+ int d2rightpos= 0;
+ int d2leftpos= 0;
+
+ void OneTube_next(double *inn, int inNumSamples) {
+
+	 int i;
+
+	 //value to store
+	 double * in = inn;//= IN(0);
+	 //	double * out;//= OUT(0);
+	 double k= 0.9;// (double)ZIN0(1); //scattering coefficient updated at control rate?
+	 double loss= lossfactor;
+
+	 // easier stick with originals
+
+	 double * d1right= delay1right;
+	 double * d1left= delay1left;
+	 double * d2right= delay2right;
+	 double * d2left= delay2left;
+
+	 //have to store filter state around loop; probably don't need to store output, but oh well
+
+	 for (i=0; i<inNumSamples; ++i) {
+
+		 //update outs of all delays
+		 double d1rightout= d1right[d1rightpos];
+		 double d1leftout= d1left[d1leftpos];
+		 double d2rightout= d2right[d2rightpos];
+		 double d2leftout= d2left[d2leftpos];
+
+		 //output value
+		 //		out[i]=d1rightout;
+
+
+		 signed int s16=(signed int)(d1rightout*32768.0);
+		 s16=in[i]*32768.0;
+		 //		signed int s16=(signed int)(in[i]*32768.0);
+		 //		 printf("ff %f \n",in[i]);
+		fwrite(&s16,2,1,fo);
+
+		 //update all filters
+		 f1out= loss*0.5*(f1in+d1leftout);
+		 f1in= d1leftout;
+
+		 f2out= loss*(0.5*f2in+0.5*d2rightout);
+		 f2in= d2rightout;
+
+		 //calculate inputs of all delays
+		 d1right[d1rightpos]= in[i]+f1out;
+		 d2right[d2rightpos]= d1rightout*(1+k)+ ((-k)*d2leftout);
+		 d2left[d2leftpos]= f2out;
+		 d1left[d1leftpos]= d1rightout*k+ ((1-k)*d2leftout);
+		 //		d1left[d1leftpos]= d1rightout*k;//+ ((1-k)*d2leftout); FIX!
+
+		 //update delay line position pointers
+
+		 d1rightpos= (d1rightpos+1)%d1length;
+		 d2rightpos= (d2rightpos+1)%d2length;
+		 d1leftpos= (d1leftpos+1)%d1length;
+		 d2leftpos= (d2leftpos+1)%d2length;
+	 }
+ }
+
+
+ #define DOUBLE_TO_SHORT(x) ((int)((x)*32768.0))
+
+ typedef struct _DelayLine {
+     short *data;
+     int length;
+     short *pointer;
+     short *end;
+ } DelayLine;
+
+ static DelayLine *initDelayLine(int len) {
+     DelayLine *dl = (DelayLine *)calloc(len, sizeof(DelayLine));
+     dl->length = len;
+     if (len > 0)
+	 dl->data = (short *)calloc(len, len * sizeof(short));
+     else
+	 dl->data = 0;
+     dl->pointer = dl->data;
+     dl->end = dl->data + len - 1;
+     return dl;
+ }
+
+ static void freeDelayLine(DelayLine *dl) {
+     if (dl && dl->data)
+		 free(dl->data);
+     dl->data = 0;
+     free(dl);
+ }
+
+ inline static void setDelayLine(DelayLine *dl, double *values, double scale) {
+     int i;
+     for (i=0; i<dl->length; i++)
+	 dl->data[i] = DOUBLE_TO_SHORT(scale * values[i]);
+ }
+
+ /* lg_dl_update(dl, insamp);
+  * Places "nut-reflected" sample from upper delay-line into
+  * current lower delay-line pointer location (which represents
+  * x = 0 position).  The pointer is then incremented (i.e. the
+  * wave travels one sample to the left), turning the previous
+  * position into an "effective" x = L position for the next
+  * iteration.
+  */
+ static inline void lg_dl_update(DelayLine *dl, short insamp) {
+     register short *ptr = dl->pointer;
+     *ptr = insamp;
+	 ptr++;
+     if (ptr > dl->end)
+	 ptr = dl->data;
+     dl->pointer = ptr;
+ }
+
+ /* rg_dl_update(dl, insamp);
+  * Decrements current upper delay-line pointer position (i.e.
+  * the wave travels one sample to the right), moving it to the
+  * "effective" x = 0 position for the next iteration.  The
+  * "bridge-reflected" sample from lower delay-line is then placed
+  * into this position.
+  */
+ static inline void rg_dl_update(DelayLine *dl, short insamp) {
+     register short *ptr = dl->pointer;    
+	 ptr--;
+     if (ptr < dl->data)
+	 ptr = dl->end;
+	 *ptr = insamp;
+     dl->pointer = ptr;
+ }
+
+ /* dl_access(dl, position);
+  * Returns sample "position" samples into delay-line's past.
+  * Position "0" points to the most recently inserted sample.
+  */
+ static inline short dl_access(DelayLine *dl, int position) {
+     short *outloc = dl->pointer + position;
+     while (outloc < dl->data)
+	 outloc += dl->length;
+     while (outloc > dl->end)
+	 outloc -= dl->length;
+     return *outloc;
+ }
+
+ /*
+  *  Right-going delay line:
+  *  -->---->---->--- 
+  *  x=0
+  *  (pointer)
+  *  Left-going delay line:
+  *  --<----<----<--- 
+  *  x=0
+  *  (pointer)
+  */
+
+ /* rg_dl_access(dl, position);
+  * Returns spatial sample at location "position", where position zero
+  * is equal to the current upper delay-line pointer position (x = 0).
+  * In a right-going delay-line, position increases to the right, and
+  * delay increases to the right => left = past and right = future.
+  */
+ static inline short rg_dl_access(DelayLine *dl, int position) {
+     return dl_access(dl, position);
+ }
+
+ /* lg_dl_access(dl, position);
+  * Returns spatial sample at location "position", where position zero
+  * is equal to the current lower delay-line pointer position (x = 0).
+  * In a left-going delay-line, position increases to the right, and
+  * delay DEcreases to the right => left = future and right = past.
+  */
+ static inline short lg_dl_access(DelayLine *dl, int position) {
+     return dl_access(dl, position);
+ }
+
+ static DelayLine *upper_rail,*lower_rail;
+
+ static inline short bridgeReflection(int insamp) {
+     static short state = 0; /* filter memory */
+     /* Implement a one-pole lowpass with feedback coefficient = 0.5 */
+     /* outsamp = 0.5 * outsamp + 0.5 * insamp */
+     short outsamp = (state >> 1) + (insamp >> 1);
+     state = outsamp;
+     return outsamp;
+ }
+
+
+ void single_tube_init(int len){
+     int i, rail_length = len;
+     upper_rail = initDelayLine(rail_length);
+     lower_rail = initDelayLine(rail_length);
+ }
+
+ void single_tube(short *inn, int inNumSamples, int length) {
+     short yp0,ym0,ypM,ymM;
+     int i;
+     short outsamp, outsamp1,out;
+     for (i=0;i<inNumSamples;i++){
+
+     /* Output at pickup location */
+     out  = rg_dl_access(upper_rail, length-1);
+     fwrite(&out,2,1,fo);
+
+     //    outsamp1 = lg_dl_access(lower_rail, pickup_loc);
+     //	outsamp += outsamp1;
+
+     ym0 = lg_dl_access(lower_rail, 1);     /* Sample traveling into "bridge" */ // bridge is base of trachea
+     ypM = rg_dl_access(upper_rail, length - 1); /* Sample to "nut" */ // was -2 why???? nut is mouth/air/beak
+
+     ymM = -ypM;                    /* Inverting reflection at rigid nut */
+     //    yp0 = -bridgeReflection(ym0)+inn[i];  /* Reflection at yielding bridge */  // where do we add our incoming sample?
+     yp0=(ym0*0.9)+inn[i];
+
+     /* String state update */
+     rg_dl_update(upper_rail, yp0);  // was yp0 /* Decrement pointer and then update */
+     lg_dl_update(lower_rail, ymM); /* Update and then increment pointer */
+     }
+
+
+ }
+
+ //./..........
+
+ double computeSample(double pressure_in);
+ void clearOld();
+
+ double ps;		//subglottal pressure
+ double r1;		//damping factor
+ double r2;
+ double m1;		//mass
+ double m2;
+ double k1;		//spring constant
+ double k2;
+ double k12;		//coupling spring constant
+ double d1;		//glottal width
+ double d2;
+ double lg;		//glottal length
+ double aida;		//nonlinearity coefficient
+ double S;			//subglottal surface area
+ double Ag01;		//nominal glottal area, with mass at rest position
+ double Ag02;
+ double pm1Prev;	//pressure at previous time step
+ double pm2Prev;
+ double x1Prev;	//displacement at previous time step
+ double x1PrevPrev;//displacement at previous time step to the previous one
+ double x2Prev;
+ double x2PrevPrev;
+ double gain;		//after-market gain
+ double uPrev;		//previous flow value
+ double Fs;		//calculation sampling rate, not actual audio output sample rate
+
+
+ void init(){
+
+   // adapt these settings for potential raven voice
+
+   // from MATLAB code: also there is pressure envelope there
+
+   /*
+
+ p=0;        %relative output pressure, 
+ rho = 1.14; %kg/m^3 mass density
+ v = 1.85e-5; %N*s/m^2 greek new: air shear viscosity
+ lg = 1.63e-2; %m glottal length
+
+ twod = 3e-5; %m, glottal width 2d1
+ d1=twod/2; %1.5000e-005
+ d2=d1;
+ m = 4.4e-5/90; %kg, glottal mass // why /90 - otherwise accords for human glottis
+ m1=m; %4.8889e-007
+ m2=m;
+ k12=0.04; %coupling spring constant
+ k = 0.09; %N/m, spring constant
+ k1=k;
+ k2=k1;
+ aida=1000000.01; %non-linearity factor
+ r = 0.0001*sqrt(m*k); %damper constant, N*s/m
+ r1=r*1;
+ r2=r1; %2.0976e-008
+ %Ag0 = 5e-6; %m^2 glottal area at rest = 5mm^2=5e-6
+ Ag0 = 5e-9; %m^2 glottal area at rest
+ S = 5e-5; %m^2 output area (vocal tract end)
+ %S = 5e-4; %m^2 output area (vocal tract end)
 
    */
 
-//	r1 =2.0976e-8;
-	r1 =1.2e-3;
-//	r2 =2.0976e-8;
-	r2 =1.2e-3;
-	m1=3.848e-6;
-//	m1 =5.8889e-6;
-	m2 =3.848e-6;
+   /* raven details (see kahrs.pdf and zacarelli)
 
-	k1 =0.1;
-	k2 =0.1;
-	//	k2 =0.5;
-//	k12=0.04;
-	k12=0.04;
-	//	aida =10000000.0;
-	aida =0.000001;
+ kahrs: 
+
+ from zacarelli we have:
+
+ stiffness (g ms−2)	k1, k2	22.0×10−3
+ damping constant (g ms−1)	r1, r2	1.2×10−3
+ coupling constant (g ms−2)	kc	6.0×10−3
+
+ but not sure how to convert between????
+
+ m1/m2=glottal mass - 3.848451000647498e-6 - 0.00000384 /90
+
+ k1/k2-spring constant N/m - 3.11 ???
+ k12=coupling spring constant ???
+
+ d1/d2=glottal width 2dl /2??? diameter is 7mm  say 2mm now or is this *thickness?* 1e-4 - from fletcher is 100 micrometer
+ r1/r2 = 0.0001*sqrt(m*k); %damper constant, N*s/m - 1.386e-7 // but depends on K spring constant can vary 0.0001
+
+ Ag0 = 5e-9; %m^2 glottal area at rest - 2mm say at rest= 3.14mm 3.14e-6
+ S = 5e-5; %m^2 output area (vocal tract end) - 20mm diameter BEAK 314mm = 0.000314
+
+ lg= 1.63e-2; %m glottal length - say 7mm=7e-3
+
+    */
+
+ //	r1 =2.0976e-8;
+//	 r1 =1.2e-3;
+ //	r2 =2.0976e-8;
+//	 r2 =1.2e-3;
+//	 m1=3.848e-6;
+ //	m1 =5.8889e-6;
+//	 m2 =3.848e-6;
+
+//	 k1 =0.5;
+//	 k2 =0.5;
+	 //	k2 =0.5;
+ //	k12=0.04;
+//	 k12=0.04;
+	 //	aida =10000000.0;
+//aida =0.000001;
 //	d1 =1.5e-5;
 	d1 =0.00005;
 	d2 =0.00005;
@@ -241,22 +439,22 @@ lg= 1.63e-2; %m glottal length - say 7mm=7e-3
 
   /// ballon
 
-  /*
+  
 //	r1 =2.0976e-8;
-	r1 =2.0976e-8;
+	r1 =2.0976e-6;
 //	r2 =2.0976e-8;
-	r2 =2.0976e-8;
+	r2 =2.0976e-6;
 //	m1 =4.8889e-7;
 	m1 =5.8889e-6;
 //	m2 =4.8889e-7;
 	m2 =5.8889e-6;
 	k1 =0.5;
-//	k2 =0.09;
-	k2 =0.5;
+	k2 =0.09;
+//	k2 =0.5;
 //	k12=0.04;
 	k12=0.04;
-//	aida =10000000.0;
-	aida =0.000001;
+	aida =10000000.0;
+//	aida =0.000001;
 //	d1 =1.5e-5;
 	d1 =1.5e-5;
 	d2 =1.5e-5;
@@ -273,13 +471,13 @@ lg= 1.63e-2; %m glottal length - say 7mm=7e-3
 	pm2Prev=0.0;
 	uPrev=0.0;
 	ps=0.0;
-	Fs=48000.0;
-  */
+	Fs=32000.0;
+  
 }
 
 
-int rtick(float *buffer, int bufferSize, double pressureIn) {
-  float *samples = (float *) buffer;
+int rtick(double *buffer, int bufferSize, double pressureIn) {
+  double *samples = (double *) buffer;
 
 /*	bsynth->setM1(5e-8*(double)[(id)dataPointer m1In]);
 	bsynth->setM2(5e-8*(double)[(id)dataPointer m2In]);
@@ -333,41 +531,17 @@ else
 	  pressureIn=300; // 0.3 kPa after Fletcher
 
 	  //   signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
-	  *samples++=(float)(computeSample(pressureIn));
+	  *samples++=(double)(computeSample(pressureIn));
    //   printf("%d\n",s16);
    //   fwrite(&s16,2,1,fo);
    lastp=pressureIn;
+   //   fwrite(&s16,2,1,fo);
+
    //*samples++ = [(id)dataPointer amp] * bsynth->tick();
 	}
 
 	return 0;
 };
-
-void main(void){
-  int x;
-  fo = fopen("testraven.pcm", "wb");
-
-  init();
-  float buffer[32000];  // try now varying some parameters each second:
-
-  OneTube_init();
-
-  for (x=0;x<10;x++){
-  rtick(buffer, 32000, 300.0);
-          k1=k1+0.01;
-  //    m1=m1+0.00001;
-  	k2=k1;
-	//    m2=m1;
-    r1=0.0001*sqrt(m1*k1);
-    r2=r1;
-
-    //    d1+=0.00001;
-    //    d2=d1;
-    OneTube_next(buffer, 32000);
-    clearOld();
-  OneTube_init();
-  }
-}
 
 double computeSample(double pressure_in){
   double T=1/Fs;
@@ -556,4 +730,42 @@ pm2Prev=0;
 uPrev=0;
 ps=0;
 }
+
+void main(void){
+  int x,lenny=8,freq=200;
+  fo = fopen("testraven.pcm", "wb");
+
+  init();
+  double buffer[320000];  // try now varying some parameters each second:
+
+  OneTube_init();
+
+  // we need some kind of input?
+
+  /*  for (x=0;x<100;x++){
+    single_tube_init(lenny);
+    //    do_impulse(buffer,320,freq);
+    donoise(buffer,3200);
+    single_tube(buffer, 3200, lenny);
+    lenny++;
+    //    freq+=5;
+    }*/
+
+//    for (x=0;x<10;x++){
+  rtick(buffer, 32000, 300.0);
+//          k1=k1+0.01;
+//    m1=m1+0.01;
+//	k2=k1;
+//	m2=m1;
+//  r1=0.0001*sqrtf(m1*k1);
+//  r2=r1;
+
+//      d1+=0.00001;
+//      d2=d1;
+OneTube_next(buffer, 32000);
+//	clearOld();
+//	OneTube_init();
+//  }
+}
+
 

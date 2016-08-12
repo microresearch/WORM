@@ -43,23 +43,25 @@ double tc; //= fxs->_tc;
 int k=0; //= fxs->_k;
 
 // basic voice
-
+/*
 double _tcVal = 1.0;
 double _teVal = 0.780;
 double _tpVal = 0.6;
 double _taVal = 0.028;
 double vocalTension = 0.0;
 int noiseOn = FALSE;
+*/
 
 // FRY?
-/*
+
+
 double _tcVal = 1.0;
 double _teVal = 0.251;
 double _tpVal = 0.19;
 double _taVal = 0.008;
 double noiseOn = FALSE;
 double vocalTension = 0.0;
-*/
+
 
 /* others
 
@@ -136,14 +138,11 @@ FILE* fo = fopen("testlfgen.pcm", "wb");
 
 for (x=0;x<320;x++){
 
-  /*if (k>dataLength) {
-k = k - dataLength;
-}*/
+// THIS IS ROSENBERG:
 
-// ROSENBERG:
-  signed int s16;
+/*  signed int s16;
   float sample;
- float T=1/200.0;
+ float T=1/400.0;
  float fs=32000;
  float pulselength=T*fs;
 
@@ -151,9 +150,8 @@ k = k - dataLength;
  //%N1 is the duration of the glottal opening as a fraction of the 
  //%total pulse, from 0 to 1.
 
-
- float N2=pulselength*0.1;
- float N1=0.9*N2;
+ float N2=pulselength*0.9;
+ float N1=0.9*N2; // was 0.9
  int kkk;
  for (kkk=0;kkk<N1;kkk++){
    //    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
@@ -170,54 +168,37 @@ k = k - dataLength;
    fwrite(&s16,2,1,fo);
  }
  for (kkk=N2;kkk<pulselength;kkk++){
-   LFcurrentSample1==0.0;
-   s16=(signed int)(LFcurrentSample1*10.0);
+   LFcurrentSample1=0.0;
+   s16=(signed int)(LFcurrentSample1);
    //   printf("%d\n",s16);
    fwrite(&s16,2,1,fo);
  }
 
+ */
 
-/*
-%Rosenberg Pulse
-%this function accepts fundamental frequency of the glottal signal and 
-%the sampling frequency in hertz as input and returns one period of 
-%the rosenberg pulse at the specified frequency.
-%N2 is duty cycle of the pulse, from 0 to 1.
-%N1 is the duration of the glottal opening as a fraction of the 
-%total pulse, from 0 to 1.
-function[gn]=rosenberg(N1,N2,f0,fs)
-T=1/f0;     %period in seconds
-pulselength=floor(T*fs);    %length of one period of pulse
-%select N1 and N2 for duty cycle
-N2=floor(pulselength*N2);
-N1=floor(N1*N2);
-gn=zeros(1,N2);
-%calculate pulse samples
-for n=1:N1-1
-    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
-end
-for n=N1:N2
-    gn(n)=cos(pi*(n-N1)/(N2-N1)/2);
-end
-gn=[gn zeros(1,(pulselength-N2))];
-*/
-
-/*
+ /// LF
 
 t = (double)k*period/(double)dataLength;
 
 if (t<te) {
 LFcurrentSample = Eo*(exp(alpham*t)) * sin(wg*t);
 //printf("wg %f alpha %f\n",wg, alpha);
+// printf("<<< t %f te %f\n",t, te);
 }
 
 if (t>=te) {
-LFcurrentSample = -((Ee)/(epsilon*ta))*(exp(epsilon*(t-te)) - exp(-epsilon*(tc-te)));
+  LFcurrentSample = -((Ee)/(epsilon*ta))*(exp(epsilon*(t-te)) - exp(-epsilon*(tc-te))); // crazy exponential
+  // printf("%f\n", LFcurrentSample);
+  //  printf(">>>=== t %f te %f ta %f tc %f\n",t, te, ta, tc);
+  //LFcurrentSample = 0.0;
+  //LFcurrentSample = 0.0;
 }
 
 if (t>tc) {
 LFcurrentSample = 0.0;
+k=0;
 }
+
 
 // adding noise here?
 
@@ -252,24 +233,28 @@ LFcurrentSample1 = LFcurrentSample+noiseAdd;
 }
  }
 
+/// no noise
+
 if (noiseOn == FALSE) {
 LFcurrentSample1 = LFcurrentSample;
 }
 
-*/
+/// no noise
+
 //printf("SAMPLE %f\n",LFcurrentSample);
 
 // if (LFcurrentSample>32768.0) LFcurrentSample=32768.0;
 // if (LFcurrentSample<-32768.0) LFcurrentSample=-32768.0;
 
 //   printf("%d\n",s16);
-/* unsigned int s16=(unsigned int)(LFcurrentSample1*1.0);
- unsigned char c = (unsigned)s16 & 255;
+ unsigned int s16=(unsigned int)(LFcurrentSample1*1.0);
+ /* unsigned char c = (unsigned)s16 & 255;
  fwrite(&c, 1, 1, fo);
  c = ((unsigned)s16 / 256) & 255;
- fwrite(&c, 1, 1, fo);*/
- 
- //k += 1;
+ fwrite(&c, 1, 1, fo);
+*/
+ k += 1;
+   fwrite(&s16,2,1,fo);
   }
 
 
@@ -289,7 +274,7 @@ Fs = 32000;
 f0 = 100.0;
 overSample = 1000;
 period = 1/f0;
-Ee = 1.0;
+Ee = - 1.0;
 tc = _tcVal;
 te = _teVal;
 tppp = _tpVal;
@@ -313,11 +298,11 @@ te = tc-ta - (tc-ta)*0.01;
  }
 
 // over sample values (can omit this section if it impacts real time operation)
-period = period/overSample;
+/*period = period/overSample;
 tc = tc/overSample;
 te = te/overSample;
 tppp = tppp/overSample;
-ta = ta/overSample;
+ta = ta/overSample;*/
 // dependant timing parameters
 tn = te - tppp;
 tb = tc - te;
@@ -327,7 +312,7 @@ wg = MY_PI/tppp;
 Eo = Ee;
 // epsilon and alpha equation coefficients
 
-/*
+
 areaSum = 1.0;
 optimumArea = 1e-14;
 epsilonDiff = 10000.0;
@@ -355,7 +340,7 @@ while (areaSum > optimumArea){
 
   //printf("Ee %f Eo %f wg %f te %f Areasum %f\n",Ee,Eo,wg,te,area2);
 
-alpham = ( clog(-Ee/(Eo*sin(wg*te))))/te; // problem is here! NaN for log of negative
+alpham = ( log(-Ee/(Eo*sin(wg*te))))/te; // problem is here! NaN for log of negative -> clog
 //alpha = ((-Ee/(Eo*sin(wg*te))))/te;
 
 //printf("al %f xx %f xx %f\n",alpha, te,sin(wg*te) );
@@ -373,29 +358,55 @@ if (areaSum<0.0) {
 Eo = Eo + 1e5*areaSum;
 }
 }
-*/
+
 
 // alpham=938077.0;
 // epsilon=12500000.0;
 
- alpham=305670.0;
- epsilon=3355800.0;
+// alpham=305670.0;
+// epsilon=3355800.0;
 
 
 //calculate length of waveform in samples
 //if (_pitchSlide == FALSE) {
-dataLength = floor(overSample*Fs*period);
+//dataLength = floor(overSample*Fs*period);
 //}
 //else{
 //dataLength = _dataLength;
 //}
 //calculate length of waveform in samples without overSample
 //
-//dataLength = floor(Fs*period);
+dataLength = floor(Fs*period);
 // pass all variables needed for waveform calculation to effectState
 
- printf("period=%f, length= %d, alpham = %f epsilon= %f \n", period, dataLength, alpham,epsilon);
+printf("period=%f, length= %d, alpham = %f epsilon= %f \n", period, dataLength, alpham,epsilon);
 
 //printf("period=%f, length= %d, tc = %f, te = %f, tp = %f, ta = %f wg = %f \n", period, dataLength, tc, te, tp,ta, wg);
 
  }
+
+/////
+/*
+%Rosenberg Pulse
+%this function accepts fundamental frequency of the glottal signal and 
+%the sampling frequency in hertz as input and returns one period of 
+%the rosenberg pulse at the specified frequency.
+%N2 is duty cycle of the pulse, from 0 to 1.
+%N1 is the duration of the glottal opening as a fraction of the 
+%total pulse, from 0 to 1.
+function[gn]=rosenberg(N1,N2,f0,fs)
+T=1/f0;     %period in seconds
+pulselength=floor(T*fs);    %length of one period of pulse
+%select N1 and N2 for duty cycle
+N2=floor(pulselength*N2);
+N1=floor(N1*N2);
+gn=zeros(1,N2);
+%calculate pulse samples
+for n=1:N1-1
+    gn(n)=0.5*(1-cos(pi*(n-1)/N1));
+end
+for n=N1:N2
+    gn(n)=cos(pi*(n-N1)/(N2-N1)/2);
+end
+gn=[gn zeros(1,(pulselength-N2))];
+*/
