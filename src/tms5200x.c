@@ -17,7 +17,7 @@ typedef int32_t INT32;
 
 #include "tms5110r.inc"
 
-extern uint8_t* ptrAddr, ptrBit;
+static const uint8_t* ptrAddr; static uint8_t ptrBit;
 extern uint8_t byte_rev[256];
 
 #define PERFECT_INTERPOLATION_HACK 0

@@ -285,7 +285,6 @@ static void setabcg (long int f, long int bw, resonator_ptr rp, float gain);
 static void setzeroabc (long int f, long int bw, resonator_ptr rp);
 static float DBtoLIN (klatt_global_ptr globals, long int dB);
 static float dBconvert (long int arg);
-static void overload_warning (klatt_global_ptr globals, long int arg);
 static int16_t clip (klatt_global_ptr globals, float input);
 static void pitch_synch_par_reset (klatt_global_ptr globals,
                                          klatt_frame_ptr frame, long ns);
@@ -383,10 +382,10 @@ static float natural_source(long nper)
 static void setabc(long f, long bw, resonator_ptr rp)
 {
 	float arg = minus_pi_t * bw;
-	float r = exp(arg);              /* Let r  =  exp(-pi bw t) */
+	float r = expf(arg);              /* Let r  =  exp(-pi bw t) */
 	rp->c = -(r * r);                /* Let c  =  -r**2 */
 	arg = two_pi_t * f;
-	rp->b = r * cos(arg) * 2.0;      /* Let b = r * 2*cos(2 pi f t) */
+	rp->b = r * cosf(arg) * 2.0;      /* Let b = r * 2*cos(2 pi f t) */
 	rp->a = 1.0 - rp->b - rp->c;     /* Let a = 1.0 - b - c */
 }
 
@@ -440,22 +439,9 @@ static float DBtoLIN(klatt_global_ptr globals, long dB)
 
 static float dBconvert(long arg)
 {
-	return 20.0 * log10((float) arg / 32767.0);
+	return 20.0f * log10f((float) arg / 32767.0f);
 }
 
-static void overload_warning(klatt_global_ptr globals, long arg)
-{
-	if (warnsw == 0)
-	{
-		warnsw++;
-		if (!globals->quiet_flag)
-		{
-			printf("\n* * * WARNING: ");
-			printf(" Signal at output of synthesizer (+%3.1f dB) exceeds 0 dB\n",
-            dBconvert(arg));
-		}
-	}
-}
 
 /* Reset selected parameters pitch-synchronously */
 

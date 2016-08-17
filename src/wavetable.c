@@ -197,7 +197,6 @@ void wavetable_init(Wavetable* wavtable, const float *tableitself, int16_t lengt
   firfilt.FIRCoef=filtertaps;
   firfilt.numberTaps=49; firfilt.FIRPtr=0;
   wavtable->FIRFilter=&firfilt;
-
 }
 
 /*

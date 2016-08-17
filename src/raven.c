@@ -1,5 +1,5 @@
  /*
-  *  based on balloon1.cpp - LF model...
+  *  based on balloon1.cpp - IF model...
 
  See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf - measurements
 
@@ -10,6 +10,11 @@
  #include <sys/stat.h>
  #include <sys/times.h>
  #include <sys/unistd.h>
+
+double integrate(double old_value, double new_value, double period);
+
+#define PI            3.1415927
+
 
  // forlap: 
 
@@ -123,7 +128,7 @@
 
 
 		 signed int s16=(signed int)(d1rightout*32768.0);
-		 s16=in[i]*32768.0;
+		 s16=in[i]*32768.0; // TESTY=straight OUT!
 		 //		signed int s16=(signed int)(in[i]*32768.0);
 		 //		 printf("ff %f \n",in[i]);
 		fwrite(&s16,2,1,fo);
@@ -400,69 +405,28 @@
  lg= 1.63e-2; %m glottal length - say 7mm=7e-3
 
     */
+d1 =0.0008;
+d2 =0.0008;
 
- //	r1 =2.0976e-8;
-//	 r1 =1.2e-3;
- //	r2 =2.0976e-8;
-//	 r2 =1.2e-3;
-//	 m1=3.848e-6;
- //	m1 =5.8889e-6;
-//	 m2 =3.848e-6;
-
-//	 k1 =0.5;
-//	 k2 =0.5;
-	 //	k2 =0.5;
- //	k12=0.04;
-//	 k12=0.04;
-	 //	aida =10000000.0;
-//aida =0.000001;
-//	d1 =1.5e-5;
-	d1 =0.00005;
-	d2 =0.00005;
+r1=0.00000980665; // damper constant depends on k and mass r = 0.0001*sqrt(m*k); %damper constant, N*s/m Avanzini has 0.1 * sqrt(m*k)  m0.000044 * 20 = 0.002966
+// above 0.001 is no sound
+	r2 =r1;
+m1 =1e-6; // -7 or -5 for -5 we would have for r1 and as k1=0.09 = 
+	m2 =m1;
+	k1 =0.014;
+	k2 =k1;
+	k12=0.00005;
+	aida =10000000.0;
+//	aida =10.0;
+	d1 =1.5e-2;
+	d2 =d1;
 
 	lg =0.007;
 	gain=400.0;
-	S=0.000314;
-	Ag01=3.14e-6;
-	Ag02=3.14e-6; 
+	S=0.0005;
+	Ag01=3e-7;
+	Ag02=3e-7; 
 
-
-	x1Prev=0.0;
-	x1PrevPrev=0.0;
-	x2Prev=0.0;
-	x2PrevPrev=0.0;
-	pm1Prev=0.0;
-	pm2Prev=0.0;
-	uPrev=0.0;
-	ps=0.0;
-	Fs=32000.0;
-
-  /// ballon
-
-  
-//	r1 =2.0976e-8;
-	r1 =2.0976e-6;
-//	r2 =2.0976e-8;
-	r2 =2.0976e-6;
-//	m1 =4.8889e-7;
-	m1 =5.8889e-6;
-//	m2 =4.8889e-7;
-	m2 =5.8889e-6;
-	k1 =0.5;
-	k2 =0.09;
-//	k2 =0.5;
-//	k12=0.04;
-	k12=0.04;
-	aida =10000000.0;
-//	aida =0.000001;
-//	d1 =1.5e-5;
-	d1 =1.5e-5;
-	d2 =1.5e-5;
-	lg =0.0163;
-	gain=1000.0;
-	S=5e-5;
-	Ag01=5e-9;
-	Ag02=5e-9;
 	x1Prev=0.0;
 	x1PrevPrev=0.0;
 	x2Prev=0.0;
@@ -520,15 +484,13 @@ else
 	  //	  *samples++ = computeSample(pressureIn);
 	  //	  printf("%f  ",computeSample(pressureIn));
 
-	  /*	 	  if (i<5) pressureIn=0;
+	  	 	  if (i<5) pressureIn=0;
 	  else if (i< (32000/90)) pressureIn=lastp+ 400/(32000/90);
 	  else if (i<= (32000/80)) pressureIn=lastp;
-	  else pressureIn=lastp+(30-400)/(32000-(32000/80));
-
-	  */
+	  else pressureIn=lastp-360.0f/(32000.0f-(32000.0/80.0));
 
 	  // constant pressure
-	  pressureIn=300; // 0.3 kPa after Fletcher
+//	  pressureIn=300; // 0.3 kPa after Fletcher
 
 	  //   signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
 	  *samples++=(double)(computeSample(pressureIn));
@@ -639,16 +601,16 @@ double computeSample(double pressure_in){
   det=b*b-4.0*a*c;
 
   if (det>=0){
-    flow1=(-b+sqrt(det))/(2*a);
-    flow2=(-b-sqrt(det))/(2*a);
+    flow1=(-b+sqrt(det))/(2.0*a);
+    flow2=(-b-sqrt(det))/(2.0*a);
   }
   else{
-    flow1=(-b)/(2*a);
-    flow2=(-b)/(2*a);
+    flow1=(-b)/(2.0*a);
+    flow2=(-b)/(2.0*a);
   }
 
-  udif1=fabs(flow1-uPrev);
-  udif2=fabs(flow2-uPrev);
+  udif1=fabsf(flow1-uPrev);
+  udif2=fabsf(flow2-uPrev);
 
   if (udif1<udif2){
     u=flow1;
@@ -681,25 +643,25 @@ double computeSample(double pressure_in){
       pm2=pm2/2+pm2b/2;
     }
     else{
-      //           pm2=pressure_in;
-      //         pm1=pressure_in;
+                 pm2=pressure_in;
+               pm1=pressure_in;
     }
   }     
   else{
-    //    pm1=pressure_in;
-    //   pm2=0.0;
+       pm1=pressure_in;
+       pm2=0.0;
   }
 
-  /*  if (pm1>pressure_in)
-    //	{pm1=pressure_in;}
+    if (pm1>pressure_in)
+    	{pm1=pressure_in;}
     
     if (pm2>pressure_in)
-      //     {pm2=pressure_in;}
+           {pm2=pressure_in;}
     
       if (pm1<0.0)
-	//   pm1(n)=abs(pm1(n));
-        {pm1=0.0;}
-  */
+	//	   pm1(n)=abs(pm1(n));
+	{pm1=fabsf(pm1);}
+ 
 
   if (pm2<0.0)
     {pm2=0.0;}
@@ -715,7 +677,7 @@ double computeSample(double pressure_in){
   x2Prev=x2;
   uPrev=u;
   ps=pressure_in;
-
+printf("UUUU %f pressure-in %f\n", u, pressure_in);
   return gain*u;
 }
 
@@ -731,14 +693,109 @@ uPrev=0;
 ps=0;
 }
 
+
+//////////////////////booooo
+
+float x = 0.0;
+float xprime = 1.0;
+float xdoubleprime = 0.0;
+float M = 0.005;
+float R = 5.0;
+float K = 200000.0;
+float T = 1.0/96000.0;
+
+typedef struct gardner {
+  double x, xprime,xdoubleprime, K, Pb, a0, b0, t, M, K_scale, D, D2, Pb_scale, T, freq, ofreq;
+}Gardner;
+
+Gardner syrinx;
+
+void init_gardner(Gardner* gd){
+gd->x=0;
+gd->xprime=1.0;
+gd->xdoubleprime = 0;
+gd->K = 0;
+gd->Pb = 0;
+
+//#constants
+ gd->a0 = 0.02;
+ gd->b0 = 0.04;
+ gd->t = 0.00015;
+ gd->M = 0.005;
+ gd->K_scale = 10000.0;
+ gd->D = 5.0;
+ gd->D2 = 0.01;
+ gd->Pb_scale = 10000.0;
+ gd->T = 1/96000.0;
+ gd->freq = 10.0;
+ gd->ofreq= 10.0;
+}
+
+double calc_xdoubleprime_gardner(Gardner *gd, int i){
+  double a = gd->a0 + gd->x + (gd->t*gd->xprime);
+  double b = gd->b0 + gd->x - (gd->t*gd->xprime);
+  double Pf = gd->Pb*(1 - (a/b));
+  printf("%f\n",Pf);
+  int iii=Pf*1.0f;
+  fwrite(&iii,2,1,fo);
+  //		return (Pf - (self.K*self.x) - (self.D2*math.pow(self.xprime,3)) - (self.D*self.xprime))/self.M
+  //  return (Pf - (gd->K*gd->x) - (gd->D*gd->xprime))/gd->M;
+   return (Pf - (gd->K*gd->x) - (gd->D2*pow(gd->xprime,3)) - (gd->D*gd->xprime))/gd->M;
+}
+
+
+void gardner_oscillate(Gardner* gd, int i){
+  double newxdoubleprime = calc_xdoubleprime_gardner(gd,i);
+  double newxprime = gd->xprime + integrate(gd->xdoubleprime,newxdoubleprime,gd->T);
+    gd->xdoubleprime = newxdoubleprime;
+  gd->x += integrate(gd->xprime,newxprime,gd->T);
+  gd->xprime = newxprime;
+  gd->K = gd->K_scale*sin((2*PI*gd->T*gd->freq*i)) + gd->K_scale;
+		  //		gd->K = gd->K_scale*2.0
+  gd->Pb = gd->Pb_scale*cos((2*PI*gd->T*gd->ofreq*i) + PI) + gd->Pb_scale;
+		  //               gd->Pb = gd->Pb_scale
+  //   gd->freq += 0.01;
+  //   gd->ofreq+=0.01;
+}
+
+double calc_xdoubleprime(int i){
+  //# M x'' + Rx' + Kx = 0
+  return (- (R*xprime) - (K*x) )/M;
+}
+
+double integrate(double old_value, double new_value, double period){
+  return (old_value + new_value)*(period/2.0);
+}
+
+float flintegrate(float old_value, float new_value, float period){
+  return (old_value + new_value)*(period/2.0);
+}
+
+void spring_oscillate(int i){
+float newxdoubleprime = calc_xdoubleprime(i);
+float newxprime = xprime + flintegrate(xdoubleprime,newxdoubleprime,T);
+xdoubleprime = newxdoubleprime;
+x += flintegrate(xprime,newxprime,T);
+printf("%f\n",x);
+xprime = newxprime;
+}
+
 void main(void){
-  int x,lenny=8,freq=200;
+  int xx,lenny=8,freq=200;
   fo = fopen("testraven.pcm", "wb");
 
   init();
   double buffer[320000];  // try now varying some parameters each second:
 
-  OneTube_init();
+  init_gardner(&syrinx);
+
+
+for (xx=0;xx<96000;xx++){
+  //  spring_oscillate(xx);
+  gardner_oscillate(&syrinx,xx);
+}
+
+//  OneTube_init();
 
   // we need some kind of input?
 
@@ -752,17 +809,17 @@ void main(void){
     }*/
 
 //    for (x=0;x<10;x++){
-  rtick(buffer, 32000, 300.0);
+//  rtick(buffer, 32000, 300.0);
 //          k1=k1+0.01;
 //    m1=m1+0.01;
 //	k2=k1;
 //	m2=m1;
-//  r1=0.0001*sqrtf(m1*k1);
+//  r1=0.0001*sqrt(m1*k1);
 //  r2=r1;
 
 //      d1+=0.00001;
 //      d2=d1;
-OneTube_next(buffer, 32000);
+//OneTube_next(buffer, 32000);
 //	clearOld();
 //	OneTube_init();
 //  }

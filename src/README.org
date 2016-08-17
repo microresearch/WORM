@@ -2063,7 +2063,7 @@ from: https://rs2007.limsi.fr/PS_Page_2.html
 - where we can find mass model? praat - compile all notes on these
   models with working code for each to test
 
-- where are we at with lfgen? vocal fry settings hang - but not if we
+- where are we at with lfgen vocal fry settings hang - but not if we
   use double - but how to get round this? revert to lookups as above and test this-partTESTED!
 
 also add noise in lfgen.c - from thesis - also maybe test tract model there to see how sounds?
@@ -3273,24 +3273,54 @@ and: http://read.pudn.com/downloads115/sourcecode/speech/488885/%E4%BD%95%E5%BB%
 
 ** 12/8
 
-pitch track, raven/glottis models, decimation filter tests, generate and collect wavetables
+*raven/glottis models finished and cleaned, decimation filter tests, generate and collect wavetables*
 
 ///
 
 - raven/syrinx/glottis models below to work through:
 
-Ishizaka Flanagan=IF: raven.c - question of parameters and double but could be used for wavetables????
+*Ishizaka Flanagan=IF: raven.c - question of parameters and double but could be used for wavetables once we have fixed it!*
+
+vsqrt.f64 ? double ref is here: http://visualgdb.com/tutorials/arm/stm32/fpu/
+
+also compile with -Wdouble-promotion to check we don;t have doubles inited -> DONE and fixed
+
+[look at params]
 
 LF and others: lfgen.c = now test code in lfgen2.c is working 
 Rosenberg in lfgen
 
-glottalair.py = klglot88? PORTED
+glottalair.py = klglot88? PORTED->lfgen2.c
 
-shimmer=FANT -> port?
+shimmer=FANT -> ported into *lfgen2.c* needs some tweaks...
 
 [raven_model.py // praat/artsynth ]
 
 TODO: compile all possible sources!
+
+** 13/8 +
+
+*raven.c based on balloon - notes* 
+
+- if we adjust model to values from avanzini - raven.h then we get very low frequencies
+
+- can run with floats but some NaN - try and figure out or run only for wavetables
+
+- we need to have changing flow into these mass models and this can also be a wormed-calculated flow!
+
+** 17/8+
+
+- catalogue glottal models and what papers we have: so far raven
+  unresolved: Gardner(one mass), Fletcher (air flow)
+
+- for glottal models (esp. Gardner) how we get output
+  velocity=pressure from base of trachea and couple this to delay
+  line?
+
+- test all lfgen2.c models with plots and how to achieve vocal fry with these? -> lfgen2.c becomes glottalsources.c
+
+NOTE: Laje/Gardner/Mindlin equation/model https://nsaquib.files.wordpress.com/2013/06/mindlin-model.pdf
+
 
 * TODO from 1 AUG:
 

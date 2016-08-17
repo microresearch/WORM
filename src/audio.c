@@ -386,6 +386,10 @@ void tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
      while (xx<size){
        samplel=(tms5200_get_sample());//<<6)-32768; 
 
+       /// interpol filter but in wavetable case was 2x UPSAMPLE????
+        samplel = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i);
+
+
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
