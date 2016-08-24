@@ -138,7 +138,7 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
 	//	scatteringcoefficients[1]=((float)adc_buffer[SELZ]/2048.0f)-1.0f; 
 
-	// try this as worming??? there are 3 coeffs - values are -1 to 1 
+	// try this as worming??? there are 3 coeffs - values are -1 to 1 TESTY!!!
 	
 	scatteringcoefficients[(int)count%3]=sinf((float)count)*0.8f;
 	count+=(float)adc_buffer[SPEED]/4096.0f;

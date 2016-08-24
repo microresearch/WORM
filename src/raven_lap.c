@@ -6,18 +6,21 @@
 
 TODO: dooble->floot and port tests, port in latest FLETCHER
 
-split to raven_lap.c and raven.c ...
+split to raven_lap.c and raven.c - or extract resonances
 
 */
 
-#include "audio.h"
-#include "stdio.h"
-#include <math.h>
+#include <stdio.h>
+#include "math.h"
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
 
-float integrate(float old_value, float new_value, float period);
-float old_integrate(float old_value, float new_value, float period);
+double integrate(double old_value, double new_value, double period);
+double old_integrate(double old_value, double new_value, double period);
 
-//#define PI            3.1415927
+#define PI            3.1415927
 
  // forlap: 
 
@@ -28,39 +31,38 @@ float old_integrate(float old_value, float new_value, float period);
 
  // setting up
 
-// FILE *fo;
+ FILE *fo;
 
  int d1length=7; // *trachea = 7 samples = 1st K = (0.3838-3.141) / (0.3838+3.141) = -2.7572 / 3.525 = -0.782*
-// so wider we open beak = (0.3838 - WIDER) / (0.3838 + WIDER) = -LARGER / +LARGER = towards -1.0
  int d2length=2; // //*beak length=20mm = 2 samples   2nd K = (3.141 - 3.141) / (3.141 + 3.141) = 0 ????*
 
 
  // delay = round( L * fs / c); = say for 70mm = 0.07 * 32000 (here) / 347.23   // speed of sound (m/sec)
 
- float lossfactor=0.99;
+ double lossfactor=0.99;
 
  //just need delay1 for one TUBE!!
 
- float delay1right[8]; //->d1length of floats
- float delay1left[8];//=>d1length of floats
+ double delay1right[8]; //->d1length of doubles
+ double delay1left[8];//=>d1length of doubles
 
- float delay2right[8]; //->d1length of floats
- float delay2left[8];//=>d1length of floats
+ double delay2right[8]; //->d1length of doubles
+ double delay2left[8];//=>d1length of doubles
 
- void donoise(float *out, int numSamples){
+ void donoise(short *out, int numSamples){
    int x;
    for (x=0;x<numSamples;x++){
-     float xx=(float) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
-     out[x]=xx;
+     double xx=(double) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
+     out[x]=xx*8000.0;
    }
  }
 
 
-/* void do_impulse(short* out, int numSamples, int freq){ //- so for 256 samples we have freq 125 for impulse
+ void do_impulse(short* out, int numSamples, int freq){ //- so for 256 samples we have freq 125 for impulse
      // from Impulse->LFUGens.cpp
    int i;
-   static float phase =0.0f;
-   float z, freqinc;
+   static double phase =0.0f;
+   double z, freqinc;
    freqinc=0.00003125 * freq;
 
    for (i=0; i<numSamples;++i) {
@@ -75,7 +77,7 @@ float old_integrate(float old_value, float new_value, float period);
      //    fwrite(&out[i],2,1,fo);
 
    }
-   }*/
+ }
 
 
  void RavenTube_init(void){
@@ -91,59 +93,52 @@ float old_integrate(float old_value, float new_value, float period);
 	 }
  }
 
- float f1in= 0.0;
- float f1out= 0.0;
- float f2in= 0.0;
- float f2out= 0.0;
+ double f1in= 0.0;
+ double f1out= 0.0;
+ double f2in= 0.0;
+ double f2out= 0.0;
 
  int d1rightpos= 0;
  int d1leftpos= 0;
  int d2rightpos= 0;
  int d2leftpos= 0;
 
-extern __IO uint16_t adc_buffer[10];
-
-
-void RavenTube_next(float *inn, float *outt, int inNumSamples) {
+ void RavenTube_next(double *inn, int inNumSamples) {
 
 	 int i;
 
 	 //value to store
-	 float * in = inn;//= IN(0);
-	 //	float * out;//= OUT(0);
-	 //	 float k= -0.782;// (float)ZIN0(1); //scattering coefficient updated at control rate?
-	 //	 float k=-0.1f;
-	 	 float k = 1.0f-((float)(adc_buffer[SELZ])/2048.0f);
-	 float loss= lossfactor;
+	 double * in = inn;//= IN(0);
+	 //	double * out;//= OUT(0);
+	 double k= -0.782;// (double)ZIN0(1); //scattering coefficient updated at control rate?
+	 double loss= lossfactor;
 
 	 // easier stick with originals
 
-	 float * d1right= delay1right;
-	 float * d1left= delay1left;
-	 float * d2right= delay2right;
-	 float * d2left= delay2left;
+	 double * d1right= delay1right;
+	 double * d1left= delay1left;
+	 double * d2right= delay2right;
+	 double * d2left= delay2left;
 
 	 //have to store filter state around loop; probably don't need to store output, but oh well
-
 
 	 for (i=0; i<inNumSamples; ++i) {
 
 		 //update outs of all delays
-		 float d1rightout= d1right[d1rightpos];
-		 float d1leftout= d1left[d1leftpos];
-		 float d2rightout= d2right[d2rightpos];
-		 float d2leftout= d2left[d2leftpos];
+		 double d1rightout= d1right[d1rightpos];
+		 double d1leftout= d1left[d1leftpos];
+		 double d2rightout= d2right[d2rightpos];
+		 double d2leftout= d2left[d2leftpos];
 
 		 //output value
 		 //		out[i]=d1rightout;
 
 
-		 //		  signed int s16=(signed int)(d1rightout*32768.0);
-		  outt[i]=d2rightout;
+		  signed int s16=(signed int)(d1rightout*32768.0);
 		  //	 		 s16=in[i]*32768.0; // TESTY=straight OUT!
 		 //		signed int s16=(signed int)(in[i]*32768.0);
 		 //		 printf("ff %f \n",in[i]);
-		  //		fwrite(&s16,2,1,fo);
+		fwrite(&s16,2,1,fo);
 
 		 //update all filters
 		 f1out= loss*0.5*(f1in+d1leftout);
@@ -154,11 +149,9 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 
 		 //calculate inputs of all delays
 		 d1right[d1rightpos]= in[i]+f1out;
-		 d2right[d2rightpos]= d1rightout*(1.0f+k)+ ((-k)*d2leftout);
+		 d2right[d2rightpos]= d1rightout*(1+k)+ ((-k)*d2leftout);
 		 d2left[d2leftpos]= f2out;
-		 d1left[d1leftpos]= d1rightout*k+ ((1.0f-k)*d2leftout);
-
-
+		 d1left[d1leftpos]= d1rightout*k+ ((1-k)*d2leftout);
 		 //		d1left[d1leftpos]= d1rightout*k;//+ ((1-k)*d2leftout); FIX!
 
 		 //update delay line position pointers
@@ -171,7 +164,7 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
  }
 
 
- #define FLOAT_TO_SHORT(x) ((int)((x)*32768.0))
+ #define DOUBLE_TO_SHORT(x) ((int)((x)*32768.0))
 
  typedef struct _DelayLine {
      short *data;
@@ -199,10 +192,10 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
      free(dl);
  }
 
- inline static void setDelayLine(DelayLine *dl, float *values, float scale) {
+ inline static void setDelayLine(DelayLine *dl, double *values, double scale) {
      int i;
      for (i=0; i<dl->length; i++)
-	 dl->data[i] = FLOAT_TO_SHORT(scale * values[i]);
+	 dl->data[i] = DOUBLE_TO_SHORT(scale * values[i]);
  }
 
  /* lg_dl_update(dl, insamp);
@@ -308,7 +301,7 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 
      /* Output at pickup location */
      out  = rg_dl_access(upper_rail, length-1);
-//     fwrite(&out,2,1,fo);
+     fwrite(&out,2,1,fo);
 
      //    outsamp1 = lg_dl_access(lower_rail, pickup_loc);
      //	outsamp += outsamp1;
@@ -335,33 +328,33 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 
   */
 
- float computeSample(float pressure_in);
+ double computeSample(double pressure_in);
  void clearOld();
 
- float ps;		//subglottal pressure
-static float r1;		//damping factor
-static float r2;
- float m1;		//mass
- float m2;
- float k1;		//spring constant
- float k2;
- float k12;		//coupling spring constant
- float d1;		//glottal width
- float d2;
- float lg;		//glottal length
- float aida;		//nonlinearity coefficient
- float S;			//subglottal surface area
- float Ag01;		//nominal glottal area, with mass at rest position
- float Ag02;
- float pm1Prev;	//pressure at previous time step
- float pm2Prev;
- float x1Prev;	//displacement at previous time step
- float x1PrevPrev;//displacement at previous time step to the previous one
- float x2Prev;
- float x2PrevPrev;
- float gain;		//after-market gain
- float uPrev;		//previous flow value
- float Fs;		//calculation sampling rate, not actual audio output sample rate
+ double ps;		//subglottal pressure
+ double r1;		//damping factor
+ double r2;
+ double m1;		//mass
+ double m2;
+ double k1;		//spring constant
+ double k2;
+ double k12;		//coupling spring constant
+ double d1;		//glottal width
+ double d2;
+ double lg;		//glottal length
+ double aida;		//nonlinearity coefficient
+ double S;			//subglottal surface area
+ double Ag01;		//nominal glottal area, with mass at rest position
+ double Ag02;
+ double pm1Prev;	//pressure at previous time step
+ double pm2Prev;
+ double x1Prev;	//displacement at previous time step
+ double x1PrevPrev;//displacement at previous time step to the previous one
+ double x2Prev;
+ double x2PrevPrev;
+ double gain;		//after-market gain
+ double uPrev;		//previous flow value
+ double Fs;		//calculation sampling rate, not actual audio output sample rate
 
 
  void init(){
@@ -459,25 +452,25 @@ m1 =1e-6; // -7 or -5 for -5 we would have for r1 and as k1=0.09 =
 }
 
 
-int rtick(float *buffer, int bufferSize, float pressureIn) {
-  float *samples = (float *) buffer;
+int rtick(double *buffer, int bufferSize, double pressureIn) {
+  double *samples = (double *) buffer;
 
-/*	bsynth->setM1(5e-8*(float)[(id)dataPointer m1In]);
-	bsynth->setM2(5e-8*(float)[(id)dataPointer m2In]);
-	bsynth->setR1(5e-9*(float)[(id)dataPointer r1In]);
-	bsynth->setR2(5e-9*(float)[(id)dataPointer r2In]);
-	bsynth->setK1(1e-3*(float)[(id)dataPointer k1In]);
-	bsynth->setK2(1e-3*(float)[(id)dataPointer k2In]);
-	bsynth->setD1(1.5e-7*(float)[(id)dataPointer d1In]);
-	bsynth->setD2(1.5e-7*(float)[(id)dataPointer d2In]);
-	bsynth->setK12(1e-4*(float)[(id)dataPointer k12In]);
-	bsynth->setLg(1.3e-4*(float)[(id)dataPointer lgIn]);
-	bsynth->setAida(1.1e-4*(float)[(id)dataPointer aidaIn]);
-	bsynth->setS(5.5e-7*(float)[(id)dataPointer SIn]);
-	bsynth->setAg01(5.1e-10*(float)[(id)dataPointer Ag01In]);
-	bsynth->setAg02(5.1e-10*(float)[(id)dataPointer Ag02In]);
-	bsynth->setGain((float)[(id)dataPointer gainIn]);
-	bsynth->setFs((float)[(id)dataPointer FsIn]);
+/*	bsynth->setM1(5e-8*(double)[(id)dataPointer m1In]);
+	bsynth->setM2(5e-8*(double)[(id)dataPointer m2In]);
+	bsynth->setR1(5e-9*(double)[(id)dataPointer r1In]);
+	bsynth->setR2(5e-9*(double)[(id)dataPointer r2In]);
+	bsynth->setK1(1e-3*(double)[(id)dataPointer k1In]);
+	bsynth->setK2(1e-3*(double)[(id)dataPointer k2In]);
+	bsynth->setD1(1.5e-7*(double)[(id)dataPointer d1In]);
+	bsynth->setD2(1.5e-7*(double)[(id)dataPointer d2In]);
+	bsynth->setK12(1e-4*(double)[(id)dataPointer k12In]);
+	bsynth->setLg(1.3e-4*(double)[(id)dataPointer lgIn]);
+	bsynth->setAida(1.1e-4*(double)[(id)dataPointer aidaIn]);
+	bsynth->setS(5.5e-7*(double)[(id)dataPointer SIn]);
+	bsynth->setAg01(5.1e-10*(double)[(id)dataPointer Ag01In]);
+	bsynth->setAg02(5.1e-10*(double)[(id)dataPointer Ag02In]);
+	bsynth->setGain((double)[(id)dataPointer gainIn]);
+	bsynth->setFs((double)[(id)dataPointer FsIn]);
 */
 
 /* pressure waveform:
@@ -498,7 +491,7 @@ else
     ps(n)=ps(n-1)+(MINps-MAXps)/(N-T2); // MINps is 30
 */
 
-	int i; float lastp;
+	int i; double lastp;
 	for (i=0; i<bufferSize; i++ ) {
 	  //	  *samples++ = computeSample(pressureIn);
 	  //	  printf("%f  ",computeSample(pressureIn));
@@ -512,7 +505,7 @@ else
 //	  pressureIn=300; // 0.3 kPa after Fletcher
 
 	  //   signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
-	  *samples++=(float)(computeSample(pressureIn));
+	  *samples++=(double)(computeSample(pressureIn));
    //   printf("%d\n",s16);
    //   fwrite(&s16,2,1,fo);
    lastp=pressureIn;
@@ -524,61 +517,61 @@ else
 	return 0;
 };
 
-float computeSample(float pressure_in){
-  float T=1/Fs;
-  float rho = 1.14; 
-  float rhosn = rho*0.69;
-  float hfrho=rho/2;
-  float v = 1.85e-5;
-  float twvd1lg=12*v*d1*lg*lg;
-  float twvd2lg=12*v*d2*lg*lg;
-  float Ag012lg=Ag01/2/lg;
-  float Ag022lg=Ag02/2/lg;
-  float lgd1=lg*d1;
-  float lgd2=lg*d2;
-  float m1T=m1/T/T;
-  float m2T=m2/T/T;
-  float r1T=r1/T;
-  float r2T=r2/T;
-  float C11=k1*(1+aida*x1Prev*x1Prev);
-  float C12=k2*(1+aida*x2Prev*x2Prev);
-  float C21=k1*(1+aida*(x1Prev+Ag012lg)*(x1Prev+Ag012lg));
-  float C22=k2*(1+aida*(x2Prev+Ag022lg)*(x2Prev+Ag022lg));
-  float alpha1=lgd1*pm1Prev;
-  float alpha2=lgd2*pm2Prev;
-  float beta1=m1T*(x1PrevPrev-2*x1Prev);
-  float beta2=m2T*(x2PrevPrev-2*x2Prev);
-  float gamma1=-r1T*x1Prev;
-  float gamma2=-r2T*x2Prev;
-  float delta1=Ag012lg*C21;
-  float delta2=Ag022lg*C22;
-  float lambda1=-k12*x2Prev;
-  float lambda2=-k12*x1Prev;
-  float x1=0.0;
-  float x2=0.0;
-  float pm1=0.0;
-  float pm2=0.0;
-  float A1=0.0;
-  float A2=0.0;
-  float A1n2=0.0;
-  float A1n3=0.0;
-  float A2n2=0.0;
-  float A2n3=0.0;
-  float a=0.0;
-  float b=0.0;
-  float c=0.0;
-  float det=0.0;
-  float flow1=0.0;
-  float flow2=0.0;
-  float udif1=0.0;
-  float udif2=0.0;
-  float u=0.0;
-  float g1=0.0;
-  float g2=0.0;
-  float g4=0.0;
-  float g5=0.0;
-  float pm1b=0.0;
-  float pm2b=0.0;
+double computeSample(double pressure_in){
+  double T=1/Fs;
+  double rho = 1.14; 
+  double rhosn = rho*0.69;
+  double hfrho=rho/2;
+  double v = 1.85e-5;
+  double twvd1lg=12*v*d1*lg*lg;
+  double twvd2lg=12*v*d2*lg*lg;
+  double Ag012lg=Ag01/2/lg;
+  double Ag022lg=Ag02/2/lg;
+  double lgd1=lg*d1;
+  double lgd2=lg*d2;
+  double m1T=m1/T/T;
+  double m2T=m2/T/T;
+  double r1T=r1/T;
+  double r2T=r2/T;
+  double C11=k1*(1+aida*x1Prev*x1Prev);
+  double C12=k2*(1+aida*x2Prev*x2Prev);
+  double C21=k1*(1+aida*(x1Prev+Ag012lg)*(x1Prev+Ag012lg));
+  double C22=k2*(1+aida*(x2Prev+Ag022lg)*(x2Prev+Ag022lg));
+  double alpha1=lgd1*pm1Prev;
+  double alpha2=lgd2*pm2Prev;
+  double beta1=m1T*(x1PrevPrev-2*x1Prev);
+  double beta2=m2T*(x2PrevPrev-2*x2Prev);
+  double gamma1=-r1T*x1Prev;
+  double gamma2=-r2T*x2Prev;
+  double delta1=Ag012lg*C21;
+  double delta2=Ag022lg*C22;
+  double lambda1=-k12*x2Prev;
+  double lambda2=-k12*x1Prev;
+  double x1=0.0;
+  double x2=0.0;
+  double pm1=0.0;
+  double pm2=0.0;
+  double A1=0.0;
+  double A2=0.0;
+  double A1n2=0.0;
+  double A1n3=0.0;
+  double A2n2=0.0;
+  double A2n3=0.0;
+  double a=0.0;
+  double b=0.0;
+  double c=0.0;
+  double det=0.0;
+  double flow1=0.0;
+  double flow2=0.0;
+  double udif1=0.0;
+  double udif2=0.0;
+  double u=0.0;
+  double g1=0.0;
+  double g2=0.0;
+  double g4=0.0;
+  double g5=0.0;
+  double pm1b=0.0;
+  double pm2b=0.0;
 
 
   if  (x1Prev>=-Ag012lg){
@@ -620,8 +613,8 @@ float computeSample(float pressure_in){
   det=b*b-4.0*a*c;
 
   if (det>=0){
-    flow1=(-b+sqrtf(det))/(2.0*a);
-    flow2=(-b-sqrtf(det))/(2.0*a);
+    flow1=(-b+sqrt(det))/(2.0*a);
+    flow2=(-b-sqrt(det))/(2.0*a);
   }
   else{
     flow1=(-b)/(2.0*a);
@@ -696,7 +689,7 @@ float computeSample(float pressure_in){
   x2Prev=x2;
   uPrev=u;
   ps=pressure_in;
-//printf("UUUU %f pressure-in %f\n", u, pressure_in);
+printf("UUUU %f pressure-in %f\n", u, pressure_in);
   return gain*u;
 }
 
@@ -715,12 +708,12 @@ ps=0;
 //////////////////////// MINDLIN - from Laje, Gardner and Mindlin:
 
 typedef struct mindlin {
-float x, xprime,xdobleprime, k, b, c, f0, T, p0;
+double x, xprime,xdobleprime, k, b, c, f0, T, p0;
 }Mindlin;
 
 Mindlin syrinxM;
 
-void init_mindlin(Mindlin* mind, float b, float k, float c){
+void init_mindlin(Mindlin* mind, double b, double k, double c){
 mind->b=b;
 mind->k=k;
 mind->c=c;
@@ -732,14 +725,14 @@ mind->T = 1.0/96000.0;
 
 }
 
-float calc_xdobleprime_mindlin(Mindlin *mind){
+double calc_xdobleprime_mindlin(Mindlin *mind){
 // from pseudocode: result/0?/=xdobleprime+k*xprime + (c*x)^2 * xprime * xprime - b * xprime + f0;
 // xdobleprime = - (k*x + c *x^2 * xprime * xprime - b * xprime + f0);
 
 //return - (mind->k*mind->x + mind->c* pow(mind->x,2) * mind->xprime * mind->xprime - mind->b * mind->xprime + mind->f0);
 
 // from paper: xdobleprime= -k*x-c*x^2*xprime+b*xprime-f0;
-return -mind->k*mind->x - mind->c*powf(mind->x,2) * mind->xprime+mind->b *mind->xprime-mind->f0; // exp overruns
+return -mind->k*mind->x - mind->c*pow(mind->x,2) * mind->xprime+mind->b *mind->xprime-mind->f0; // exp overruns
 
 // from: http://www.scholarpedia.org/article/Models_of_birdsong_%28physics%29
 
@@ -747,13 +740,13 @@ return -mind->k*mind->x - mind->c*powf(mind->x,2) * mind->xprime+mind->b *mind->
 
 }
 
-float mindlin_oscillate(Mindlin* mind){
+double mindlin_oscillate(Mindlin* mind){
 int iii;  
-float newxdobleprime = calc_xdobleprime_mindlin(mind);
-float newxprime = mind->xprime + integrate(mind->xdobleprime,newxdobleprime,mind->T);
+double newxdobleprime = calc_xdobleprime_mindlin(mind);
+double newxprime = mind->xprime + integrate(mind->xdobleprime,newxdobleprime,mind->T);
 mind->xdobleprime = newxdobleprime;
 mind->x += integrate(mind->xprime,newxprime,mind->T);
-//printf("%f\n", mind->x);
+printf("%f\n", mind->x);
 //iii=32768.0f*mind->x;
 //fwrite(&iii,2,1,fo);
 mind->xprime = newxprime;
@@ -763,7 +756,7 @@ return mind->x;
 ////////////////////// GARDNER
 
 typedef struct gardner {
-  float x, xprime,oldxprime,xdobleprime, K, Pb, a0, b0, t, M, K_scale, K_scalex, Pb_scalex, D, D2, Pb_scale, T, freq, ofreq;
+  double x, xprime,oldxprime,xdobleprime, K, Pb, a0, b0, t, M, K_scale, K_scalex, Pb_scalex, D, D2, Pb_scale, T, freq, ofreq;
 }Gardner;
 
 Gardner syrinx;
@@ -772,8 +765,8 @@ void init_gardner(Gardner* gd, int16_t kk, int16_t pb){
 gd->x=0;
 gd->xprime=1.0;
 gd->xdobleprime = 0.0f;
-gd->K =  (float)kk; // between 11k and 12k something happens... - and now???
-gd->Pb = (float)pb;
+gd->K =  (double)kk; // between 11k and 12k something happens... - and now???
+gd->Pb = (double)pb;
 
 /*
 	upper_labia = 0.02 #cm
@@ -807,23 +800,23 @@ gd->Pb = (float)pb;
  gd->ofreq= 20.0;
 }
 
-float calc_xdobleprime_gardner(Gardner *gd, int i){
-  float a = gd->a0 + gd->x + (gd->t*gd->xprime);
-  float b = gd->b0 + gd->x - (gd->t*gd->xprime);
-  float Pf = gd->Pb*(1 - (a/b));
-//  printf("%f\n",gd->x);
-  int iii=(float)gd->x*327680.0f;
-//  fwrite(&iii,2,1,fo);
+double calc_xdobleprime_gardner(Gardner *gd, int i){
+  double a = gd->a0 + gd->x + (gd->t*gd->xprime);
+  double b = gd->b0 + gd->x - (gd->t*gd->xprime);
+  double Pf = gd->Pb*(1 - (a/b));
+  printf("%f\n",gd->x);
+  int iii=(double)gd->x*327680.0f;
+  fwrite(&iii,2,1,fo);
   //		return (Pf - (self.K*self.x) - (self.D2*math.pow(self.xprime,3)) - (self.D*self.xprime))/self.M
   //    return (Pf - (gd->K*gd->x) - (gd->D*gd->xprime))/gd->M;
   //  return (Pf - (gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
-return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*powf(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
+return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
 }
 
 
 void gardner_oscillate(Gardner* gd, int i){
-  float newxdobleprime = calc_xdobleprime_gardner(gd,i);
-  float newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
+  double newxdobleprime = calc_xdobleprime_gardner(gd,i);
+  double newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
     gd->xdobleprime = newxdobleprime;
     gd->x += integrate(gd->xprime,newxprime,gd->T);
     //    fwrite(&gd->x,2,1,fo);
@@ -841,56 +834,55 @@ gd->oldxprime=gd->xprime;
 
 //// simple spring undriven
 
-float x = 0.0;
-float xprime = 1.0;
-float xdobleprime = 0.0;
-float M = 0.005;
-float R = 5.0;
-float K = 200000.0;
-float T = 1.0/96000.0;
+double x = 0.0;
+double xprime = 1.0;
+double xdobleprime = 0.0;
+double M = 0.005;
+double R = 5.0;
+double K = 200000.0;
+double T = 1.0/96000.0;
 
 
 
-float calc_xdobleprime(int i){
+double calc_xdobleprime(int i){
   //# M x'' + Rx' + Kx = 0
   return (- (R*xprime) - (K*x) )/M;
 }
 
-float integrate(float old_value, float new_value, float period){
+double integrate(double old_value, double new_value, double period){
   return (old_value + new_value)*(period/2.0);
 }
 
-float flintegrate(float old_value, float new_value, float period){
+double flintegrate(double old_value, double new_value, double period){
   return (old_value + new_value)*(period/2.0);
 }
 
-float old_integrate(float old_value, float new_value, float period){
+double old_integrate(double old_value, double new_value, double period){
   return new_value*period;
 }
 
-float old_flintegrate(float old_value, float new_value, float period){
+double old_flintegrate(double old_value, double new_value, double period){
   return old_value + new_value*period;
 }
 
 void spring_oscillate(int i){
-float newxdobleprime = calc_xdobleprime(i);
-float newxprime = xprime + flintegrate(xdobleprime,newxdobleprime,T);
+double newxdobleprime = calc_xdobleprime(i);
+double newxprime = xprime + flintegrate(xdobleprime,newxdobleprime,T);
 xdobleprime = newxdobleprime;
 x += flintegrate(xprime,newxprime,T);
-//printf("%f\n",x);
+printf("%f\n",x);
 xprime = newxprime;
 }
 
-/*
 void main(int argc, char *argv[]){
   int xx,lenny=8,freq=200;
   fo = fopen("testraven.pcm", "wb");
 
   init();
-  float buffer[320000];  // try now varying some parameters each second:
-float f=(float)atoi(argv[1]);
-float ff=(float)atoi(argv[2]);
-float fff=(float)atoi(argv[3]);
+  double buffer[320000];  // try now varying some parameters each second:
+double f=(double)atoi(argv[1]);
+double ff=(double)atoi(argv[2]);
+double fff=(double)atoi(argv[3]);
 init_gardner(&syrinx, f, ff);
 init_mindlin(&syrinxM, f, ff, fff);
 
@@ -907,8 +899,6 @@ for (xx=0;xx<32000;xx++){
 RavenTube_next(buffer, 32000);
 
 }
-*/
-
   // we need some kind of input?
 
   /*  for (x=0;x<100;x++){
@@ -935,6 +925,6 @@ RavenTube_next(buffer, 32000);
 //	clearOld();
 //	OneTube_init();
 //  }
-//}
+}
 
 

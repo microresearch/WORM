@@ -36,7 +36,7 @@ void rrr(float ranger, xy* rrrr){
  rrrr->y= (runiform(ranger/-2.0f, ranger/2.0f)); 
 }
 
-void normalize(xy* loc){
+void normalize(xy* loc){ // normalize a vector
   float x=loc->x;  
   float y=loc->y;
   float mag=sqrtf(x*x + y*y);

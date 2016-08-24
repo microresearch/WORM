@@ -1906,7 +1906,7 @@ from APEX->LF model ApexSource01 {
 	}
 }
 
-- what is two tube SC in SLUgens about?
+- what is two tube SC in SLUgen about?
 
 Physical model; two tube sections with scattering junction inbetween; their relative areas determine k. 
 
@@ -3271,7 +3271,7 @@ and: http://read.pudn.com/downloads115/sourcecode/speech/488885/%E4%BD%95%E5%BB%
 - single tube model -> pluck.c now in raven.c testedDONE
 
 
-** 12/8
+** 12/8 + TODO
 
 *raven/glottis models finished and cleaned, decimation filter tests, generate and collect wavetables*
 
@@ -3317,10 +3317,72 @@ TODO: compile all possible sources!
   velocity=pressure from base of trachea and couple this to delay
   line?
 
-- test all lfgen2.c models with plots and how to achieve vocal fry with these? -> lfgen2.c becomes glottalsources.c
-
+- test all lfgen2.c models with plots and how to achieve vocal fry
+  with these? -> *lfgen2.c becomes glottalsources.c* and needs to be
+  ported and tested to ARM once finished/cleaned up!
+ 
 NOTE: Laje/Gardner/Mindlin equation/model https://nsaquib.files.wordpress.com/2013/06/mindlin-model.pdf
 
+** 19/8+
+
+- Gardner now self-oscillates but with changes to equation so we use equation 4
+
+- started on Mindlin - paper equation works eg. for:  ./raven 10000 120000 100000 > testplot   
+
+notebook TODO notes and other thoughts:
+
+*** what could be 2 tube model for bird (70mm length first tube= say 7 samples long (0.07/340.26 (speed sound) * 32000 = 6.6)
+
+and for area?) 
+
+trachea radius = 3.5mm = 38.48mm^2 in cm= 0.3848
+
+beak radius = 10mm=3.141 cm^2
+
+karray= Array.fill(10,{|i| (areas[i]-areas[i+1])/(areas[i]+areas[i+1])}); 
+
+*trachea = 7 samples = 1st K = (0.3838-3.141) / (0.3838+3.141) = -2.7572 / 3.525 = -0.782*
+
+*beak length=20mm = 2 samples   2nd K = (3.141 - 3.141) / (3.141 + 3.141) = 0 ????*
+ 
+what is area(i+1) for last element of 2?
+
+loss is 0.99 say for all
+
+*// raventube in raven.c to test a bit more thoroughly and also with floats!*
+
+*** check filter in raven_model_latestmari.py (is built in-numpy!)...
+
+*** raven fry/glottis with human resonances...
+
+** 23/8 TODO - need to summarise all before Montreal:
+
+*** where are we at with all raven and human glottis models:
+
+RAVEN: raven.c
+
+- Gardner - can't seem to get it to oscillate any more?
+- Mindlin - ./raven 1000 120000 100000
+- IF (doubles only?)
+- Fletcher - port in from latest py code
+
+in raven.c we also have delay line and TwoTube _as_ RavenTube - silence at some values???
+
+HUMAN: glottalsources.c
+
+- LF
+- Rosenberg
+- shimmer
+- KLGLOTT
+
+and summarise also other simple models: wavetables for both, pulses, triangle wave, what are others?
+
+- in scformant we have LPF etc. of Blip impulse
+- sources for each model that we have to abstract out - Klatt etc...
+
+- plague models: looking now at simforstacksansmem2.c - either use as wavetable or run as simulation
+
+other plague models?
 
 * TODO from 1 AUG:
 
@@ -4311,7 +4373,7 @@ now as *glottalair.py* and writing wav file - seems working -> port to C (also R
 - others: wavetable, formants a la SINGER/SPASM with two glottal
   oscillators and vibrato -> where? check VOICFORM again, LPC
 
-- plague model (where we find clean code?)
+- plague model (where we find clean code? looking now at simforstacksansmem2.c
 
 *** TRACHEA MODELS:
 

@@ -43,6 +43,7 @@
 #include "wavetable.h"
 #include "wavetables.h"
 #include "worming.h"
+#include "raven.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -108,8 +109,10 @@ tms5200_newsay();
   Blip_init(blipper);
   RLPF_init(RLPFer);
   NTube_init(&tuber);
-  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
+  //  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
+  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
   addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
+  RavenTube_init();
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
