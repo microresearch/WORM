@@ -113,7 +113,8 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 	 //	float * out;//= OUT(0);
 	 //	 float k= -0.782;// (float)ZIN0(1); //scattering coefficient updated at control rate?
 	 //	 float k=-0.1f;
-	 	 float k = 1.0f-((float)(adc_buffer[SELZ])/2048.0f);
+	 	 float k = 1.0f-((float)(adc_buffer[SELZ])/2048.0f); // -1 to +1.0 - far left = open=higher res?
+	 //	 float k = -0.8f;
 	 float loss= lossfactor;
 
 	 // easier stick with originals
@@ -149,14 +150,16 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 		 f1out= loss*0.5*(f1in+d1leftout);
 		 f1in= d1leftout;
 
-		 f2out= loss*(0.5*f2in+0.5*d2rightout);
+		 f2out= -(loss*(0.5*f2in+0.5*d2rightout)); // added minus which is for open tube! REFLECTION
 		 f2in= d2rightout;
 
 		 //calculate inputs of all delays
 		 d1right[d1rightpos]= in[i]+f1out;
-		 d2right[d2rightpos]= d1rightout*(1.0f+k)+ ((-k)*d2leftout);
+		 d2right[d2rightpos]= d1rightout*(1.0f+k)+ ((-k)*d2leftout); // losses here? 
+		 //- checked against http://www.music.mcgill.ca/~gary/courses/2015/618/week8/node19.html
 		 d2left[d2leftpos]= f2out;
-		 d1left[d1leftpos]= d1rightout*k+ ((1.0f-k)*d2leftout);
+		 d1left[d1leftpos]= d1rightout*k+ ((1.0f-k)*d2leftout); // losses here?
+		 //- checked against http://www.music.mcgill.ca/~gary/courses/2015/618/week8/node19.html
 
 
 		 //		d1left[d1leftpos]= d1rightout*k;//+ ((1-k)*d2leftout); FIX!

@@ -109,7 +109,7 @@ inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float fr
 {
   //    wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wavetable->basicIncrement));
   float speed=(float)adc_buffer[SELX]/40960.0f; 
-  u8 param=adc_buffer[SELY]/128; 
+  u8 param=adc_buffer[SELY]>>6; 
   float wm=wormonefloat(&myworm, speed, param, (float)wavetable->length);
   wavetable->currentPosition = wm;//mod0(wm,wavetable->length);
 }

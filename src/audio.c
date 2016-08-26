@@ -637,12 +637,12 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float lastbuffer[32], otherbuffer[32];
-    dowavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
-  //  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
-  //  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
-    //  donoise(otherbuffer,32);
+  //      dowavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+  //donoise(otherbuffer,32);
 
-  RavenTube_next(otherbuffer, lastbuffer, 32);
+  //    RavenTube_next(otherbuffer, lastbuffer, size);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 

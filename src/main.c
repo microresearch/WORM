@@ -110,7 +110,8 @@ tms5200_newsay();
   RLPF_init(RLPFer);
   NTube_init(&tuber);
   //  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
-  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
+  //  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
+  wavetable_init(&wavtable, plaguetable_simplesir_002, 493); // now last arg as length of table=less than 512
   addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
   RavenTube_init();
 

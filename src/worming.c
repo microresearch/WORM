@@ -1,6 +1,9 @@
 #include "audio.h"
 #include "worming.h"
 
+extern __IO uint16_t adc_buffer[10];
+
+
 u8 randy(u8 range){
   return rand()%range;
 }
@@ -120,7 +123,9 @@ void squiggleworm(struct wormy *worms, float addx, float addy, float param){
 
 
 void spiralworm(struct wormy *worms, float addx, float addy, float param){
-  worms->counter+=param;
+  // need to add speed here
+
+  worms->counter+=worms->speed;
   //  float rot=sinf((float)worms->counter)*param; // this can be multiplied
   float rot=(float)worms->counter*param; // this can be multiplied
   float z0 = (worms->acc.x * cosf(rot) - worms->acc.y * sinf(rot));
@@ -250,7 +255,7 @@ void addwormsans(wormy* worm, float x, float y, float boundx, float boundy, void
   worm->wloc.x=x;
   worm->wloc.y=y;
   worm->speed=1;
-  worm->maxspeed=2.0;
+  worm->maxspeed=4.0;
   worm->acc.x=0;worm->vel.x=0;
   worm->acc.y=0;worm->vel.y=0;
   worm->dir.x=2;worm->dir.y=4;
@@ -320,7 +325,11 @@ void wormfloat(wormy* wormyy, float speed, float param, float *x, float *y){ // 
 float wormonefloat(wormy* wormyy, float speed, float param, float limit){ // for worm as float and no constraints
   wormyy->speed=speed;
   wormyy->boundy=wormyy->boundx=limit;
-  wormyy->wormfunction(wormyy,0.0,0.0, param);
+
+  // addx offset
+  float offset=(float)adc_buffer[SPEED]/32.0f;
+
+  wormyy->wormfunction(wormyy,offset,0.0, param);
   //  *x=(wormyy->wloc.x-100.0f)/100.0f;
   float y=wormyy->wloc.x;
   return y;

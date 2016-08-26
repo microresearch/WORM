@@ -214,7 +214,7 @@ void NTube_do(NTube *unit, float *in, float *out, int inNumSamples) {
 
 		//should change s factor later, and independent time varying gains...
 		f2out= losses[numtubes]*(0.5*f2in+0.5*rightouts[numtubes-1]);
-		f2in= rightouts[numtubes-1];
+		f2in= - rightouts[numtubes-1]; // final end reflection?>? TODO_ TESTY!
 
 		//// and if we LPF f2out?
 		//		RLPF_do_single(RLPFer, &f2out, &f2out, 100, 1.4f, 0.001);

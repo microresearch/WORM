@@ -3270,7 +3270,6 @@ and: http://read.pudn.com/downloads115/sourcecode/speech/488885/%E4%BD%95%E5%BB%
 
 - single tube model -> pluck.c now in raven.c testedDONE
 
-
 ** 12/8 + TODO
 
 *raven/glottis models finished and cleaned, decimation filter tests, generate and collect wavetables*
@@ -3329,7 +3328,26 @@ NOTE: Laje/Gardner/Mindlin equation/model https://nsaquib.files.wordpress.com/20
 
 - started on Mindlin - paper equation works eg. for:  ./raven 10000 120000 100000 > testplot   
 
-notebook TODO notes and other thoughts:
+*** notebook TODO notes and other thoughts:
+
+- Fant (1960) - area function tables with ntubes
+
+- Flanagan and Landgraf - one mass model
+
+- how can we shimmer the wavetable (see shimmer in Klatt 1990 female voice)
+
+- Kelly and Lochbaum 1962 paper to look at
+
+- MITTalk book transition tables 
+
+- draw Fletcher wavetables and test with crow resonances/twotube model also:
+
+200Hz fundamental syrinx, 70mm trachea
+
+Formants are 1.4/2/3/3.7 and 5 KHz
+
+- chowning FM singing voice - srk/vox in csouns/paper on google drive... overlap blah...
+
 
 *** what could be 2 tube model for bird (70mm length first tube= say 7 samples long (0.07/340.26 (speed sound) * 32000 = 6.6)
 
@@ -3357,30 +3375,65 @@ loss is 0.99 say for all
 
 ** 23/8 TODO - need to summarise all before Montreal:
 
+*** general TODO
+
+- composting/audio_buffer
+- parameters straightened out and basic mode models
+- clean ups for each mode
+- assemble wavetables
+- text to speech for relevant modes
+- in worming we need to standardize params...
+- 2d wavetable implementation
+- trigger sync for wavetables
+- clean up generators in glottalsources.c
+
+- what else?
+
+*** seperate worm/plague control _and_ excitations _and_ filtering models
+
 *** where are we at with all raven and human glottis models:
 
-RAVEN: raven.c
+**** RAVEN: raven.c and raven_lap.c
 
-- Gardner - can't seem to get it to oscillate any more?
+- Gardner - can't seem to get it to oscillate any more? WHY??? what were our settings for this; now around: ./raven 1000 800 0 > testy 
+
+but not so exciting oscillation
+
 - Mindlin - ./raven 1000 120000 100000
 - IF (doubles only?)
-- Fletcher - port in from latest py code
+- Fletcher - test in py/// latest is maybe values are way out as those from: smac03.pdf
+ and port in from latest py code
 
-in raven.c we also have delay line and TwoTube _as_ RavenTube - silence at some values???
+further: different Mindlin equation, non linear spring and Van de Pol oscillator and chaos
 
-HUMAN: glottalsources.c
+in raven.c we also have delay line: CONV to FLOAT! and TwoTube _as_
+RavenTube - silence at some values for plague wavetable - question of spectrum/resonance
+
+what are resonances for say 70mm tube = closed=1200Hz open=2400Hz 90mm=950//1900 higher
+
+TODO: check this in ntubes and twotube with white noise in!DONE and check white noise spectrum/triangle, fill in model with rightout etcDONE:
+
+FINDINGS: That was behaving opposite to expected so for k=1 = closed we have higher resonance than k=-1 wide open
+
+- added minus reflection in RavenTube and reverses this!
+
+- do we need to do this for Ntubes? DONE - to test!DONE
+
+**** HUMAN: glottalsources.c
 
 - LF
 - Rosenberg
 - shimmer
 - KLGLOTT
 
-and summarise also other simple models: wavetables for both, pulses, triangle wave, what are others?
+**** and summarise also other simple models: wavetables for both, pulses, triangle wave, what are others?
 
 - in scformant we have LPF etc. of Blip impulse
 - sources for each model that we have to abstract out - Klatt etc...
 
 - plague models: looking now at simforstacksansmem2.c - either use as wavetable or run as simulation
+
+TODO: pulsed wavetable?
 
 other plague models?
 
@@ -3424,7 +3477,15 @@ TODO:
 
 - worm writing to TTS...
 
-* 2d wavetable notes:
+* wavetable notes/HOWTO:
+
+- generate crow wavetables (praat?) - we also need sets of crow LPCs - larger windows... what is windowsize again in lpc? *128*
+
+// workflow for wavetables: praat inverse filter, audacity, dump to float using dumpwave.c but we need 32k samplerate
+
+/////
+
+2d wavetable:
 
 how is implemented in braids: 
 

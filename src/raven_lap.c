@@ -6,7 +6,9 @@
 
 TODO: dooble->floot and port tests, port in latest FLETCHER
 
-split to raven_lap.c and raven.c - or extract resonances
+split to raven_lap.c and raven.c 
+
+we want to look at resonances imposed on plague model by raven
 
 */
 
@@ -134,7 +136,7 @@ double old_integrate(double old_value, double new_value, double period);
 		 //		out[i]=d1rightout;
 
 
-		  signed int s16=(signed int)(d1rightout*32768.0);
+		  signed int s16=(signed int)(d2rightout*32768.0);
 		  //	 		 s16=in[i]*32768.0; // TESTY=straight OUT!
 		 //		signed int s16=(signed int)(in[i]*32768.0);
 		 //		 printf("ff %f \n",in[i]);
@@ -732,6 +734,9 @@ double calc_xdobleprime_mindlin(Mindlin *mind){
 //return - (mind->k*mind->x + mind->c* pow(mind->x,2) * mind->xprime * mind->xprime - mind->b * mind->xprime + mind->f0);
 
 // from paper: xdobleprime= -k*x-c*x^2*xprime+b*xprime-f0;
+
+// other paper xxdobleprime= -k*x-(B1 + B2 * x^2 - p0/=air sac pressure/) * xprime - f0
+
 return -mind->k*mind->x - mind->c*pow(mind->x,2) * mind->xprime+mind->b *mind->xprime-mind->f0; // exp overruns
 
 // from: http://www.scholarpedia.org/article/Models_of_birdsong_%28physics%29
@@ -747,8 +752,8 @@ double newxprime = mind->xprime + integrate(mind->xdobleprime,newxdobleprime,min
 mind->xdobleprime = newxdobleprime;
 mind->x += integrate(mind->xprime,newxprime,mind->T);
 printf("%f\n", mind->x);
-//iii=32768.0f*mind->x;
-//fwrite(&iii,2,1,fo);
+iii=32768.0f*mind->x;
+fwrite(&iii,2,1,fo);
 mind->xprime = newxprime;
 return mind->x;
 }
@@ -775,7 +780,7 @@ gd->Pb = (double)pb;
 	mass = .005 #g/cm3
 	K=restitution_constant = 200000 #g*cm/s2cm3 // this is K- IF= approx 200 kdyn/cm3 ??? // paper 0-8 N/cm3
 
-8 Newtons is 800 kdyn
+8 Newtons is 800 kdyn = 800 000 dyne = 
 
 	D_coefficient = 5 #dynes*s/cm3
 	D2_coefficient = .01 #dyne*s/cm5 .001
@@ -792,7 +797,7 @@ gd->Pb = (double)pb;
  gd->K_scale = 1.0;
  gd->K_scalex = 1000.0;
  gd->D = 5.0;
- gd->D2 = 0.001;
+ gd->D2 = 0.01;
  gd->Pb_scale = 1.0;
  gd->Pb_scalex = 1000.0;
  gd->T = 1/96000.0;
@@ -810,20 +815,20 @@ double calc_xdobleprime_gardner(Gardner *gd, int i){
   //		return (Pf - (self.K*self.x) - (self.D2*math.pow(self.xprime,3)) - (self.D*self.xprime))/self.M
   //    return (Pf - (gd->K*gd->x) - (gd->D*gd->xprime))/gd->M;
   //  return (Pf - (gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
-return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
+return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-((gd->K*gd->x) + (gd->D2*pow(gd->xprime,3)) + (gd->D*gd->xprime)))/gd->M;
 }
 
 
 void gardner_oscillate(Gardner* gd, int i){
-  double newxdobleprime = calc_xdobleprime_gardner(gd,i);
-  double newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
-    gd->xdobleprime = newxdobleprime;
-    gd->x += integrate(gd->xprime,newxprime,gd->T);
-    //    fwrite(&gd->x,2,1,fo);
+double newxdobleprime = calc_xdobleprime_gardner(gd,i);
+double newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
+gd->xdobleprime = newxdobleprime;
+gd->x += integrate(gd->xprime,newxprime,gd->T);
+//fwrite(&gd->x,2,1,fo);
 gd->oldxprime=gd->xprime;
-  gd->xprime = newxprime;
-//  gd->K+= gd->K_scale;
-//  gd->Pb+= gd->Pb_scale;
+gd->xprime = newxprime;
+gd->K+= gd->K_scale;
+gd->Pb+= gd->Pb_scale;
   //    gd->K = gd->K_scale*sin((2*PI*gd->T*gd->freq*i)) + gd->K_scalex;
 		  //		gd->K = gd->K_scale*2.0
   //    gd->Pb = gd->Pb_scale*cos((2*PI*gd->T*gd->ofreq*i) + PI) + gd->Pb_scalex;
@@ -858,11 +863,11 @@ double flintegrate(double old_value, double new_value, double period){
 }
 
 double old_integrate(double old_value, double new_value, double period){
-  return new_value*period;
+return (old_value + new_value)*period;
 }
 
 double old_flintegrate(double old_value, double new_value, double period){
-  return old_value + new_value*period;
+return (old_value + new_value) *period;
 }
 
 void spring_oscillate(int i){
@@ -886,19 +891,19 @@ double fff=(double)atoi(argv[3]);
 init_gardner(&syrinx, f, ff);
 init_mindlin(&syrinxM, f, ff, fff);
 
-RavenTube_init();
+//RavenTube_init();
 
-for (lenny=0;lenny<2;lenny++){
+//for (lenny=0;lenny<2;lenny++){
 
-for (xx=0;xx<32000;xx++){
+for (xx=0;xx<3200;xx++){
   //  spring_oscillate(xx);
    gardner_oscillate(&syrinx,xx);
 //buffer[xx]=mindlin_oscillate(&syrinxM);
 }
 
-RavenTube_next(buffer, 32000);
+//RavenTube_next(buffer, 32000);
 
-}
+//}
   // we need some kind of input?
 
   /*  for (x=0;x<100;x++){
