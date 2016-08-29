@@ -41,6 +41,7 @@
 #include <inttypes.h>
 #include <math.h>
 #include "nsynth.h"
+#include "wavetable.h"
 #include "audio.h"
 #ifndef PI
 #ifndef M_PI                      /* <math.h> */
@@ -344,6 +345,16 @@ static void flutter(klatt_global_ptr globals, klatt_frame_ptr pars)
 	float fle = sin(2 * PI * 4.7 * time_count);
 	float delta_f0 = fla * flb * (flc + fld + fle) * 10;
 	F0hz10 += (long) delta_f0;
+}
+
+extern Wavetable wavtable;
+extern __IO uint16_t adc_buffer[10];
+
+
+static float wave_source(long nper) {
+  float res;
+  res=dosinglewavetable(&wavtable, (adc_buffer[SPEED]>>6)+(F0hz10/16.0)); // TODO freq a
+  return res*2048.0f;
 }
 
 static float triangular_source(long nper) {
@@ -884,7 +895,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 		period of female voice)
 		*/
 
-		for (n4 = 0; n4 < 4; n4++)
+		for (n4 = 0; n4 < 4; n4++) // TODO ALL SOURCES as below
 		{
 			if (globals->glsource == IMPULSIVE)
 			{
@@ -1104,24 +1115,25 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 
 		for (n4 = 0; n4 < 4; n4++)
 		{
-			if (globals->glsource == IMPULSIVE)
-			{
-				/* Use impulsive glottal source */
-				voice = impulsive_source(nper);
-			}
-			else if (globals->glsource == NATURAL)
-			{
-				/* Or use a more-natural-shaped source waveform with excitation
-				occurring both upon opening and upon closure, stronest at closure */
-				voice = natural_source(nper);
-			}
-			else if (globals->glsource == SAMPLE)// sampled wavetable source
+		        switch(globals->glsource)
 			  {
-				voice = sampled_source(nper);
-			}
-			else
-			  {
+			  case IMPULSIVE:
+			    /* Use impulsive glottal source */
+			    voice = impulsive_source(nper);
+			    break;
+			  case NATURAL:
+			    /* Or use a more-natural-shaped source waveform with excitation
+			       occurring both upon opening and upon closure, stronest at closure */
+			    voice = natural_source(nper);
+			    break;
+			  case SAMPLE:
+			    voice = sampled_source(nper);
+			    break;
+			  case TRIANGULAR:
 			    voice = triangular_source(nper);
+			    break;
+			  case WAVETABLE:
+			    voice = wave_source(nper);
 			  }
 
 /*            Modify F1 and BW1 pitch synchrounously - from parwv.c */

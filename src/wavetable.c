@@ -165,6 +165,26 @@ void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, int16_t
 }
 #endif
 
+float dosinglewavetable(Wavetable *wavetable, float frequency) 
+{
+    int lowerPosition, upperPosition;
+
+    //  First increment the table position, depending on frequency
+    WavetableIncrementPosition(wavetable, frequency);
+
+    //  Find surrounding integer table positions
+    lowerPosition = (int)wavetable->currentPosition;
+    upperPosition = mod0(lowerPosition + 1, wavetable->length);
+
+    //  Return interpolated table value
+    float sample= (wavetable->wavetable[lowerPosition] +
+            ((wavetable->currentPosition - lowerPosition) *
+             (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
+
+    return sample;
+}
+
+
 void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, int16_t length)  //  Plain oscillator
 {
     int lowerPosition, upperPosition;

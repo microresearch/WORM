@@ -7,6 +7,7 @@
 #define NATURAL               2
 #define SAMPLE                3
 #define TRIANGULAR            4
+#define WAVETABLE             5
 
 #ifndef PI
 #define PI            3.1415927

@@ -3386,6 +3386,7 @@ loss is 0.99 say for all
 - 2d wavetable implementation
 - trigger sync for wavetables
 - clean up generators in glottalsources.c
+- abstract out SELX etc so we don't overuse them!
 
 - what else? try with interpol from wavetable but do we need to generate coeffs?
 
