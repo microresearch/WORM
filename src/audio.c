@@ -629,7 +629,7 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
     floot_to_int(outgoing,lastbuffer,size);
 };
 
-void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
   dowavetable(lastbuffer, &wavtable, adc_buffer[SELX], size);
   floot_to_int(outgoing,lastbuffer,size);
@@ -637,12 +637,12 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float lastbuffer[32], otherbuffer[32];
-  //      dowavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
-  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
-  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+        dowavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+  //  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+	//  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
   //donoise(otherbuffer,32);
 
-  //    RavenTube_next(otherbuffer, lastbuffer, size);
+	RavenTube_next(otherbuffer, lastbuffer, size);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -715,7 +715,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  mode=17; // checked=0,1,2,3,4,5,6,7,8 17 is last
+  mode=1; // checked=0,1,2,3,4,5,6,7,8 17 is last
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 

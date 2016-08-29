@@ -52,6 +52,21 @@
 
 #define ONE 1.0F
 
+  static int natural_samples[100]=
+  {
+    -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
+    605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,
+    -598,737,125,-592,41,11,-247,-10,65,92,80,-304,71,167,-1,122,
+    233,161,-43,278,479,485,407,266,650,134,80,236,68,260,269,179,
+    53,140,275,293,296,104,257,152,311,182,263,245,125,314,140,44,
+    203,230,-235,-286,23,107,92,-91,38,464,443,176,98,-784,-2449,
+    -1891,-1045,-1600,-1462,-1384,-1261,-949,-730
+  };
+
+static float slopet1,slopet2,Afinal,maxt1,maxt2;        /* For triangle */
+static int nfirsthalf,nsecondhalf,assym,as;   /* For triangle */
+
+
 typedef struct
  {
   char *name;
@@ -331,6 +346,28 @@ static void flutter(klatt_global_ptr globals, klatt_frame_ptr pars)
 	F0hz10 += (long) delta_f0;
 }
 
+static float triangular_source(long nper) {
+
+/*    See if glottis open */
+        if (nper < nopen) {
+            if (nper < nfirsthalf) {
+                vwave += slopet1;
+                if (vwave > maxt1)    return(maxt1);
+            }
+            else {
+                vwave += slopet2;
+                if (vwave < maxt2)    return(maxt2);
+            }
+            return(vwave);
+        }
+
+/*    Glottis closed */
+        else {
+            return(0.);
+        }
+}
+
+
 static float impulsive_source(long nper)
 {
 	static float floatt[] =
@@ -371,6 +408,49 @@ static float natural_source(long nper)
 		return (0.0);
 	}
 }
+
+// other sources - eventually all excitations but just test here simple wavetable
+
+// from klatt in docs
+
+static float sampled_source(long nper)
+{
+  int itemp;
+  float ftemp;
+  float result;
+  float diff_value;
+  int current_value;
+  int next_value;
+  float temp_diff;
+
+  if(T0!=0)
+  {
+    ftemp = (float) nper;
+    ftemp = ftemp / T0;
+    ftemp = ftemp * 100;
+    itemp = (int) ftemp;
+
+    temp_diff = ftemp - (float) itemp;
+  
+    current_value = natural_samples[itemp];
+    next_value = natural_samples[itemp+1];
+
+    diff_value = (float) next_value - (float) current_value;
+    diff_value = diff_value * temp_diff;
+
+    result = natural_samples[itemp] + diff_value;
+    //    result = result * globals->sample_factor;
+    result = result * 2.0f;
+    //    printf("xxx %f",result);
+  }
+  else
+  {
+    result = 0;
+  }
+  return(result);
+}
+
+
 
 /*----------------------------------------------------------------------------*/
 /* Convert formant freqencies and bandwidth into
@@ -509,6 +589,21 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
 		temp1 = nopen * .00833;
 		rgl.a *= (temp1 * temp1);
+	
+/*        Reset legs of triangular glottal pulse */
+            if (globals->glsource == TRIANGULAR) {
+                assym = (nopen*(as-50))/100;  /* as=50 is symmetrical  CHECK */
+                nfirsthalf = (nopen>>1) + assym;
+                if (nfirsthalf >= nopen)    nfirsthalf = nopen -1;
+                if (nfirsthalf <= 0)            nfirsthalf = 1;
+                nsecondhalf = nopen - nfirsthalf;
+                Afinal = -7000.;
+                maxt2 = Afinal * 0.25;
+                slopet2 = Afinal / nsecondhalf;
+                vwave = -(Afinal * nsecondhalf) / nfirsthalf;   /* CHECK */
+                maxt1 = vwave * 0.25;
+                slopet1 = - vwave / nfirsthalf;
+	    }
 
 		/* Truncate skewness so as not to exceed duration of closed phase
 		of glottal period */
@@ -796,12 +891,36 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 				/* Use impulsive glottal source */
 				voice = impulsive_source(nper);
 			}
-			else
+			else if (globals->glsource == NATURAL)
 			{
 				/* Or use a more-natural-shaped source waveform with excitation
 				occurring both upon opening and upon closure, stronest at closure */
 				voice = natural_source(nper);
 			}
+			else
+			  {
+				voice = sampled_source(nper);
+			}
+
+
+/*            Modify F1 and BW1 pitch synchrounously - from parwv.c */
+/*
+                if (nper == nopen) {
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz,B1hz);
+                    }
+                    F1hzmod = 0;                // Glottis closes 
+                    B1hzmod = 0;
+                }
+                if (nper == T0) {
+                    F1hzmod = dF1hz;            // opens
+                    B1hzmod = dB1hz;
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz+F1hzmod,B1hz+B1hzmod);
+                    }
+                }
+            }
+*/
 
 			/* Reset period when counter 'nper' reaches T0 */
 			if (nper >= T0)
@@ -990,12 +1109,40 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 				/* Use impulsive glottal source */
 				voice = impulsive_source(nper);
 			}
-			else
+			else if (globals->glsource == NATURAL)
 			{
 				/* Or use a more-natural-shaped source waveform with excitation
 				occurring both upon opening and upon closure, stronest at closure */
 				voice = natural_source(nper);
 			}
+			else if (globals->glsource == SAMPLE)// sampled wavetable source
+			  {
+				voice = sampled_source(nper);
+			}
+			else
+			  {
+			    voice = triangular_source(nper);
+			  }
+
+/*            Modify F1 and BW1 pitch synchrounously - from parwv.c */
+/*
+                if (nper == nopen) {
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz,B1hz);
+                    }
+                    F1hzmod = 0;                // Glottis closes 
+                    B1hzmod = 0;
+                }
+                if (nper == T0) {
+                    F1hzmod = dF1hz;            // opens
+                    B1hzmod = dB1hz;
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz+F1hzmod,B1hz+B1hzmod);
+                    }
+                }
+            }
+*/
+
 
 			/* Reset period when counter 'nper' reaches T0 */
 			if (nper >= T0)

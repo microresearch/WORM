@@ -5,6 +5,9 @@
 #define NPAR                 40
 #define IMPULSIVE             1
 #define NATURAL               2
+#define SAMPLE                3
+#define TRIANGULAR            4
+
 #ifndef PI
 #define PI            3.1415927
 #endif

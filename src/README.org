@@ -3387,7 +3387,7 @@ loss is 0.99 say for all
 - trigger sync for wavetables
 - clean up generators in glottalsources.c
 
-- what else?
+- what else? try with interpol from wavetable but do we need to generate coeffs?
 
 *** seperate worm/plague control _and_ excitations _and_ filtering models
 
@@ -3401,7 +3401,7 @@ but not so exciting oscillation
 
 - Mindlin - ./raven 1000 120000 100000
 - IF (doubles only?)
-- Fletcher - test in py/// latest is maybe values are way out as those from: smac03.pdf
+- Fletcher - test in py/// checked values against smac03.pdf and they match except maybe for pressure
  and port in from latest py code
 
 further: different Mindlin equation, non linear spring and Van de Pol oscillator and chaos
@@ -3436,6 +3436,14 @@ FINDINGS: That was behaving opposite to expected so for k=1 = closed we have hig
 TODO: pulsed wavetable?
 
 other plague models?
+
+** 29/8 +
+
+- more plague wavetables using different code - catalogue wavetables...
+- clean glottalsources and raven.c
+- Fletcher as drawn wavetable, all raven work summarised
+- recordings and draft of early modes and eg. test klatt excitation subs (say with wavetable) -> now all modes as we go in modes.org
+- vocoder with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
 
 * TODO from 1 AUG:
 
@@ -3481,7 +3489,11 @@ TODO:
 
 - generate crow wavetables (praat?) - we also need sets of crow LPCs - larger windows... what is windowsize again in lpc? *128*
 
-// workflow for wavetables: praat inverse filter, audacity, dump to float using dumpwave.c but we need 32k samplerate
+// workflow for inverse filtered wavetables: praat inverse filter, audacity, dump to float using dumpwave.c but we need 32k samplerate
+
+// for drawn wavetable - create tone, isolate sine, redraw with draw tool, save, dump with dumpewave.c
+
+
 
 /////
 
@@ -3726,7 +3738,7 @@ klatt in docs:
 
 ** 2.5 do we want klatt which has say phoneme to next transitions
 
-also TTS?
+also TTS so kind of straightforward klatt synth?
 
 ** 3/SAM - test/re-work - still glitchy issue
 
