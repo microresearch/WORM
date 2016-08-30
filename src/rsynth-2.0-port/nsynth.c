@@ -780,7 +780,7 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
 
 static int16_t clip(klatt_global_ptr globals, float input)
 {
-	long temp = input*4.0f;
+	long temp = input;
 	/* clip on boundaries of 16-bit word */
 	if (temp < -32767)
 	{

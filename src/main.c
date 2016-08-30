@@ -71,10 +71,16 @@ extern RLPF *RLPFer;
 extern NTube tuber;
 extern Wavetable wavtable;
 extern wormy myworm;
+extern biquad* newBB;
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
-u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  44, 8, 0, 1, 8, 0}; // ELM_LEN in holmes - but why do we need extra 0>// extra what?
+//u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  44, 6, 0,  44, 8, 0,  44, 8, 0}; // ELM_LEN in holmes - but why do we need extra 0>// extra what?
+
+//u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0}; // ELM_LEN in holmes - but why do we need extra 0>// extra what? - this one doesn;t crackle
+																			 u8 test_elm[51]={28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0, 20, 8, 0, 53, 9, 0, 1, 6, 0, 1, 6, 0, 25, 12, 0, 54, 16, 0, 1, 6, 0, 1, 6, 0}; // "help me sir"
+
+// ELM_LEN is 48 = 16 phonemes
 
 void main(void)
 {
@@ -114,6 +120,7 @@ tms5200_newsay();
   wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512
   addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
   RavenTube_init();
+  newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
@@ -135,7 +142,7 @@ tms5200_newsay();
     /*          for (x=0;x<32768;x++){
 	  audio_buffer[x]=tube_get_sample();
 	  }*/
-   // writepos=run_holmes(writepos); 
+  //   int writepos=run_holmes(writepos); 
 
   /*  for (x=0;x<32767;x++){
 	    audio_buffer[x]=tube_get_sample();
@@ -149,8 +156,8 @@ tms5200_newsay();
   // testing changing test_elm
       u8 axis=adc_buffer[SELX]>>8; // 16*3=48
       // change element, change length? leave stress as is 0
-      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
-      test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
+      //      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
+      //      test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
     
 
       //      oldmode=mode;    

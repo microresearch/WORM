@@ -95,6 +95,8 @@ NTube tuber;
 Wavetable wavtable;
 wormy myworm;
 
+biquad* newBB;
+
 #define THRESH 32000
 #define THRESHLOW 30000
 
@@ -344,11 +346,25 @@ void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
 void fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // first without speed or any params SELZ is pitch bend commentd now OUT
   //  klattrun(outgoing, size);
+  float tmpbuffer[32]; float xxx,x;
   u8 xx=0;
      while (xx<size){
        outgoing[xx]=klatt_get_sample();
        xx++;
      }
+
+     // test lowpass/biquad:
+     
+     int_to_floot(outgoing,tmpbuffer,32);
+    for (xx=0;xx<32;xx++){
+    xxx=tmpbuffer[xx];
+    xxx=BiQuad(xxx,newBB); 
+    tmpbuffer[xx]=xxx;
+      }
+    floot_to_int(outgoing,tmpbuffer,32);
+    
+
+
 };
 
 void tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
@@ -694,15 +710,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   //  static u8 framecount=0, tmpcount=0;
   //  static float eaten=0;
-  //  static float samplepos=0.0f; 
+  //    static float samplepos=0.0f; 
   float samplespeed;
   //  static float samplepos=0.0f;
   u8 x;
-  //  u16 readpos;
-  u8 speedy;
+  //   u16 readpos;
+    u8 speedy;
   //  float xx,yy;
 
-  //  u16 ending=AUDIO_BUFSZ;
+    //  u16 ending=AUDIO_BUFSZ;
   speedy=(adc_buffer[SPEED]>>6)+1;
   samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
 
@@ -719,16 +735,16 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 
-  generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
+    generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
-
-  /*    for (x=0;x<sz/2;x++){ // STRIP_OUT
+    /*
+      for (x=0;x<sz/2;x++){ // STRIP_OUT - leave for TESTING
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];
       samplepos+=samplespeed;
       if (readpos>=ending) samplepos=0.0f;    
-      }*/
-
+      }
+    */
 
 #ifdef TEST
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);

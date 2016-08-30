@@ -19,14 +19,14 @@ long samp_rate = 32000;
 void init_synth(void)
 {
 	//double mSec_per_frame = 10;
-  float mSec_per_frame = 10; // 10? or 8?
+  float mSec_per_frame = 8; // 10? or 8?
   //	int impulse = 0;
-  int impulse = 1;
+  //  int impulse = 1;
 	//int casc = 1;
-	int casc = 6;
+	int casc = 5;
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
-	klatt_global.glsource = WAVETABLE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE
+	klatt_global.glsource = IMPULSIVE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE
 	klatt_global.f0_flutter = 0;
 
 	//	klatt_global.quiet_flag, "Quiet - minimal messages",
@@ -39,7 +39,7 @@ void init_synth(void)
 
 	//	def_pars.TLTdb=10;
 	//	def_pars.F0hz10=1200;//         "Base F0 in 0.1Hz",
-	def_pars.Kskew=10;
+	//	def_pars.Kskew=10;
 	if (casc > 0)
 	{
 		klatt_global.synthesis_model = CASCADE_PARALLEL;

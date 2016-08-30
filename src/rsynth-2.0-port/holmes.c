@@ -695,12 +695,12 @@ int16_t klatt_get_sample(){
   unsigned nelm=ELM_LEN; // 10 phonemes = how many frames approx ???? - in test case we have 87 frames - now 16 phonemes
   unsigned char *elm=test_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
   u8 j; 
-  static u8 dur;
+  static u8 dur,first=0;
   slope_t startyy[nEparm];
   slope_t end[nEparm];
   static klatt_frame_t pars;
   if (i>nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
-    i=0;
+    i=0; 
     le = &Elements[0];
       top = 1.1 * def_pars.F0hz10;
     //        top= 200+ adc_buffer[SELX];
@@ -712,7 +712,6 @@ int16_t klatt_get_sample(){
     pars.B4phz = def_pars.B4phz;
 
     parwave_init(&klatt_global);
-
     /* Set stress attack/decay slope */
     stress_s.t = 40;
     stress_e.t = 40;
@@ -767,14 +766,14 @@ int16_t klatt_get_sample(){
 	t=0;
 	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
 	newframe=1;
-      }
+      } // if dur==0
   }
   
   if (newframe==1) { // this is a new frame - so we need new parameters
     newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
-    if (t<dur){
+    if (t<dur){ //
                   float base = top * 0.8 /* 3 * top / 5 */;
       //      float base =      200+ adc_buffer[SELZ];
       float tp[nEparm];
@@ -847,13 +846,12 @@ int16_t klatt_get_sample(){
       initparwave(&klatt_global, &pars);
       nextelement=0;
       tstress++; t++;
-    }
+    } // if t<dur
     else { // hit end of DUR number of frames...
       nextelement=1;
       le = ce; // where we can put this?????? TODO!!!
     }
   }
-
   if (nextelement==0){
     // always run through samples till we hit next frame
     //    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); 
@@ -862,11 +860,11 @@ int16_t klatt_get_sample(){
     ///x++;
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
-    if (samplenumber>klatt_global.nspfr) {
+    if (samplenumber>=klatt_global.nspfr) {
       // end of frame so...????
       newframe=1;
       samplenumber=0;
-            top -= 0.5; // where we can put this?
+      top -= 0.5; // where we can put this?
     }
   }
   return sample;
