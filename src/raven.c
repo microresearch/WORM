@@ -1,23 +1,36 @@
 /* what do we have here?
 
-- resonances with twotube and onetube delay line
+- resonances with twotube and onetube delay line (finish float there)
 
-- raven syrinx models: Mindlin, IF (dooble only?), gardner
+- raven syrinx models: Mindlin, IF (double only?), gardner
 
 TODO: dooble->floot and port tests, port in latest FLETCHER
 
-split to raven_lap.c and raven.c ...
+split to raven_lap.c and raven.c ... NO - back now just do as define
 
 */
 
+#ifdef LAP
+#include <stdio.h>
+#include "math.h"
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
+typedef float ourfloat;
+#define PI            3.1415927
+FILE *fo;
+#else
 #include "audio.h"
 #include "stdio.h"
 #include <math.h>
+typedef float ourfloat;
+extern __IO uint16_t adc_buffer[10];
+#endif
 
-float integrate(float old_value, float new_value, float period);
-float old_integrate(float old_value, float new_value, float period);
+ourfloat integrate(ourfloat old_value, ourfloat new_value, ourfloat period);
+ourfloat old_integrate(ourfloat old_value, ourfloat new_value, ourfloat period);
 
-//#define PI            3.1415927
 
  // forlap: 
 
@@ -28,7 +41,6 @@ float old_integrate(float old_value, float new_value, float period);
 
  // setting up
 
-// FILE *fo;
 
  int d1length=7; // *trachea = 7 samples = 1st K = (0.3838-3.141) / (0.3838+3.141) = -2.7572 / 3.525 = -0.782*
 // so wider we open beak = (0.3838 - WIDER) / (0.3838 + WIDER) = -LARGER / +LARGER = towards -1.0
@@ -37,20 +49,20 @@ float old_integrate(float old_value, float new_value, float period);
 
  // delay = round( L * fs / c); = say for 70mm = 0.07 * 32000 (here) / 347.23   // speed of sound (m/sec)
 
- float lossfactor=0.99;
+ ourfloat lossfactor=0.99;
 
  //just need delay1 for one TUBE!!
 
- float delay1right[8]; //->d1length of floats
- float delay1left[8];//=>d1length of floats
+ ourfloat delay1right[8]; //->d1length of ourfloats
+ ourfloat delay1left[8];//=>d1length of ourfloats
 
- float delay2right[8]; //->d1length of floats
- float delay2left[8];//=>d1length of floats
+ ourfloat delay2right[8]; //->d1length of ourfloats
+ ourfloat delay2left[8];//=>d1length of ourfloats
 
- void donoise(float *out, int numSamples){
+ void donoise(ourfloat *out, int numSamples){
    int x;
    for (x=0;x<numSamples;x++){
-     float xx=(float) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
+     ourfloat xx=(ourfloat) ( 2.0 * rand() / (RAND_MAX + 1.0) - 1.0 );
      out[x]=xx;
    }
  }
@@ -59,8 +71,8 @@ float old_integrate(float old_value, float new_value, float period);
 /* void do_impulse(short* out, int numSamples, int freq){ //- so for 256 samples we have freq 125 for impulse
      // from Impulse->LFUGens.cpp
    int i;
-   static float phase =0.0f;
-   float z, freqinc;
+   static ourfloat phase =0.0f;
+   ourfloat z, freqinc;
    freqinc=0.00003125 * freq;
 
    for (i=0; i<numSamples;++i) {
@@ -91,38 +103,36 @@ float old_integrate(float old_value, float new_value, float period);
 	 }
  }
 
- float f1in= 0.0;
- float f1out= 0.0;
- float f2in= 0.0;
- float f2out= 0.0;
+ ourfloat f1in= 0.0;
+ ourfloat f1out= 0.0;
+ ourfloat f2in= 0.0;
+ ourfloat f2out= 0.0;
 
  int d1rightpos= 0;
  int d1leftpos= 0;
  int d2rightpos= 0;
  int d2leftpos= 0;
 
-extern __IO uint16_t adc_buffer[10];
-
-
-void RavenTube_next(float *inn, float *outt, int inNumSamples) {
+void RavenTube_next(ourfloat *inn, ourfloat *outt, int inNumSamples) {
 
 	 int i;
 
 	 //value to store
-	 float * in = inn;//= IN(0);
-	 //	float * out;//= OUT(0);
-	 //	 float k= -0.782;// (float)ZIN0(1); //scattering coefficient updated at control rate?
-	 //	 float k=-0.1f;
-	 	 float k = 1.0f-((float)(adc_buffer[SELZ])/2048.0f); // -1 to +1.0 - far left = open=higher res?
-	 //	 float k = -0.8f;
-	 float loss= lossfactor;
+	 ourfloat * in = inn;//= IN(0);
+#ifdef LAP
+	 ourfloat k= -0.782;// (ourfloat)ZIN0(1); //scattering coefficient updated at control rate?
+#else
+	 	 ourfloat k = 1.0f-((ourfloat)(adc_buffer[SELZ])/2048.0f); // -1 to +1.0 - far left = open=higher res?
+#endif
+	 //	 ourfloat k = -0.8f;
+	 ourfloat loss= lossfactor;
 
 	 // easier stick with originals
 
-	 float * d1right= delay1right;
-	 float * d1left= delay1left;
-	 float * d2right= delay2right;
-	 float * d2left= delay2left;
+	 ourfloat * d1right= delay1right;
+	 ourfloat * d1left= delay1left;
+	 ourfloat * d2right= delay2right;
+	 ourfloat * d2left= delay2left;
 
 	 //have to store filter state around loop; probably don't need to store output, but oh well
 
@@ -130,10 +140,10 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 	 for (i=0; i<inNumSamples; ++i) {
 
 		 //update outs of all delays
-		 float d1rightout= d1right[d1rightpos];
-		 float d1leftout= d1left[d1leftpos];
-		 float d2rightout= d2right[d2rightpos];
-		 float d2leftout= d2left[d2leftpos];
+		 ourfloat d1rightout= d1right[d1rightpos];
+		 ourfloat d1leftout= d1left[d1leftpos];
+		 ourfloat d2rightout= d2right[d2rightpos];
+		 ourfloat d2leftout= d2left[d2leftpos];
 
 		 //output value
 		 //		out[i]=d1rightout;
@@ -174,7 +184,7 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
  }
 
 
- #define FLOAT_TO_SHORT(x) ((int)((x)*32768.0))
+ #define OURFLOAT_TO_SHORT(x) ((int)((x)*32768.0))
 
  typedef struct _DelayLine {
      short *data;
@@ -202,10 +212,10 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
      free(dl);
  }
 
- inline static void setDelayLine(DelayLine *dl, float *values, float scale) {
+ inline static void setDelayLine(DelayLine *dl, ourfloat *values, ourfloat scale) {
      int i;
      for (i=0; i<dl->length; i++)
-	 dl->data[i] = FLOAT_TO_SHORT(scale * values[i]);
+	 dl->data[i] = OURFLOAT_TO_SHORT(scale * values[i]);
  }
 
  /* lg_dl_update(dl, insamp);
@@ -311,8 +321,9 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
 
      /* Output at pickup location */
      out  = rg_dl_access(upper_rail, length-1);
-//     fwrite(&out,2,1,fo);
-
+#ifdef LAP
+     fwrite(&out,2,1,fo);
+#endif
      //    outsamp1 = lg_dl_access(lower_rail, pickup_loc);
      //	outsamp += outsamp1;
 
@@ -332,39 +343,40 @@ void RavenTube_next(float *inn, float *outt, int inNumSamples) {
  }
 
  /*
-  *  based on balloon1.cpp - IF model...
+  *  based on balloon1.cpp - IF model... only works on lap so...
 
  See http://www.dei.unipd.it/~avanzini/downloads/paper/avanzini_eurosp01_revised.pdf - measurements
 
   */
 
- float computeSample(float pressure_in);
+#ifdef LAP
+ ourfloat computeSample(ourfloat pressure_in);
  void clearOld();
 
- float ps;		//subglottal pressure
-static float r1;		//damping factor
-static float r2;
- float m1;		//mass
- float m2;
- float k1;		//spring constant
- float k2;
- float k12;		//coupling spring constant
- float d1;		//glottal width
- float d2;
- float lg;		//glottal length
- float aida;		//nonlinearity coefficient
- float S;			//subglottal surface area
- float Ag01;		//nominal glottal area, with mass at rest position
- float Ag02;
- float pm1Prev;	//pressure at previous time step
- float pm2Prev;
- float x1Prev;	//displacement at previous time step
- float x1PrevPrev;//displacement at previous time step to the previous one
- float x2Prev;
- float x2PrevPrev;
- float gain;		//after-market gain
- float uPrev;		//previous flow value
- float Fs;		//calculation sampling rate, not actual audio output sample rate
+ ourfloat ps;		//subglottal pressure
+static ourfloat r1;		//damping factor
+static ourfloat r2;
+ ourfloat m1;		//mass
+ ourfloat m2;
+ ourfloat k1;		//spring constant
+ ourfloat k2;
+ ourfloat k12;		//coupling spring constant
+ ourfloat d1;		//glottal width
+ ourfloat d2;
+ ourfloat lg;		//glottal length
+ ourfloat aida;		//nonlinearity coefficient
+ ourfloat S;			//subglottal surface area
+ ourfloat Ag01;		//nominal glottal area, with mass at rest position
+ ourfloat Ag02;
+ ourfloat pm1Prev;	//pressure at previous time step
+ ourfloat pm2Prev;
+ ourfloat x1Prev;	//displacement at previous time step
+ ourfloat x1PrevPrev;//displacement at previous time step to the previous one
+ ourfloat x2Prev;
+ ourfloat x2PrevPrev;
+ ourfloat gain;		//after-market gain
+ ourfloat uPrev;		//previous flow value
+ ourfloat Fs;		//calculation sampling rate, not actual audio output sample rate
 
 
  void init(){
@@ -438,8 +450,8 @@ m1 =1e-6; // -7 or -5 for -5 we would have for r1 and as k1=0.09 =
 	k1 =0.014;
 	k2 =k1;
 	k12=0.00005;
-	aida =10000000.0;
-//	aida =10.0;
+		aida =10000000.0;
+	//	aida =10.0;
 	d1 =1.5e-2;
 	d2 =d1;
 
@@ -457,30 +469,30 @@ m1 =1e-6; // -7 or -5 for -5 we would have for r1 and as k1=0.09 =
 	pm2Prev=0.0;
 	uPrev=0.0;
 	ps=0.0;
-	Fs=32000.0;
+	Fs=48000.0;
   
 }
 
 
-int rtick(float *buffer, int bufferSize, float pressureIn) {
-  float *samples = (float *) buffer;
+int rtick(ourfloat *buffer, int bufferSize, ourfloat pressureIn) {
+  ourfloat *samples = (ourfloat *) buffer;
 
-/*	bsynth->setM1(5e-8*(float)[(id)dataPointer m1In]);
-	bsynth->setM2(5e-8*(float)[(id)dataPointer m2In]);
-	bsynth->setR1(5e-9*(float)[(id)dataPointer r1In]);
-	bsynth->setR2(5e-9*(float)[(id)dataPointer r2In]);
-	bsynth->setK1(1e-3*(float)[(id)dataPointer k1In]);
-	bsynth->setK2(1e-3*(float)[(id)dataPointer k2In]);
-	bsynth->setD1(1.5e-7*(float)[(id)dataPointer d1In]);
-	bsynth->setD2(1.5e-7*(float)[(id)dataPointer d2In]);
-	bsynth->setK12(1e-4*(float)[(id)dataPointer k12In]);
-	bsynth->setLg(1.3e-4*(float)[(id)dataPointer lgIn]);
-	bsynth->setAida(1.1e-4*(float)[(id)dataPointer aidaIn]);
-	bsynth->setS(5.5e-7*(float)[(id)dataPointer SIn]);
-	bsynth->setAg01(5.1e-10*(float)[(id)dataPointer Ag01In]);
-	bsynth->setAg02(5.1e-10*(float)[(id)dataPointer Ag02In]);
-	bsynth->setGain((float)[(id)dataPointer gainIn]);
-	bsynth->setFs((float)[(id)dataPointer FsIn]);
+/*	bsynth->setM1(5e-8*(ourfloat)[(id)dataPointer m1In]);
+	bsynth->setM2(5e-8*(ourfloat)[(id)dataPointer m2In]);
+	bsynth->setR1(5e-9*(ourfloat)[(id)dataPointer r1In]);
+	bsynth->setR2(5e-9*(ourfloat)[(id)dataPointer r2In]);
+	bsynth->setK1(1e-3*(ourfloat)[(id)dataPointer k1In]);
+	bsynth->setK2(1e-3*(ourfloat)[(id)dataPointer k2In]);
+	bsynth->setD1(1.5e-7*(ourfloat)[(id)dataPointer d1In]);
+	bsynth->setD2(1.5e-7*(ourfloat)[(id)dataPointer d2In]);
+	bsynth->setK12(1e-4*(ourfloat)[(id)dataPointer k12In]);
+	bsynth->setLg(1.3e-4*(ourfloat)[(id)dataPointer lgIn]);
+	bsynth->setAida(1.1e-4*(ourfloat)[(id)dataPointer aidaIn]);
+	bsynth->setS(5.5e-7*(ourfloat)[(id)dataPointer SIn]);
+	bsynth->setAg01(5.1e-10*(ourfloat)[(id)dataPointer Ag01In]);
+	bsynth->setAg02(5.1e-10*(ourfloat)[(id)dataPointer Ag02In]);
+	bsynth->setGain((ourfloat)[(id)dataPointer gainIn]);
+	bsynth->setFs((ourfloat)[(id)dataPointer FsIn]);
 */
 
 /* pressure waveform:
@@ -501,23 +513,23 @@ else
     ps(n)=ps(n-1)+(MINps-MAXps)/(N-T2); // MINps is 30
 */
 
-	int i; float lastp;
+	int i; ourfloat lastp;
 	for (i=0; i<bufferSize; i++ ) {
 	  //	  *samples++ = computeSample(pressureIn);
 	  //	  printf("%f  ",computeSample(pressureIn));
 
-	  	 	  if (i<5) pressureIn=0;
+	  /*	  	 	  if (i<5) pressureIn=0;
 	  else if (i< (32000/90)) pressureIn=lastp+ 400/(32000/90);
 	  else if (i<= (32000/80)) pressureIn=lastp;
 	  else pressureIn=lastp-360.0f/(32000.0f-(32000.0/80.0));
-
+	  */
 	  // constant pressure
 //	  pressureIn=300; // 0.3 kPa after Fletcher
 
-	  //   signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
-	  *samples++=(float)(computeSample(pressureIn));
+			  signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
+	  *samples++=(ourfloat)(computeSample(pressureIn));
    //   printf("%d\n",s16);
-   //   fwrite(&s16,2,1,fo);
+     fwrite(&s16,2,1,fo);
    lastp=pressureIn;
    //   fwrite(&s16,2,1,fo);
 
@@ -527,61 +539,61 @@ else
 	return 0;
 };
 
-float computeSample(float pressure_in){
-  float T=1/Fs;
-  float rho = 1.14; 
-  float rhosn = rho*0.69;
-  float hfrho=rho/2;
-  float v = 1.85e-5;
-  float twvd1lg=12*v*d1*lg*lg;
-  float twvd2lg=12*v*d2*lg*lg;
-  float Ag012lg=Ag01/2/lg;
-  float Ag022lg=Ag02/2/lg;
-  float lgd1=lg*d1;
-  float lgd2=lg*d2;
-  float m1T=m1/T/T;
-  float m2T=m2/T/T;
-  float r1T=r1/T;
-  float r2T=r2/T;
-  float C11=k1*(1+aida*x1Prev*x1Prev);
-  float C12=k2*(1+aida*x2Prev*x2Prev);
-  float C21=k1*(1+aida*(x1Prev+Ag012lg)*(x1Prev+Ag012lg));
-  float C22=k2*(1+aida*(x2Prev+Ag022lg)*(x2Prev+Ag022lg));
-  float alpha1=lgd1*pm1Prev;
-  float alpha2=lgd2*pm2Prev;
-  float beta1=m1T*(x1PrevPrev-2*x1Prev);
-  float beta2=m2T*(x2PrevPrev-2*x2Prev);
-  float gamma1=-r1T*x1Prev;
-  float gamma2=-r2T*x2Prev;
-  float delta1=Ag012lg*C21;
-  float delta2=Ag022lg*C22;
-  float lambda1=-k12*x2Prev;
-  float lambda2=-k12*x1Prev;
-  float x1=0.0;
-  float x2=0.0;
-  float pm1=0.0;
-  float pm2=0.0;
-  float A1=0.0;
-  float A2=0.0;
-  float A1n2=0.0;
-  float A1n3=0.0;
-  float A2n2=0.0;
-  float A2n3=0.0;
-  float a=0.0;
-  float b=0.0;
-  float c=0.0;
-  float det=0.0;
-  float flow1=0.0;
-  float flow2=0.0;
-  float udif1=0.0;
-  float udif2=0.0;
-  float u=0.0;
-  float g1=0.0;
-  float g2=0.0;
-  float g4=0.0;
-  float g5=0.0;
-  float pm1b=0.0;
-  float pm2b=0.0;
+ourfloat computeSample(ourfloat pressure_in){
+  ourfloat T=1/Fs;
+  ourfloat rho = 1.14; 
+  ourfloat rhosn = rho*0.69;
+  ourfloat hfrho=rho/2;
+  ourfloat v = 1.85e-5;
+  ourfloat twvd1lg=12*v*d1*lg*lg;
+  ourfloat twvd2lg=12*v*d2*lg*lg;
+  ourfloat Ag012lg=Ag01/2/lg;
+  ourfloat Ag022lg=Ag02/2/lg;
+  ourfloat lgd1=lg*d1;
+  ourfloat lgd2=lg*d2;
+  ourfloat m1T=m1/T/T;
+  ourfloat m2T=m2/T/T;
+  ourfloat r1T=r1/T;
+  ourfloat r2T=r2/T;
+  ourfloat C11=k1*(1+aida*x1Prev*x1Prev);
+  ourfloat C12=k2*(1+aida*x2Prev*x2Prev);
+  ourfloat C21=k1*(1+aida*(x1Prev+Ag012lg)*(x1Prev+Ag012lg));
+  ourfloat C22=k2*(1+aida*(x2Prev+Ag022lg)*(x2Prev+Ag022lg));
+  ourfloat alpha1=lgd1*pm1Prev;
+  ourfloat alpha2=lgd2*pm2Prev;
+  ourfloat beta1=m1T*(x1PrevPrev-2*x1Prev);
+  ourfloat beta2=m2T*(x2PrevPrev-2*x2Prev);
+  ourfloat gamma1=-r1T*x1Prev;
+  ourfloat gamma2=-r2T*x2Prev;
+  ourfloat delta1=Ag012lg*C21;
+  ourfloat delta2=Ag022lg*C22;
+  ourfloat lambda1=-k12*x2Prev;
+  ourfloat lambda2=-k12*x1Prev;
+  ourfloat x1=0.0;
+  ourfloat x2=0.0;
+  ourfloat pm1=0.0;
+  ourfloat pm2=0.0;
+  ourfloat A1=0.0;
+  ourfloat A2=0.0;
+  ourfloat A1n2=0.0;
+  ourfloat A1n3=0.0;
+  ourfloat A2n2=0.0;
+  ourfloat A2n3=0.0;
+  ourfloat a=0.0;
+  ourfloat b=0.0;
+  ourfloat c=0.0;
+  ourfloat det=0.0;
+  ourfloat flow1=0.0;
+  ourfloat flow2=0.0;
+  ourfloat udif1=0.0;
+  ourfloat udif2=0.0;
+  ourfloat u=0.0;
+  ourfloat g1=0.0;
+  ourfloat g2=0.0;
+  ourfloat g4=0.0;
+  ourfloat g5=0.0;
+  ourfloat pm1b=0.0;
+  ourfloat pm2b=0.0;
 
 
   if  (x1Prev>=-Ag012lg){
@@ -602,11 +614,11 @@ float computeSample(float pressure_in){
   A2=Ag02+lg*x2;
     
   if (A1<=0)
-    {A1=0.1e-25;}
+    {A1=0.1e-8;}
     
 
   if (A2<=0)
-    {A2=0.1e-25;}
+    {A2=0.1e-8;}
    
 	
 	
@@ -714,16 +726,18 @@ pm2Prev=0;
 uPrev=0;
 ps=0;
 }
+#endif
+
 
 //////////////////////// MINDLIN - from Laje, Gardner and Mindlin:
 
 typedef struct mindlin {
-float x, xprime,xdobleprime, k, b, c, f0, T, p0;
+ourfloat x, xprime,xdobleprime, k, b, c, f0, T, p0;
 }Mindlin;
 
 Mindlin syrinxM;
 
-void init_mindlin(Mindlin* mind, float b, float k, float c){
+void init_mindlin(Mindlin* mind, ourfloat b, ourfloat k, ourfloat c){
 mind->b=b;
 mind->k=k;
 mind->c=c;
@@ -735,14 +749,20 @@ mind->T = 1.0/96000.0;
 
 }
 
-float calc_xdobleprime_mindlin(Mindlin *mind){
+ourfloat calc_xdobleprime_mindlin(Mindlin *mind){
 // from pseudocode: result/0?/=xdobleprime+k*xprime + (c*x)^2 * xprime * xprime - b * xprime + f0;
 // xdobleprime = - (k*x + c *x^2 * xprime * xprime - b * xprime + f0);
 
 //return - (mind->k*mind->x + mind->c* pow(mind->x,2) * mind->xprime * mind->xprime - mind->b * mind->xprime + mind->f0);
 
 // from paper: xdobleprime= -k*x-c*x^2*xprime+b*xprime-f0;
-return -mind->k*mind->x - mind->c*powf(mind->x,2) * mind->xprime+mind->b *mind->xprime-mind->f0; // exp overruns
+
+return -mind->k*mind->x - mind->c*powf(mind->x,2) * mind->xprime+ mind->b *mind->xprime-mind->f0; // exp overruns
+
+// from book: -k*x + b*xprime - c*x^2*xprime
+
+
+//  return -(mind->k*mind->x) + (mind->b *mind->xprime) - (mind->c*powf(mind->x,2) * mind->xprime);
 
 // from: http://www.scholarpedia.org/article/Models_of_birdsong_%28physics%29
 
@@ -750,15 +770,17 @@ return -mind->k*mind->x - mind->c*powf(mind->x,2) * mind->xprime+mind->b *mind->
 
 }
 
-float mindlin_oscillate(Mindlin* mind){
+ourfloat mindlin_oscillate(Mindlin* mind){
 int iii;  
-float newxdobleprime = calc_xdobleprime_mindlin(mind);
-float newxprime = mind->xprime + integrate(mind->xdobleprime,newxdobleprime,mind->T);
+ourfloat newxdobleprime = calc_xdobleprime_mindlin(mind);
+ourfloat newxprime = mind->xprime + integrate(mind->xdobleprime,newxdobleprime,mind->T);
 mind->xdobleprime = newxdobleprime;
 mind->x += integrate(mind->xprime,newxprime,mind->T);
-//printf("%f\n", mind->x);
-//iii=32768.0f*mind->x;
-//fwrite(&iii,2,1,fo);
+#ifdef LAP
+printf("%f\n", mind->x);
+iii=32768.0f*mind->x;
+fwrite(&iii,2,1,fo);
+#endif
 mind->xprime = newxprime;
 return mind->x;
 }
@@ -766,7 +788,7 @@ return mind->x;
 ////////////////////// GARDNER
 
 typedef struct gardner {
-  float x, xprime,oldxprime,xdobleprime, K, Pb, a0, b0, t, M, K_scale, K_scalex, Pb_scalex, D, D2, Pb_scale, T, freq, ofreq;
+  ourfloat x, xprime,oldxprime,xdobleprime, K, Pb, a0, b0, t, M, K_scale, K_scalex, Pb_scalex, D, D2, Pb_scale, T, freq, ofreq;
 }Gardner;
 
 Gardner syrinx;
@@ -775,8 +797,8 @@ void init_gardner(Gardner* gd, int16_t kk, int16_t pb){
 gd->x=0;
 gd->xprime=1.0;
 gd->xdobleprime = 0.0f;
-gd->K =  (float)kk; // between 11k and 12k something happens... - and now???
-gd->Pb = (float)pb;
+gd->K =  (ourfloat)kk; // between 11k and 12k something happens... - and now???
+gd->Pb = (ourfloat)pb;
 
 /*
 	upper_labia = 0.02 #cm
@@ -810,30 +832,33 @@ gd->Pb = (float)pb;
  gd->ofreq= 20.0;
 }
 
-float calc_xdobleprime_gardner(Gardner *gd, int i){
-  float a = gd->a0 + gd->x + (gd->t*gd->xprime);
-  float b = gd->b0 + gd->x - (gd->t*gd->xprime);
-  float Pf = gd->Pb*(1 - (a/b));
+ourfloat calc_xdobleprime_gardner(Gardner *gd, int i){
+  ourfloat a = gd->a0 + gd->x + (gd->t*gd->xprime);
+  ourfloat b = gd->b0 + gd->x - (gd->t*gd->xprime);
+  ourfloat Pf = gd->Pb*(1 - (a/b));
 //  printf("%f\n",gd->x);
-  int iii=(float)gd->x*327680.0f;
-//  fwrite(&iii,2,1,fo);
+  int iii=(ourfloat)gd->x*327680.0f;
+#ifdef LAP
+  fwrite(&iii,2,1,fo);
+#endif
   //		return (Pf - (self.K*self.x) - (self.D2*math.pow(self.xprime,3)) - (self.D*self.xprime))/self.M
   //    return (Pf - (gd->K*gd->x) - (gd->D*gd->xprime))/gd->M;
   //  return (Pf - (gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
-return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*powf(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
+return ((gd->Pb*((gd->a0 - gd->b0) +(2*gd->t*gd->xprime)/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*powf(gd->xprime,3)) - (gd->D*gd->xprime))/gd->M;
 }
 
 
 void gardner_oscillate(Gardner* gd, int i){
-  float newxdobleprime = calc_xdobleprime_gardner(gd,i);
-  float newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
+  ourfloat newxdobleprime = calc_xdobleprime_gardner(gd,i);
+  ourfloat newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
     gd->xdobleprime = newxdobleprime;
     gd->x += integrate(gd->xprime,newxprime,gd->T);
     //    fwrite(&gd->x,2,1,fo);
+
 gd->oldxprime=gd->xprime;
   gd->xprime = newxprime;
-//  gd->K+= gd->K_scale;
-//  gd->Pb+= gd->Pb_scale;
+  //gd->K+= gd->K_scale;
+  //gd->Pb+= gd->Pb_scale;
   //    gd->K = gd->K_scale*sin((2*PI*gd->T*gd->freq*i)) + gd->K_scalex;
 		  //		gd->K = gd->K_scale*2.0
   //    gd->Pb = gd->Pb_scale*cos((2*PI*gd->T*gd->ofreq*i) + PI) + gd->Pb_scalex;
@@ -844,73 +869,146 @@ gd->oldxprime=gd->xprime;
 
 //// simple spring undriven
 
-float x = 0.0;
-float xprime = 1.0;
-float xdobleprime = 0.0;
-float M = 0.005;
-float R = 5.0;
-float K = 200000.0;
-float T = 1.0/96000.0;
+ourfloat x = 0.0;
+ourfloat xprime = 1.0;
+ourfloat xdobleprime = 0.0;
+ourfloat M = 0.005;
+ourfloat R = 5.0;
+ourfloat K = 200000.0;
+ourfloat T = 1.0/96000.0;
 
+ourfloat integrate_runge(ourfloat old_value, ourfloat new_value, ourfloat period){// needs function!
 
-
-float calc_xdobleprime(int i){
-  //# M x'' + Rx' + Kx = 0
-  return (- (R*xprime) - (K*x) )/M;
 }
 
-float integrate(float old_value, float new_value, float period){
+ourfloat integrate(ourfloat old_value, ourfloat new_value, ourfloat period){
   return (old_value + new_value)*(period/2.0);
 }
 
-float flintegrate(float old_value, float new_value, float period){
+ourfloat flintegrate(ourfloat old_value, ourfloat new_value, ourfloat period){
   return (old_value + new_value)*(period/2.0);
 }
 
-float old_integrate(float old_value, float new_value, float period){
+ourfloat old_integrate(ourfloat old_value, ourfloat new_value, ourfloat period){
   return new_value*period;
 }
 
-float old_flintegrate(float old_value, float new_value, float period){
+ourfloat old_flintegrate(ourfloat old_value, ourfloat new_value, ourfloat period){
   return old_value + new_value*period;
 }
 
+ourfloat calc_xdobleprime(int i){
+  //# M x'' + Rx' + Kx = 0
+  // R is damping, K is stiffness
+  return ( -K / M ) * x - ( R / M ) * xprime; // is the same as below
+
+  //  return (- (R*xprime) - (K*x) )/M;
+}
+
+// for runge-kutta spring
+
+float mass, stiffness, damping;
+float time;
+float position;
+float velocity;
+
+float dx (float t, float x, float v){ // derivative of x - displacement
+	return v;
+}
+
+float dv (float t, float x, float v)
+{
+	return ( -stiffness / mass ) * x - ( damping / mass ) * v;
+}
+
+float rk4 ( float t, float h )
+{
+	// step 1
+	float x = position;
+	float v = velocity;
+
+	float dx1 = dx ( t, x, v );
+	float dv1 = dv ( t, x, v );
+
+	// step 2
+	x = position + ( h / 2.0 ) * dx1;
+	v = velocity + ( h / 2.0 ) * dv1;
+
+	float dx2 = dx ( t, x, v );
+	float dv2 = dv ( t, x, v );
+
+	// step 3
+	x = position + ( h / 2.0 ) * dx2;
+	v = velocity + ( h / 2.0 ) * dv2;
+
+	float dx3 = dx ( t, x, v );
+	float dv3 = dv ( t, x, v );
+
+	// step 4
+	x = position + h * dx3;
+	v = velocity + h * dv3;
+
+	float dx4 = dx ( t, x, v );
+	float dv4 = dv ( t, x, v );
+
+	// now combine the derivative estimates and
+	// compute new state
+	position = position + ( h / 6.0 ) * ( dx1 + dx2 * 2.0 + dx3 * 2.0 + dx4 );
+	velocity = velocity + ( h / 6.0 ) * ( dv1 + dv2 * 2.0 + dv3 * 2.0 + dv4 );
+	printf("%f\n",position);
+	// returns new time
+	return t + h;
+}
+
+
+
 void spring_oscillate(int i){
-float newxdobleprime = calc_xdobleprime(i);
-float newxprime = xprime + flintegrate(xdobleprime,newxdobleprime,T);
+ourfloat newxdobleprime = calc_xdobleprime(i);
+ourfloat newxprime = xprime + flintegrate(xdobleprime,newxdobleprime,T);
 xdobleprime = newxdobleprime;
 x += flintegrate(xprime,newxprime,T);
-//printf("%f\n",x);
+printf("%f\n",x);
 xprime = newxprime;
 }
 
-/*
+#ifdef LAP
 void main(int argc, char *argv[]){
   int xx,lenny=8,freq=200;
   fo = fopen("testraven.pcm", "wb");
 
   init();
-  float buffer[320000];  // try now varying some parameters each second:
-float f=(float)atoi(argv[1]);
-float ff=(float)atoi(argv[2]);
-float fff=(float)atoi(argv[3]);
+  ourfloat buffer[320000], otherbuffer[320000];  // try now varying some parameters each second:
+ourfloat f=(ourfloat)atoi(argv[1]);
+ourfloat ff=(ourfloat)atoi(argv[2]);
+ourfloat fff=(ourfloat)atoi(argv[3]);
+ourfloat ffff=(ourfloat)atoi(argv[4]);
 init_gardner(&syrinx, f, ff);
 init_mindlin(&syrinxM, f, ff, fff);
 
-RavenTube_init();
+//RavenTube_init();
 
-for (lenny=0;lenny<2;lenny++){
+//for (lenny=0;lenny<2;lenny++){
 
-for (xx=0;xx<32000;xx++){
+// test for runge kutta
+
+ position = 10.0;
+ velocity = 0.0;
+ mass = 0.5;
+ stiffness = 3.0;
+ damping = 0.1;
+ time = 0.0;
+
+ //for (xx=0;xx<3200;xx++){
+  //  time=rk4(time,0.01);
   //  spring_oscillate(xx);
-   gardner_oscillate(&syrinx,xx);
-//buffer[xx]=mindlin_oscillate(&syrinxM);
-}
+  //   gardner_oscillate(&syrinx,xx);
+  //buffer[xx]=mindlin_oscillate(&syrinxM);
+ //}
 
-RavenTube_next(buffer, 32000);
+//RavenTube_next(buffer, 32000);
 
-}
-*/
+//}
+
 
   // we need some kind of input?
 
@@ -923,21 +1021,28 @@ RavenTube_next(buffer, 32000);
     //    freq+=5;
     }*/
 
-//    for (x=0;x<10;x++){
-//  rtick(buffer, 32000, 300.0);
-//          k1=k1+0.01;
-//    m1=m1+0.01;
-//	k2=k1;
-//	m2=m1;
-//  r1=0.0001*sqrt(m1*k1);
-//  r2=r1;
+ k1=ff; k2=k1;
+ m1=fff; m2=m1;
+ d1=ffff; d2=d1;
+ r1=0.0001*sqrtf(m1*k1);
+ r2=r1;
 
-//      d1+=0.00001;
-//      d2=d1;
-//OneTube_next(buffer, 32000);
-//	clearOld();
-//	OneTube_init();
-//  }
-//}
 
+   for (x=0;x<10;x++){
+ rtick(buffer, 32000, f);
+ //         k1=k1+0.001;
+ //   m1=m1+0.001;
+ //	k2=k1;
+ //	m2=m1;
+ // r1=0.0001*sqrt(m1*k1);
+ // r2=r1;
+
+ //     d1+=0.00001;
+ //     d2=d1;
+     //OneTube_next(buffer, 32000);
+ //  	clearOld();
+     //	OneTube_init();
+ }
+}
+#endif
 

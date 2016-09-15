@@ -18,7 +18,7 @@ SELZ- length of phoneme at that position
 
 -- could be glitch in updatingMAYBE, bad codeSANITY CHECK, speedNO,
 -- msec per frameNO, glottal sourceNO, volumeNO, just that doesn't fit phraseMOST LIKELYbut how to fix - or try add after filter (works but dullness)
--- what we need is test phrase from klatt out (where is our lap test code - docs/rsynth-2-un
+-- what we need is test phrase from klatt out (where is our lap test code = docs/rsynth-2-un)
 
 - that in main.c we have the SELX etc selections
 - that there was a pitchbend but now where we can have it if not in another mode

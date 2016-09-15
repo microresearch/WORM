@@ -3442,9 +3442,29 @@ other plague models?
 
 - more plague wavetables using different code - catalogue wavetables...
 - clean glottalsources and raven.c
-- Fletcher as drawn wavetable, all raven work summarised
+- Fletcher as drawn wavetable, all raven work summarised and final tests of each/ runge kutta?
 - recordings and draft of early modes and eg. test klatt excitation subs (say with wavetable) -> now all modes as we go in modes.org
 - vocoder with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
+
+** 16/9
+
+- starting go over raven works - break down to:
+
+live raven models, wavetables of models, glottal sources
+
+raven.c now one file with ifdef for lap/arm (to test for ARM):
+
+---> IF: to testTESTED with all params on commandline/
+double issue - where that could be? find original equations! TODO
+MINDLIN: ?
+GARDNER: ? test these 2 with new RK4 implementation (working with spring model)
+
+port Fletcher from python
+recheck Mindlin from book
+clean up twotube and single tube delay line
+
+clean up glottal sources.c
+
 
 * TODO from 1 AUG:
 
@@ -3880,6 +3900,8 @@ https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
 - started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
   samplerate is 9000 or so and we have repeats and new_say *TO_TEST ON ARM DONE*
+
+- which rom do we use so far?
 
 - also added primitive pitch bend
 
@@ -4479,7 +4501,7 @@ find synsrc for LF and Rosenberg - can't find
 
 http://www.mattmontag.com/projects-page/academic/speech
 
-NOTES:
+NOTES from this:
 
     First, the glottal pulse is perturbed with noise to simulate air
     turbulence ("breathiness") at the glottis. Importantly, this noise
