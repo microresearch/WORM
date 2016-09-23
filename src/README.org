@@ -343,63 +343,6 @@ runform in simforstacksansmem
 - what effects we implement in DI: mdavoc, pvvoc
   
 
-
-* using SC notes
-
-http://swiki.hfbk-hamburg.de/MusicTechnology/848.diff?id=30
-
-M-x sclang-start
-M-x sclang-server-boot
-(C-x C-e eval)
-C-c C-s STOP!
-
-E copies the buffer, puts it in text mode and sclang-minor-mode, to
-enable you to edit the code parts to try out variations of the
-provided code in the help file. With C-M-h you can then return to the
-Help browser and browse further from the Help file.
-
-C-c C-c eval line or region
-
-C-c C-h searches for a help file 
-C-M-h switches to the Help browser 
-
-putting sc class files in /usr/local/share/SuperCollider/Extensions
-
-** problems
-
-problem is help only seems to access html and not schelp????
-
-stk stuff doesn't work
-
-** snippets
-
-x = Synth(\voicform);
-x.set(\sweepRate, 0.5);
-i=0;
-
-(
-    i = i+1;
-    a = Phonemes.parameter(i).flop;
-    b = Phonemes.gain(i);
-    Phonemes.string(i).postln;
-    x.setn(\ffreq, a[0]);
-    x.setn(\bw, 1-a[1]);
-    x.setn(\gain, a[2].dbamp);
-    x.set(\voiceGain, b[0]);
-    x.set(\noiseGain, b[1]);
-    x.set(\freq, exprand(200, 800) );
-)
-
-x.play;
-
-
-* Matlab/octave notes
-
-use wavwrite but always problems with:
-
-error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
-
-
 * knobs
 
 #define MODE 3 // for pcb=2 TOP
@@ -3446,7 +3389,7 @@ other plague models?
 - recordings and draft of early modes and eg. test klatt excitation subs (say with wavetable) -> now all modes as we go in modes.org
 - vocoder with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
 
-** 16/9
+** 15/9
 
 - starting go over raven works - break down to:
 
@@ -3465,6 +3408,129 @@ clean up twotube and single tube delay line
 
 clean up glottal sources.c
 
+** 16/9
+
+- playing with runge-kutta and model from Hirabayashi force-mass
+  model - can't get it to oscillate - maybe just parameters, moved this
+  towards Flan, Landgraf model
+
+- SPRING: not self-oscillating and can't figure this out - now does oscillate using oldx value but does that make sense for rk4?
+
+- MINDLIN: new mindlin - write all equations down for this and choose parameter space
+
+- GARDNER: overflows unless parameters are fixed??? tested but still no action... REDO!
+
+- IF: ifdef for floats fixed but BIG difference here - in sqrt/sqrtf but all over
+now seems more stable with lower aida but question of correct parameters - vary now ONLY the incoming pressure!
+
+*** TODO
+
+- all raven models inc. IF cleaned up, ported and tested on ARM, fix
+  Fletcher in python and port/or just as wavetable (and test wavetable
+  with trachea lines)
+
+- clean glottalsources, loose ends, wavetable catalogue, clean LPC samples
+
+- vocal fry notes collated: eg. low tension and flow, folds come together and compress, all TODO eg. Klatt/shimmer and female voice
+
+- how we can re-figure general complexity we have now into perhaps 2
+  modules which can co-operate or work standalone - crossing say of
+  vocoder/spectral processors or seperate out wormed control which
+  means more parameters - worm only through multiple parameters eg. vocal/tubes and raw klatt -> woprm generator tested for SIR
+
+- fill in sources and filter notes
+
+** 17/9
+
+- raven.c -Wdouble-promotion checked and fixedDONE
+
+- how we get from displacement to air flow/pressure?
+
+- and now realising that Fletcher model is variation of one mass model with pressure and volume flow taken into account!
+
+also: http://quod.lib.umich.edu/cgi/p/pod/dod-idx/one-and-two-mass-model-oscillations-for-voice.pdf?c=icmc;idno=bbp2372.1995.061
+
+- raven_model_latestmari.py - gardner isn't working as just replicates
+  forcing frequency,,, fletcher doesn't seem super freq responsive and delay line/trachea issues
+
+TODO: arrive at ONE interesting raven or worm model, also couple to trachea
+
+Mindlin or Fletcher
+
+** 18/9
+
+- singletube to float and to test - seems to function ok
+
+** 19/9
+
+- Mindlin working across two versions, watch parameters for both and also distortion for audio output
+
+- playing with Mindlin synth code - altered so parameters are varied
+  in finch, try to reduce complexity, also we can borrow some
+  parameters and see if we can figure pressure out
+
+In Mindlin we don't divide by mass...
+
+see also: https://github.com/mschachter/birdy/blob/master/src/cpp/physical_oscillator.cpp
+
+x3 as cube, x2 as ^2
+
+double da = pp->a01 - pp->a02;
+
+double tterm = (da + 2*pp->tau*v) / (pp->a01 + x + pp->tau*v);
+
+-pp->k1*x - pp->k2*x3 - pp->beta1*v - pp->beta2*v3 - pp->c*x2*v + pp->f0 + pp->alab*pp->psub*tterm;
+
+and then divide by mass/// also parameters from here:
+
+pp->m = 4e-10;
+pp->k1 = k1; // var
+pp->k2 = 400.0;
+pp->beta1 = 444e-7;
+pp->beta2 = 4e-11;
+pp->c = 16e-3;
+pp->f0 = f0; // var
+pp->alab = 2e-4;
+pp->tau = 5e-6;
+pp->a01 = 0.1;
+pp->a02 = 0.11;
+pp->psub = psub; // var
+
+and from Mindlin synth: aa.gm=24000.; / also divide down in time
+
+///// but still doesn't give us Ug or S(x,xprime) or any pressure out Pi
+
+- Fletcher looks fine but hard to vary frequency/doesn't work with
+  angular thing and delay-line needs fixingINPYTHON // check all against
+  FletcherDONE - seems to vary now in frequency
+
+freeing k from frequency we get some math issues but at least does respond to frequency
+
+** 20/9
+
+- focussing on tubes...
+- single_tube_next gives consistent results (fixed bug)
+- SingleRavenTube_next - seems to work
+- RavenTube_next - is tube and beak to open/close - seems to work
+- NTube is in: ntube.c
+
+Mindlin: 
+
+
+From the dynamics of the labia to the flow, one has to multiply the
+average velocity of the air through the glottis and the transverse
+glottal area, which is proportional to (constant-x). For a proxy of
+the velocity you can the air sac pressure (as as a proxy for that, the
+envelope of the sound you want to mimic). As a first approach, for
+S(t) use the U(t) that you are generating. Then you can enrich the
+sound by using a linear combination that includes U´. you wont be able
+to fit parameters of a model from first principles.
+
+finch_void.c -> a[t]= (.50)* (1.01*(1.*(aa.A1*v[1])))+bb[t-tau1]; // pressure! A1 as envelope? v[1] is xprime/derivative???
+
+** 21/9
+
+- fixed delayline in latestmari - check sample_length calculation - CHECKED
 
 * TODO from 1 AUG:
 
@@ -3493,6 +3559,138 @@ wavetable as in raven, generators eg. pulse, square, and original
 A =   A1 * sin ( f1 * t ) +
       A2 * sin ( f2 * t ) +
       A3 * rect( f3 * t ) // in SAM as in rendervowel1
+
+
+* using SC notes
+
+http://swiki.hfbk-hamburg.de/MusicTechnology/848.diff?id=30
+
+M-x sclang-start
+M-x sclang-server-boot
+(C-x C-e eval)
+C-c C-s STOP!
+
+E copies the buffer, puts it in text mode and sclang-minor-mode, to
+enable you to edit the code parts to try out variations of the
+provided code in the help file. With C-M-h you can then return to the
+Help browser and browse further from the Help file.
+
+C-c C-c eval line or region
+
+C-c C-h searches for a help file 
+C-M-h switches to the Help browser 
+
+putting sc class files in /usr/local/share/SuperCollider/Extensions
+
+** problems
+
+problem is help only seems to access html and not schelp????
+
+stk stuff doesn't work
+
+** snippets
+
+x = Synth(\voicform);
+x.set(\sweepRate, 0.5);
+i=0;
+
+(
+    i = i+1;
+    a = Phonemes.parameter(i).flop;
+    b = Phonemes.gain(i);
+    Phonemes.string(i).postln;
+    x.setn(\ffreq, a[0]);
+    x.setn(\bw, 1-a[1]);
+    x.setn(\gain, a[2].dbamp);
+    x.set(\voiceGain, b[0]);
+    x.set(\noiseGain, b[1]);
+    x.set(\freq, exprand(200, 800) );
+)
+
+x.play;
+
+
+* Matlab/octave notes
+
+use wavwrite but always problems with:
+
+error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
+
+
+
+
+* glottal/source models summary
+
+Collect notes here:
+
+** Physical glottis
+
+raven.c
+
+- One mass: Flanagan/Landgraf - question of Ug = airflow in these / coupling - in progress
+
+and relation to Van der Pol oscillator
+
+- Two mass: IF, Ishizaka/Flanagan - double?
+
+- Titze?
+
+** Bird/syrinx models
+
+raven.c
+
+- Gardner - similar to one mass
+
+- Mindlin - similar to one mass with non-linear elements
+
+** Other math models
+
+glottalsources.c
+
+- LF is from: gm.py
+
+- Rosenberg is from lfgen.c
+
+- KLGLOTT88 is from glottalair.py
+
+- shimmer is from err flowgen_shimmer.c
+
+** Others
+
+from each model we have (break down), basic square, triangle, wavetables, LPC inverse filter, voicform, buffer, addition of noise
+
+- in scformant we have LPF etc. of Blip impulse
+- sources for each model that we have to abstract out - Klatt etc...
+
+- plague models: looking now at simforstacksansmem2.c - either use as wavetable or run as simulation
+
+- pulsed wavetables - fragments
+
+* Tube/tracheal/filter models
+
+** Tubes
+
+- Twotube in raven.c: RavenTube_next also transforming for the size and width of a worm
+
+- Ntube in ntube.c: void NTube_do(NTube *unit, float *in, float *out, int inNumSamples)
+
+- delay line in raven.c:  void single_tube(short *inn, int inNumSamples, int length)  -> now to floats
+
+** Filters
+
+- bandpass
+
+- vocoder 10 bands?
+
+** Other
+
+LPC, each mode
+
+* Control models
+
+- XYZ and/as CV/knobs assignment
+
+- wormings
 
 * TTS
 
@@ -4373,7 +4571,7 @@ sort out from here and from raven.org :
 
 1. Kelly-Lochbaum model: https://ccrma.stanford.edu/~jos/pasp/Singing_Kelly_Lochbaum_Vocal_Tract.html -> Perry Cook (refs/code? PRCThesis.pdf)
 2. tube resonance model - TRM - see tube.c
-3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis only
+3. two mass model - Ishizaka and Flanagan, Fletcher (Ravens)= Fletcher1988.pdf for glottis only - this is one mass!
 4. waveguide model - transmission line? - perry cook/ lochbaum??? .. tube?
 5. APEX model = 2-D vocal tract articulation... same as SC ntube!
 
