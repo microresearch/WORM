@@ -2,7 +2,7 @@
 
 - resonances with twotube and onetube delay line (finish float there-DONE)
 
-- raven syrinx models: Mindlin, IF (double only?), gardner
+- raven syrinx models: Mindlin, IF (double only?)
 
 TODO: dooble->floot and port tests, port in latest FLETCHER from raven_model_latestmari.py when we have working
 
@@ -17,8 +17,6 @@ play -t raw --bits 16 --channels 1 --encoding signed-integer --rate 96000 testra
 IF- double only so only on laptop???: ./raven 100 100 10 100 but need to tweak these
 
  // params=pressure, k1, m1, d1
-
-Gardner: ./raven 11000 6000 0 0  ... testraven.pcm only // decays????
 
 Mindlin: ./raven 1000 12000 1000 0 > testplot // oscillates
 
@@ -178,7 +176,7 @@ ourfloat k = 1.0f-((ourfloat)(adc_buffer[SELZ])/2048.0f); // -1 to +1.0 - far le
 		 ourfloat d2leftout= d2left[d2leftpos];
 		  outt[i]=d2rightout;
 		 //update all filters ????
-		  f1out= loss*0.5*(f1in+d1leftout);
+		  f1out= loss*0.5f*(f1in+d1leftout);
 		  //		  f1out= loss*d1leftout; // why f1in here as last f1in and same question below? - this was a low pass
 		 f1in= d1leftout;
 
@@ -463,7 +461,7 @@ r1=0.00000980665f; // damper constant depends on k and mass r = 0.0001*sqrt(m*k)
 	r2 =r1;
 m1 =1e-6; // -7 or -5 for -5 we would have for r1 and as k1=0.09 = 
 	m2 =m1;
-	k1 =0.014f;
+	k1 =0.0014f;
 	k2 =k1;
 	k12=0.00005f;
 	//		aida =10000000.0f;
@@ -542,7 +540,7 @@ else
 	  // constant pressure
 //	  pressureIn=300; // 0.3 kPa after Fletcher
 
-			  signed int s16=(signed int)(computeSample(pressureIn)*32768.0);
+	  signed int s16=(signed int)(computeSample(pressureIn)*32768.0f);
 	  *samples++=(ourfloat)(computeSample(pressureIn));
 #ifdef LAP
 	  //	  printf("%d\n",s16);
@@ -661,8 +659,8 @@ ourfloat computeSample(ourfloat pressure_in){
     flow2=(-b)/(2.0f*a);
   }
 
-  udif1=fabsf(flow1-uPrev);
-  udif2=fabsf(flow2-uPrev);
+  udif1=fabs(flow1-uPrev);
+  udif2=fabs(flow2-uPrev);
 
   if (udif1<udif2){
     u=flow1;
@@ -1007,8 +1005,8 @@ ourfloat computeSample(ourfloat pressure_in){
     flow2=(-b)/(2.0*a);
   }
 
-  udif1=fabs(flow1-uPrev);
-  udif2=fabs(flow2-uPrev);
+  udif1=fabsf(flow1-uPrev);
+  udif2=fabsf(flow2-uPrev);
 
   if (udif1<udif2){
     u=flow1;
@@ -1155,106 +1153,11 @@ mind->xdobleprime = newxdobleprime;
 mind->x += integrate(mind->xprime,newxprime,mind->T);
 #ifdef LAP
 //printf("%f\n", mind->x);
-// iii=1600.0f*mind->x;
-// fwrite(&iii,2,1,fo);
+//iii=1600.0f*mind->x;
+//fwrite(&iii,2,1,fo);
 #endif
 mind->xprime = newxprime;
 return mind->x;
-}
-
-////////////////////// GARDNER 2001
-
-typedef struct gardner {
-  ourfloat x, xprime,oldxprime,xdobleprime, K, Pb, a0, b0, t, M, K_scale, K_scalex, Pb_scalex, D, D2, Pb_scale, T, freq, ofreq;
-}Gardner;
-
-Gardner syrinx;
-
-void init_gardner(Gardner* gd, int16_t kk, int16_t pb){
-gd->x=0.0f;
-gd->xprime=1.0f;
-gd->xdobleprime = 0.0f;
-gd->K =  (ourfloat)kk; // between 11k and 12k something happens... - and now???
-gd->Pb = (ourfloat)pb;
-
-// kk is say 5 N/cm3 - 500000 // pb is say 5 kPa = 50000 g/s 
-
-/*
-	upper_labia = 0.02 #cm
-	lower_labia = 0.04 #cm
-	t_constant = .00015 #s # phenomenological constant Titze!
-	mass = .005 #g/cm3
-	K=restitution_constant = 200000 #g*cm/s2cm3 // this is K- IF= approx 200 kdyn/cm3 ??? // paper 0-8 N/cm3
-
-8 Newtons is 800 kdyn 1 newton = 100 000 dyne
-
-	D_coefficient = 5 #dynes*s/cm3
-	D2_coefficient = .01 #dyne*s/cm5 .001
-	bronchial_pressure = 10000 #g/(cm*s2) # 0-3 kPa
-
-1 pascal is 1 N/m2 = 1 kg /ms2 =  say 2 kPa = 2 N/m2 2000 kPa=20000 g/s
-1 pascal is 0.01 g/cm^2 so 2000 kpa=20 g/cm2
-*/
-
-//#constants
- gd->a0 = 0.02f;
- gd->b0 = 0.04f;
- gd->t = 0.00015f;
- gd->M = 0.005f;
- gd->K_scale = 1.0f;
- gd->K_scalex = 1000.0f;
- gd->D = 5.0f;
- gd->D2 = 0.001f;
- gd->Pb_scale = 1.0f;
- gd->Pb_scalex = 1000.0f;
- gd->T = 1.0f/96000.0f;
- gd->freq = 10.0f;
- gd->ofreq= 20.0f;
-}
-
-ourfloat dvx (ourfloat t, ourfloat x, ourfloat v)
-{
-Gardner* gd=&syrinx;
-  ourfloat value;
-  value=((gd->Pb*(((gd->a0 - gd->b0) +(2.0f*gd->t*v))/(x+gd->b0+(gd->t*v)))) -(gd->K*x) - (gd->D2*powf(v,3)) - (gd->D*v))/gd->M;
-  return value;
-}
-
-
-ourfloat calc_xdobleprime_gardner(Gardner *gd, int i){
-  //  ourfloat a = gd->a0 + gd->x + (gd->t*gd->xprime);
-  //  ourfloat b = gd->b0 + gd->x - (gd->t*gd->xprime);
-  //  ourfloat Pf = gd->Pb*(1 - (a/b));
-//  printf("%f\n",gd->x);
-  int iii=(ourfloat)gd->x*32768.0f;
-#ifdef LAP
-  //  printf("%f\n",gd->x);
-  //  fwrite(&iii,2,1,fo);
-#endif
-  //		return (Pf - (self.K*self.x) - (self.D2*math.pow(self.xprime,3)) - (self.D*self.xprime))/self.M
-  //    return (Pf - (gd->K*gd->x) - (gd->D*gd->xprime))/gd->M;
-  //  return (Pf - (gd->K*gd->x) - (gd->D2*pow(gd->oldxprime,3)) - (gd->D*gd->xprime))/gd->M;
-  return ((gd->Pb*(((gd->a0 - gd->b0) +(2.0f*gd->t*gd->xprime))/(gd->x+gd->b0+(gd->t*gd->xprime))))-(gd->K*gd->x) - (gd->D2*powf(gd->xprime,3)) - (gd->D*gd->xprime))/gd->M;
-}
-
-
-void gardner_oscillate(Gardner* gd, int i){
-  ourfloat newxdobleprime = calc_xdobleprime_gardner(gd,i);
-  ourfloat newxprime = gd->xprime + integrate(gd->xdobleprime,newxdobleprime,gd->T);
-    gd->xdobleprime = newxdobleprime;
-    gd->x += integrate(gd->xprime,newxprime,gd->T);
-    //    fwrite(&gd->x,2,1,fo);
-
-gd->oldxprime=gd->xprime;
-  gd->xprime = newxprime;
-  //  gd->K+= gd->K_scale;
-  //  gd->Pb+= gd->Pb_scale;
-  //      gd->K = gd->K_scale*sin((2*PI*gd->T*gd->freq*i)) + gd->K_scalex;
-		  //		gd->K = gd->K_scale*2.0
-      //    gd->Pb = gd->Pb_scale*cos((2*PI*gd->T*gd->ofreq*i) + PI) + gd->Pb_scalex;
-		  //               gd->Pb = gd->Pb_scale
-  //   gd->freq += 0.01;
-  //   gd->ofreq+=0.01;
 }
 
 //// simple spring undriven
@@ -1265,23 +1168,11 @@ ourfloat xdobleprime = 0.0f;
 ourfloat M = 0.005f;
 ourfloat R = 5.0f;
 ourfloat K = 200000.0f;
-ourfloat T = 1.0/96000.0f;
+ourfloat T = 1.0f/96000.0f;
 
 
 ourfloat integrate(ourfloat old_value, ourfloat new_value, ourfloat period){
   return (old_value + new_value)*(period/2.0f);
-}
-
-ourfloat flintegrate(ourfloat old_value, ourfloat new_value, ourfloat period){
-  return (old_value + new_value)*(period/2.0f);
-}
-
-ourfloat old_integrate(ourfloat old_value, ourfloat new_value, ourfloat period){
-  return new_value*period;
-}
-
-ourfloat old_flintegrate(ourfloat old_value, ourfloat new_value, ourfloat period){
-  return old_value + new_value*period;
 }
 
 ourfloat Fx=0.0f;
@@ -1402,7 +1293,7 @@ ourfloat dvy (ourfloat t, ourfloat x, ourfloat v)
   return value;
 }
 
-ourfloat rk4 (ourfloat (*dv)(ourfloat t, ourfloat x, ourfloat v), ourfloat t, ourfloat h )
+ourfloat rk4 (ourfloat (*dv)(ourfloat t, ourfloat x, ourfloat v), ourfloat t, ourfloat h, ourfloat *result)
 {
 	// step 1
 	ourfloat x = position;
@@ -1442,22 +1333,24 @@ ourfloat rk4 (ourfloat (*dv)(ourfloat t, ourfloat x, ourfloat v), ourfloat t, ou
 	//	printf("%d\n",iii);
 #endif
 	// returns new time
+	*result=position;
 	return t + h;
 }
 
 
 
-void spring_oscillate(int i){
+float spring_oscillate(int i){
 ourfloat newxdobleprime = calc_xdobleprime(i);
-ourfloat newxprime = xprime + flintegrate(xdobleprime,newxdobleprime,T);
+ourfloat newxprime = xprime + integrate(xdobleprime,newxdobleprime,T);
 xdobleprime = newxdobleprime;
-x += flintegrate(xprime,newxprime,T);
+x += integrate(xprime,newxprime,T);
 #ifdef LAP
 // int iii=x*32768.0f;
  // fwrite(&iii,2,1,fo);
-printf("%f\n",x);
+//printf("%f\n",x);
 #endif
 xprime = newxprime;
+ return x;
 }
 
 #ifdef LAP
@@ -1471,7 +1364,6 @@ ourfloat f=(ourfloat)atoi(argv[1]);
 ourfloat ff=(ourfloat)atoi(argv[2]);
 ourfloat fff=(ourfloat)atoi(argv[3]);
 ourfloat ffff=(ourfloat)atoi(argv[4]);
-init_gardner(&syrinx, f, ff);
 init_mindlin(&syrinxM, f, ff, fff);
  single_tube_init(ffff); // delay
  RavenTube_init();
@@ -1484,7 +1376,7 @@ init_mindlin(&syrinxM, f, ff, fff);
  velocity = 0.0f;
  mass = ff/100.0f; // = .1e-3 - all kg and m
  stiffness = f/100.0f; // was 30.0f or 0.47 when calculated according to cataldo
- damping = 2.0f*sqrt(mass*stiffness)*0.1f;
+ damping = 2.0f*sqrtf(mass*stiffness)*0.1f;
  //  damping=0.0015;
  time = 0.0f;
   d1length=ffff;
@@ -1492,30 +1384,40 @@ init_mindlin(&syrinxM, f, ff, fff);
   int samplerun=3200;
 
    for (x=0;x<10;x++){
-        for (xx=0;xx<samplerun;xx++){
-     ///        time=rk4(dvy, time,0.00002); // 44k samplerate
-    //                spring_oscillate(xx);
-    //         gardner_oscillate(&syrinx,xx);
-	  buffer[xx]=mindlin_oscillate(&syrinxM);
-     //      do_impulse(buffer,3200,freq);
-         }
+            for (xx=0;xx<samplerun;xx++){
+	      //	      time=rk4(dvy, time,0.002, &buffer[xx]); // 44k samplerate
+              //     buffer[xx]=spring_oscillate(xx);
+	      //	  	  buffer[xx]=mindlin_oscillate(&syrinxM);
+		   //          do_impulse(buffer,3200,freq);
+             }
 
-	RavenTube_next(buffer, otherbuffer,samplerun);
+	//		RavenTube_next(buffer, otherbuffer,samplerun);
 	//	         SingleRavenTube_next(buffer, otherbuffer,samplerun);
 	//	single_tube_next(buffer, otherbuffer,samplerun, ffff);
+ /*     rtick(buffer, 3200, f); */
+ /*         k1=k1+0.00001; */
+ /*   m1=m1+0.00001; */
+ /* 	k2=k1; */
+ /* 	m2=m1; */
+ /* r1=0.0001*sqrtf(m1*k1); */
+ /* r2=r1; */
+
+ /*     d1+=0.00001; */
+ /*     d2=d1; */
+
 
    for (xx=0;xx<samplerun;xx++){
       int iii=32768.0f*otherbuffer[xx];
       int iiii=32768.0f*buffer[xx];
       printf("%d %d\n",iiii,iii);
-      fwrite(&iii,2,1,fo);
+      fwrite(&iiii,2,1,fo);
    }
 
  
    //for latest mindlin-> optimum values
 
-alpha+=0.001f;
-beta=0.25f;
+alpha+=0.01f;
+beta=0.45f;
  }
 
  fclose(fo);

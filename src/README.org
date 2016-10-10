@@ -3289,7 +3289,7 @@ NOTE: Laje/Gardner/Mindlin equation/model https://nsaquib.files.wordpress.com/20
 
 Formants are 1.4/2/3/3.7 and 5 KHz
 
-- chowning FM singing voice - srk/vox in csouns/paper on google drive... overlap blah...
+- chowning FM singing voice - srk/vox in csound/paper on google drive... overlap blah...
 
 
 *** what could be 2 tube model for bird (70mm length first tube= say 7 samples long (0.07/340.26 (speed sound) * 32000 = 6.6)
@@ -3516,7 +3516,6 @@ freeing k from frequency we get some math issues but at least does respond to fr
 
 Mindlin: 
 
-
 From the dynamics of the labia to the flow, one has to multiply the
 average velocity of the air through the glottis and the transverse
 glottal area, which is proportional to (constant-x). For a proxy of
@@ -3531,6 +3530,44 @@ finch_void.c -> a[t]= (.50)* (1.01*(1.*(aa.A1*v[1])))+bb[t-tau1]; // pressure! A
 ** 21/9
 
 - fixed delayline in latestmari - check sample_length calculation - CHECKED
+
+** 6/10 - 9/10
+
+*** how to go forward // break down issues:
+
+0] all notes above TODO eg. for glottalsources
+
+1]- resolve raven syrinx model issues/questions? where are we at with each model and which ones we will finally use:
+
+Fletcher in latestmari.py: 
+
+It seems to work with frequency, to be ported and checked with float,
+still wierd soundings with p1/reflections. Changing pressure and Q
+seems have large effects but x is still not pulsing as in examples... reflections?
+
+Fiddling and Python code works with vague parameter range: *TO PORT and test with floats*
+
+In raven.c: *PORT TO ARM/TEST*
+- Mindlin: working basic source
+- IF: bit crunchy with floats but usable with right parameters - 
+[- Gardner: ditched]
+- rk4/dvy seems to work but watch parameters
+
+From Mindlin: finch_void, email notes// book notes
+
+: ./makefile
+: ./synthesize 000
+: ./dat2wav song_000 test.wav 32000
+
+- double question to test - can't FIX for floats as runs into infinity very early on RK4
+
+- but maybe try to understand code a bit and port to integration/also long arrays?
+
+2]- tubes work in raven.c to re-do/test again
+
+3]- glottalsources
+
+4]- general issues like source/filter separation, calibration of ADC (mutable?), general modes
 
 * TODO from 1 AUG:
 
