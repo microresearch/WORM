@@ -33,7 +33,7 @@ void ADC1_Init(uint16_t *ADC_Buffer)
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&ADC1->DR;
 	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)ADC_Buffer;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
-	DMA_InitStructure.DMA_BufferSize = 10;
+	DMA_InitStructure.DMA_BufferSize = 5;
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
@@ -60,8 +60,8 @@ void ADC1_Init(uint16_t *ADC_Buffer)
 	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE; // was enable
 	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
-	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right; // was right
-	ADC_InitStructure.ADC_NbrOfConversion = 10;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Left; // was right - in CLOUDS is left?
+	ADC_InitStructure.ADC_NbrOfConversion = 5;
 	//	ADC_InitStructure.ADC_NbrOfChannel = 10; not existing
 	ADC_Init(ADC1, &ADC_InitStructure);
 	
@@ -84,16 +84,11 @@ void ADC1_Init(uint16_t *ADC_Buffer)
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_2, 3, ADC_SampleTime_480Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_3, 4, ADC_SampleTime_480Cycles);
 	ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 5, ADC_SampleTime_480Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_5, 6, ADC_SampleTime_480Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_6, 7, ADC_SampleTime_480Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_7, 8, ADC_SampleTime_480Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 9, ADC_SampleTime_480Cycles);
-	ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 10, ADC_SampleTime_480Cycles);
 	
 
 	/* Enable Complete DMA interrupt  */
 	
-	DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE);
+	DMA_ITConfig(DMA2_Stream0, DMA_IT_TC, ENABLE); // do we need this?
     
 	/* ADC DMA IRQ Channel configuration */
 	NVIC_EnableIRQ(DMA2_Stream0_IRQn);

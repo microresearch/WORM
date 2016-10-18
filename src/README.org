@@ -342,7 +342,6 @@ runform in simforstacksansmem
 
 - what effects we implement in DI: mdavoc, pvvoc
   
-
 * knobs
 
 #define MODE 3 // for pcb=2 TOP
@@ -3188,7 +3187,7 @@ test this with sine DONE but could be cleaner
 
 - all above notes ported into TODO for each mode below and cleaned up/checked and as modes.org file
 
-- also general TODO eg. text decimation interpol tests, cosf and sinf speedups, triggerQ, our own synthetic mode?
+- also general TODO eg. decimation interpol tests, cosf and sinf speedups, triggerQ, our own synthetic mode?
 
 - also general model for division of potential sources/and/filters and knobs throughout
 
@@ -3531,7 +3530,7 @@ finch_void.c -> a[t]= (.50)* (1.01*(1.*(aa.A1*v[1])))+bb[t-tau1]; // pressure! A
 
 - fixed delayline in latestmari - check sample_length calculation - CHECKED
 
-** 6/10 - 9/10
+** 6/10 - 12/10
 
 *** how to go forward // break down issues:
 
@@ -3542,7 +3541,7 @@ finch_void.c -> a[t]= (.50)* (1.01*(1.*(aa.A1*v[1])))+bb[t-tau1]; // pressure! A
 Fletcher in latestmari.py: 
 
 It seems to work with frequency, to be ported and checked with float,
-still wierd soundings with p1/reflections. Changing pressure and Q
+still weird soundings with p1/reflections. Changing pressure and Q
 seems have large effects but x is still not pulsing as in examples... reflections?
 
 Fiddling and Python code works with vague parameter range: *TO PORT and test with floats*
@@ -3551,7 +3550,8 @@ In raven.c: *PORT TO ARM/TEST*
 - Mindlin: working basic source
 - IF: bit crunchy with floats but usable with right parameters - 
 [- Gardner: ditched]
-- rk4/dvy seems to work but watch parameters
+- rk4/dvy seems to work but watch parameters - like now?
+- spring: strange ???
 
 From Mindlin: finch_void, email notes// book notes
 
@@ -3565,9 +3565,54 @@ From Mindlin: finch_void, email notes// book notes
 
 2]- tubes work in raven.c to re-do/test again
 
-3]- glottalsources
+3]- glottalsources - doubles in LF. list questions/sources?
 
 4]- general issues like source/filter separation, calibration of ADC (mutable?), general modes
+
+** 12/10 +
+
+*** interpol or not?
+
+- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]] - DONE but tests not so worthwhile? - could try???
+
+*** soundfun - and where else we had tau calc=lfgen/glottalsources
+
+- LF again
+- tests work and dumped some wav from audacity for later wavetables processings -> dump more
+
+*** FM??
+
+from above- chowning FM singing voice - vox.ins in csound/paper on google drive... overlap blah...
+
+FMVoices.h
+
+jcvoi.ins/scm
+
+https://ccrma.stanford.edu/~cc/vox/smac2013som/dsp/FMVox.dsp
+
+differences/clicks according to paper
+
+*** clean up notes/notes on modes
+
+source/filter and substitution.// decide on modes
+
+*** extract what works from raven.c port and test 
+
+also that in Mindlin we can make certain factors dependent on CV (eg. suggested envelope)
+
+*** glottalsources also
+
+*** all wavetables, all data sources
+
+*** start on modes - heading back into wavetables to work with SIR
+*** and need to address adc jitter and range and abstract out all -> each adc (range, starting point 0 or top, constraint, smoothing coeff)
+
+- changed way we deal with adc (also was still doing 10x aDC stuff
+  from darkint so now back to 5) - process all in audio callback
+
+- but we need to update all generators for this - lpc/c/TMS-done!
+
+*** TOWARDS: template for all generators and TODO for each mode and general TODO
 
 * TODO from 1 AUG:
 
@@ -3596,7 +3641,6 @@ wavetable as in raven, generators eg. pulse, square, and original
 A =   A1 * sin ( f1 * t ) +
       A2 * sin ( f2 * t ) +
       A3 * rect( f3 * t ) // in SAM as in rendervowel1
-
 
 * using SC notes
 
@@ -3646,13 +3690,11 @@ i=0;
 
 x.play;
 
-
 * Matlab/octave notes
 
 use wavwrite but always problems with:
 
 error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
-
 
 
 
@@ -3802,10 +3844,9 @@ SELX/Y = offset
 
 TODO: test on lap different worm movements...
 
-
 * important general notes-TODO
 
-- for excitation 1v per octave
+- for excitation 1v per octave - calibration
 
 - compost as audio_buffer - also toggle writes to this on/off
 
@@ -3853,17 +3894,16 @@ and sp0256), and those on code (also sp0256, talkie and associated TMS series, n
 
 - warps?
 
-- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]] - DONE but tests not so worthwhile?
+- sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]] - DONE but tests not so worthwhile? - could try???
 
 - linear interpol and filtering (freq?): http://stackoverflow.com/questions/1125666/how-do-you-do-bicubic-or-other-non-linear-interpolation-of-re-sampled-audio-da
 
 and: http://www.rockbox.org/tracker/12223?getfile=24000
 
-downsample=throw out samples (speed up)... lowpass first then decimate
+downsample=throw out samples (speed up)... lowpass first then decimate or reverse in case of tube.c
 
 upsample=interpolate - do we need filter as this is on output?
  
-
 * MODES 13/6_+++ TODO:
 
 ** 0/LPC/TMS5220 - decide if keep LPC/lpc.c which is talkie code or just use TMS5200x.c!
@@ -4492,6 +4532,7 @@ and for 11v in 11-10=1/200=0.005 = 5mA so max heat is 0.005 x 10 = 0.05 which is
 this test to 9.9v
 
 test for POTS now: 0-62/63 some jitter???
+
 * rom extraction howto
 
 TMS howto TI99 eg...:

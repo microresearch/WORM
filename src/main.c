@@ -43,13 +43,13 @@
 #include "wavetable.h"
 #include "wavetables.h"
 #include "worming.h"
-#include "raven.h"
+//#include "raven.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
 
 /* DMA buffer for ADC  & copy */
-__IO uint16_t adc_buffer[10];
+__IO uint16_t adc_buffer[5];
 
 #define delay()						 do {	\
     register unsigned int ix;					\
@@ -116,10 +116,10 @@ tms5200_newsay();
   RLPF_init(RLPFer);
   NTube_init(&tuber);
   //  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
-  //  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
-  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512
+    wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
+  //  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512
   addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
-  RavenTube_init();
+  //  RavenTube_init();
   newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
 
  ////////

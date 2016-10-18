@@ -44,7 +44,7 @@ LINEIN/OUTL-filter
 #include "ntube.h"
 #include "wavetable.h"
 #include "worming.h"
-#include "raven.h"
+//#include "raven.h"
 
 /*
 static const float freq[5][5] __attribute__ ((section (".flash"))) = {
@@ -73,6 +73,13 @@ static const float mull[5][5] __attribute__ ((section (".flash"))) = {
 
 */
 
+#define CONSTRAIN(var, min, max) \
+  if (var < (min)) { \
+    var = (min); \
+  } else if (var > (max)) { \
+    var = (max); \
+  }
+
 arm_biquad_casd_df1_inst_f32 df[5][5] __attribute__ ((section (".ccmdata")));
 float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2} b1 and b2 negate
 
@@ -80,6 +87,26 @@ extern __IO uint16_t adc_buffer[10];
 extern int16_t* buf16;
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
+
+float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
+static adc_transform transform[5] = {
+  {MODE, 0, 0.1f, 32.0f},
+  {SELX, 0, 0.1f, 32.0f},
+  {SELY, 0, 0.1f, 32.0f},
+  {SELZ, 0, 0.1f, 32.0f},
+  {SPEED, 1, 0.1f, 1024.0f}
+};
+
+float _mode, _speed, _selx, _sely, _selz;
+u16 _intspeed, _intmode;
+
+enum adcchannel {
+  MODE_,
+  SELX_,
+  SELY_,
+  SELZ_,
+  SPEED_
+};
 
 #define float float32_t
 
@@ -106,7 +133,6 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 
@@ -286,10 +312,6 @@ void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  // lpc_running
-
-  //  samplespeed=0.3;
-
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
 
@@ -405,7 +427,6 @@ void tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 
        /// interpol filter but in wavetable case was 2x UPSAMPLE????
        //        samplel = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i);
-
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -647,7 +668,10 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
-  dowavetable(lastbuffer, &wavtable, adc_buffer[SELX], size);
+  //  dowavetable(lastbuffer, &wavtable, 2, size);
+  //  dowavetable(lastbuffer, &wavtable, 2+(1024-(adc_buffer[SPEED]>>2)), size);
+
+  dowavetable(lastbuffer, &wavtable, 2+_intspeed, size);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -658,7 +682,7 @@ void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 	//  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
   //donoise(otherbuffer,32);
 
-	RavenTube_next(otherbuffer, lastbuffer, size);
+	//	RavenTube_next(otherbuffer, lastbuffer, size);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -704,39 +728,59 @@ extern u16 writepos;
 extern u8 mode; /// ????? TODO do we need these?
 */
 
-u8 mode;
+u8 toggled=0;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
-  //  static u8 framecount=0, tmpcount=0;
-  //  static float eaten=0;
-  //    static float samplepos=0.0f; 
   float samplespeed;
-  //  static float samplepos=0.0f;
+  static u16 cc;
   u8 x;
-  //   u16 readpos;
-    u8 speedy;
-  //  float xx,yy;
 
-    //  u16 ending=AUDIO_BUFSZ;
-  speedy=(adc_buffer[SPEED]>>6)+1;
-  samplespeed=4.0f/(float)(speedy); // what range this gives? - 10bits>>6=4bits=16 so 8max skipped and half speed
+  for (x=0;x<5;x++){
+  float value=(float)adc_buffer[transform[x].whichone]/65536.0f; // 4096.0f; // why 65536.0f as in clouds - align? - try that
 
-  //  samplespeed=1.0f;
+  if (transform[x].flip) {
+      value = 1.0f - value;
+    }
+  smoothed_adc_value[x] += transform[x].filter_coeff * (value - smoothed_adc_value[x]);
+  }
+
+  _speed=smoothed_adc_value[SPEED_];
+  CONSTRAIN(_speed,0.0f,1.0f);
+  _selx=smoothed_adc_value[SELX_];
+  CONSTRAIN(_selx,0.0f,1.0f);
+  _sely=smoothed_adc_value[SELY_];
+  CONSTRAIN(_sely,0.0f,1.0f);
+  _selz=smoothed_adc_value[SELZ_];
+  CONSTRAIN(_selz,0.0f,1.0f);
+  _mode=smoothed_adc_value[MODE_];
+  CONSTRAIN(_mode,0.0f,1.0f);
+  _intmode=_mode*transform[MODE_].multiplier;
+
+  samplespeed=_speed+0.01f; // TODO test this fully!
+  _intspeed=_speed*transform[SPEED_].multiplier;
 
   // splitting input
-
   for (x=0;x<sz/2;x++){
     sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
     src++;
   }
 
-  mode=1; // checked=0,1,2,3,4,5,6,7,8 17 is last
+  _intmode=0; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 17 is last
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 
-    generators[mode](sample_buffer,mono_buffer,samplespeed,sz/2); 
+  generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
+  // copy sample buffer into audio_buffer as COMPOST
+
+  if (!toggled){
+  for (x=0;x<sz/2;x++) {
+    audio_buffer[cc]=mono_buffer[x];
+    cc++;
+    if (cc>AUDIO_BUFSZ) cc=0;
+  }
+  }
     /*
       for (x=0;x<sz/2;x++){ // STRIP_OUT - leave for TESTING
       readpos=samplepos;

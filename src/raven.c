@@ -74,6 +74,7 @@ ourfloat integrate(ourfloat old_value, ourfloat new_value, ourfloat period);
  ourfloat delay2right[80]; //->d1length of ourfloats
  ourfloat delay2left[80];//=>d1length of ourfloats
 
+#ifdef LAP
  void donoise(ourfloat *out, int numSamples){
    int x;
    for (x=0;x<numSamples;x++){
@@ -81,6 +82,7 @@ ourfloat integrate(ourfloat old_value, ourfloat new_value, ourfloat period);
      out[x]=xx;
    }
  }
+
 
 void do_impulse(ourfloat* out, int numSamples, int freq){ //- so for 256 samples we have freq 125 for impulse
      // from Impulse->LFUGens.cpp
@@ -100,7 +102,7 @@ void do_impulse(ourfloat* out, int numSamples, int freq){ //- so for 256 samples
      out[i]=z;
    }
    }
-
+#endif
 
  void RavenTube_init(void){
 	 int i;
@@ -1162,7 +1164,7 @@ return mind->x;
 
 //// simple spring undriven
 
-static ourfloat x = 0.0f;
+ourfloat xy = 0.0f;
 ourfloat xprime = 1.0f;
 ourfloat xdobleprime = 0.0f;
 ourfloat M = 0.005f;
@@ -1184,8 +1186,8 @@ ourfloat l=0.0018f;
 
 ourfloat mass, stiffness, damping, pulse;
 ourfloat time;
-ourfloat position;
-ourfloat velocity;
+ourfloat position=0.0001f;
+ourfloat velocity=0.0001f;
 
 static ourfloat lastx;
 
@@ -1209,7 +1211,7 @@ ourfloat calc_xdobleprime(int i){
   ourfloat airdensity= 1.225f; // kg/m3
   //      ourfloat ug= ;//acoustic volume velocity - but is not constant? - relates to vocal tract? impedance*pressure?
 
-  ourfloat ag=ago + l*x; // as x is already oldx
+  ourfloat ag=ago + l*xy; // as x is already oldx
     //    ourfloat pb=0.5*airdensity*pow(abs(ug),2))*pow(ag,-2);  // we just ignore ug
     ourfloat pb=0.5f*airdensity*powf(ag,-2);
   //  ourfloat pb=0.5f*airdensity*powf(abs(lastx),2)*powf(ag,-2);
@@ -1218,7 +1220,7 @@ ourfloat calc_xdobleprime(int i){
 
     Fx=0.5f * (p1 + p2)*(l*0.002f); // break out
   //  Fx=6.0f*powf(lastx,2);
-  lastx=x;
+  lastx=xy;
 
 
   //    Fx=stiffness/5.0f * pow(x,2);
@@ -1228,7 +1230,7 @@ ourfloat calc_xdobleprime(int i){
   //  if (i>0.05f && i<0.06f) pulse=1.0f;
   //  else pulse=0.0f;
   //    value=(0.01f-damping*v-stiffness*x)/mass;
-      value=(0.01f*pulse+Fx-damping*xprime-stiffness*x)/mass;
+      value=(0.01f*pulse+Fx-damping*xprime-stiffness*xy)/mass;
   //  value=(Fx- damping*v - stiffness*x)/mass; 
   //  value=(1-pow(x,2))*v-x; // van der pol - this is working
   //  return ( -stiffness / mass ) * x - ( damping / mass ) * v;
@@ -1242,6 +1244,47 @@ ourfloat dx (ourfloat t, ourfloat x, ourfloat v){ // derivative of x - displacem
 	return v;
 }
 
+// finch from physical_osc
+
+ourfloat mmm = 4e-10;
+ourfloat k1;
+ourfloat k2 = 400.0;
+ourfloat beta1 = 444e-7;
+ourfloat beta2 = 4e-11;
+ourfloat ccc = 16e-3;
+ourfloat f0;
+ourfloat alab = 2e-4;
+ourfloat tau = 5e-6;
+ourfloat a01 = 0.1;
+ourfloat a02 = 0.11;
+ourfloat psub;
+
+ourfloat gammaaa=23500.0;
+ ourfloat alphaa;
+ ourfloat betaa;
+					// vars = k1, f0, psub
+
+ourfloat dvfinch(ourfloat t, ourfloat x, ourfloat v)
+{
+  ourfloat value;
+  ourfloat x2 = x*x;
+  ourfloat x3 = x*x*x;
+  ourfloat v3 = v*v*v;
+  ourfloat da = a01 - a02;
+  ourfloat tterm = (da + 2.0f*tau*v) / (a01 + x + tau*v);
+  ourfloat gamma2=gammaaa*gammaaa;
+
+  //normal_soc    dstate[1] = gamma2*pp->alpha + gamma2*pp->beta*x + gamma2*x2 - gamma*x*v - gamma2*x3 - gamma*x2*v;
+  // ./raven 717 746 0 0
+  //    value=gamma2*alphaa - gamma2*betaa*x - gamma2*x3 - gammaaa*x2*v + gamma2*x2 - gammaaa*x*v; // adapted to Mindlin and now works
+
+  // this one below not working - overflows into -nan
+  //  value = -k1*x - k2*x3 - beta1*v - beta2*v3 - ccc*x2*v + f0 + alab*psub*tterm; // where is this from? - also looks like Mindlin
+  value = -k1*x - beta1*v - ccc*x2*v + f0 + alab*psub*tterm; // where is this from? - also looks like Mindlin - adapted p1
+  //  value /= mmm; // but there we don't divide by mass?
+  //  printf("%f %f\n",x, value);
+  return value;
+}
 
 ourfloat dvy (ourfloat t, ourfloat x, ourfloat v)
 {
@@ -1289,7 +1332,7 @@ ourfloat dvy (ourfloat t, ourfloat x, ourfloat v)
   //  value=(1-pow(x,2))*v-x; // van der pol - this is working
   //  return ( -stiffness / mass ) * x - ( damping / mass ) * v;
   //    return (Fx- ((damping*v) + (stiffness*x)))/mass; 
-    //    printf("\nFx: %f x: %f\n",Fx,x);
+      //       printf("\nFx: %f x: %f\n",Fx,x);
   return value;
 }
 
@@ -1299,19 +1342,21 @@ ourfloat rk4 (ourfloat (*dv)(ourfloat t, ourfloat x, ourfloat v), ourfloat t, ou
 	ourfloat x = position;
 	ourfloat v = velocity;
 
+	//		printf("%f\n",x);
+
 	ourfloat dx1 = dx ( t, x, v );
 	ourfloat dv1 = dv ( t, x, v );
 
 	// step 2
-	x = position + ( h / 2.0f ) * dx1;
-	v = velocity + ( h / 2.0f ) * dv1;
+	x = position + ( h / 2.0 ) * dx1;
+	v = velocity + ( h / 2.0 ) * dv1;
 
 	ourfloat dx2 = dx ( t, x, v );
 	ourfloat dv2 = dv ( t, x, v );
 
 	// step 3
-	x = position + ( h / 2.0f ) * dx2;
-	v = velocity + ( h / 2.0f ) * dv2;
+	x = position + ( h / 2.0 ) * dx2;
+	v = velocity + ( h / 2.0 ) * dv2;
 
 	ourfloat dx3 = dx ( t, x, v );
 	ourfloat dv3 = dv ( t, x, v );
@@ -1325,8 +1370,8 @@ ourfloat rk4 (ourfloat (*dv)(ourfloat t, ourfloat x, ourfloat v), ourfloat t, ou
 
 	// now combine the derivative estimates and
 	// compute new state
-	position = position + ( h / 6.0f ) * ( dx1 + dx2 * 2.0f + dx3 * 2.0f + dx4 );
-	velocity = velocity + ( h / 6.0f ) * ( dv1 + dv2 * 2.0f + dv3 * 2.0f + dv4 );
+	position = position + ( h / 6.0 ) * ( dx1 + dx2 * 2.0 + dx3 * 2.0 + dx4 );
+	velocity = velocity + ( h / 6.0 ) * ( dv1 + dv2 * 2.0 + dv3 * 2.0 + dv4 );
 #ifdef LAP
 	int iii=position*32768.0f;
 	//	fwrite(&iii,2,1,fo);
@@ -1343,19 +1388,19 @@ float spring_oscillate(int i){
 ourfloat newxdobleprime = calc_xdobleprime(i);
 ourfloat newxprime = xprime + integrate(xdobleprime,newxdobleprime,T);
 xdobleprime = newxdobleprime;
-x += integrate(xprime,newxprime,T);
+xy += integrate(xprime,newxprime,T);
 #ifdef LAP
 // int iii=x*32768.0f;
  // fwrite(&iii,2,1,fo);
 //printf("%f\n",x);
 #endif
 xprime = newxprime;
- return x;
+ return xy;
 }
 
 #ifdef LAP
 void main(int argc, char *argv[]){
-  int xx,lenny=8,freq=200;
+  int xx,xxx,lenny=8,freq=200;
   fo = fopen("testraven.pcm", "wb");
 
   init();
@@ -1365,31 +1410,46 @@ ourfloat ff=(ourfloat)atoi(argv[2]);
 ourfloat fff=(ourfloat)atoi(argv[3]);
 ourfloat ffff=(ourfloat)atoi(argv[4]);
 init_mindlin(&syrinxM, f, ff, fff);
- single_tube_init(ffff); // delay
- RavenTube_init();
+// single_tube_init(ffff); // delay
+// RavenTube_init();
 
 //for (lenny=0;lenny<2;lenny++){
 
 // test for runge kutta - spring only
 
- position = 0.0f;
- velocity = 0.0f;
+ position = 0.01;
+ velocity = 0.0;
  mass = ff/100.0f; // = .1e-3 - all kg and m
  stiffness = f/100.0f; // was 30.0f or 0.47 when calculated according to cataldo
  damping = 2.0f*sqrtf(mass*stiffness)*0.1f;
  //  damping=0.0015;
- time = 0.0f;
+ time = 0.0;
   d1length=ffff;
 
-  int samplerun=3200;
+  int samplerun=320;
 
-   for (x=0;x<10;x++){
+  // for finch
+
+  // vars = k1, f0, psub
+  //    k1 = 0.016; psub = 1900.0; f0 = 0.0399;
+    k1=f/100.0f;
+    psub=ff;
+    f0=fff/100.0f;
+  // was                          double alpha=-0.41769, double beta=-0.346251775):
+
+  alphaa=-f/1000.0f;
+  betaa=-ff/1000.0f;
+
+   for (xxx=0;xxx<1000;xxx++){
             for (xx=0;xx<samplerun;xx++){
-	      //	      time=rk4(dvy, time,0.002, &buffer[xx]); // 44k samplerate
-              //     buffer[xx]=spring_oscillate(xx);
-	      //	  	  buffer[xx]=mindlin_oscillate(&syrinxM);
+	      //time=rk4(dvy, time,0.0002, &buffer[xx]); // 44k samplerate
+	      time=rk4(dvfinch, time,0.00002, &buffer[xx]); // 44k samplerate
+	      //                   buffer[xx]=spring_oscillate(xx);
+	      //	      	  	  buffer[xx]=mindlin_oscillate(&syrinxM);
 		   //          do_impulse(buffer,3200,freq);
              }
+	    alphaa+=0.01;
+	    betaa-=0.01;
 
 	//		RavenTube_next(buffer, otherbuffer,samplerun);
 	//	         SingleRavenTube_next(buffer, otherbuffer,samplerun);
@@ -1409,7 +1469,8 @@ init_mindlin(&syrinxM, f, ff, fff);
    for (xx=0;xx<samplerun;xx++){
       int iii=32768.0f*otherbuffer[xx];
       int iiii=32768.0f*buffer[xx];
-      printf("%d %d\n",iiii,iii);
+      //      printf("%d %d\n",iiii,iii);
+      printf("%f\n",buffer[xx]);
       fwrite(&iiii,2,1,fo);
    }
 

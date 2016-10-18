@@ -34,6 +34,13 @@
 void Audio_Init(void);
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz);
 
+typedef struct adc_transformer {
+  u8 whichone; // of MODE,X,Y,Z,SPEED
+  u8 flip;
+  float filter_coeff;
+  float multiplier;
+} adc_transform;
+
 
 #endif
 

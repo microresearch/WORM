@@ -1,11 +1,17 @@
 * MAJOR MODES 
 
-- run down by name, files, description, manual desc, 1-SELX/2-Y/3-Z/4-SPEED, notes, TODO
+1-SELX
+2-SELY
+3-SELZ
+4-SPEED
+
+- run down by name, files, description, manual desc, 1-SELX/2-Y/3-Z/4-SPEED/AND_TRIGGER, notes, TODO
 
 ** 0) TMS5220
 
-** 1) FULLKLATT: rsyth-2.0-port, main.c
 
+
+** 1) FULLKLATT: rsyth-2.0-port, main.c
 
 SELX- chooses which position - like X axis
 SELY- chooses phoneme for that position - like Y axis
@@ -21,7 +27,7 @@ SELZ- length of phoneme at that position
 -- what we need is test phrase from klatt out (where is our lap test code = docs/rsynth-2-un)
 
 - that in main.c we have the SELX etc selections
-- that there was a pitchbend but now where we can have it if not in another mode
+- that there was a pitchbend but now where we can have it if not in another mode (pitch can be speed)
 
 *** TODO:
 
@@ -35,4 +41,23 @@ fill in here:
 
 - SPEED setting to do (and maybe test interpol there)
 
+** X) WAVETABLE:
 
+- choose wavetableX, frequencySPEED and Y/Z as tube//other filters
+
+- trigger as resync start of wavetable
+
+- oversampling or not? TEST
+
+*** TODO
+
+- as above, 2d wavetable
+
+- new wavetables from wavs, and new generated:
+
+we need to derive and edit wavetables first: real raven, real human,
+historical speech synth models, glottal models as below with varying parameters...
+
+more plague wavetables using different code - catalogue wavetables...
+
+LF, raven etc...
