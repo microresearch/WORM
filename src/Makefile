@@ -1,6 +1,7 @@
 
 
-TOOL_PREFIX = /opt/ARM/arm-linaro-eabi-4.6
+#TOOL_PREFIX = /opt/ARM/arm-linaro-eabi-4.6
+TOOL_PREFIX = /root/gcc-arm-none-eabi-5_4-2016q3
 
 PRG_PREFIX = $(TOOL_PREFIX)/bin/arm-none-eabi-
 LIB_PREFIX = $(TOOL_PREFIX)/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/
