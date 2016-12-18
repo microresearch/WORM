@@ -47,7 +47,7 @@ fill in here:
 
 - trigger as resync start of wavetable
 
-- oversampling or not? TEST
+- oversampling or not? TEST - doesn't work with oversample - fixed - any difference?
 
 *** TODO
 

@@ -3,6 +3,7 @@
 #include <math.h>
 //#include "forlap.h"
 #include "worming.h"
+#include "wavetable.h"
 
 // varying wavetable implementations: params - oversampling, interpolating... length and calc frequency?
 
@@ -12,7 +13,7 @@
 
 #define TWO_PI 6.28318530717958647693
 
-#define OVERSAMPLING_OSCILLATOR 0
+#define OVERSAMPLING_OSCILLATOR 1
 
 #define FIR_BETA                  .2
 #define FIR_GAMMA                 .1
@@ -20,22 +21,10 @@
 
 // TODO: FIR filter for above = use coeffs JUST for this!// and then delete doble to float etc
 
-float filtertaps[49]={ 0.00000001,  0.00000007,  0.00000021, -0.00000007, -0.00000243, -0.00000627,  0.00000224,  0.00004326,  0.00006970, -0.00008697, -0.00043244, -0.00028644,  0.00113161,  0.00232968, -0.00061607, -0.00709116, -0.00592280,  0.01120457,  0.02472395, -0.00136324, -0.05604421, -0.05124764,  0.08785309,  0.29650419,  0.39847428,  0.29650419,  0.08785309, -0.05124764, -0.05604421, -0.00136324,  0.02472395,  0.01120457, -0.00592280, -0.00709116, -0.00061607,  0.00232968,  0.00113161, -0.00028644, -0.00043244, -0.00008697,  0.00006970,  0.00004326,  0.00000224, -0.00000627, -0.00000243, -0.00000007,  0.00000021,  0.00000007,  0.00000001}; // filter coeffs for above settings
+float filtertaps[49]={ 0.00000001f,  0.00000007f,  0.00000021f, -0.00000007f, -0.00000243f, -0.00000627f,  0.00000224f,  0.00004326f,  0.00006970f, -0.00008697f, -0.00043244f, -0.00028644f,  0.00113161f,  0.00232968f, -0.00061607f, -0.00709116f, -0.00592280f,  0.01120457f,  0.02472395f, -0.00136324f, -0.05604421f, -0.05124764f,  0.08785309f,  0.29650419f,  0.39847428f,  0.29650419f,  0.08785309f, -0.05124764f, -0.05604421f, -0.00136324f,  0.02472395f,  0.01120457f, -0.00592280f, -0.00709116f, -0.00061607f,  0.00232968f,  0.00113161f, -0.00028644f, -0.00043244f, -0.00008697f,  0.00006970f,  0.00004326f,  0.00000224f, -0.00000627f, -0.00000243f, -0.00000007f,  0.00000021f,  0.00000007f,  0.00000001f}; // filter coeffs for above settings
 
-extern __IO uint16_t adc_buffer[10];
+extern __IO uint16_t adc_buffer[5];
 
-typedef struct {
-    float FIRData[49], *FIRCoef;
-    int FIRPtr, numberTaps;
-} TRMFIRFilter;
-
-typedef struct _Wavetable {
-  TRMFIRFilter *FIRFilter;
-    const float *wavetable;
-    float basicIncrement;
-    float currentPosition;
-int16_t length;
-} Wavetable;
 
 ////////////SNIPPED filtercalcs -> gentable.c
 
@@ -56,35 +45,26 @@ return modulus - 1;
 }
 
 
-float doFIRFilter(TRMFIRFilter *filter, float input, int needOutput)
+float doFIRFilter(TRMFIRFilter *filter, float input, u8 needOutput)
 {
-    if (needOutput) {
-	int i;
-	float output = 0.0;
+        if (needOutput) {
+	float output = 0.0f;
 
-	/*  PUT INPUT SAMPLE INTO DATA BUFFER  */
 	filter->FIRData[filter->FIRPtr] = input;
 
-	/*  SUM THE OUTPUT FROM ALL FILTER TAPS  */
-	for (i = 0; i < filter->numberTaps; i++) {
-	    output += filter->FIRData[filter->FIRPtr] * filter->FIRCoef[i];
-	    filter->FIRPtr = iincrement(filter->FIRPtr, filter->numberTaps);
+	for (u8 i = 0; i < filter->numberTaps; i++) {
+	  output += filter->FIRData[filter->FIRPtr] * filter->FIRCoef[i];
+	  //output=input;
+	  filter->FIRPtr = iincrement(filter->FIRPtr, filter->numberTaps);
 	}
 
-	/*  DECREMENT THE DATA POINTER READY FOR NEXT CALL  */
 	filter->FIRPtr = ddecrement(filter->FIRPtr, filter->numberTaps);
-
-	/*  RETURN THE OUTPUT VALUE  */
 	return output;
     } else {
-	/*  PUT INPUT SAMPLE INTO DATA BUFFER  */
-	filter->FIRData[filter->FIRPtr] = input;
-
-	/*  ADJUST THE DATA POINTER, READY FOR NEXT CALL  */
-	filter->FIRPtr = ddecrement(filter->FIRPtr, filter->numberTaps);
-
-	return 0.0;
-    }
+	  filter->FIRData[filter->FIRPtr] = input;
+	  filter->FIRPtr = ddecrement(filter->FIRPtr, filter->numberTaps);
+	return 0.0f;
+	}
 }
 
 //////////////////////////////
@@ -108,27 +88,27 @@ extern wormy myworm;
 inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
 {
   //    wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wavetable->basicIncrement));
-  float speed=(float)adc_buffer[SELX]/40960.0f; 
-  u8 param=adc_buffer[SELY]>>6; 
+    float speed=(float)adc_buffer[SELX]/40960.0f; 
+    u8 param=adc_buffer[SELY]>>6; 
   float wm=wormonefloat(&myworm, speed, param, (float)wavetable->length);
   wavetable->currentPosition = wm;//mod0(wm,wavetable->length);
 }
 
 
 #if OVERSAMPLING_OSCILLATOR
-void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, int16_t length)  //  2X oversampling oscillator
+void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  2X oversampling oscillator
 {
-    int i, lowerPosition, upperPosition;
+  int lowerPosition, upperPosition;
     float interpolatedValue, sample;
 
-    for (int ii = 0; ii < length; ii++) {
-    for (i = 0; i < 2; i++) {
+    for (u8 ii = 0; ii < length; ii++) {
+    for (u8 iii = 0; iii < 2; iii++) {
         //  First increment the table position, depending on frequency
-        WavetableIncrementPosition(wavetable, frequency / 2.0);
+        WavetableIncrementPosition(wavetable, frequency / 2.0f);
 
         //  Find surrounding integer table positions
         lowerPosition = (int)wavetable->currentPosition;
-upperPosition = mod0(lowerPosition + 1, , wavetable->length);
+	upperPosition = mod0(lowerPosition + 1, wavetable->length);
 
         //  Calculate interpolated table value
         interpolatedValue = (wavetable->wavetable[lowerPosition] +
@@ -136,17 +116,18 @@ upperPosition = mod0(lowerPosition + 1, , wavetable->length);
                               (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
 
         //  Put value through FIR filter
-	sample = doFIRFilter(wavetable->FIRFilter, interpolatedValue, i);
+			sample = doFIRFilter(wavetable->FIRFilter, interpolatedValue, iii);
+	//		sample=interpolatedValue;
     }
     outgoing[ii]=sample;
     //  Since we decimate, take only the second output value
     }
 }
 #else
-void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, int16_t length)  //  Plain oscillator
+void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  Plain oscillator
 {
     int lowerPosition, upperPosition;
-    for (int ii = 0; ii < length; ii++) {
+    for (u8 ii = 0; ii < length; ii++) {
 
     //  First increment the table position, depending on frequency
     WavetableIncrementPosition(wavetable, frequency);
@@ -185,7 +166,7 @@ float dosinglewavetable(Wavetable *wavetable, float frequency)
 }
 
 
-void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, int16_t length)  //  Plain oscillator
+void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  Plain oscillator
 {
     int lowerPosition, upperPosition;
     for (int ii = 0; ii < length; ii++) {
@@ -206,6 +187,8 @@ void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, int
     }
 }
 
+TRMFIRFilter firfilt;
+
 
 void wavetable_init(Wavetable* wavtable, const float *tableitself, int16_t length){ // need to declare wavetable struct and ourtable we use
   wavtable->wavetable=tableitself;
@@ -213,7 +196,6 @@ void wavetable_init(Wavetable* wavtable, const float *tableitself, int16_t lengt
   wavtable->currentPosition=0.0;
   wavtable->length=length;
   //  wavtable.FIRFilter = TRMFIRFilterCreate(FIR_BETA, FIR_GAMMA, FIR_CUTOFF);
-  TRMFIRFilter firfilt;
   firfilt.FIRCoef=filtertaps;
   firfilt.numberTaps=49; firfilt.FIRPtr=0;
   wavtable->FIRFilter=&firfilt;

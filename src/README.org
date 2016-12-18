@@ -3610,7 +3610,7 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 - changed way we deal with adc (also was still doing 10x aDC stuff
   from darkint so now back to 5) - process all in audio callback
 
-- but we need to update all generators for this - lpc/c/TMS-done!
+- TODO: but we need to update all generators for this - lpc/c/TMS-done!
 
 *** TOWARDS: template for all generators and TODO for each mode and general TODO
 
@@ -4833,3 +4833,7 @@ Titze:
 3/ audio out - patch out
 
 Q is to test WITHOUT all connections - program/audio out say mode=1
+
+* links also
+
+Altair and lots of links: https://sites.google.com/site/analogvocoderinfo/speech-synth/sp-synth-altair-imsai

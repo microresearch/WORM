@@ -671,7 +671,7 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   //  dowavetable(lastbuffer, &wavtable, 2, size);
   //  dowavetable(lastbuffer, &wavtable, 2+(1024-(adc_buffer[SPEED]>>2)), size);
 
-  dowavetable(lastbuffer, &wavtable, 2+_intspeed, size);
+  dowavetable(lastbuffer, &wavtable, 2.0f + (1024.0f*_speed), size);
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -728,15 +728,14 @@ extern u16 writepos;
 extern u8 mode; /// ????? TODO do we need these?
 */
 
-u8 toggled=0;
+u8 toggled=1;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   float samplespeed;
   static u16 cc;
-  u8 x;
 
-  for (x=0;x<5;x++){
+  for (u8 x=0;x<5;x++){
   float value=(float)adc_buffer[transform[x].whichone]/65536.0f; // 4096.0f; // why 65536.0f as in clouds - align? - try that
 
   if (transform[x].flip) {
@@ -755,18 +754,18 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   CONSTRAIN(_selz,0.0f,1.0f);
   _mode=smoothed_adc_value[MODE_];
   CONSTRAIN(_mode,0.0f,1.0f);
-  _intmode=_mode*transform[MODE_].multiplier;
+  _intmode=_mode*transform[MODE_].multiplier; //0=32 we hope!
 
   samplespeed=_speed+0.01f; // TODO test this fully!
   _intspeed=_speed*transform[SPEED_].multiplier;
 
   // splitting input
-  for (x=0;x<sz/2;x++){
+  for (u8 x=0;x<sz/2;x++){
     sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
     src++;
   }
 
-  _intmode=0; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 17 is last
+  _intmode=15; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 17 is last
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
 
@@ -775,7 +774,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // copy sample buffer into audio_buffer as COMPOST
 
   if (!toggled){
-  for (x=0;x<sz/2;x++) {
+  for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc]=mono_buffer[x];
     cc++;
     if (cc>AUDIO_BUFSZ) cc=0;

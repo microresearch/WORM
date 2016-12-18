@@ -89,7 +89,7 @@ void main(void)
 LPCAnalyzer_init();
 init_synth(); // which one? --> klatt rsynth !!!! RENAME!
 sp0256_init();
-lpc_init(); 
+lpc_init();
 simpleklatt_init();
 sam_init();
 sam_newsay(); // TEST!
@@ -118,9 +118,9 @@ tms5200_newsay();
   //  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
     wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
   //  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512
-  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
+    //  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
   //  RavenTube_init();
-  newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
+    //  newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
@@ -154,7 +154,7 @@ tms5200_newsay();
   
             
   // testing changing test_elm
-      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
+      //      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
       // change element, change length? leave stress as is 0
       //      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
       //      test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
