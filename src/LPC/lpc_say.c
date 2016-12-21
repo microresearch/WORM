@@ -84,7 +84,7 @@ pitch 6 bits=0b =25
 
 */
 
-#include "spkspellroms.h"
+#include "vocab_spkspell.h"
 
 /*
  * TMS5xxx LPC coefficient tables
@@ -134,7 +134,7 @@ pitch 6 bits=0b =25
 
 const uint8_t tmsEnergy5100[0x10] = {0,  0,  1,  1,  2,  3,  5,  7, 10, 15, 21, 30, 43, 61, 86, 0 }; 
 const uint8_t tmsEnergyTALKIE[0x10] = {0x00,0x02,0x03,0x04,0x05,0x07,0x0a,0x0f,0x14,0x20,0x29,0x39,0x51,0x72,0xa1,0xff};
-const uint8_t tmsEnergy52xx[0x10] = {0,  1,  2,  3,  4,  6,  8, 11, 16, 23, 33, 47, 63, 85,114, 0 };
+const uint8_t tmsEnergy5200[0x10] = {0,  1,  2,  3,  4,  6,  8, 11, 16, 23, 33, 47, 63, 85,114, 0 };
 
 const uint8_t tmsPeriod5100[0x40] =   	{  0,   41,  43,  45,  47,  49,  51,  53,  \
 		55,  58,  60,  63,  66,  70,  73,  76,  \
@@ -170,7 +170,7 @@ const int8_t chirp5100[CHIRP_SIZE] = { 0x00, 0x2a, 0xd4, 0x32, 0xb2, 0x12, 0x25,
 					    0x00, 0x00, 0x00, 0x00 };
 
 
-const int8_t chirp52xx[CHIRP_SIZE] = 	{   0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,\
+const int8_t chirp5200[CHIRP_SIZE] = 	{   0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,\
 		0x25, 0x26, 0x4c, 0x44, 0x1a, 0x32, 0x3b, 0x13,\
 		0x37, 0x1a, 0x25, 0x1f, 0x1d, 0x00, 0x00, 0x00,\
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,\
@@ -731,8 +731,8 @@ void main(int argc, char *argv[]){
    srand (time(NULL));
    u8 randy[1280]; // zero it if necessary
 
-//   test_random_params(randy, 10);
-//   lpc_say(randy);
+   //   test_random_params(randy, 10);
+   //   lpc_say(randy);
 //   while(synth_running) lpc_running();
 
    // and try and read these back well first one
@@ -744,7 +744,7 @@ void main(int argc, char *argv[]){
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-   lpc_say(wordlist_testspell1[uffset]+uuffset);
+      lpc_say(wordlist_testspell1[uffset]+uuffset);
    //                lpc_say(testfor5100+uffset);
 
 	// or we try c7 etc as length?

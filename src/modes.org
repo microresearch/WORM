@@ -9,6 +9,7 @@
 
 ** 0) TMS5220
 
+- list ROMS, where are allophones -> TTS!
 
 
 ** 1) FULLKLATT: rsyth-2.0-port, main.c

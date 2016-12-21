@@ -1,7 +1,7 @@
 * ERD/WORM dirty speech synth
 
 The WORM was for a long time desirous to speake, but the rule and
-or∣der of the Court enjoyned him silence, but now strutting and
+order of the Court enjoyned him silence, but now strutting and
 swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 * TODO
@@ -3575,7 +3575,7 @@ From Mindlin: finch_void, email notes// book notes
 
 - sinc (Perry Cook): [[file:~/projects/ERD_modules/worm/docs/srconvrt.c]] - DONE but tests not so worthwhile? - could try???
 
-*** soundfun - and where else we had tau calc=lfgen/glottalsources
+*** soundfun in docs - and where else we had tau calc=lfgen/glottalsources
 
 - LF again
 - tests work and dumped some wav from audacity for later wavetables processings -> dump more
@@ -3601,10 +3601,8 @@ source/filter and substitution.// decide on modes
 also that in Mindlin we can make certain factors dependent on CV (eg. suggested envelope)
 
 *** glottalsources also
-
 *** all wavetables, all data sources
-
-*** start on modes - heading back into wavetables to work with SIR
+*** start on modes - heading back into wavetables to work with testing out new SIR
 *** and need to address adc jitter and range and abstract out all -> each adc (range, starting point 0 or top, constraint, smoothing coeff)
 
 - changed way we deal with adc (also was still doing 10x aDC stuff
@@ -3613,6 +3611,29 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 - TODO: but we need to update all generators for this - lpc/c/TMS-done!
 
 *** TOWARDS: template for all generators and TODO for each mode and general TODO
+
+** 18/12 
+
+- x220: changed makefile and stm32_flash.ld (as seemed not to follow .flash directive)
+
+- TODO: test this on WORM itself
+
+- DONE:check tms bbc stuff
+  http://www.sprow.co.uk/bbc/speechupgrade.htm against our samples
+  (and where these all are and how they are ordered)-these are
+  included!
+
+*- full PLAN!*
+
+- all NOTES!
+
+- basics eg. ADC above
+- TTS
+- catalogue ROMS
+- source/filter
+- glottalsources
+- wormings
+- each mode
 
 * TODO from 1 AUG:
 
@@ -4031,7 +4052,6 @@ klatt in docs:
 
 //////
 
-
 ** 2.5 do we want klatt which has say phoneme to next transitions
 
 also TTS so kind of straightforward klatt synth?
@@ -4171,7 +4191,7 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
-** 4.5// Digitalker 54104 
+** 4.5// Digitalker 54104 - Forest Mozer
 
 - started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
   samplerate is 9000 or so and we have repeats and new_say *TO_TEST ON ARM DONE*
@@ -4763,7 +4783,6 @@ now as *glottalair.py* and writing wav file - seems working -> port to C (also R
 
 - elements BLOW to investigate: [[file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/%20Simple%20waveguide%20tube.][file:~/projects/ERD_modules/older/eurorack/elements/dsp/tube.cc::/ Simple waveguide tube.]] and exciter is quite simple?
 
-
 *** other approaches completely
 
 - FOF/CHANT etc...
@@ -4837,3 +4856,4 @@ Q is to test WITHOUT all connections - program/audio out say mode=1
 * links also
 
 Altair and lots of links: https://sites.google.com/site/analogvocoderinfo/speech-synth/sp-synth-altair-imsai
+

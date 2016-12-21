@@ -51,6 +51,7 @@ MEMORY
 /* Define output sections */
 SECTIONS
 {
+
   /* The startup code goes first into FLASH */
   .isr_vector :
   {
@@ -77,6 +78,14 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;        /* define a global symbols at end of code */
     _exit = .;
+  } >FLASH
+
+
+  .flash :
+  {
+  . = ALIGN(4);
+  *(.flash  )
+  . = ALIGN(4);
   } >FLASH
 
 

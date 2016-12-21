@@ -1,10 +1,12 @@
 
 
 #TOOL_PREFIX = /opt/ARM/arm-linaro-eabi-4.6
-TOOL_PREFIX = /root/gcc-arm-none-eabi-5_4-2016q3
+TOOL_PREFIX = /root/ARM/gcc-arm-none-eabi-5_4-2016q3
 
 PRG_PREFIX = $(TOOL_PREFIX)/bin/arm-none-eabi-
 LIB_PREFIX = $(TOOL_PREFIX)/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/
+
+# LIB_PREFIX is not used
 
 CC      = $(PRG_PREFIX)gcc
 LD      = $(PRG_PREFIX)gcc
@@ -45,7 +47,7 @@ LDSCRIPT = stm32_flash.ld
 
 # LACH is -DTEST option!
 
-CFLAGS  =  -I. -IInclude -I/~/CMSIS/FFTEX/cmsis -Iinc -I./rsynth-2.0-port -I./LPC -I./vocoder -std=gnu99 \
+CFLAGS  =  -I. -IInclude -I/~/ARM/CMSIS_5 -Iinc -I./rsynth-2.0-port -I./LPC -I./vocoder -std=gnu99 \
 	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' \
 	-mthumb \
 	-mfpu=fpv4-sp-d16 \
@@ -63,8 +65,9 @@ AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfl
 #LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16  -L$(LIB_PREFIX) 
 #LFLAGS_END = -lm -lc -Wl,--gc-sections,-Map=myfile.map
 
-LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -L/root/CMSIS/CMSIS/Lib -L/root/CMSIS/CMSIS/Lib/GCC
-LFLAGS_END = -larm_cortexM4lf_math -ldsplib_lm4f -Wl,--gc-sections,-Map=myfile.map -lm -lc
+LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -L/root/ARM/CMSIS_5/CMSIS/Lib -L/root/ARM/CMSIS_5/CMSIS/Lib/GCC
+#LFLAGS_END = -larm_cortexM4lf_math -ldsplib_lm4f -Wl,--gc-sections,-Map=myfile.map -lm -lc
+LFLAGS_END = -larm_cortexM4lf_math -Wl,--gc-sections,-Map=myfile.map -lm -lc
 
 # Executables
 ARCH = arm-none-eabi
