@@ -3616,7 +3616,7 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - x220: changed makefile and stm32_flash.ld (as seemed not to follow .flash directive)
 
-- TODO: test this on WORM itself
+- TODO: test this on WORM itselfDONE
 
 - DONE:check tms bbc stuff
   http://www.sprow.co.uk/bbc/speechupgrade.htm against our samples
@@ -3627,7 +3627,10 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - all NOTES!
 
-- catalogue ROMS// final ROMS
+- coherent approach to source/filter, control and worming, stack based?
+
+- catalogue ROMS// final ROMS converted
+
 - basics eg. ADC above
 - TTS
 - source/filter model

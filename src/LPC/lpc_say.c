@@ -11,7 +11,6 @@
 #include "math.h"
 #include "time.h"
 
-
 //#include "lpc.h"
 //#include "audio.h"
 
@@ -24,6 +23,9 @@ typedef unsigned short u16;
 typedef signed short int16_t;
 typedef unsigned int uint32_t;
 typedef signed int int32_t;
+
+#include "vocab_spkspellone.h"
+#include "vocab_mpf.h"
 
 uint16_t lpc_get_sample(void);
 
@@ -84,8 +86,6 @@ pitch 6 bits=0b =25
 02 0b 8f = 0000 0010 , 0000 1011, 
 
 */
-
-#include "vocab_spkspellone.h"
 
 /*
  * TMS5xxx LPC coefficient tables
@@ -747,7 +747,7 @@ void main(int argc, char *argv[]){
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-         lpc_say(wordlist_testspell1[uffset]+uuffset);
+         lpc_say(wordlist_spell1[uffset]+uuffset);
    //         lpc_say(mpf+uffset);
    //                lpc_say(testfor5100+uffset);
 
