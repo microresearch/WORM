@@ -3627,13 +3627,20 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - all NOTES!
 
+- catalogue ROMS// final ROMS
 - basics eg. ADC above
 - TTS
-- catalogue ROMS
-- source/filter
-- glottalsources
+- source/filter model
+- glottalsources and where we can insert these
 - wormings
 - each mode
+
+** 22/12
+
+- vocab_spkspell.h - first section done
+- TMS could be CV controlled with trigger/freeze - model for this kind of control
+- vocab_mpf.h begun - format/test - 5200
+
 
 * TODO from 1 AUG:
 
@@ -4557,7 +4564,7 @@ test for POTS now: 0-62/63 some jitter???
 
 TMS howto TI99 eg...:
 
-test first with lpc_reader for approx offset: ./lpcr 2400 /root/mess/software/ti99_4ae/phm3226g4.bin > /dev/dsp  
+test first with lpc_reader for approx offset: ./lpcr 2400 /root/mess/software/ti99_4ae/phm3226g4.bin | aplay
 
 then dump to hex: ./lpcdump /root/mess/software/ti99_4ae/phm3226g4.bin > phm3226g4.hex
 

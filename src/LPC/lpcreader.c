@@ -57,7 +57,7 @@ const int8_t tmsK8[0x08]      = {0xC0,0xD8,0xF0,0x07,0x1F,0x37,0x4F,0x66};
 const int8_t tmsK9[0x08]      = {0xC0,0xD4,0xE8,0xFC,0x10,0x25,0x39,0x4D};
 const int8_t tmsK10[0x08]     = {0xCD,0xDF,0xF1,0x04,0x16,0x20,0x3B,0x4D};
 
-#define CHIRP_SIZE 41
+#define CHIRP_SIZE 52
 const int8_t chirp[CHIRP_SIZE] = {0x00,0x2a,0xd4,0x32,0xb2,0x12,0x25,0x14,0x02,0xe1,0xc5,0x02,0x5f,0x5a,0x05,0x0f,0x26,0xfc,0xa5,0xa5,0xd6,0xdd,0xdc,0xfc,0x25,0x2b,0x22,0x21,0x0f,0xff,0xf8,0xee,0xed,0xef,0xf7,0xf6,0xfa,0x00,0x03,0x02,0x01};
 
 const int8_t chirpnew[52] = { 0x00, 0x03, 0x0f, 0x28, 0x4c, 0x6c, 0x71, 0x50,\
@@ -74,6 +74,14 @@ const uint8_t tmsPeriod5110[0x40] =	{   0,  15,  16,  17,  19,  21,  22,  25,  \
 		55,  60,  64,  68,  72,  76,  80,  84,  \
 					    86,  93, 101, 110, 120, 132, 144, 159};
 
+const uint8_t tmsPeriod5200[0x40] = 	{   0,  14,  15,  16,  17,  18,  19,  20,  \
+		21,  22,  23,  24,  25,  26,  27,  28,  \
+		29,  30,  31,  32,  34,  36,  38,  40,  \
+		41,  43,  45,  48,  49,  51,  54,  55,  \
+		57,  60,  62,  64,  68,  72,  74,  76,  \
+		81,  85,  87,  90,  96,  99, 103, 107, \
+		112, 117, 122, 127, 133, 139, 145, 151, \
+					    157, 164, 171, 178, 186, 194, 202, 211};
 
 /*
  * Parse frame parameter bits from the ROM data stream.
@@ -84,10 +92,10 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint16_t data;
 	
 	data = byte_rev[*ptrAddr]<<8;
-	//	data = (*ptrAddr)<<8;
+	//data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-	  data |= byte_rev[*(ptrAddr+1)];
+	      data |= byte_rev[*(ptrAddr+1)];
 	  //  	   data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
@@ -215,7 +223,7 @@ void lpc_update_coeffs(void)
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
 	//	printf("};\n{");
-	fprintf(stderr, "OFF: %d\r", ptrAddr-xxx);
+	fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
 
 
 		}
@@ -226,7 +234,8 @@ void lpc_update_coeffs(void)
 			repeat = lpc_getBits(1);
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
-			nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
+			//			nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
+			nextPeriod = tmsPeriod5200[lpc_getBits(6)]; // TEST for 5110
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
 			//			nextPeriod=64;
