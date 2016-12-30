@@ -44,7 +44,7 @@ fill in here:
 
 ** X) WAVETABLE:
 
-- choose wavetableX, frequencySPEED and Y/Z as tube//other filters
+- choose wavetableX, frequencySPEED and Y/Z as tube//other filter parameters
 
 - trigger as resync start of wavetable
 

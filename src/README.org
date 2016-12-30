@@ -10,11 +10,11 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 
 - collate worm quotes - Blake, alchemical - below
 
-- image K worm scans
+- image K worm scansDONE
 
 - recordings
 
-- try solderpaste build process-oven
+- try solderpaste build process-ovenDONE
 
 - re-think how all works with excitation and resonance/process - what
   models don't work in this way (more classical speech synth), and
@@ -3627,7 +3627,7 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - all NOTES!
 
-- coherent approach to source/filter, control and worming, stack based?
+- coherent approach to source/filter, control and worming, stack based -XYZ, speed, trigger/freeze?
 
 - catalogue ROMS// final ROMS converted
 
@@ -3642,8 +3642,15 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - vocab_spkspell.h - first section done
 - TMS could be CV controlled with trigger/freeze - model for this kind of control
-- vocab_mpf.h begun - format/test - 5200
+- vocab_mpf.h begun - test - 5200 DONE
+-
+** 28/12
 
+- decide to split worming as CV generator future module and RAVEN too - concentrate on core speech
+- ROMS? apple disks-echo II, latest spk and spell, old ones like tron again
+- soundfun -> wavetables???
+
+- TODO: all notes and clear way forward
 
 * TODO from 1 AUG:
 
@@ -3651,12 +3658,12 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 
 - start on each mode and what can be changed/morphed for each and how this suggests new modes eg.
 
-source/filter model we have sources as: input straight (fine for
+*source/filter model we have sources as: input straight (fine for
 oscillation or noise in), inverse filtered in, inv in as triggered
-wavetable, inverse filtered audio bufer, audio buffer (and toggle off
+wavetable, inverse filtered audio buffer, audio buffer (and toggle off
 write on use of audio buffer), physical glottal model, stored
 wavetable as in raven, generators eg. pulse, square, and original
-(eg. TMS, Klatt)
+(eg. TMS, Klatt)*
 
 ->>>>>compare these synthetic (not source/filter) approaches for abstraction out into worm.c (also sco1/votrax and dirty model)
 
@@ -3726,7 +3733,6 @@ x.play;
 use wavwrite but always problems with:
 
 error: wavwrite: Y has more than 32767 columns (too many for a WAV-file)
-
 
 
 * glottal/source models summary
@@ -3879,7 +3885,7 @@ TODO: test on lap different worm movements...
 
 - for excitation 1v per octave - calibration
 
-- compost as audio_buffer - also toggle writes to this on/off
+- compost as audio_buffer - also toggle writes to this on/off DONE in audio.c
 
 - see paper notes for abstracting out of excitation and filter for
   cross-worming, interbreeding of synthesis technologies - NOTE: if we
@@ -3978,6 +3984,7 @@ from: http://www.unige.ch/medecine/nouspikel/ti99/speech.htm
 
 ++ mix and match with ROM data, transpose coeffs on time co-ordinate (stored in stack), freeze them...
 
+
 ** 1/KLATT
 
 - inverse filtered source
@@ -4066,6 +4073,7 @@ klatt in docs:
 
 also TTS so kind of straightforward klatt synth?
 
+
 ** 3/SAM - test/re-work - still glitchy issue
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
@@ -4113,6 +4121,7 @@ default = 72
 
 
 //// 
+
 
 ** 4/SP0256 
 
@@ -4201,6 +4210,7 @@ http://nsd.dyndns.org/speech/
 
 https://github.com/MarquisdeGeek/homemadehawking/tree/master/speech
 
+
 ** 4.5// Digitalker 54104 - Forest Mozer
 
 - started with digitalker.c... where are ROMS we have some, TESTED.DONE on lap
@@ -4245,6 +4255,7 @@ WORKS on lap -> TODO ARM tests, extra roms, vocab and banks
 ///- leave out [ [[file:~/mame/src/devices/sound/s14001a.cpp::SSi%20TSI%20S14001A%20speech%20IC%20emulator][file:~/mame/src/devices/sound/s14001a.cpp::SSi TSI
 S14001A speech IC emulator]] ]
 
+
 ** 5/TUBE - tube.c
 
 do we want phonemes here?
@@ -4280,6 +4291,7 @@ start with just one list = input_frame and do without interpolation, then implem
 
 *working but need to do generation of new parameters and interpolation*
 
+
 ** 6.1 voicform
 
 - sanity check on all
@@ -4287,6 +4299,7 @@ start with just one list = input_frame and do without interpolation, then implem
 - different excitations/raw/tabled/input
 - maybe lose the straight white noise options or push these to one side of parameters
 - maybe different vowel and filter options -> eg. formlet which is also filter model!
+
 
 ** 6.15 formlet from sc
 
@@ -4354,7 +4367,9 @@ a.set(\resonancescaling, 20)
 
 a.set(\resonancescaling, 2)
 
+
 ** 6.16 scformant working
+
 ** 6.2 vosims
 
 -  which one? scvosim, braids + braids vowel
@@ -4364,6 +4379,7 @@ sc vosim is vosim.c = strange parameters and ONE vosim TESTED ok
 braids rendervowel is 3 fofs and noise TEST-removed triggering and noise and seems okay - maybe tweak
 
 ** 6.3 fof = braids and try adding extra formants and shift these about
+
 ** 6.6 *** ntube // see also notes above!
 
 
@@ -4426,6 +4442,7 @@ singing: Main differences are having a nose (3-port unction) which allows singin
 nasals as M and N , noise injection in constrictions for allowing fricatives
 and a glottal wave for LFmodel excitation. 
 
+
 ** 7/8channel vocoder TODO svf.c and channelv.c
 
 - *swapping of channels*
@@ -4455,6 +4472,17 @@ lookups and how this could work based on : using encoder - calc.m and
   bit mono recordings to encode words for lpc.c
 
 pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs in time
+
+** 8/9vocoder TODO q of excitation, pitch/unvoiced -> wvocoder
+
+- latest wvocoder tests? WORKING - *TODO: formantshift to testDONE? and our
+  own crossing, envelope stuff as param, noise and pitch/type of wave*
+
+- changing bandwidth - maybe some differing tables for bandwidths and different frequencies
+
+- port from WARPS/ ownvocoder.c and how we can tweak this: different
+  bands, bandwidths even if coefficients are fixed, excitation
+
 
 ** 8.5 nvp.c BASICS working with primitive newsay...
 
@@ -4503,25 +4531,17 @@ also multipliers and frame param over-rides for different voicesDONE
 ** 8.6 - nvp.c new mode as only move on to next phoneme when is triggered
 ** 8.7 - nvp. vocab generated from python=new mode
 
-** 8/9vocoder TODO q of excitation, pitch/unvoiced -> wvocoder
-
-- latest wvocoder tests? WORKING - *TODO: formantshift to testDONE? and our
-  own crossing, envelope stuff as param, noise and pitch/type of wave*
-
-- changing bandwidth - maybe some differing tables for bandwidths and different frequencies
-
-- port from WARPS/ ownvocoder.c and how we can tweak this: different
-  bands, bandwidths even if coefficients are fixed, excitation
-
 ** 9/10-15 wormings-> = 10klatt/11raw klatt/12lpc params/13channelvocoder/14vocoder/15other
 
 - worm movements from paris python -> c-TESTING
 
 ** XX+ plus - worming through wavetables to TEST TODO! - worm wavetable for excitation with filters (bbandpass all)
 
+
 ** XX+ various: klatt single phonemes with transitions, raw sp0256 coding, audio buffer re-workings, some low passes of above - so maybe 32 modes
 
 ** XX+ use audio_buffer which should be filled by all modes
+
 
 ** XXXXXX what will become RAVEN code - more glottal and wavetable based, tube based, more simulation/modelling XXXXX
 
