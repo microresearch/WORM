@@ -24,11 +24,14 @@ typedef signed short int16_t;
 typedef unsigned int uint32_t;
 typedef signed int int32_t;
 
-#include "vocab_spkspellone.h"
-#include "vocab_spkspelltwo.h"
-#include "vocab_mpf.h"
-#include "vocab_testroms.h"
-#include "vocab_2702.h"
+#include "roms/vocab_spkspellone.h"
+#include "roms/vocab_spkspelltwo.h"
+#include "roms/vocab_mpf.h"
+#include "roms/vocab_testroms.h"
+#include "roms/vocab_2702.h"
+#include "roms/vocab_D033.h"
+#include "roms/vocab_D032.h"
+#include "roms/vocab_D000.h"
 
 uint16_t lpc_get_sample(void);
 
@@ -94,7 +97,7 @@ pitch 6 bits=0b =25
  * TMS5xxx LPC coefficient tables
  */
 
-#define PERIOD_BITS 5 /// 5 for 5100, 6 for 5200
+#define PERIOD_BITS 6 /// 5 for 5100, 6 for 5200
 #define CHIRP_SIZE 52 // was 41 for older chirp
 
 /* 5100=
@@ -593,11 +596,11 @@ void lpc_update_coeffs(void)
 		else
 		{
 			/* All other energy types */
-			nextEnergy = tmsEnergy5100[energy];
+			nextEnergy = tmsEnergy5200[energy];
 			repeat = lpc_getBits(1);
 			int origpitch = lpc_getBits(PERIOD_BITS); // 5110 - place these in defines
 			//	nextPeriod = tmsPeriod[lpc_getBits(6)];
-			nextPeriod=tmsPeriod5100[origpitch];
+			nextPeriod=tmsPeriod5200[origpitch];
 			//		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", energy, repeat, origpitch);
 
 			/* A repeat frame uses the last coefficients */
@@ -688,7 +691,7 @@ uint16_t lpc_get_sample(void)
 			periodCounter = 0;
 		
 		if (periodCounter < CHIRP_SIZE)
-		  ulpc[10] = ((chirp5100[periodCounter]) * (uint32_t) synthEnergy) >> 8;
+		  ulpc[10] = ((chirp5200[periodCounter]) * (uint32_t) synthEnergy) >> 8;
 		else
 			ulpc[10] = 0;
 	}
@@ -750,7 +753,7 @@ void main(int argc, char *argv[]){
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
    //   lpc_say(test62[uffset]+uuffset);
-   lpc_say(wordlist_spell2702[uffset]+uuffset);
+   lpc_say(wordlist_ffD000[uffset]+uuffset);
    //                lpc_say(testfor5100+uffset);
 
 	// or we try c7 etc as length?

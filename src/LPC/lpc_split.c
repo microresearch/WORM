@@ -7,7 +7,7 @@
  
 #include "stdio.h"
 #include "math.h"
-
+#include "string.h"
 
 //#include "lpc.h"
 //#include "audio.h"
@@ -21,11 +21,13 @@ typedef unsigned int uint32_t;
 typedef signed int int32_t;
 
 uint16_t lpc_get_sample(void);
+char strung[80];
 
 #define INTERP_PERIOD 25  // samples per subframe
 #define SUBFRAME_PERIOD 8 // subframes per frame
 
 int didntjump=1;
+   int counter=0;
 
 uint8_t* ptrAddr, ptrBit;
 uint8_t synth_running, synth_subframe_ctr, synth_sample_ctr;
@@ -61,6 +63,9 @@ const int8_t chirp[CHIRP_SIZE] = {0x00,0x2a,0xd4,0x32,0xb2,0x12,0x25,0x14,0x02,0
 /*
  * Parse frame parameter bits from the ROM data stream.
  */
+
+int bytes=0;
+
 uint8_t lpc_getBits(uint8_t num_bits)
 {
 	uint8_t value;
@@ -79,8 +84,9 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	if (ptrBit >= 8)
 	{
 	  printf("0x%X, ",*ptrAddr);
-		ptrBit -= 8;
+	  ptrBit -= 8;
 		ptrAddr++;
+		bytes++;
 		//		didntjump=2;
 		if (ptrBit==0) {
 		  didntjump=0;
@@ -186,7 +192,9 @@ void lpc_update_coeffs(void)
 			//						ptrAddr++; ptrBit=0;
 			if (didntjump){
 			  ptrBit =0;
-			  printf("0x%X, ",*ptrAddr);
+			  printf("0x%X",*ptrAddr);
+			  //			  	  printf("xxxxxx");
+
 			  ptrAddr++;
 			} 
 			//			didntjump=0;
@@ -194,7 +202,12 @@ void lpc_update_coeffs(void)
 			//	sleep(1);
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
-	printf("};\n{");
+	counter++;
+	printf("};\n\n");
+	printf("const uint8_t sp_ff%s", strung);
+	printf("nn%d", counter);
+	printf("[]         __attribute__ ((section (\".flash\")))  ={");
+
 		       
 
 		}
@@ -310,11 +323,23 @@ uint16_t lpc_get_sample(void)
 	return ulpc[0]+512;
 }
 
-
+unsigned char buffer[327680];//143360
 
 void main( int argc, char *argv[]){
   lpc_init();
-   int uffset=atoi(argv[1]);
+
+  // rewrite split so reads from filename
+
+     int uffset=atoi(argv[2]);
+
+  FILE *fp = fopen(argv[1], "r");
+   fseek(fp,0, SEEK_END);
+   int lengthy=ftell(fp);
+   fseek(fp,0, SEEK_SET);
+   fread(buffer, 1, lengthy, fp);
+   fclose(fp);
+   // and array name is argv[1] concat
+   //   printf("%x\n",*(buffer+uffset));
 
   // stay with first one which could be THIR or THIRTEE according to
   // TABLE (c40301 which is first of the 03 set D003 comes before THIRTEE and after THIR)
@@ -348,7 +373,7 @@ c12b 2f2c b92c 352d
   //  int offset=offsetsfrompointers[uffset]+ 200 + offsetsfromtables[uffset] ;
   //  printf("%d\n",offset);
 
-   int offset=279;
+  //   int offset=279;
     //    offset=0;	
     //    printf("TOTAL OFFSET %d\n\n", offset);
   //  while(1){
@@ -357,14 +382,39 @@ c12b 2f2c b92c 352d
 	        lpc_say(wordlist[xx]+offset);
 		while(synth_running) lpc_running();
 		}*/
-		    lpc_say(spTEST+uffset);
 
+   strcpy(strung,argv[1]);
+   lpc_say(buffer+uffset);
+
+        // const uint8_t sp_ff2303nn0[]         __attribute__ ((section (".flash")))  =
+   printf("const uint8_t sp_ff%s", strung);
+   printf("nn%d", counter);
+   printf("[]         __attribute__ ((section (\".flash\")))  ={");
+   
 	// or we try c7 etc as length?
 		    //    while(synth_running) lpc_running();
+   //     counter++;
+        while(bytes<lengthy) {
+	  //     printf("BYUT\n");
+     lpc_running();
+        }
+   //const uint8_t *wordlist_spell2303[112] =  {
+   printf("};\n\n\nconst uint8_t *wordlist_ff%s",strung);
+   printf("[%d",counter+2);
+   printf("] = {");
 
-		    	while(1) lpc_running();
+   int x;
+   
+   for (x=0;x<counter+1;x++){
+     // sp_spk2303nn0,
+     printf("sp_ff%s",strung);
+     printf("nn%d",x);
+     if (x!=counter)     printf(", ");
+   }
+   printf("};\n\n");	    
     //    offset++;
     //    sleep(1);
     //   printf("offset: %d\n",offset);
     //}
 }
+

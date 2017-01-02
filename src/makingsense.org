@@ -1,0 +1,131 @@
+* new progress
+
+** 2/1/2017
+
+- working on ROMS, TODO: extract rest of echo II female voices, rest
+  of speak and spell, where is TRON=sp0256 (work on those when we get
+  to that)
+
+- LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34
+
+** 3/1
+
+- TODO - ADC extent and vocabulary, how much better does mame code sound for say echo II speech/5200 Dxxx samples
+
+- how we can bend TMS - other excitation, X/Y/Z bendings, freeze?
+
+* general TODO
+
+- test new x220 flash and run! cableDONE
+
+- start with one mode and its extensions and define/clean below from there
+
+- basics eg. ROMS, filenamings, compost, 
+
+XYZSPEED arrangement - maybe swop so X and Y are left and right
+
+, ADC extent,
+
+  control models:
+
+eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
+
+, layout, interpolXNO!, split of glottal sources, new code,
+  TTS and where it is relevant, what else?
+
+- basic modes templated: XYZ, speed, triggering, compost
+
+each source/filter mode has regular in (eg. TMS, external in, other glottal sources)
+X,Y,Z and speed...
+
+- LPC inverse filter as excitation and/or NOT so...
+- vocoder and experimental modes
+- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
+- clean ups, documentation, tests and release
+
+* TMS ROMS
+
+
+** 5100-speak and spell
+
+** 5200- early echo II, disks of TRON, TI99/4 
+
+** 5220- later echo II, BBC MICRO
+
+* notes from README.org
+
+- source/filter model we have sources as: input straight (fine for
+oscillation or noise in), inverse filtered in, inv in as triggered
+wavetable, inverse filtered audio buffer, audio buffer (and toggle off
+write on use of audio buffer), physical glottal model, stored
+wavetable as in raven, generators eg. pulse, square, and original
+(eg. TMS, Klatt)
+
+
+* main modes overview - otherwise see modes.org
+
+** basic modes to do with suggested extensions
+
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+
+
+
+* chipsets/emulation/roms
+
+rom data structure - only makes sense for TMS
+
+- array pointer of pointers
+- number of entries/length 
+- chip ident (enum)
+
+*** 5100//522x
+
+- rename these! tms_roms_etc.h
+in LPC:
+vocab_spkspell.h - 5100 all
+vocab_acorn.h -
+vocab_custom.h -
+vocab_large_male.h -
+vocab_male.h -
+vocab_talko.h -
+vocab_testroms.h - inc allophones...
+vocab_ti99.h -
+
+*** sp0256
+
+256_roms.h - 
+
+m_rom_256_012 - ?
+
+m_rom_256_al2 - 64 allophones
+
+*** digitalker
+
+digitalker_roms.h - 
+
+m_rom (rename!)
+
+* questions:
+
+** all roms/dumps
+
+MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are extended speech roms?
+
+** control
+
+** glottal sources
+
+** vocoding
+
+** data sources/wavetables to generate
