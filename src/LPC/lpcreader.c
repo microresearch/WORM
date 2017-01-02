@@ -91,11 +91,11 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	uint8_t value;
 	uint16_t data;
 	
-	data = byte_rev[*ptrAddr]<<8;
-	//data = (*ptrAddr)<<8;
+		data = byte_rev[*ptrAddr]<<8;
+		//	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
-	      data |= byte_rev[*(ptrAddr+1)];
+	        data |= byte_rev[*(ptrAddr+1)];
 	  //  	   data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
@@ -235,7 +235,7 @@ void lpc_update_coeffs(void)
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
 			//			nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
-			nextPeriod = tmsPeriod5200[lpc_getBits(6)]; // TEST for 5110
+			nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
 			//			nextPeriod=64;

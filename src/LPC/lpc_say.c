@@ -27,6 +27,8 @@ typedef signed int int32_t;
 #include "vocab_spkspellone.h"
 #include "vocab_spkspelltwo.h"
 #include "vocab_mpf.h"
+#include "vocab_testroms.h"
+#include "vocab_2702.h"
 
 uint16_t lpc_get_sample(void);
 
@@ -133,6 +135,7 @@ pitch 6 bits=0b =25
 /* 		{   0,  0,  1,  1,  2,  3,  5,  7, \ */
 /* 			10, 15, 21, 30, 43, 61, 86, COEFF_ENERGY_SENTINEL }, */
 /*  // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c */
+
 
 
 const uint8_t tmsEnergy5100[0x10] = {0,  0,  1,  1,  2,  3,  5,  7, 10, 15, 21, 30, 43, 61, 86, 0 }; 
@@ -746,8 +749,8 @@ void main(int argc, char *argv[]){
    //   printf("rand1: %d FINAL %d", randy[1],val);
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-   lpc_say(wordlist_spell//2[uffset]+uuffset);
+   //   lpc_say(test62[uffset]+uuffset);
+   lpc_say(wordlist_spell2702[uffset]+uuffset);
    //                lpc_say(testfor5100+uffset);
 
 	// or we try c7 etc as length?
