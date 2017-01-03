@@ -234,8 +234,8 @@ void lpc_update_coeffs(void)
 			repeat = lpc_getBits(1);
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
-						nextPeriod = tmsPeriod5200[lpc_getBits(6)]; // TEST for 5110
-			//			nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
+			//						nextPeriod = tmsPeriod5200[lpc_getBits(6)]; // TEST for 5110
+						nextPeriod = tmsPeriod5110[lpc_getBits(5)]; // TEST for 5110
 			//			ptrBit =0; // TEST for ALPHONS
 			//			ptrAddr++;
 			//			nextPeriod=64;

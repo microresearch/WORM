@@ -7,6 +7,7 @@
 #include "math.h"
 #include "time.h"
 
+extern float _selx, _sely, _selz;
 
 typedef u8 UINT8;
 typedef char INT8;
@@ -16,6 +17,8 @@ typedef uint32_t UINT32;
 typedef int32_t INT32;
 
 #include "tms5110r.inc"
+
+#include "LPC/roms/vocab_2304.h"
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 extern uint8_t byte_rev[256];
@@ -556,7 +559,7 @@ int16_t process(u8 *ending)
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]+(_sely*255.0f); // TODO: very rough but makes very croaky!
 			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			for (i = 0; i < 4; i++)
 				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
@@ -774,7 +777,7 @@ void tms5200_init()
    */
 
   //  m_coeff=&T0285_2501E_coeff; // this is for 5200! //		m_coeff = &tms5220_coeff;
-   m_coeff = &T0280B_0281A_coeff; // this is for 5100!
+   m_coeff = &T0280B_0281A_coeff; // this is for 5100! // TODO - sett/swap here
 	
   //  m_coeff=tms5220_coeff;
   for(i=0;i<256;i++)
@@ -811,7 +814,10 @@ void tms5200_newsay(){
   m_talk_status = 1;
 
   //  ptrAddr = sp_parNICEe;
-  ptrAddr = sp_spk0352n9; // TODO ptr to const
+  //  ptrAddr = sp_spk0352n9; // TODO ptr to const
+  INT16 sel=_selx*132.0f;
+  ptrAddr=wordlist_spell2304[sel]; // bank TODO but test now extent
+  //  ptrAddr = sp_spk2304nn131;
   ptrBit = 0;
 
 };

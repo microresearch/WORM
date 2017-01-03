@@ -6,13 +6,42 @@
   of speak and spell, where is TRON=sp0256 (work on those when we get
   to that)
 
+-lpc_split adapted for: ./lpc_split D034 0 > roms/vocab_D034.h
+
 - LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34
 
 ** 3/1
 
-- TODO - ADC extent and vocabulary, how much better does mame code sound for say echo II speech/5200 Dxxx samples
+5100 to check/trim all:
 
-- how we can bend TMS - other excitation, X/Y/Z bendings, freeze?
+vocab_2321.h-DONE
+vocab_2322.h-DONE
+vocab_2352.h-DONE
+vocab_2350.h-DONE
+vocab_2303.h-DONE
+vocab_2304.h-DONE
+
+5200 all d000-d034 - DONE but need to check against echo_female (all
+there are in D000 and D003) 
+
+- also groupings of these vocabs TODO
+
+/////
+
+- new MAME votrax to PORT
+
+- any changes for others in MAME?
+
+- TODO - general below, ADC extent (eg. for modes, vocab) and vocabulary, how much
+  better does mame code sound for say echo II speech/5200 Dxxx samples
+
+- tested speak and spell on mame code sounds fine, some end glitch???
+
+- extent good till 128 at least
+
+- inverted ADC, do Y and speed swop - DONE!
+
+*- how we can bend TMS - other excitation-TRY with inverse filter in, X/Y/Z bendings, trigger=freeze?*
 
 * general TODO
 
@@ -22,9 +51,9 @@
 
 - basics eg. ROMS, filenamings, compost, 
 
-XYZSPEED arrangement - maybe swop so X and Y are left and right
+XYZSPEED arrangement
 
-, ADC extent,
+, ADC extent,-128 at least
 
   control models:
 
@@ -45,6 +74,7 @@ X,Y,Z and speed...
 
 * TMS ROMS
 
+classify each ROM in tms dir
 
 ** 5100-speak and spell
 
@@ -66,20 +96,17 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 ** basic modes to do with suggested extensions
 
-1. 
-2. 
-3. 
-4. 
-5. 
-6. 
-7. 
-8. 
-9. 
-10. 
-11. 
-12. 
-
-
+1. TMS
+2. SP0256
+3. digitalker
+4. SAM
+5. klatt/nvp variations
+6. LPC vocoder
+7. vocoder
+8. vosim/fof etc.
+9. compost
+10. tube/glottal/wavetable
+11. voicform?
 
 * chipsets/emulation/roms
 
@@ -91,16 +118,17 @@ rom data structure - only makes sense for TMS
 
 *** 5100//522x
 
-- rename these! tms_roms_etc.h
-in LPC:
+in LPC/roms:
 vocab_spkspell.h - 5100 all
 vocab_acorn.h -
 vocab_custom.h -
 vocab_large_male.h -
 vocab_male.h -
-vocab_talko.h -
+vocab_talko.h - checl against others
 vocab_testroms.h - inc allophones...
 vocab_ti99.h -
+
+and more...
 
 *** sp0256
 

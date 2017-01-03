@@ -28,10 +28,41 @@ typedef signed int int32_t;
 #include "roms/vocab_spkspelltwo.h"
 #include "roms/vocab_mpf.h"
 #include "roms/vocab_testroms.h"
-#include "roms/vocab_2702.h"
-#include "roms/vocab_D033.h"
-#include "roms/vocab_D032.h"
+#include "roms/vocab_2304.h"
+#include "roms/vocab_2303.h"
+#include "roms/vocab_2321.h"
+#include "roms/vocab_2322.h"
+#include "roms/vocab_2352.h"
+#include "roms/vocab_2350.h"
+
 #include "roms/vocab_D000.h"
+#include "roms/vocab_D001.h"
+#include "roms/vocab_D002.h"
+#include "roms/vocab_D003.h"
+#include "roms/vocab_D004.h"
+#include "roms/vocab_D005.h"
+#include "roms/vocab_D006.h"
+#include "roms/vocab_D007.h"
+#include "roms/vocab_D008.h"
+#include "roms/vocab_D009.h"
+#include "roms/vocab_D010.h"
+#include "roms/vocab_D011.h"
+#include "roms/vocab_D012.h"
+#include "roms/vocab_D013.h"
+#include "roms/vocab_D014.h"
+#include "roms/vocab_D015.h"
+#include "roms/vocab_D016.h"
+#include "roms/vocab_D017.h"
+#include "roms/vocab_D018.h"
+#include "roms/vocab_D019.h"
+#include "roms/vocab_D020.h"
+#include "roms/vocab_D021.h"
+#include "roms/vocab_D022.h"
+#include "roms/vocab_D023.h"
+#include "roms/vocab_D024.h"
+#include "roms/vocab_D025.h"
+#include "roms/vocab_D026.h"
+#include "roms/vocab_D027-34.h"
 
 uint16_t lpc_get_sample(void);
 
@@ -752,9 +783,14 @@ void main(int argc, char *argv[]){
    //   printf("rand1: %d FINAL %d", randy[1],val);
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+   //const uint8_t sp_ffD008nn172[]={0xCC, 0xAD, 0x41, 0x48, 0xA6, 0x6C, 0x33, 0xBB, 0x48, 0x25, 0xED, 0x72, 0xC4, 0xD, 0xA1, 0x34, 0x6B, 0x20, 0x39, 0x69, 0xD, 0xDB, 0x94, 0xA, 0x6F, 0x78, 0x19, 0x4C, 0xCF, 0xCA, 0xBC, 0x9E, 0x64, 0x10, 0x43, 0xA9, 0xF2, 0x7A, 0x92, 0x89, 0xF, 0xA2, 0x6B, 0x53, 0x9A, 0x48, 0x3D, 0xA8, 0xE6, 0x9D, 0x79, 0xCC, 0xC9, 0x64, 0x1B, 0x5F, 0x8D, 0xAB, 0xAC, 0xC7, 0x2E, 0x52, 0xF6, 0xAA, 0xB1, 0x99, 0x2A, 0xA9, 0xC1, 0x85, 0xD5, 0x56, 0xC6, 0xA0, 0xAB, 0x9C, 0x19, 0x67, 0xA9, 0x9C, 0xA9, 0x4A, 0x7A, 0x6C, 0x39, 0x32, 0xB6, 0x6A, 0xAE, 0xB5, 0xE9, 0x4A, 0xD9, 0x62, 0xBA, 0xD5, 0x94, 0x1D, 0xE5, 0xF0, 0x51, 0x6E, 0x99, 0xA9, 0xA5, 0xCB, 0x3C, 0xB1, 0x42, 0x6D, 0x2A, 0x15, 0xF1, 0xCD, 0x70, 0xD1, 0xA9, 0x54, 0x28, 0x88, 0x35, 0x48, 0xCB, 0x8A, 0x12, 0x2F, 0x79, 0x33, 0xD, 0x4F, 0xFC, };
+
+   
    //   lpc_say(test62[uffset]+uuffset);
-   lpc_say(wordlist_ffD000[uffset]+uuffset);
-   //                lpc_say(testfor5100+uffset);
+   //   lpc_say(wordlist_spell2303[uffset]+uuffset);
+   lpc_say(wordlist_ffD026[uffset]+uuffset);
+// lpc_say(sp_ffD008nn172);
 
 	// or we try c7 etc as length?
                 while(synth_running) lpc_running();

@@ -1,196 +1,213 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
     votrax.h
 
-    Simple VOTRAX SC-01 simulator based on sample fragments.
-
-****************************************************************************
-
-    Copyright Aaron Giles
-    All rights reserved.
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are
-    met:
-
-        * Redistributions of source code must retain the above copyright
-          notice, this list of conditions and the following disclaimer.
-        * Redistributions in binary form must reproduce the above copyright
-          notice, this list of conditions and the following disclaimer in
-          the documentation and/or other materials provided with the
-          distribution.
-        * Neither the name 'MAME' nor the names of its contributors may be
-          used to endorse or promote products derived from this software
-          without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
-    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
-    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
+    Votrax SC01A simulation
 
 ***************************************************************************/
 
-#pragma once
+// PROBS:
 
-#ifndef __VOTRAX_H__
-#define __VOTRAX_H__
+// bitswap - is only one TODO
 
-//#include "sound/samples.h"
+#define BIT(x,n) (((x)>>(n))&1)
 
+/*
 
+BIT:
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VOTRAX_SC01_ADD(_tag, _clock, _interface) \
-	MCFG_DEVICE_ADD(_tag, VOTRAX_SC01, _clock) \
-	votrax_sc01_device::static_set_interface(*device, _interface);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> votrax_sc01_interface
-
-/*struct votrax_sc01_interface
+template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c)
 {
-	devcb_write_line m_request_cb;      // callback for request
-};
+	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
+}
+
+#define BITSWAP8(val,B7,B6,B5,B4,B3,B2,B1,B0) \
+	((BIT(val,B7) << 7) | (BIT(val,B6) << 6) | (BIT(val,B5) << 5) | (BIT(val,B4) << 4) | \
+		(BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))
+
+
+eg.			m_rom_fc  = bitswap(val,  3, 10, 17, 24);
+
+test out as:
+	((BIT(val,3) << 3) | (BIT(val,10) << 2) | (BIT(val,17) << 1) | (BIT(val,24) << 0)
+
+we have either 4 bits or 1 or 7 so...
+
 */
 
-// ======================> votrax_sc01_device
+#define BITSWAP4(val,B3,B2,B1,B0) \
+  ((BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))
 
-//votrax_sc01_device(const machine_config &mconfig, const char *tag, device_t *owner, unsigned int clock);
+#define BITSWAP7(val,B6,B5,B4,B3,B2,B1,B0) \
+	((BIT(val,B6) << 6) | (BIT(val,B5) << 5) | (BIT(val,B4) << 4) | \
+		(BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))
 
-	// static configuration helpers
-//static void static_set_interface(device_t &device, const votrax_sc01_interface &interface);
-
-	// writers
-//DECLARE_WRITE8_MEMBER( write );
-//DECLARE_WRITE8_MEMBER( inflection_w );
-//DECLARE_READ_LINE_MEMBER( request ) { return m_request_state; }
-
-	// device-level overrides
-//const rom_entry *device_rom_region() const;
-void device_start();
-void device_reset();
-void device_clock_changed();
-//void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	// device_sound_interface overrides
-//void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-
-	// internal helpers
-void update_subphoneme_clock_period();
-static double bits_to_caps(unsigned int value, int caps_count, const double *caps_values);
-static void shift_hist(double val, double *hist_array, int hist_size);
-static void filter_s_to_z(const double *k, double fs, double *a, double *b);
-static double apply_filter(const double *x, const double *y, const double *a, const double *b);
-
-	// internal state
-//sound_stream *              m_stream;               // output stream
-//emu_timer *                 m_phoneme_timer;        // phoneme timer
-//const unsigned char *               m_rom;                  // pointer to our ROM
-
-	// inputs
-unsigned char                       m_inflection;           // 2-bit inflection value
-unsigned char                       m_phoneme;              // 6-bit phoneme value
-
-	// outputs
-//devcb_resolved_write_line   m_request_func;         // request callback
-unsigned char                       m_request_state;        // request as seen to the outside world
-unsigned char                       m_internal_request;     // request managed by stream timing
-
-	// timing circuit
-unsigned int                      m_master_clock_freq;    // frequency of the master clock
-unsigned char                       m_master_clock;         // master clock
-unsigned int                      m_counter_34;           // ripple counter @ 34
-unsigned char                       m_latch_70;             // 4-bit latch @ 70
-unsigned char                       m_latch_72;             // 4-bit latch @ 72
-unsigned char                       m_beta1;                // beta1 clock state
-unsigned char                       m_p2;                   // P2 clock state
-unsigned char                       m_p1;                   // P1 clock state
-unsigned char                       m_phi2;                 // phi2 clock state
-unsigned char                       m_phi1;                 // phi1 clock state
-unsigned char                       m_phi2_20;              // alternate phi2 clock state (20kHz)
-unsigned char                       m_phi1_20;              // alternate phi1 clock state (20kHz)
-unsigned int                      m_subphoneme_period;    // period of the subphoneme timer
-unsigned int                      m_subphoneme_count;     // number of ticks executed already
-unsigned char                       m_clock_88;             // subphoneme clock output @ 88
-unsigned char                       m_latch_42;             // D flip-flop @ 42
-unsigned char                       m_counter_84;           // 4-bit phoneme counter @ 84
-unsigned char                       m_latch_92;             // 2-bit latch @ 92
-
-// low parameter clocking
-unsigned char                       m_srff_132;             // S/R flip-flop @ 132
-unsigned char                       m_srff_114;             // S/R flip-flop @ 114
-unsigned char                       m_srff_112;             // S/R flip-flop @ 112
-unsigned char                       m_srff_142;             // S/R flip-flop @ 142
-unsigned char                       m_latch_80;             // phoneme timing latch @ 80
-
-// glottal circuit
-unsigned char                       m_counter_220;          // 4-bit counter @ 220
-unsigned char                       m_counter_222;          // 4-bit counter @ 222
-unsigned char                       m_counter_224;          // 4-bit counter @ 224
-unsigned char                       m_counter_234;          // 4-bit counter @ 234
-unsigned char                       m_counter_236;          // 4-bit counter @ 236
-unsigned char                       m_fgate;                // FGATE signal
-unsigned char                       m_glottal_sync;         // Glottal Sync signal
-
-// transition circuit
-unsigned char                       m_0625_clock;           // state of 0.625kHz clock
-unsigned char                       m_counter_46;           // 4-bit counter in block @ 46
-unsigned char                       m_latch_46;             // 4-bit latch in block @ 46
-unsigned char                       m_ram[8];               // RAM to hold parameters
-unsigned char                       m_latch_168;            // 4-bit latch @ 168
-unsigned char                       m_latch_170;            // 4-bit latch @ 170
-unsigned char                       m_f1;                   // latched 4-bit F1 value
-unsigned char                       m_f2;                   // latched 5-bit F2 value
-unsigned char                       m_fc;                   // latched 4-bit FC value
-unsigned char                       m_f3;                   // latched 4-bit F3 value
-unsigned char                       m_f2q;                  // latched 4-bit F2Q value
-unsigned char                       m_va;                   // latched 4-bit VA value
-unsigned char                       m_fa;                   // latched 4-bit FA value
-
-// noise generator circuit
-unsigned char                       m_noise_clock;          // clock input to noise generator
-unsigned int                      m_shift_252;            // shift register @ 252
-unsigned char                       m_counter_250;          // 4-bit counter @ 250
-
-// stages outputs history
-double                      m_ni_hist[4];
-double                      m_no_hist[4];
-double                      m_va_hist[4];
-double                      m_s1_hist[4];
-double                      m_s2g_hist[4];
-double                      m_s2ni_hist[4];
-double                      m_s2n_hist[4];
-double                      m_s2_hist[4];
-double                      m_s3_hist[4];
-double                      m_s4i_hist[4];
-double                      m_s4_hist[4];
-
-// static tables
-//static const char *const s_phoneme_table[64];
-//static const double s_glottal_wave[16];
+#define BITSWAP1(val,B0) \
+  ((BIT(val,B0) << 0))
 
 
+#ifndef VOTRAX_H
+#define VOTRAX_H
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+#define u8 unsigned char
+#define u16 unsigned int
+#define u32 unsigned int
+#define u64 unsigned long long 
+#define bool unsigned char
+#define true 1
+#define false 0
 
-// device type definition
-//extern const device_type VOTRAX_SC01;
+//	sound_stream *m_stream;                         // Output stream
+//	emu_timer *m_timer;                             // General timer
+//	required_memory_region m_rom;                   // Internal ROM
+	u32 m_mainclock;                                // Current main clock
+	double m_sclock;                                // Stream sample clock (40KHz, main/18)
+	double m_cclock;                                // 20KHz capacitor switching clock (main/36)
+	u32 m_sample_count;                             // Sample counter, to cadence chip updates
+
+	// Inputs
+	u8 m_inflection;                                // 2-bit inflection value
+	u8 m_phone;                                     // 6-bit phone value
+
+	// Outputs
+//	devcb_write_line m_ar_cb;                       // Callback for ar
+	bool m_ar_state;                                // Current ar state
+
+	// "Unpacked" current rom values
+	u8 m_rom_duration;                              // Duration in 5KHz units (main/144) of one tick, 16 ticks per phone, 7 bits
+	u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+	u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+	u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits each
+	bool m_rom_closure;                             // Closure bit, true = silence at cld
+	bool m_rom_pause;                               // Pause bit
+
+	// Current interpolated values (8 bits each)
+	u8 m_cur_fa, m_cur_fc, m_cur_va;
+	u8 m_cur_f1, m_cur_f2, m_cur_f2q, m_cur_f3;
+
+	// Current committed values
+	u8 m_filt_fa, m_filt_fc, m_filt_va;             // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+	u8 m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3; // Analog parameters, formant frequencies/Q on 4 bits except f2 on 5 bits
+
+	// Internal counters
+	u16 m_phonetick;                                // 9-bits phone tick duration counter
+	u8  m_ticks;                                    // 5-bits tick counter
+	u8  m_pitch;                                    // 7-bits pitch counter
+	u8  m_closure;                                  // 5-bits glottal closure counter
+	u8  m_update_counter;                           // 6-bits counter for the 625Hz (main/1152) and 208Hz (main/3456) update timing generators
+
+	// Internal state
+	bool m_cur_closure;                             // Current internal closure state
+	u16 m_noise;                                    // 15-bit noise shift register
+	bool m_cur_noise;                               // Current noise output
+
+	// Filter coefficients and level histories
+	double m_voice_1[4];
+	double m_voice_2[4];
+	double m_voice_3[4];
+
+	double m_noise_1[3];
+	double m_noise_2[3];
+	double m_noise_3[2];
+	double m_noise_4[2];
+
+	double m_vn_1[4];
+	double m_vn_2[4];
+	double m_vn_3[4];
+	double m_vn_4[4];
+	double m_vn_5[2];
+	double m_vn_6[2];
+
+	double m_f1_a[4],  m_f1_b[4];                   // F1 filtering
+	double m_f2v_a[4], m_f2v_b[4];                  // F2 voice filtering
+	double m_f2n_a[2], m_f2n_b[2];                  // F2 noise filtering
+	double m_f3_a[4],  m_f3_b[4];                   // F3 filtering
+	double m_f4_a[4],  m_f4_b[4];                   // F4 filtering
+	double m_fx_a[1],  m_fx_b[2];                   // Final filtering
+	double m_fn_a[3],  m_fn_b[3];                   // Noise shaping
+
+	// Compute a total capacitor value based on which bits are currently active
+static double bits_to_caps(u32 value, u32 *caps_values, int howm) {
+		double total = 0;
+		double d;
+		int i;
+		/*		for(double d : caps_values) { // what is this doing?
+			if(value & 1)
+				total += d;
+			value >>= 1;
+			}*/
+		for (i=0;i<howm;i++){
+		  d=caps_values[i];
+		  if(value & 1)
+		    total += d;
+		  value >>= 1;
+			}
+		return total;
+	}
+
+	// Shift a history of values by one and insert the new value at the front
+static void shift_hist(double val, double *hist_array, int N) {
+		for(u32 i=N-1; i>0; i--)
+			hist_array[i] = hist_array[i-1];
+		hist_array[0] = val;
+	}
 
 
-#endif /* __VOTRAX_H__ */
+
+	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
+static double apply_filter(const double *x, const double *y, const double *a, const double *b, int Na, int Nb) {
+		double total = 0;
+		for(u32 i=0; i<Na; i++)
+			total += x[i] * a[i];
+		for(u32 i=1; i<Nb; i++)
+			total -= y[i-1] * b[i];
+		return total / b[0];
+	}
+
+/*older
+
+double apply_filter(const double *x, const double *y, const double *a, const double *b)
+{
+  	return (x[0]*a[0] + x[1]*a[1] + x[2]*a[2] + x[3]*a[3] - y[0]*b[1] - y[1]*b[2] - y[2]*b[3]) / b[0];
+}
+*/
+
+	void build_standard_filter(double *a, double *b,
+							   double c1t, // Unswitched cap, input, top
+							   double c1b, // Switched cap, input, bottom
+							   double c2t, // Unswitched cap, over first amp-op, top
+							   double c2b, // Switched cap, over first amp-op, bottom
+							   double c3,  // Cap between the two op-amps
+							   double c4); // Cap over second op-amp
+
+	void build_noise_shaper_filter(double *a, double *b,
+								   double c1,  // Cap over first amp-op
+								   double c2t, // Unswitched cap between amp-ops, input, top
+								   double c2b, // Switched cap between amp-ops, input, bottom
+								   double c3,  // Cap over second amp-op
+								   double c4); // Switched cap after second amp-op
+
+	void build_lowpass_filter(double *a, double *b,
+							  double c1t,  // Unswitched cap, over amp-op, top
+							  double c1b); // Switched cap, over amp-op, bottom
+
+	void build_injection_filter(double *a, double *b,
+								double c1b, // Switched cap, input, bottom
+								double c2t, // Unswitched cap, over first amp-op, top
+								double c2b, // Switched cap, over first amp-op, bottom
+								double c3,  // Cap between the two op-amps
+								double c4); // Cap over second op-amp
+
+	static void interpolate(u8 reg, u8 target);    // Do one interpolation step
+	void chip_update();                             // Global update called at 20KHz (main/36)
+	void filters_commit(bool force);                // Commit the currently computed interpolation values to the filters
+	void phone_commit();                            // Commit the current phone id
+	u32 analog_calc();                  // Compute one more sample
+
+
+
+
+
+#endif /* VOTRAX_H */
