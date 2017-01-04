@@ -129,10 +129,10 @@ we have either 4 bits or 1 or 7 so...
 	float m_fn_a[3],  m_fn_b[3];                   // Noise shaping
 
 	// Compute a total capacitor value based on which bits are currently active
-static float bits_to_caps(u32 value, u32 *caps_values, int howm) {
-		float total = 0;
+static float bits_to_caps(u32 value, u32 *caps_values, u8 howm) {
+		float total = 0.0f;
 		float d;
-		int i;
+		u8 i;
 		/*		for(float d : caps_values) { // what is this doing?
 			if(value & 1)
 				total += d;
@@ -148,8 +148,8 @@ static float bits_to_caps(u32 value, u32 *caps_values, int howm) {
 	}
 
 	// Shift a history of values by one and insert the new value at the front
-static void shift_hist(float val, float *hist_array, int N) {
-  for(u32 i=N-1; i>0; i--)
+static void shift_hist(float val, float *hist_array, u8 N) {
+  for(u8 i=N-1; i>0; i--)
   			hist_array[i] = hist_array[i-1];
   		hist_array[0] = val;
 	}
@@ -157,11 +157,11 @@ static void shift_hist(float val, float *hist_array, int N) {
 
 
 	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
-static float apply_filter(const float *x, const float *y, const float *a, const float *b, int Na, int Nb) {
+static float apply_filter(const float *x, const float *y, const float *a, const float *b, u8 Na, u8 Nb) {
 		float total = 0;
-		for(u32 i=0; i<Na; i++)
+		for(u8 i=0; i<Na; i++)
 			total += x[i] * a[i];
-		for(u32 i=1; i<Nb; i++)
+		for(u8 i=1; i<Nb; i++)
 			total -= y[i-1] * b[i];
 		return total / b[0];
 	}

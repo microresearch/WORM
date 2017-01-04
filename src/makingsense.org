@@ -42,12 +42,21 @@ there are in D000 and D003)
 
 *- how we can bend TMS - other excitation-TRY with inverse filter in, X/Y/Z bendings, trigger=freeze?*
 
-** 4/1
+** 4/1+
 
-- proof of concept votrax working -. new mode... TODO: ARM port, vocabs, TTS, bends
+- proof of concept votrax working -. new mode... TODO: ARM port, vocabs, TTS- see also deladriere code
+
+// wow.c, gorf.c (where else? gottlieb) - convert to arrays and check against roms for each
+
+, bends
 
 - any changes for others in MAME? CHECK!
 
+- grouping of TMS vocabs and clear chipsets marked for arm mam code
+
+- bends of TMS
+
+- inversion of any ADC?
 
 * general TODO
 
