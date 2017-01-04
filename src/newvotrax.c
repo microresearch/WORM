@@ -7,7 +7,12 @@
     Votrax SC01A simulation
 
 ***************************************************************************/
-// TODO: re-work - how to deal with timers?, test, test without doubles, test on ARM
+// TODO: re-work - how to deal with timers?, test, test without floatsDONE, test on ARM
+
+// seems to work but question of timings, also vocabs for the phonemes from:
+// wow.c, gorf.c (where else? gottlieb) - convert to arrays and check against roms for each
+
+// float ok - sqrtf etc... seems to work but make sure all floats for ARM
 
 /*
   tp3 stb i1 i2 tp2
@@ -41,13 +46,18 @@ tp1 = phi clock (tied to f2q rom access)
 ROM_END
 */
 
-// how we can do 64 bits little endian for below and we need sc01a.bin??
+FILE* fo;
+
 
 //this is from sc01a.bin:
 
 const unsigned char m_rom[512]={0xA4, 0x50, 0xA0, 0xF0, 0xE0, 0x0, 0x0, 0x3, 0xA4, 0x50, 0xA0, 0x0, 0x23, 0xA, 0x0, 0x3E, 0xA4, 0x58, 0xA0, 0x30, 0xF0, 0x0, 0x0, 0x3F, 0xA3, 0x80, 0x69, 0xB0, 0xC1, 0xC, 0x0, 0x3D, 0x26, 0xD3, 0x49, 0x90, 0xA1, 0x9, 0x0, 0x3C, 0x27, 0x81, 0x68, 0x94, 0x21, 0xA, 0x0, 0x3B, 0x82, 0xC3, 0x48, 0x24, 0xA1, 0x8, 0x0, 0x3A, 0xA4, 0x0, 0x38, 0x18, 0x68, 0x1, 0x0, 0x39, 0x20, 0x52, 0xE1, 0x88, 0x63, 0xA, 0x0, 0x38, 0x22, 0xC1, 0xE8, 0x90, 0x61, 0x4, 0x0, 0x37, 0xA2, 0x83, 0x60, 0x10, 0x66, 0x3, 0x0, 0x36, 0xA2, 0xC1, 0xE8, 0x80, 0xA1, 0x9, 0x0, 0x35, 0xA2, 0xC1, 0xE8, 0x34, 0x61, 0xA, 0x0, 0x34, 0xA3, 0x81, 0x89, 0xB4, 0x21, 0xA, 0x0, 0x33, 0xA3, 0x81, 0x89, 0xE4, 0xA1, 0x7, 0x0, 0x32, 0xA3, 0x81, 0x89, 0x54, 0x63, 0x1, 0x0, 0x31, 0xA3, 0x80, 0x69, 0x60, 0x61, 0x4, 0x0, 0x30, 0xA7, 0x80, 0xE8, 0x74, 0xA0, 0x7, 0x0, 0x2F, 0xA7, 0x80, 0xE8, 0x74, 0x20, 0xA, 0x0, 0x2E, 0x22, 0xC1, 0x60, 0x14, 0x66, 0xA, 0x0, 0x2D, 0x26, 0xD3, 0x49, 0x70, 0x20, 0xA, 0x0, 0x2C, 0x82, 0x43, 0x8, 0x54, 0x63, 0x4, 0x0, 0x2B, 0xE0, 0x32, 0x11, 0xE8, 0x72, 0x1, 0x0, 0x2A, 0x26, 0x53, 0x1, 0x64, 0xA1, 0x7, 0x0, 0x29, 0x22, 0xC1, 0xE8, 0x80, 0x21, 0xA, 0x0, 0x28, 0xA6, 0x91, 0x61, 0x80, 0x21, 0xA, 0x0, 0x27, 0xA2, 0xC1, 0xE8, 0x84, 0x21, 0xA, 0x0, 0x26, 0xA8, 0x24, 0x13, 0x63, 0xB2, 0x7, 0x0, 0x25, 0xA3, 0x40, 0xE9, 0x84, 0xC1, 0xC, 0x0, 0x24, 0xA3, 0x81, 0x89, 0x54, 0xE3, 0x0, 0x0, 0x23, 0x26, 0x12, 0xA0, 0x64, 0x61, 0xA, 0x0, 0x22, 0x26, 0xD3, 0x69, 0x70, 0x61, 0x5, 0x0, 0x21, 0xA6, 0xC1, 0xC9, 0x84, 0x21, 0xA, 0x0, 0x20, 0xE0, 0x32, 0x91, 0x48, 0x68, 0x4, 0x0, 0x1F, 0x26, 0x91, 0xE8, 0x0, 0x7C, 0xB, 0x0, 0x1E, 0xA8, 0x2C, 0x83, 0x65, 0xA2, 0x7, 0x0, 0x1D, 0x26, 0xC1, 0x41, 0xE0, 0x73, 0x1, 0x0, 0x1C, 0xAC, 0x4, 0x22, 0xFD, 0x62, 0x1, 0x0, 0x1B, 0x2C, 0x34, 0x7B, 0xDB, 0xE8, 0x0, 0x0, 0x1A, 0x2C, 0x64, 0x23, 0x11, 0x72, 0xA, 0x0, 0x19, 0xA2, 0xD0, 0x9, 0xF4, 0xA1, 0x7, 0x0, 0x18, 0x23, 0x81, 0x49, 0x20, 0x21, 0xA, 0x0, 0x17, 0x23, 0x81, 0x49, 0x30, 0xA1, 0x7, 0x0, 0x16, 0xA3, 0x40, 0xE9, 0x84, 0xA1, 0x8, 0x0, 0x15, 0x36, 0x4B, 0x8, 0xD4, 0xA0, 0x9, 0x0, 0x14, 0xA3, 0x80, 0x69, 0x70, 0xA0, 0x8, 0x0, 0x13, 0x60, 0x58, 0xD1, 0x9C, 0x63, 0x1, 0x0, 0x12, 0x6C, 0x54, 0x8B, 0xFB, 0xA2, 0x9, 0x0, 0x11, 0x6C, 0x54, 0x8B, 0xFB, 0x63, 0x1, 0x0, 0x10, 0x28, 0x64, 0xD3, 0xF7, 0x63, 0x1, 0x0, 0xF, 0x22, 0x91, 0xE1, 0x90, 0x73, 0x1, 0x0, 0xE, 0x36, 0x19, 0x24, 0xE6, 0x61, 0xA, 0x0, 0xD, 0x32, 0x88, 0xA5, 0x66, 0xA3, 0x7, 0x0, 0xC, 0xA6, 0x91, 0x61, 0x90, 0xA1, 0x9, 0x0, 0xB, 0xA6, 0x91, 0x61, 0x90, 0x61, 0xA, 0x0, 0xA, 0xA6, 0x91, 0x61, 0x80, 0x61, 0xB, 0x0, 0x9, 0xA3, 0x40, 0xE9, 0xC4, 0x61, 0x1, 0x0, 0x8, 0x6C, 0x54, 0xCB, 0xF3, 0x63, 0x4, 0x0, 0x7, 0xA6, 0xC1, 0xC9, 0x34, 0xA1, 0x7, 0x0, 0x6, 0xA6, 0xC1, 0xC9, 0x64, 0x61, 0x1, 0x0, 0x5, 0xE8, 0x16, 0x3, 0x61, 0xFB, 0x0, 0x0, 0x4, 0x27, 0x81, 0x68, 0xC4, 0xA1, 0x9, 0x0, 0x2, 0x27, 0x81, 0x68, 0xD4, 0x61, 0x1, 0x0, 0x1, 0x27, 0x81, 0x68, 0x74, 0x61, 0x3, 0x0, 0x0};
 
 //const unsigned char m_rom[512]={144, 128, 0, 176, 8, 254, 0, 108, 144, 128, 0, 176, 4, 254, 0, 104, 144, 128, 0, 176, 4, 246, 0, 89, 64, 96, 240, 200, 11, 6, 136, 112, 96, 176, 0, 176, 8, 246, 0, 104, 96, 176, 0, 176, 8, 250, 0, 94, 32, 176, 240, 224, 30, 30, 128, 98, 240, 48, 0, 176, 4, 150, 0, 104, 80, 160, 0, 192, 4, 242, 0, 109, 80, 160, 0, 192, 4, 250, 0, 101, 80, 160, 0, 192, 4, 250, 0, 89, 16, 48, 0, 144, 250, 166, 0, 94, 16, 128, 0, 208, 252, 198, 0, 101, 16, 48, 0, 200, 6, 250, 0, 104, 32, 48, 240, 144, 30, 30, 96, 104, 32, 176, 240, 224, 30, 14, 144, 104, 32, 176, 240, 224, 30, 12, 144, 89, 32, 48, 0, 208, 70, 26, 176, 104, 208, 32, 0, 160, 8, 188, 0, 81, 32, 192, 0, 176, 196, 204, 0, 89, 240, 48, 0, 176, 4, 146, 0, 81, 128, 32, 0, 160, 8, 250, 0, 94, 128, 32, 0, 160, 8, 242, 0, 69, 96, 32, 0, 240, 12, 174, 0, 94, 48, 160, 240, 136, 2, 8, 64, 101, 16, 160, 240, 224, 21, 28, 112, 112, 80, 128, 240, 144, 14, 12, 16, 104, 32, 160, 0, 136, 14, 246, 0, 104, 64, 48, 240, 144, 74, 4, 64, 94, 16, 144, 0, 232, 1, 241, 0, 109, 64, 112, 0, 192, 1, 4, 240, 98, 96, 176, 0, 176, 4, 242, 0, 69, 48, 224, 0, 224, 8, 254, 0, 106, 16, 208, 0, 208, 8, 134, 0, 101, 192, 48, 0, 176, 2, 238, 0, 112, 240, 48, 0, 176, 4, 146, 0, 51, 64, 32, 240, 136, 26, 4, 96, 94, 112, 16, 0, 176, 4, 242, 0, 69, 80, 160, 0, 192, 4, 242, 0, 69, 48, 16, 0, 160, 4, 242, 0, 69, 32, 224, 0, 208, 8, 198, 0, 94, 64, 96, 0, 200, 14, 4, 240, 104, 96, 64, 0, 48, 2, 206, 0, 98, 32, 224, 0, 224, 8, 252, 0, 69, 48, 0, 0, 144, 2, 249, 0, 101, 208, 144, 0, 176, 8, 188, 0, 69, 208, 144, 0, 176, 8, 188, 0, 94, 208, 32, 0, 160, 8, 182, 0, 98, 192, 48, 0, 176, 2, 238, 0, 104, 192, 48, 0, 176, 12, 230, 0, 94, 192, 48, 0, 176, 12, 234, 0, 69, 112, 16, 0, 176, 8, 250, 0, 101, 112, 16, 0, 160, 4, 242, 0, 89, 80, 64, 0, 128, 2, 249, 0, 108, 48, 16, 0, 160, 4, 250, 0, 98, 48, 112, 0, 192, 6, 18, 16, 101, 80, 128, 0, 160, 1, 8, 48, 104, 96, 64, 0, 48, 8, 242, 0, 81, 144, 128, 0, 176, 4, 250, 0, 69, 32, 224, 0, 224, 4, 250, 0, 89, 208, 32, 0, 160, 12, 186, 0, 51, 112, 144, 0, 200, 72, 8, 0, 112, 112, 144, 0, 192, 2, 2, 8, 69, 112, 144, 0, 192, 12, 12, 0, 112};
+
+const unsigned char welcome[6] = {45, 2, 24, 25, 50,12};
+
+const unsigned char allwow[45]={0x2D ,0x15 ,0x0 ,0x9 ,0x18 ,0x22 ,0x76 ,0x68 ,0x1E ,0x3C ,0xF ,0x2 ,0x18 ,0x23 ,0x25 ,0x2A ,0x1F ,0x15 ,0x9 ,0x21 ,0x3B ,0xD ,0x1F ,0x3E ,0x2D ,0x3C ,0x29 ,0x1E ,0x3C ,0xF ,0x2 ,0x18 ,0x23 ,0x25 ,0x2A ,0xC ,0x2F ,0x0 ,0x1E ,0x1A ,0xB ,0x19 ,0x3E ,0xFF};
 
 // textual phone names for debugging
 const char *const s_phone_table[64] =
@@ -76,7 +86,7 @@ const char *const s_phone_table[64] =
 // the top at 1.  The final wave is very similar to the patent
 // drawing.
 
-const double s_glottal_wave[9] =
+const float s_glottal_wave[9] =
 {
 	0,
 	-4/7.0,
@@ -154,7 +164,14 @@ void generate_samples(int samples)
 		m_sample_count++;
 		if(m_sample_count & 1)
 			chip_update();
-		printf("%d\n",analog_calc());
+		printf("%c",analog_calc()>>8);
+		unsigned int s16 = analog_calc();
+
+		unsigned char c = (unsigned)s16 & 255;
+		fwrite(&c, 1, 1, fo);
+		c = ((unsigned)s16 / 256) & 255;
+		fwrite(&c, 1, 1, fo);
+
 	}
 }
 
@@ -237,8 +254,6 @@ void device_reset()
 	memset(m_vn_6, 0, sizeof(m_vn_6));
 }
 
-// bitswap and cast?
-
 void phone_commit()
 {
 	// Only these two counters are reset on phone change, the rest is
@@ -248,11 +263,11 @@ void phone_commit()
 
 	// In the real chip, the rom is re-read all the time.  Since it's
 	// internal and immutable, no point in not caching it though.
-	for(int i=0; i<512; i+=8) {// added +8
+	for(int i=0; i<512; i+=8) {// added +8 seems to work
 	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
-	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
 			
 	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
+	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
 			m_rom_f1  = BITSWAP4(val,  0,  7, 14, 21);
 			m_rom_va  = BITSWAP4(val,  1,  8, 15, 22);
 			m_rom_f2  = BITSWAP4(val,  2,  9, 16, 23);
@@ -264,7 +279,6 @@ void phone_commit()
 			// compared to everything else due to a bug in the
 			// prototype (miswiring of the comparator with the ticks
 			// count) they compensated in the rom.
-			printf("romf1xxxxxxxxxx %d\n",m_rom_f1);
 
 			m_rom_cld = BITSWAP4(val, 34, 32, 30, 28);
 			m_rom_vd  = BITSWAP4(val, 35, 33, 31, 29);
@@ -272,6 +286,7 @@ void phone_commit()
 			m_rom_closure  = BITSWAP1(val, 36);
 			m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
 
+			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
 			// Hard-wired on the die, not an actual part of the rom.
 			m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
 
@@ -288,11 +303,12 @@ void phone_commit()
 	}
 }
 
-void interpolate(u8 reg, u8 target)
+u8 interpolate(u8 reg, u8 target) // does nothing as it was
 {
 	// One step of interpolation, adds one eight of the distance
 	// between the current value and the target.
 	reg = reg - (reg >> 3) + (target << 1);
+	return reg;
 }
 
 void chip_update()
@@ -301,16 +317,18 @@ void chip_update()
 	// Technically the counter keeps updating, but the comparator is
 	// disabled.
 	if(m_ticks != 0x10) {
-		m_phonetick++;
+	  //	  printf("MTICKS: %d %d %d\n",m_ticks, m_phonetick, m_rom_cld);
+
+	  m_phonetick++;
 		// Comparator is with duration << 2, but there's a one-tick
 		// delay in the path.
-		if(m_phonetick == ((m_rom_duration << 2) | 1)) {
+	  if(m_phonetick == ((m_rom_duration << 2) | 1)) {
 			m_phonetick = 0;
 			m_ticks++;
 			if(m_ticks == m_rom_cld)
 				m_cur_closure = m_rom_closure;
+				}
 		}
-	}
 
 	// The two update timing counters.  One divides by 16, the other
 	// by 48, and they're phased so that the 208Hz counter ticks
@@ -327,21 +345,24 @@ void chip_update()
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		//      interpolate(m_cur_va,  m_rom_va);
-		interpolate(m_cur_fc,  m_rom_fc);
-		interpolate(m_cur_f1,  m_rom_f1);
-		interpolate(m_cur_f2,  m_rom_f2);
-		interpolate(m_cur_f2q, m_rom_f2q);
-		interpolate(m_cur_f3,  m_rom_f3);
+		m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
+		m_cur_f1=interpolate(m_cur_f1,  m_rom_f1);
+		m_cur_f2=interpolate(m_cur_f2,  m_rom_f2);
+		m_cur_f2q=interpolate(m_cur_f2q, m_rom_f2q);
+		m_cur_f3=interpolate(m_cur_f3,  m_rom_f3);
 		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
 	}
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
 	if(tick_625) {
 		if(m_ticks >= m_rom_vd)
-			interpolate(m_cur_fa, m_rom_fa);
-		if(m_ticks >= m_rom_cld)
+			m_cur_fa=interpolate(m_cur_fa, m_rom_fa);
+		if(m_ticks >= m_rom_cld){
 			//          interpolate(m_cur_fc, m_rom_fc);
-			interpolate(m_cur_va, m_rom_va);
+				  
+		  m_cur_va=interpolate(m_cur_va, m_rom_va);
+		  //		  printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx %d %d\n",m_cur_va, m_rom_va); // NEVER!
+		}
 		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
 	}
 
@@ -365,9 +386,10 @@ void chip_update()
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
-	if((m_pitch >> 2) == 1)
+	if((m_pitch >> 2) == 1){
+	  //	  printf("update");
 		filters_commit(false);
-
+	}
 	// Noise shift register.  15 bits, with a nxor on the last two
 	// bits for the loop.
 	bool inp = (1||m_filt_fa) && m_cur_noise && (m_noise != 0x7fff);
@@ -383,7 +405,7 @@ void filters_commit(bool force)
   u32 capsf2q[4]={ 1390, 2965, 5875, 11297 };
   u32 capsf2[5]={ 833, 1663, 3164, 6327, 12654 };
   u32 capsf3[4]={ 2226, 4485, 9056, 18111 };
-  
+  //  printf("commit %d\n",m_cur_va);  
 	m_filt_fa = m_cur_fa >> 4;
 	m_filt_fc = m_cur_fc >> 4;
 	m_filt_va = m_cur_va >> 4;
@@ -407,14 +429,14 @@ void filters_commit(bool force)
 		build_standard_filter(m_f2v_a, m_f2v_b,
 							  24840,
 							  29154,
-				      829 + bits_to_caps(m_filt_f2q, capsf2q,5),
+				      829 + bits_to_caps(m_filt_f2q, capsf2q,4),
 							  38180,
 				      2352+ bits_to_caps(m_filt_f2, capsf2,5),
 							  34270);
 
 		build_injection_filter(m_f2n_a, m_f2n_b,
 							   29154,
-				       829+ bits_to_caps(m_filt_f2q, capsf2q,5),
+				       829+ bits_to_caps(m_filt_f2q, capsf2q,4),
 							   38180,
 				       2352+ bits_to_caps(m_filt_f2, capsf2,5),
 							   34270);
@@ -462,12 +484,15 @@ u32 analog_calc()
 {
 	// Voice-only path.
 	// 1. Pick up the pitch wave
+  //  printf("rom_durcalcxxxxxxxxxx %d\n",m_rom_duration);
 
-	double v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
+	float v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
+	//	printf("vvvvvv%f\n",v);
 
 	// 2. Multiply by the initial amplifier.  It's linear on the die,
 	// even if it's not in the patent.
 	v = v * m_filt_va / 15.0;
+	//	printf("vvvvvv%f %f\n",v, m_filt_va);
 	shift_hist(v, m_voice_1, 4);
 
 	// 3. Apply the f1 filter
@@ -481,7 +506,7 @@ u32 analog_calc()
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
 	// intensity should be checked w.r.t the voice.
-	double n = 1e4 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	float n = 1e4 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
 	n = n * m_filt_fa / 15.0;
 	shift_hist(n, m_noise_1, 3);
 
@@ -490,7 +515,7 @@ u32 analog_calc()
 	shift_hist(n, m_noise_2, 3);
 
 	// 7. Scale with the f2 noise input
-	double n2 = n * m_filt_fc / 15.0;
+	float n2 = n * m_filt_fc / 15.0;
 	shift_hist(n2, m_noise_3, 2);
 
 	// 8. Apply the f2 filter, noise half,
@@ -499,7 +524,7 @@ u32 analog_calc()
 
 	// Mixed path
 	// 9. Add the f2 voice and f2 noise outputs
-	double vn = v + n2;
+	float vn = v + n2;
 	shift_hist(vn, m_vn_1, 4);
 
 	// 10. Apply the f3 filter
@@ -519,10 +544,11 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_5, 2);
 
 	// 13. Apply the final fixed filter
-	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b,1,2);
+	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b,1,2); // fx_a is array of 1
 	shift_hist(vn, m_vn_6, 2);
-	printf("%d\n",vn);
-	return vn*50000;
+	//	printf("%d\n",vn);
+	//	return vn*50000;
+	return vn*50000.0;
 }
 
 /*
@@ -708,32 +734,32 @@ u32 analog_calc()
 
 */
 
-void build_standard_filter(double *a, double *b,
-			   double c1t, // Unswitched cap, input, top
-			   double c1b, // Switched cap, input, bottom
-			   double c2t, // Unswitched cap, over first amp-op, top
-			   double c2b, // Switched cap, over first amp-op, bottom
-			   double c3,  // Cap between the two op-amps
-			   double c4)  // Cap over second op-amp
+void build_standard_filter(float *a, float *b,
+			   float c1t, // Unswitched cap, input, top
+			   float c1b, // Switched cap, input, bottom
+			   float c2t, // Unswitched cap, over first amp-op, top
+			   float c2b, // Switched cap, over first amp-op, bottom
+			   float c3,  // Cap between the two op-amps
+			   float c4)  // Cap over second op-amp
 {
 	// First compute the three coefficients of H(s).  One can note
 	// that there is as many capacitor values on both sides of the
 	// division, which confirms that the capacity-per-surface-area
 	// is not needed.
-	double k0 = c1t / (m_cclock * c1b);
-	double k1 = c4 * c2t / (m_cclock * c1b * c3);
-	double k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
+	float k0 = c1t / (m_cclock * c1b);
+	float k1 = c4 * c2t / (m_cclock * c1b * c3);
+	float k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(fabs(k0*k1 - k2))/(2*M_PI*k2);
+	float fpeak = sqrtf(fabsf(k0*k1 - k2))/(2*M_PI*k2);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	float zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	double m0 = zc*k0;
-	double m1 = zc*k1;
-	double m2 = zc*zc*k2;
+	float m0 = zc*k0;
+	float m1 = zc*k1;
+	float m2 = zc*zc*k2;
 
 	a[0] = 1+m0;
 	a[1] = 3+m0;
@@ -763,21 +789,21 @@ void build_standard_filter(double *a, double *b,
   H(s) = Vo/Vi = (R1/R0) * (1 / (1 + s.R1.C1))
 */
 
-void build_lowpass_filter(double *a, double *b,
-											  double c1t, // Unswitched cap, over amp-op, top
-											  double c1b) // Switched cap, over amp-op, bottom
+void build_lowpass_filter(float *a, float *b,
+											  float c1t, // Unswitched cap, over amp-op, top
+											  float c1b) // Switched cap, over amp-op, bottom
 {
 	// Compute the only coefficient we care about
-	double k = c1b / (m_cclock * c1t);
+	float k = c1b / (m_cclock * c1t);
 
 	// Compute the filter cutoff frequency
-	double fpeak = 1/(2*M_PI*k);
+	float fpeak = 1/(2*M_PI*k);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	float zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	double m = zc*k;
+	float m = zc*k;
 
 	a[0] = 1;
 	b[0] = 1+m;
@@ -813,28 +839,28 @@ void build_lowpass_filter(double *a, double *b,
   We assume r0 = r2
 */
 
-void build_noise_shaper_filter(double *a, double *b,
-												   double c1,  // Cap over first amp-op
-												   double c2t, // Unswitched cap between amp-ops, input, top
-												   double c2b, // Switched cap between amp-ops, input, bottom
-												   double c3,  // Cap over second amp-op
-												   double c4)  // Switched cap after second amp-op
+void build_noise_shaper_filter(float *a, float *b,
+												   float c1,  // Cap over first amp-op
+												   float c2t, // Unswitched cap between amp-ops, input, top
+												   float c2b, // Switched cap between amp-ops, input, bottom
+												   float c3,  // Cap over second amp-op
+												   float c4)  // Switched cap after second amp-op
 {
 	// Coefficients of H(s) = k1*s / (1 + k2*s + k3*s^2)
-	double k0 = c2t*c3*c2b/c4;
-	double k1 = c2t*(m_cclock * c2b);
-	double k2 = c1*c2t*c3/(m_cclock * c4);
+	float k0 = c2t*c3*c2b/c4;
+	float k1 = c2t*(m_cclock * c2b);
+	float k2 = c1*c2t*c3/(m_cclock * c4);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(1/k2)/(2*M_PI);
+	float fpeak = sqrt(1/k2)/(2*M_PI);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	float zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	double m0 = zc*k0;
-	double m1 = zc*k1;
-	double m2 = zc*zc*k2;
+	float m0 = zc*k0;
+	float m1 = zc*k1;
+	float m2 = zc*zc*k2;
 
 	a[0] = m0;
 	a[1] = 0;
@@ -867,23 +893,23 @@ void build_noise_shaper_filter(double *a, double *b,
   that H(infinity)=1.
 */
 
-void build_injection_filter(double *a, double *b,
-												double c1b, // Switched cap, input, bottom
-												double c2t, // Unswitched cap, over first amp-op, top
-												double c2b, // Switched cap, over first amp-op, bottom
-												double c3,  // Cap between the two op-amps
-												double c4)  // Cap over second op-amp
+void build_injection_filter(float *a, float *b,
+												float c1b, // Switched cap, input, bottom
+												float c2t, // Unswitched cap, over first amp-op, top
+												float c2b, // Switched cap, over first amp-op, bottom
+												float c3,  // Cap between the two op-amps
+												float c4)  // Cap over second op-amp
 {
 	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
-	double k0 = m_cclock * c2t;
-	double k1 = m_cclock * (c1b * c3 / c2t - c2t);
-	double k2 = c2b;
+	float k0 = m_cclock * c2t;
+	float k1 = m_cclock * (c1b * c3 / c2t - c2t);
+	float k2 = c2b;
 
 	// Don't pre-warp
-	double zc = 2*m_sclock;
+	float zc = 2*m_sclock;
 
 	// Finally compute the result of the z-transform
-	double m = zc*k2;
+	float m = zc*k2;
 
 	a[0] = k0 + m;
 	a[1] = k0 - m;
@@ -897,13 +923,46 @@ void build_injection_filter(double *a, double *b,
 	b[1] = 0;
 }
 
+const int PhonemeLengths[65] =
+{
+59, 71, 121, 47, 47, 71, 103, 90,
+71, 55, 80, 121, 103, 80, 71, 71,
+71, 121, 71, 146, 121, 146, 103, 185,
+103, 80, 47, 71, 71, 103, 55, 90,
+185, 65, 80, 47, 250, 103, 185, 185,
+185, 103, 71, 90, 185, 80, 185, 103,
+90, 71, 103, 185, 80, 121, 59, 90,
+80, 71, 146, 185, 121, 250, 185, 47,
+0
+};
+
+
 void main(void){
 
+  fo = fopen("testnewvotrax.pcm", "wb");
+  int x;
+  
   // set up
   device_start();
   device_reset();
   
   // try and say
-  writer(1);
-  generate_samples(16);
+  for (x=0;x<44;x++){
+    //    writer(welcome[x]);
+    writer(allwow[x]);
+    phone_commit();
+//	m_votrax->inflection_w(space, 0, data >> 6);
+    inflection_w(allwow[x]>>6);
+    // how to get duration:
+  //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
+
+    ///    int lenny=PhonemeLengths[welcome[x]]*100;
+    //    int lenny=m_rom_duration*144;
+    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+// this is not precise - say 1200 above = 16*41*4*9+2=24000 odd
+    // sample rate? say 24000 as about right?
+  generate_samples(lenny);
+  }
+  //  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d\n",m_rom_duration);
+
 }

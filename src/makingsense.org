@@ -24,13 +24,12 @@ vocab_2304.h-DONE
 5200 all d000-d034 - DONE but need to check against echo_female (all
 there are in D000 and D003) 
 
-- also groupings of these vocabs TODO
+- also groupings of these vocabs TODO - for example numbers, letters, allophones etc... so that banks make sense
 
 /////
 
-- new MAME votrax to PORT
-
-- any changes for others in MAME?
+- new MAME votrax to PORT: started but filter issue...cur_va DONE -
+  seems to work but timing is not so solid and we need vocab data
 
 - TODO - general below, ADC extent (eg. for modes, vocab) and vocabulary, how much
   better does mame code sound for say echo II speech/5200 Dxxx samples
@@ -42,6 +41,13 @@ there are in D000 and D003)
 - inverted ADC, do Y and speed swop - DONE!
 
 *- how we can bend TMS - other excitation-TRY with inverse filter in, X/Y/Z bendings, trigger=freeze?*
+
+** 4/1
+
+- proof of concept votrax working -. new mode... TODO: ARM port, vocabs, TTS, bends
+
+- any changes for others in MAME? CHECK!
+
 
 * general TODO
 
@@ -99,14 +105,15 @@ wavetable as in raven, generators eg. pulse, square, and original
 1. TMS
 2. SP0256
 3. digitalker
-4. SAM
-5. klatt/nvp variations
-6. LPC vocoder
-7. vocoder
-8. vosim/fof etc.
-9. compost
-10. tube/glottal/wavetable
-11. voicform?
+4. votrax
+5. SAM
+6. klatt/nvp variations
+7. LPC vocoder
+8. vocoder
+9. vosim/fof etc.
+10. compost
+11. tube/glottal/wavetable
+12. voicform?
 
 * chipsets/emulation/roms
 
