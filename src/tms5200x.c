@@ -815,7 +815,7 @@ void tms5200_newsay(){
 
   //  ptrAddr = sp_parNICEe;
   //  ptrAddr = sp_spk0352n9; // TODO ptr to const
-  INT16 sel=_selx*132.0f;
+  INT16 sel=_selx*132.0f; // TODO - length of bank
   ptrAddr=wordlist_spell2304[sel]; // bank TODO but test now extent
   //  ptrAddr = sp_spk2304nn131;
   ptrBit = 0;

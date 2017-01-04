@@ -1,4 +1,4 @@
-// - is from WORDS_D00 which is expanded from WORDEDIT.SDK (apple II/echo) - female voice (also D001,2 and 3)
+// 5200 repeated in D-series - is from WORDS_D00 which is expanded from WORDEDIT.SDK (apple II/echo) - female voice (also D001,2 and 3)
 // so guess is from D003 
 
 // female voice T->Z ??? missing some and is from D003

@@ -3386,7 +3386,7 @@ other plague models?
 - clean glottalsources and raven.c
 - Fletcher as drawn wavetable, all raven work summarised and final tests of each/ runge kutta?
 - recordings and draft of early modes and eg. test klatt excitation subs (say with wavetable) -> now all modes as we go in modes.org
-- vocoder with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
+- vocoder also with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
 
 ** 15/9
 
@@ -3650,7 +3650,7 @@ also that in Mindlin we can make certain factors dependent on CV (eg. suggested 
 - ROMS? apple disks-echo II, latest spk and spell, old ones like tron again
 - soundfun -> wavetables???
 
-- TODO: all notes and clear way forward
+- TODO: all notes and clear way forward -> makingsense.org
 
 * TODO from 1 AUG:
 

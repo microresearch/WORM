@@ -1,4 +1,4 @@
-// TOTAL - 360
+// TOTAL - 360 5200
 
 // Talkie library
 // Copyright 2011 Peter Knight

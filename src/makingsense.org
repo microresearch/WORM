@@ -29,7 +29,7 @@ there are in D000 and D003)
 /////
 
 - new MAME votrax to PORT: started but filter issue...cur_va DONE -
-  seems to work but timing is not so solid and we need vocab data
+  seems to work but timing is not so solid and we need vocab dataDONEtotest
 
 - TODO - general below, ADC extent (eg. for modes, vocab) and vocabulary, how much
   better does mame code sound for say echo II speech/5200 Dxxx samples
@@ -44,19 +44,37 @@ there are in D000 and D003)
 
 ** 4/1+
 
-- proof of concept votrax working -. new mode... TODO: ARM port, vocabs, TTS- see also deladriere code
+- any changes for others in MAME? CHECK -> files are: TMS-NOchange, digitalk-NOchange DONE!
 
-// wow.c, gorf.c (where else? gottlieb) - convert to arrays and check against roms for each
+///
 
-, bends
+- proof of concept votrax working -. new mode... TODO: ARM port-compilesDONE, testTODO, all_vocabsTEST, TTS- see also deladriere code
 
-- any changes for others in MAME? CHECK!
+// wow.c, gorf.c - convert to arraysDONE - TEST!
 
-- grouping of TMS vocabs and clear chipsets marked for arm mam code
+, bends-> pitch, phoneme length, change filters
 
-- bends of TMS
+////
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code
+
+- bends of TMS - first mode and start from here
 
 - inversion of any ADC?
+
+TMS, sp0256, votrax, sam. TODO: newsay for basic phonemes, TTS and vocabulary(if any)
+
+do we have vocab as in for allophones for TMS? NO
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where is crow lpc overlap?
+
+- all readme notes for modes -> modes.org
+
+** 5/1
+
+- Votrax ARM code in audio.c to test
 
 * general TODO
 
@@ -81,6 +99,8 @@ eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for
 
 each source/filter mode has regular in (eg. TMS, external in, other glottal sources)
 X,Y,Z and speed...
+
+///////
 
 - LPC inverse filter as excitation and/or NOT so...
 - vocoder and experimental modes
@@ -109,20 +129,43 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 * main modes overview - otherwise see modes.org
 
-** basic modes to do with suggested extensions
+** basic modes to do with suggested extensions - say 64 modes
 
-1. TMS
-2. SP0256
-3. digitalker
-4. votrax
-5. SAM
+1. TMS -> TTS, phonemes, raw, other excitations for all
+2. SP0256 -> TTS, phonemes, vocab, raw?
+3. digitalker ???
+4. votrax -> TTS, phonemes, vocab, raw?
+5. SAM -> TTS, vocab, raw
+
 6. klatt/nvp variations
-7. LPC vocoder
+
+7. LPC vocoder -> where is code for this? lpcanalysis?
+
+see in README: 8.1 LPC vocoder/source - crossover with different sources and pitch following/off on ...
+
+:lpc4.c now!????
+
+wavetable and other insources and live LPC filter from IN! also window size variable?
+
+potential also for live TMS/LPC recodings with pitch or add manual pitch:=
+
+lookups and how this could work based on : using encoder - calc.m and
+  romgen from talkie with freemat and online convertor - use 8 KHz 16
+  bit mono recordings to encode words for lpc.c
+
+pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs in time
+
 8. vocoder
+
+- vocoder also with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
+
 9. vosim/fof etc.
-10. compost
-11. tube/glottal/wavetable
-12. voicform?
+10. tube and ntube/glottal/wavetable
+11. voicform?
+
+12. compost - startX, endY in compost buffer and Z? Z as last mode still writing or NOT-but no poti changes HOW?
+
+13. what own brutal worm synth could be!
 
 * chipsets/emulation/roms
 
@@ -134,17 +177,7 @@ rom data structure - only makes sense for TMS
 
 *** 5100//522x
 
-in LPC/roms:
-vocab_spkspell.h - 5100 all
-vocab_acorn.h -
-vocab_custom.h -
-vocab_large_male.h -
-vocab_male.h -
-vocab_talko.h - checl against others
-vocab_testroms.h - inc allophones...
-vocab_ti99.h -
-
-and more...
+LIST!
 
 *** sp0256
 
@@ -154,11 +187,17 @@ m_rom_256_012 - ?
 
 m_rom_256_al2 - 64 allophones
 
+vocab?
+
 *** digitalker
 
 digitalker_roms.h - 
 
-m_rom (rename!)
+m_rom (rename!)?
+
+*** votrax 
+
+- one rom with lots of vocab
 
 * questions:
 

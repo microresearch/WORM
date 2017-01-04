@@ -384,10 +384,7 @@ void fullklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
     tmpbuffer[xx]=xxx;
       }
     floot_to_int(outgoing,tmpbuffer,32);
-    
-
-
-};
+    };
 
 void tms5200mame(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   // MODEL GENERATOR: TODO is speed and interpolation options

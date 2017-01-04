@@ -1,4 +1,4 @@
-// TOTAL: testroms-200, gameroms-95, alphons-125 = 420
+// TOTAL: testroms-200, gameroms-95, alphons-125 = 420 TMS5220?
 
 /* tools: 
 
