@@ -52,7 +52,7 @@ there are in D000 and D003)
 
 // wow.c, gorf.c - convert to arraysDONE - TEST!
 
-, bends-> pitch, phoneme length, change filters
+, bends-> pitch->m_rom_f1 (u8), phoneme length, change filters
 
 ////
 
@@ -74,7 +74,222 @@ do we have vocab as in for allophones for TMS? NO
 
 ** 5/1
 
-- Votrax ARM code in audio.c to test
+- Votrax ARM code in audio.c to test - WORKING!DONE but speed is a bit wierd - TWEAK
+
+- that we can abstract out same code in audio.c - later (and need abstract out further as does bit shifts)
+
+//////////////////////////////////////////////////
+
+//-> TTS work-BELOW
+
+//->what are bends for each, organise vocabs
+
+// also question of phoneme probability mapping for all chipsets
+
+* TTS
+
+: gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99
+
+parse has main in it.
+
+TODO: test with 256, with SAM, add klatt/TMS/votrax phoneme mappings
+and function, and test all, test encapsulation, port to arm and test
+there (X/Y)
+
+//256: tested on lap, code is there for TTS in ARM version but I guess
+needs to be checked (changed and use as template for SAM etc.)
+
+** NOTES:
+
+const char *const votrax_sc01_device::s_phone_table[64] =
+{
+	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
+	"AH2",  "I3",   "I2",   "I1",   "M",    "N",    "B",    "V",
+	"CH",   "SH",   "Z",    "AW1",  "NG",   "AH1",  "OO1",  "OO",
+	"L",    "K",    "J",    "H",    "G",    "F",    "D",    "S",
+	"A",    "AY",   "Y1",   "UH3",  "AH",   "P",    "O",    "I",
+	"U",    "Y",    "T",    "R",    "E",    "W",    "AE",   "AE1",
+	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
+	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
+};
+
+
+ASCII is values:
+
+0-9= 47->57
+space= 32
+caps=65-90
+lowercase=97-122
+
+TOTAL: 64 with 2 spaces at start
+
+CHECK sp0256 end 255//////////!!!!!!!!!!!!!!!!!!!!!!!!
+
+make array of these values to remap 64x64
+
+{32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70,
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87,
+88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
+109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122};
+
+/////
+
+
+** TMS phoneme list:
+
+there are 125 allophons plus pause - TODO: check these
+
+convert
+
+ 1. AE1  as in ".A.ddition"
+ 2. AE1N as in ".A.nnuity"
+ 3. AH1  as in "Delt.a."s
+ 4. AH1N as in ".O.n time"
+ 5. AW1  as in ".Au.tonomy"
+ 6. AW1N as in "An.o.nimity"
+ 7. E1   as in ".E.liminate"
+ 8. E1N  as in ".E.nough"
+ 9. EH1  as in "Cont.e.xt"
+10. EH1N as in "Anci.e.nt"
+11. ER1N as in "West.e.rn"
+12. I1   as in "Synth.e.s.i.s"
+13. I1N  as in ".I.nane"
+14. OO1  as in "T.oo.k on"
+15. OW1N as in "D.o.nation"
+16. U1   as in "Ann.u.al"
+17. U1N  as in ".U.nique"
+18. UH1  as in ".A.bove"
+19. UH1M as in "Instr.u.ments"
+20. UH1N as in ".U.nderneath"
+21. Y1   as in "Ros.e.s"
+22. Y1N  as in "Basem.e.nt"
+23. ER1  as in "Seek.e.r"
+24. OW1  as in "Rati.o."
+25. Y2   as in "Funn.y."
+26. AE2  as in "H.a.t"
+27. AH2  as in "H.o.t"
+28. AI2  as in "H.ei.ght"
+29. AR2  as in "C.a.rt"
+30. AU2  as in "H.ou.se"
+31. AW2  as in "S.ou.ght"
+32. E2   as in "H.ea.t"
+33. EER2 as in "P.ie.rce"
+34. EH2  as in "S.e.t"
+35. EHR2 as in "Th.e.rapy"
+36. EI2  as in "T.a.ke"
+37. ER2  as in "H.u.rt"
+38. I2   as in ".I.ssue"
+39. OI2  as in "Ch.oi.ce"
+40. OO2  as in "C.oo.k"
+41. OOR2 as in "P.oor.ly"
+42. OR2  as in "H.or.se"
+43. OW2  as in "B.oa.t"
+44. U2   as in "Sh.oo.t"
+45. UH2  as in "H.u.t"
+46. UU2  as in "B.oo.t"
+47. AE3  as in "H.a.d"
+48. AH3  as in ".O.dd"
+49. AI3  as in "H.i.de"
+50. AR3  as in "C.a.rd"
+51. AU3  as in "L.ou.d"
+52. AW3  as in "S.a.w"
+53. E3   as in "S.ee.d"
+54. EELL as in "H.eel."
+55. EER3 as in "H.ear."
+56. EH3  as in "S.ai.d"
+57. EHR3 as in "Th.ere."
+58. EI3  as in "D.ay."
+59. ER3  as in "H.ear.d"
+60. I3   as in "H.i.d"
+61. ILL  as in "H.ill."
+62. ING2 as in "Th.in.k"
+63. OI3  as in "B.oy."
+64. OO3  as in "C.ou.ld"
+65. OOR3 as in "P.oo.r"
+66. OR3  as in "C.ore."
+67. OW3  as in "L.ow."
+68. U3   as in "Sh.oe."
+69. UH3  as in "M.u.d"
+70. ULL  as in "Sk.ull."
+71. UHL  as in "P.ull."
+72. UU3  as in "M.oo.n"
+73. L    as in ".L.ike"
+74. L-   as in "Bow.l."
+75. LL   as in "Awf.ul."
+76. M    as in ".M.ay"
+77. MM   as in "Hu.m."
+78. N    as in ".N.ice"
+79. NN   as in "Sa.ne."
+80. NG1  as in "Thi.n.k"
+81. NG2  as in "Thi.ng."
+82. R    as in ".R.eal"
+83. W    as in ".W.itch"
+84. WH   as in ".Wh.ich"
+85. Y    as in ".Y.ou"
+86. B    as in ".B.ad"
+87. BB   as in "Da.b."
+88. D    as in ".D.ig"
+89. DD   as in "Bi.d."
+90. G1   as in ".G.ive"
+91. G2   as in ".G.o"
+92. GG   as in "Ba.g."
+93. J    as in ".J.ug"
+94. JJ   as in "Bu.dge."
+95. THV  as in ".Th.is"
+96. THV- as in "Clo.the."
+97. V    as in ".V.ine"
+98. VV   as in "Li.ve."
+99. Z    as in ".Z.oo"
+100. ZZ   as in "Doe.s."
+101. ZH   as in "A.z.ure"
+102. ZH-  as in "Bei.ge."
+103. K2   as in "S.k.ate"
+104. KH   as in ".C.ase"
+105. KH-  as in "Ma.ke."
+106. KH1  as in ".K.ey"
+107. KH2  as in ".C.ough"
+108. P    as in "S.p.ace"
+109. PH   as in ".P.ie"
+110. PH-  as in "Na.p."
+111. T    as in "S.t.ake"
+112. TH   as in ".T.ie"
+113. TH-  as in "La.te."
+114. CH   as in ".Ch.ur.ch."
+115. F    as in ".F.at"
+116. FF   as in "Lau.gh."
+117. HI   as in ".H.it"
+118. HO   as in ".H.ome"
+119. HUH  as in ".H.ut"
+120. S    as in ".S.eem"
+121. SS   as in "Mi.ss."
+122. SH   as in ".Sh.ine"
+123. SH-  as in "Wa.sh."
+124. THF  as in ".Th.ing"
+125. THF- as in "Wi.th."
+126. Pause1 <short pause>
+127. Pause2 <long pause>
+
+** Klatt phoneme list:
+
+[see also ipa.py]
+
+- where do we find this? elements ones or other????
+
+** votrax sco1 phoneme list:
+
+const char *const votrax_sc01_device::s_phone_table[64] =
+{
+	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
+	"AH2",  "I3",   "I2",   "I1",   "M",    "N",    "B",    "V",
+	"CH",   "SH",   "Z",    "AW1",  "NG",   "AH1",  "OO1",  "OO",
+	"L",    "K",    "J",    "H",    "G",    "F",    "D",    "S",
+	"A",    "AY",   "Y1",   "UH3",  "AH",   "P",    "O",    "I",
+	"U",    "Y",    "T",    "R",    "E",    "W",    "AE",   "AE1",
+	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
+	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
+};
+
+
 
 * general TODO
 
@@ -132,10 +347,10 @@ wavetable as in raven, generators eg. pulse, square, and original
 ** basic modes to do with suggested extensions - say 64 modes
 
 1. TMS -> TTS, phonemes, raw, other excitations for all
-2. SP0256 -> TTS, phonemes, vocab, raw?
+2. SP0256 -> TTS, phonemes, vocab is done, raw?
 3. digitalker ???
-4. votrax -> TTS, phonemes, vocab, raw?
-5. SAM -> TTS, vocab, raw
+4. votrax -> TTS, phonemes, vocab is roms, raw?
+5. SAM -> TTS, vocab(ported already), raw
 
 6. klatt/nvp variations
 

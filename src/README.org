@@ -3132,7 +3132,7 @@ TODO: selection of ascii for TTS, worm writing for TTS also - see TTS section be
 
 - test/encapsulate text to speech/phonemeTTS-DONE 
 
-- re-mapping of this for: sp0256-DONE, SAM-DONE, klatt-more complex and see also ipa.py, nvp-, tube.cTODO when finish this
+- re-mapping of this for: sp0256-DONE, SAM-DONE, klatt-more complex and see also ipa.py, nvp-, tube.c TODO when finish this
 
 - ntubes tested fine with wormed wavetable and SELZ for mid-tube scattering... can extend this - differing excitations
 
@@ -3811,6 +3811,8 @@ LPC, each mode
 * TTS
 
 in english2phoneme with convert... dir as python re-mappings...
+
+  /root/projects/ERD_MODULES/WORM/src/convertphoneme2num
 
 TODO:
 

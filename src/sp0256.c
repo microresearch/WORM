@@ -1134,7 +1134,6 @@ void micro()
 
 void sp0256_newsayTTS();
 
-
  u16 sp0256_get_sample(void){
    int16_t* output=0;
    u8 dada;
@@ -1143,11 +1142,28 @@ void sp0256_newsayTTS();
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     //     dada=adc_buffer[SELX]>>6; //this is newsay
 	       sp0256_newsayTTS();
      //     sp0256_newsay();
-	  //     m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
-	  //     m_lrq = 0; //from 8 bit write
+   }
+
+   micro();
+     howmany=lpc12_update(&m_filt, output);
+   }
+   //   output=rand()%32768;
+
+   return *output;
+ }
+
+ u16 sp0256_get_sampleTTS(void){
+   int16_t* output=0;
+   u8 dada;
+
+   u8 howmany=0;
+   while(howmany==0){
+   
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+	       sp0256_newsayTTS();
+     //     sp0256_newsay();
    }
 
    micro();
@@ -1160,7 +1176,7 @@ void sp0256_newsayTTS();
 
  // for text to speech we need out array, length and index...
 
- static char TTSinarray[64]="test";
+ static char TTSinarray[65]="one two three fo";
  static char TTSoutarray[128];
  static u8 TTSindex=0;
  static u8 TTSlength=0;
@@ -1173,17 +1189,20 @@ void sp0256_newsayTTS();
    m_lrq = 0; //from 8 bit write
  }
 
- void sp0256_newsayTTS(void){
+static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
+
+
+void sp0256_newsayTTS(void){
    u8 dada;
    //   m_halted=1;
 
-   // how do we get phrase into inarray - with SELX and SELY
+   // how do we get phrase into inarray - with SELX and SELY - TODO when do we enter these characters and constrain to ascii - say 64x64
+   
    dada=TTSoutarray[TTSindex];
    TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
-     TTSinarray[4]=EOF;
-     TTSlength= text2speechfor256(4,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+     TTSlength= text2speechfor256(16,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
    }
 
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
@@ -1194,6 +1213,6 @@ void sp0256_newsayTTS();
    sp0256_iinit();
    reset();
      TTSindex=0;
-     TTSinarray[4]=EOF;
-     TTSlength= text2speechfor256(4,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+     TTSinarray[64]=EOF;
+     TTSlength= text2speechfor256(16,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
  }

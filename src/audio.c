@@ -44,6 +44,7 @@ LINEIN/OUTL-filter
 #include "ntube.h"
 #include "wavetable.h"
 #include "worming.h"
+#include "vot.h"
 //#include "raven.h"
 
 /*
@@ -94,7 +95,7 @@ static adc_transform transform[5] = {
   {SELX, 0, 0.1f, 32.0f},
   {SELY, 0, 0.1f, 32.0f},
   {SELZ, 0, 0.1f, 32.0f},
-  {SPEED, 1, 0.1f, 1024.0f}
+  {SPEED, 1, 0.1f, 8.0f} // what was former speed range?
 };
 
 float _mode, _speed, _selx, _sely, _selz;
@@ -359,6 +360,60 @@ void tms5220talkie(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
 
   // refill back counter etc.
 };
+
+void newvotrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_sample(); 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       samplel=votrax_get_sample();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
+  // refill back counter etc.
+};
+
 
 //float flinbuffer[MONO_BUFSZ];
 //float flinbufferz[MONO_BUFSZ];
@@ -753,8 +808,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   CONSTRAIN(_mode,0.0f,1.0f);
   _intmode=_mode*transform[MODE_].multiplier; //0=32 we hope!
 
-  samplespeed=_speed+0.01f; // TODO test this fully!
-  _intspeed=_speed*transform[SPEED_].multiplier;
+  //  samplespeed=_speed+0.01f; // TODO test this fully!
+  samplespeed=_speed*transform[SPEED_].multiplier;
 
   // splitting input
   for (u8 x=0;x<sz/2;x++){
@@ -762,9 +817,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=5; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 17 is last
+  _intmode=18; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18 is last=newvotrax
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

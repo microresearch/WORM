@@ -51,9 +51,11 @@ we have either 4 bits or 1 or 7 so...
 #ifndef VOTRAX_H
 #define VOTRAX_H
 
+#ifdef LAP
 #define u8 unsigned char
 #define u16 unsigned int
 #define u32 unsigned int
+#endif
 #define u64 unsigned long long 
 #define bool unsigned char
 #define true 1
@@ -205,9 +207,6 @@ float apply_filter(const float *x, const float *y, const float *a, const float *
 	void filters_commit(bool force);                // Commit the currently computed interpolation values to the filters
 	void phone_commit();                            // Commit the current phone id
 	u32 analog_calc();                  // Compute one more sample
-
-
-
 
 
 #endif /* VOTRAX_H */

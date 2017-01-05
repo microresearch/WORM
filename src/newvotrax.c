@@ -158,30 +158,30 @@ void generate_votrax_samples(int samples)
 // For arm we need to add votrax_get_sample - single sample and votrax_newsay TODO!
 
 #ifndef LAP
-int lenny;
+uint16_t lenny;
 // TODO: newsay for basic phonemes, TTS and vocabulary
 
 void votrax_newsay(){
   u8 sel=_selx*64.0f; // is it 64 TODO!
-
-  writer(sel); // what are we writing - is ROM
+  //  sel=16;
+  writer(sel); // what are we writing - is ROM index
   phone_commit();
-  //  inflection_w(p1[x]>>6);
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate? 
-
+  //  inflection_w(p1[x]>>6); // TODO
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
 }
 
-int16_t votrax_get_sample(){
-  int16_t sample;
+int16_t votrax_get_sample(){ 
+  int16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
-  if (m_sample_count>=lenny){
+  if (m_sample_count>lenny){
     m_sample_count=0;
     votrax_newsay();
   }
+
   return sample;
 }
 #endif
@@ -515,7 +515,7 @@ u32 analog_calc()
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
 	// intensity should be checked w.r.t the voice.
-	float n = 1e4 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	float n = 10000.0f * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
 	n = n * m_filt_fa / 15.0f;
 	shift_hist(n, m_noise_1, 3);
 
@@ -524,7 +524,7 @@ u32 analog_calc()
 	shift_hist(n, m_noise_2, 3);
 
 	// 7. Scale with the f2 noise input
-	float n2 = n * m_filt_fc / 15.0;
+	float n2 = n * m_filt_fc / 15.0f;
 	shift_hist(n2, m_noise_3, 2);
 
 	// 8. Apply the f2 filter, noise half,
@@ -541,7 +541,7 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_2, 4);
 
 	// 11. Second noise insertion
-	vn += n * (5 + (15^m_filt_fc))/20.0f;
+	vn += n * (5.0f + (15^m_filt_fc))/20.0f;
 	shift_hist(vn, m_vn_3, 4);
 
 	// 12. Apply the f4 filter
@@ -946,6 +946,11 @@ const int PhonemeLengths[65] =
 };
 
 #include "vocab_votrax.h"
+
+void votrax_init(){
+  device_start();
+  device_reset();
+}
 
 #ifdef LAP
 void main(void){

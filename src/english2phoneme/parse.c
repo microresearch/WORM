@@ -11,10 +11,10 @@ static int Char, Char1, Char2, Char3;
 static int input_count;
 static int input_length;
 static char *input_array;
-char output_array[MAX_LENGTH];
-int output_count = 0;
+unsigned char output_array[MAX_LENGTH];
+unsigned char  output_count = 0;
 
-static const char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
+static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
 
 // remap this index 0->42 to the 256 phonemes which are
 
@@ -76,14 +76,16 @@ void spell_word(char word[]);
 void say_ascii(int character);
 void xlate_file();
 int text2speech(int input_len, char *input, char *output);
-void have_number();
+int text2speechfor256(int input_len, unsigned char *input, unsigned char *output);
+int text2speechforSAM(int input_len, char *input, char *output);
 void have_letter();
 void have_special();
 void say_cardinal(long int value);
 void say_ordinal(long int value);
 void outnum(const char* ooo);
+void have_number();
 
-/*
+#ifdef LAP
 void main(argc, argv)
 	int argc;
 	char *argv[];
@@ -105,17 +107,22 @@ void main(argc, argv)
       input_size += strlen(argv[1 + i]);
       space_count += 1;
   }
-  char input[input_size + space_count];
+
+  //char input[input_size + space_count];
   
   //initialize input array to given arguments
   int index = 0;
 
-  //  input[index] = EOF;
+  //  static char TTSinarray[64]={"testing "};
+    static char TTSinarray[64];
+    static unsigned char TTSoutarray[128];
 
-  static char TTSinarray[64]={"testing "};
- static char TTSoutarray[128];
+    strcpy(TTSinarray,argv[1]);
 
- TTSinarray[8]=EOF;
+    //    TTSinarray[input_size] = EOF; // place in text2speech
+
+          printf("%s %d\n",TTSinarray, input_size);
+
   //  u8 TTSlength= text2speechfor256(9,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
 
 
@@ -123,7 +130,7 @@ void main(argc, argv)
 
   
   //transform text to integer code phonemes
-  int output_count = text2speechfor256(9,TTSinarray,TTSoutarray);
+  int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
   for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
              printf("%d, ", TTSoutarray[i]);
@@ -132,7 +139,7 @@ void main(argc, argv)
   }
   //  return output_count;
   }
-*/
+#endif
 
 /*
 ** Transforms text to integer code phonemes.
@@ -141,6 +148,8 @@ int text2speech(int input_len, char *input, char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
+  input[input_len] = EOF;
+
   xlate_file();
   for (char i=0;i<output_count;i++){
     output[i]=output_array[i]; 
@@ -148,10 +157,12 @@ int text2speech(int input_len, char *input, char *output){
   return output_count;
 }
 
-int text2speechfor256(int input_len, char *input, char *output){
+int text2speechfor256(int input_len, unsigned char *input, unsigned char *output){ // this is our model
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
+  input[input_len] = EOF;
+
   xlate_file();
   //      output_count=10;
   for (char i=0;i<output_count;i++){
@@ -162,19 +173,22 @@ int text2speechfor256(int input_len, char *input, char *output){
 	}
 	//       output[i]=remap256[rand()%43];
   }
-  return output_count;
+  output[output_count-1]=255; // USE for others
+  return output_count; // check this TODO!
 }
 
 int text2speechforSAM(int input_len, char *input, char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
+  input[input_len] = EOF;
+
   xlate_file();
   //      output_count=10;
   for (char i=0;i<output_count;i++){
         output[i]=remapsam[output_array[i]];
 	}
-  return output_count;
+  return output_count-1;
 }
 
 

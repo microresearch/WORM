@@ -52,6 +52,9 @@ const unsigned char HAPPIER[7]={0x2d,4,4,4};
 
 const unsigned char SILENT[7]={4,4,4,4,4,4,4};
 
+                                     
+const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 55, 19, 35, 7, 11, 3, 20, 17, 3, 255};
+
 // this one is stock allophone al2 rom
 
 #include "sp0romstest.h"
@@ -1129,10 +1132,10 @@ void micro()
    if (m_halted==1 && m_filt.rpt <= 0)     {
      //     dada=adc_buffer[SELX]>>6;
      //     dada=0;
-     dada=sp0256emotional[dadaa];
+     dada=testfromTTS[dadaa];
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
      //               m_ald=dada;
-     if (sp0256emotional[dadaa+1]==255) dadaa=0;
+     if (testfromTTS[dadaa+1]==255) dadaa=0;
      else dadaa+=1;
      
      m_lrq = 0; //from 8 bit write
@@ -1161,6 +1164,11 @@ void micro()
 
  void main(void){
    sp0256_init();
+   //   void sp0256_newsay();
+   u8 dada=8;
+     m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+
    while(1){
      int xx=sp0256_get_sample();
      printf("%c",xx);

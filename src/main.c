@@ -43,6 +43,8 @@
 #include "wavetable.h"
 #include "wavetables.h"
 #include "worming.h"
+#include "vot.h"
+
 //#include "raven.h"
 
 /* DMA buffers for I2S */
@@ -78,7 +80,8 @@ const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30,
 //u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,  44, 8, 0,  54, 16, 0,  20, 8, 0,  1, 6, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  44, 6, 0,  44, 8, 0,  44, 8, 0}; // ELM_LEN in holmes - but why do we need extra 0>// extra what?
 
 //u8 test_elm[51]={44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0, 44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0,44, 16, 0,  14, 15, 0,  1, 6, 0,  1, 6, 0}; // ELM_LEN in holmes - but why do we need extra 0>// extra what? - this one doesn;t crackle
-																			 u8 test_elm[51]={28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0, 20, 8, 0, 53, 9, 0, 1, 6, 0, 1, 6, 0, 25, 12, 0, 54, 16, 0, 1, 6, 0, 1, 6, 0}; // "help me sir"
+
+u8 test_elm[51]={28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0, 20, 8, 0, 53, 9, 0, 1, 6, 0, 1, 6, 0, 25, 12, 0, 54, 16, 0, 1, 6, 0, 1, 6, 0}; // "help me sir"
 
 // ELM_LEN is 48 = 16 phonemes
 
@@ -121,7 +124,8 @@ tms5200_newsay();
     //  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
   //  RavenTube_init();
     //  newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
-
+    votrax_init();
+    
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
