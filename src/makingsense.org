@@ -3,12 +3,13 @@
 ** 2/1/2017
 
 - working on ROMS, TODO: extract rest of echo II female voices, rest
-  of speak and spell, where is TRON=sp0256 (work on those when we get
-  to that)
+  of speak and spellDONE
+
+- where is TRON=sp0256 (work on those when we get to that)
 
 -lpc_split adapted for: ./lpc_split D034 0 > roms/vocab_D034.h
 
-- LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34
+- LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34DONE
 
 ** 3/1
 
@@ -32,13 +33,15 @@ there are in D000 and D003)
   seems to work but timing is not so solid and we need vocab dataDONEtotest
 
 - TODO - general below, ADC extent (eg. for modes, vocab) and vocabulary, how much
-  better does mame code sound for say echo II speech/5200 Dxxx samples
+  better does mame code sound for say echo II speech/5200 Dxxx samplesDONE
 
 - tested speak and spell on mame code sounds fine, some end glitch???
 
 - extent good till 128 at least
 
-- inverted ADC, do Y and speed swop - DONE!
+- inverted ADC?
+
+- , do Y and speed swop - DONE!
 
 *- how we can bend TMS - other excitation-TRY with inverse filter in, X/Y/Z bendings, trigger=freeze?*
 
@@ -60,7 +63,7 @@ there are in D000 and D003)
 
 - bends of TMS - first mode and start from here
 
-- inversion of any ADC?
+- inversion of any ADC? - is flip bit in transform
 
 TMS, sp0256, votrax, sam. TODO: newsay for basic phonemes, TTS and vocabulary(if any)
 
@@ -74,17 +77,62 @@ do we have vocab as in for allophones for TMS? NO
 
 ** 5/1
 
-- Votrax ARM code in audio.c to test - WORKING!DONE but speed is a bit wierd - TWEAK
+- Votrax ARM code in audio.c to test - WORKING!DONE but speed is a bit wierd - FIXED
 
-- that we can abstract out same code in audio.c - later (and need abstract out further as does bit shifts)
+- that we can abstract out same code in audio.c - later (and need
+  abstract out further as does bit shifts in some cases but place this
+  in generator code)
 
 //////////////////////////////////////////////////
 
-//-> TTS work-BELOW
+//-> TTS work-BELOW 0 TMS-TODO, VOTRAX-TODO, leave the rest!
+
+map 64x64 X and Y to position/ascii code for TTS leaves Z for length of ascii or buffer
 
 //->what are bends for each, organise vocabs
 
-// also question of phoneme probability mapping for all chipsets
+// also question of phoneme probability mapping for all chipsets - recap how we did this for klatt
+
+// klatt notes
+
+** 6/1
+
+- first three modes don;t seem to work - talkie, sp0256 and klatt ????
+- programming issue also most times???
+
+WHY?
+
+*sp0256 is fixed, talkie was ok, klatt was missing biquad, compiler changed but still issue in one of the inits - figure out?!!!*
+
+/// 
+
+- re-test sp0256 TTS additions on lapDONE and ARM - DONE but sp0256 speed is too fast - DIVIDE!
+
+- test each init/mode
+
+- X/Y prototype for sp0256 TTS
+
+- TTS votrax with multiples?
+
+- test votrax vocabs and do as newsay
+
+/////
+
+- group TMS vocabs and mark chip // solution for this
+
+- where we need inversion on X, Y, Z and speed?
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where is crow lpc overlap?
+
+- all readme notes for modes -> modes.org
+
+- what are the bends?
+
+- klatt re-acquaint
+
+- start on audio.c modes/abstraction
 
 * TTS
 
@@ -100,19 +148,6 @@ there (X/Y)
 needs to be checked (changed and use as template for SAM etc.)
 
 ** NOTES:
-
-const char *const votrax_sc01_device::s_phone_table[64] =
-{
-	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
-	"AH2",  "I3",   "I2",   "I1",   "M",    "N",    "B",    "V",
-	"CH",   "SH",   "Z",    "AW1",  "NG",   "AH1",  "OO1",  "OO",
-	"L",    "K",    "J",    "H",    "G",    "F",    "D",    "S",
-	"A",    "AY",   "Y1",   "UH3",  "AH",   "P",    "O",    "I",
-	"U",    "Y",    "T",    "R",    "E",    "W",    "AE",   "AE1",
-	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
-	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
-};
-
 
 ASCII is values:
 
@@ -141,141 +176,62 @@ there are 125 allophons plus pause - TODO: check these
 
 convert
 
- 1. AE1  as in ".A.ddition"
- 2. AE1N as in ".A.nnuity"
- 3. AH1  as in "Delt.a."s
- 4. AH1N as in ".O.n time"
- 5. AW1  as in ".Au.tonomy"
- 6. AW1N as in "An.o.nimity"
- 7. E1   as in ".E.liminate"
- 8. E1N  as in ".E.nough"
- 9. EH1  as in "Cont.e.xt"
-10. EH1N as in "Anci.e.nt"
-11. ER1N as in "West.e.rn"
-12. I1   as in "Synth.e.s.i.s"
-13. I1N  as in ".I.nane"
-14. OO1  as in "T.oo.k on"
-15. OW1N as in "D.o.nation"
-16. U1   as in "Ann.u.al"
-17. U1N  as in ".U.nique"
-18. UH1  as in ".A.bove"
-19. UH1M as in "Instr.u.ments"
-20. UH1N as in ".U.nderneath"
-21. Y1   as in "Ros.e.s"
-22. Y1N  as in "Basem.e.nt"
-23. ER1  as in "Seek.e.r"
-24. OW1  as in "Rati.o."
-25. Y2   as in "Funn.y."
-26. AE2  as in "H.a.t"
-27. AH2  as in "H.o.t"
-28. AI2  as in "H.ei.ght"
-29. AR2  as in "C.a.rt"
-30. AU2  as in "H.ou.se"
-31. AW2  as in "S.ou.ght"
-32. E2   as in "H.ea.t"
-33. EER2 as in "P.ie.rce"
-34. EH2  as in "S.e.t"
-35. EHR2 as in "Th.e.rapy"
-36. EI2  as in "T.a.ke"
-37. ER2  as in "H.u.rt"
-38. I2   as in ".I.ssue"
-39. OI2  as in "Ch.oi.ce"
-40. OO2  as in "C.oo.k"
-41. OOR2 as in "P.oor.ly"
-42. OR2  as in "H.or.se"
-43. OW2  as in "B.oa.t"
-44. U2   as in "Sh.oo.t"
-45. UH2  as in "H.u.t"
-46. UU2  as in "B.oo.t"
-47. AE3  as in "H.a.d"
-48. AH3  as in ".O.dd"
-49. AI3  as in "H.i.de"
-50. AR3  as in "C.a.rd"
-51. AU3  as in "L.ou.d"
-52. AW3  as in "S.a.w"
-53. E3   as in "S.ee.d"
-54. EELL as in "H.eel."
-55. EER3 as in "H.ear."
-56. EH3  as in "S.ai.d"
-57. EHR3 as in "Th.ere."
-58. EI3  as in "D.ay."
-59. ER3  as in "H.ear.d"
-60. I3   as in "H.i.d"
-61. ILL  as in "H.ill."
-62. ING2 as in "Th.in.k"
-63. OI3  as in "B.oy."
-64. OO3  as in "C.ou.ld"
-65. OOR3 as in "P.oo.r"
-66. OR3  as in "C.ore."
-67. OW3  as in "L.ow."
-68. U3   as in "Sh.oe."
-69. UH3  as in "M.u.d"
-70. ULL  as in "Sk.ull."
-71. UHL  as in "P.ull."
-72. UU3  as in "M.oo.n"
-73. L    as in ".L.ike"
-74. L-   as in "Bow.l."
-75. LL   as in "Awf.ul."
-76. M    as in ".M.ay"
-77. MM   as in "Hu.m."
-78. N    as in ".N.ice"
-79. NN   as in "Sa.ne."
-80. NG1  as in "Thi.n.k"
-81. NG2  as in "Thi.ng."
-82. R    as in ".R.eal"
-83. W    as in ".W.itch"
-84. WH   as in ".Wh.ich"
-85. Y    as in ".Y.ou"
-86. B    as in ".B.ad"
-87. BB   as in "Da.b."
-88. D    as in ".D.ig"
-89. DD   as in "Bi.d."
-90. G1   as in ".G.ive"
-91. G2   as in ".G.o"
-92. GG   as in "Ba.g."
-93. J    as in ".J.ug"
-94. JJ   as in "Bu.dge."
-95. THV  as in ".Th.is"
-96. THV- as in "Clo.the."
-97. V    as in ".V.ine"
-98. VV   as in "Li.ve."
-99. Z    as in ".Z.oo"
-100. ZZ   as in "Doe.s."
-101. ZH   as in "A.z.ure"
-102. ZH-  as in "Bei.ge."
-103. K2   as in "S.k.ate"
-104. KH   as in ".C.ase"
-105. KH-  as in "Ma.ke."
-106. KH1  as in ".K.ey"
-107. KH2  as in ".C.ough"
-108. P    as in "S.p.ace"
-109. PH   as in ".P.ie"
-110. PH-  as in "Na.p."
-111. T    as in "S.t.ake"
-112. TH   as in ".T.ie"
-113. TH-  as in "La.te."
-114. CH   as in ".Ch.ur.ch."
-115. F    as in ".F.at"
-116. FF   as in "Lau.gh."
-117. HI   as in ".H.it"
-118. HO   as in ".H.ome"
-119. HUH  as in ".H.ut"
-120. S    as in ".S.eem"
-121. SS   as in "Mi.ss."
-122. SH   as in ".Sh.ine"
-123. SH-  as in "Wa.sh."
-124. THF  as in ".Th.ing"
-125. THF- as in "Wi.th."
+{AE1, AE1, AH1, AH1, AW1, AW1, E1 , E1N, EH1, EH1, ER1, I1 , I1N, OO1,
+OW1, U1 , U1N, UH1, UH1, UH1, Y1 , Y1N, ER1, OW1, Y2 , AE2, AH2, AI2,
+AR2, AU2, AW2, E2 , EER, EH2, EHR, EI2, ER2, I2 , OI2, OO2, OOR, OR2,
+OW2, U2 , UH2, UU2, AE3, AH3, AI3, AR3, AU3, AW3, E3 , EEL, EER, EH3,
+EHR, EI3, ER3, I3 , ILL, ING, OI3, OO3, OOR, OR3, OW3, U3 , UH3, ULL,
+UHL, UU3, L , L- , LL , M , MM , N , NN , NG1, NG2, R , W , WH , Y , B
+, BB , D , DD , G1 , G2 , GG , J , JJ , THV, THV, V , VV , Z , ZZ , ZH
+, ZH-, K2 , KH , KH-, KH1, KH2, P , PH , PH-, T , TH , TH-, CH , F ,
+FF , HI , HO , HUH, S , SS , SH , SH-, THF, THF};
+
+plus
 126. Pause1 <short pause>
 127. Pause2 <long pause>
 
-** Klatt phoneme list:
+** Klatt phoneme list - maybe leave
+
+we started on this in parse.c
+
+69 phonemes in Elements.def
+
+{END, Q, P, PY, PZ, T, TY, TZ, K, KY, KZ, B, BY, BZ, D, DY, DZ, G, GY, GZ, M, N, NG, F, TH, S, SH, X, H, V, QQ, DH, DI, Z, ZZ, ZH, CH, CI, J, JY, L, LL, RX, R, W, Y, I, E, AA, U, O, OO, A, EE, ER, AR, AW, UU, AI, IE, OI, OU, OV, OA, IA, IB, AIR, OOR, OR};
 
 [see also ipa.py]
 
 - where do we find this? elements ones or other????
 
+- need to re-acquaint with all of klatt - where we have phonemes earlier in whole process!?
+
 ** votrax sco1 phoneme list:
+
+{0x05, 0x07,'0x08,0x05,0x03' , 0x0A, 0x0C, 0x0E,"0x12,0x11,0x11" ,
+0x11,0x16', 0x15, '0x14,0x16,0x16', 0x1c, '0x0C,0x23',
+0x1B,'0x0F,0x0D,0x0B,0x03' ,'0x0F,0x10,0x11,0x16' ,
+'0x11,0x19,0x0F,0x07,0x06' , 0x27 , 0x24, 0x28, 0x25, '0x29,0x2c',
+0x26, 0x34, 0x33, 0x35, 0x36, 0x30, 0x2f, 0x32, 0x2f, 0x2c, 0x37,
+0x38, 0x39, 0x20, 0x23, 0x04, 0x1d, '0x28,0x2D,0x32' , '0x25,0x31',
+0x23, 0, 0}
+
+*question of accuracy and how to deal with multiples - convert multiples in parse.c but how to we flag multiple*
+
+//NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
+
+from: 
+
+#phoneme strings adapted to match the SSI-263 phoneme chart and diphthong set
+
+phons = {'AA': "0x0E", 'AE': "0x0C", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "0x0C,0x1C",
+         'AW': '0x0F,0x10,0x11,0x16', 'AX':'0x0C,0x23', 'AY': '0x0F,0x0D,0x0B,0x03', 'B': '0x24', 'CH': '0x28,0x2D,0x32',
+         'D': '0x25', 'DH': '0x36', 'EH': '0x0A', 'EL': '0x0A,0x20', 'EN': '0x0A,0x38',
+         'ER': '0x1C', 'EY': '0x08,0x05,0x03', 'F': '0x34', 'G': '0x26', 'HH': '0x2C',
+         'IH': '0x07', 'IR': '0x07,0x1D', 'IY': '0x05', 'JH': '0x25,0x31', 'K': '0x29,0x2C',
+         'L': '0x20', 'M': '0x37', 'N': '0x38', 'NG': '0x39', 'OW': '0x11,0x16',
+         'OY': '0x11,0x19,0x0F,0x07,0x06', 'P': '0x27', 'R': '0x1D', 'S': '0x30', 'SH': '0x32',
+         'T': '0x28', 'TH': '0x35', 'UH': '0x15', 'UR': '0x16,0x1C', 'UW': '0x14,0x16,0x16',
+         'V': '0x33', 'W': '0x23', 'Y': '0x04', 'Z': '0x2F', 'ZH': '0x2F', 'SIL': '0'}
+
 
 const char *const votrax_sc01_device::s_phone_table[64] =
 {
@@ -346,13 +302,12 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 ** basic modes to do with suggested extensions - say 64 modes
 
-1. TMS -> TTS, phonemes, raw, other excitations for all
-2. SP0256 -> TTS, phonemes, vocab is done, raw?
+1. TMS -> vocab,TTS, phonemes, raw, other excitations for all
+2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
 3. digitalker ???
 4. votrax -> TTS, phonemes, vocab is roms, raw?
 5. SAM -> TTS, vocab(ported already), raw
-
-6. klatt/nvp variations
+6. klatt/nvp variations RE_ACQUAINT
 
 7. LPC vocoder -> where is code for this? lpcanalysis?
 
@@ -378,7 +333,9 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
 10. tube and ntube/glottal/wavetable
 11. voicform?
 
-12. compost - startX, endY in compost buffer and Z? Z as last mode still writing or NOT-but no poti changes HOW?
+12. compost - startX, endY in compost buffer and Z? Z as last mode
+    still writing or NOT-but no poti changes HOW? - 2 stages with
+    oldX.Y for example
 
 13. what own brutal worm synth could be!
 

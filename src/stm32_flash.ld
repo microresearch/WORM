@@ -81,13 +81,6 @@ SECTIONS
   } >FLASH
 
 
-  .flash :
-  {
-  . = ALIGN(4);
-  *(.flash  )
-  . = ALIGN(4);
-  } >FLASH
-
 
    .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
     .ARM : {

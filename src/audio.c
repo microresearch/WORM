@@ -99,7 +99,7 @@ static adc_transform transform[5] = {
 };
 
 float _mode, _speed, _selx, _sely, _selz;
-u16 _intspeed, _intmode;
+u8 _intspeed, _intmode;
 
 enum adcchannel {
   MODE_,
@@ -122,7 +122,6 @@ Blip *blipper;
 NTube tuber;
 Wavetable wavtable;
 wormy myworm;
-
 biquad* newBB;
 
 #define THRESH 32000
@@ -136,12 +135,11 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float remainder;
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
-
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=sp0256_get_sample();
+	  samplel=sp0256_get_sample();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
@@ -161,8 +159,7 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
-       samplel=sp0256_get_sample();
-
+              samplel=sp0256_get_sample();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
@@ -180,6 +177,60 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // refill back counter etc.
 };
+
+void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // MODEL GENERATOR: TODO is speed and interpolation options DONE
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 //	 samplel=sp0256_get_sampleTTS();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 //	 sp0256_newsayTTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+       //       samplel=sp0256_get_sampleTTS();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 //	 sp0256_newsayTTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
+  // refill back counter etc.
+};
+
 
 void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
@@ -817,9 +868,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=18; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18 is last=newvotrax
+  _intmode=2; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

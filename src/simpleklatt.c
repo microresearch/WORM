@@ -64,10 +64,12 @@ wormy* straightwormy;
 
 void simpleklatt_init(void){
 
-  straightwormy=addworm(10.0f,10.0f,100.0f, 100.0f, straightworm);
+  //  straightwormy=addworm(10.0f,10.0f,100.0f, 100.0f, straightworm);
 
+  klatt_global_tt globale;
+  globals=&globale;
 
-  globals = (klatt_global_ptrr)malloc(sizeof(klatt_global_tt));
+  //  globals = (klatt_global_ptrr)malloc(sizeof(klatt_global_tt));
   //  frame = (klatt_frame_ptrr)malloc(sizeof(klatt_frame_tt));
   //  framer framezz[40];
   //  frame_init(globals,simpleklattset.val); 

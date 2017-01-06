@@ -60,7 +60,7 @@ static const char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13,
 
 //static const char remapklatt[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, 48, AO, OW, UH, UW, 54, AX, AH, AY, 56, OY, 2, 11, 5, 14, 8, 17, 23, 29 , 24, 31, 25, 33, 26, 35, 28, 20, 21, 22, 40, 44, 45, 43, 36, 38, WH, PAUSE, 0};
 
-// 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
+// 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ //????
 
 //static const char remapnvp[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""};
 
@@ -69,6 +69,16 @@ static const char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13,
 // klatt/nvp
 
 // tubes
+
+// for VOTRAX
+
+typedef struct{
+  unsigned char howmany;
+  unsigned char its[3];
+} votmap;
+
+
+static votmap remapvotrax[] = {{1, 0x01,0x02}}; //example
 
 
 void xlate_word(char word[]);
@@ -157,7 +167,7 @@ int text2speech(int input_len, char *input, char *output){
   return output_count;
 }
 
-int text2speechfor256(int input_len, unsigned char *input, unsigned char *output){ // this is our model
+int text2speechfor256(int input_len, unsigned char *input, unsigned char *output){ // TODO: this is our model
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -173,7 +183,7 @@ int text2speechfor256(int input_len, unsigned char *input, unsigned char *output
 	}
 	//       output[i]=remap256[rand()%43];
   }
-  output[output_count-1]=255; // USE for others
+  output[output_count-1]=255; 
   return output_count; // check this TODO!
 }
 

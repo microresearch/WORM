@@ -53,7 +53,7 @@ const unsigned char HAPPIER[7]={0x2d,4,4,4};
 const unsigned char SILENT[7]={4,4,4,4,4,4,4};
 
                                      
-const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 55, 19, 35, 7, 11, 3, 20, 17, 3, 255};
+const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 255};
 
 // this one is stock allophone al2 rom
 

@@ -89,42 +89,42 @@ void main(void)
 {
   int16_t x;
   // all generator inits
-LPCAnalyzer_init();
-init_synth(); // which one? --> klatt rsynth !!!! RENAME!
-sp0256_init();
-lpc_init();
-simpleklatt_init();
-sam_init();
-sam_newsay(); // TEST!
-tms5200_init();
-tms5200_newsay();
- channelv_init();
- tube_init();
-// tube_newsay();
- BANDS_Init_();
- Vocoder_Init(32000.0f);
- digitalk_init();
- digitalk_newsay(0);
- nvp_init();
- sample_rate_init();
- initbraidworm(); // re_name
-  initvoicform();
-  formy=malloc(sizeof(Formlet));
-  formanty=malloc(sizeof(Formant));
-  blipper=malloc(sizeof(Blip));
-  RLPFer=malloc(sizeof(RLPF));
-  Formlet_init(formy);
-  Formant_init(formanty);
-  Blip_init(blipper);
-  RLPF_init(RLPFer);
-  NTube_init(&tuber);
-  //  wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512
-    wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
-  //  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512
-    //  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm);
-  //  RavenTube_init();
-    //  newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST?
-    votrax_init();
+  //      LPCAnalyzer_init();
+  init_synth(); // which one? --> klatt rsynth !!!! RENAME!
+  sp0256_init();
+   lpc_init(); 
+/*   simpleklatt_init(); */
+/* sam_init(); */
+/* sam_newsay(); // TEST! */
+/* tms5200_init(); */
+/* tms5200_newsay(); */
+/* channelv_init(); */
+/* tube_init(); */
+/* tube_newsay(); */
+/* BANDS_Init_(); */
+/* Vocoder_Init(32000.0f); */
+/* digitalk_init(); */
+/* digitalk_newsay(0); */
+/* nvp_init(); */
+/* sample_rate_init(); */
+/* initbraidworm(); // re_name */
+/* initvoicform(); */
+/*   formy=malloc(sizeof(Formlet)); */
+/*   formanty=malloc(sizeof(Formant)); */
+/*   blipper=malloc(sizeof(Blip)); */
+/*   RLPFer=malloc(sizeof(RLPF)); */
+/*   Formlet_init(formy); */
+/*   Formant_init(formanty); */
+/*   Blip_init(blipper); */
+/*   RLPF_init(RLPFer); */
+/*   NTube_init(&tuber); */
+/*    wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512 */
+/*   //    wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 */
+/*   //  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512 */
+/*     //  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm); */
+/*   //  RavenTube_init(); */
+   newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST? 
+        votrax_init(); 
     
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
@@ -133,31 +133,9 @@ tms5200_newsay();
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
   //  Audio_Init(); not needed
 
-
-  //  tube_init();
-    //    tube_newsay();
-
-    //    initializeSynthesizer();
-      //   synthesize();
-
-  //  lpc_newsay(1);
-  //  SAMINIT();
-  // test audio fill
-    /*          for (x=0;x<32768;x++){
-	  audio_buffer[x]=tube_get_sample();
-	  }*/
-  //   int writepos=run_holmes(writepos); 
-
-  /*  for (x=0;x<32767;x++){
-	    audio_buffer[x]=tube_get_sample();
-	    }
-  */
-
   while(1)
     {
-  
-            
-  // testing changing test_elm
+    // testing changing test_elm
       //      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
       // change element, change length? leave stress as is 0
       //      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
