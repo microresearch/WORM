@@ -108,8 +108,6 @@ WHY?
 
 - re-test sp0256 TTS additions on lapDONE and ARM - DONE but sp0256 speed is too fast - DIVIDE!
 
-- test each init/mode
-
 - X/Y prototype for sp0256 TTS
 
 - TTS votrax with multiples?
@@ -118,21 +116,27 @@ WHY?
 
 /////
 
+- test each init/mode
+
 - group TMS vocabs and mark chip // solution for this
 
-- where we need inversion on X, Y, Z and speed?
+- where we need inversion on X, Y, Z and speed? - this is marked in struct there!
 
 - where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
 
-- where is crow lpc overlap?
+- where is crow lpc overlay?
 
 - all readme notes for modes -> modes.org
 
-- what are the bends?
+- what are the bends? - sp0256 pitch should subtract
 
 - klatt re-acquaint
 
-- start on audio.c modes/abstraction
+- start on audio.c modes/abstraction and place bitshifts in generators
+
+** 7/1
+
+- new lpcreader to get roms - 3150,3220 for ti99 - sewermania and microsurgeon
 
 * TTS
 
@@ -168,7 +172,6 @@ make array of these values to remap 64x64
 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122};
 
 /////
-
 
 ** TMS phoneme list:
 

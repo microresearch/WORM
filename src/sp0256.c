@@ -1193,9 +1193,11 @@ void sp0256_newsayTTS(void){
    u8 dada;
    //   m_halted=1;
 
-   // how do we get phrase into inarray - with SELX and SELY - TODO when do we enter these characters and constrain to ascii - say 64x64
+   // how do we get phrase into inarray - with SELX and SELY - TODO
+   // when do we enter these characters and constrain to ascii - say
+   // 64x64 using mapy above
    
-   dada=TTSoutarray[TTSindex];
+   dada=TTSoutarray[TTSindex]; 
    TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
