@@ -95,7 +95,7 @@ map 64x64 X and Y to position/ascii code for TTS leaves Z for length of ascii or
 
 // klatt notes
 
-** 6/1
+** 6/1+
 
 - first three modes don;t seem to work - talkie, sp0256 and klatt ????
 - programming issue also most times???
@@ -110,9 +110,9 @@ WHY?
 
 - X/Y prototype for sp0256 TTS
 
-- TTS votrax with multiples?
-
 - test votrax vocabs and do as newsay
+
+- add/test all TTS on ARM
 
 /////
 
@@ -128,7 +128,7 @@ WHY?
 
 - all readme notes for modes -> modes.org
 
-- what are the bends? - sp0256 pitch should subtract
+- what are all the bends? - sp0256 pitch should subtract
 
 - klatt re-acquaint
 
@@ -138,9 +138,12 @@ WHY?
 
 - new lpcreader to get roms - 3150,3220 for ti99 - sewermania and microsurgeon
 
+- TTS votrax with multiples - compiles on both - to TEST on lap/ARM!
+
+
 * TTS
 
-: gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99
+: gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
 
 parse has main in it.
 
@@ -208,6 +211,8 @@ we started on this in parse.c
 - need to re-acquaint with all of klatt - where we have phonemes earlier in whole process!?
 
 ** votrax sco1 phoneme list:
+
+from deladriere but we converted
 
 {0x05, 0x07,'0x08,0x05,0x03' , 0x0A, 0x0C, 0x0E,"0x12,0x11,0x11" ,
 0x11,0x16', 0x15, '0x14,0x16,0x16', 0x1c, '0x0C,0x23',

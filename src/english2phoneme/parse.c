@@ -14,6 +14,59 @@ static char *input_array;
 unsigned char output_array[MAX_LENGTH];
 unsigned char  output_count = 0;
 
+typedef struct{
+  unsigned char length;
+  unsigned char mmm[5];
+} vottts;
+
+int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *output);
+
+static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x05}}, //IY
+				{1, {0x07}},//IH
+				{3,{0x08,0x05,0x03}},//EY
+				{1, {0x0A}},//eH
+				{1, {0x0C}},//AE
+				{1, {0x0E}},  //aa
+				{3, {0x12,0x11,0x11}},//ao
+				{2, {0x11,0x16}}, //ow
+				{1, {0x15}}, //uh
+				{3, {0x14,0x16,0x16}}, //uw
+				{1, {0x1c}}, //er
+				{2, {0x0C,0x23}},//ax
+				{1, {0x1B}},//ah
+				{4, {0x0F,0x0D,0x0B,0x03}},//ay
+				{4, {0x0F,0x10,0x11,0x16}},//aw
+				{5, {0x11,0x19,0x0F,0x07,0x06}}, //oy
+				{1, {0x27 }}, //p
+				{1, {0x24}}, //b
+				{1, {0x28}}, //t
+				{1, {0x25}}, //d
+				{2, {0x29,0x2c}},//k
+				{1, {0x26}}, // g
+				{1, {0x34}}, //f
+				{1, {0x33}}, //v
+				{1, {0x35}}, //th
+				{1, {0x36}}, //dh
+				{1, {0x30}}, //s
+				{1, {0x2f}}, //z
+				{1, {0x32}}, //sh
+				{1, {0x2f}}, //zh
+				{1, {0x2c}}, //h
+				{1, {0x37}},//m
+				{1, {0x38}}, //n
+				{1, {0x39}}, //ng
+				{1, {0x20}}, //l
+				{1, {0x23}}, //w
+				{1, {0x04}}, //y
+				{1, {0x1d}}, //r
+				{3, {0x28,0x2D,0x32}},//ch 
+				{2, {0x25,0x31}},//j
+				{1, {0x23}}, //wh
+				{1, {0}}, //pause
+				{1, {0}}//''
+  };
+
+
 static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
 
 // remap this index 0->42 to the 256 phonemes which are
@@ -140,7 +193,8 @@ void main(argc, argv)
 
   
   //transform text to integer code phonemes
-  int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
+	  //  int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
+	    int output_count = text2speechforvotrax(input_size,TTSinarray,TTSoutarray);
   for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
              printf("%d, ", TTSoutarray[i]);
@@ -184,7 +238,25 @@ int text2speechfor256(int input_len, unsigned char *input, unsigned char *output
 	//       output[i]=remap256[rand()%43];
   }
   output[output_count-1]=255; 
-  return output_count; // check this TODO!
+  return output_count; //check TODO!
+}
+
+int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  input[input_len] = EOF;
+
+  xlate_file();
+  char countme=0;
+  for (char i=0;i<output_count;i++){
+    for (char ii=0;ii<ourvot[output_array[i]].length;ii++){
+    output[countme]=ourvot[output_array[i]].mmm[ii];
+    countme++;
+	}
+	//       output[i]=remap256[rand()%43];
+  }
+  return countme; 
 }
 
 int text2speechforSAM(int input_len, char *input, char *output){
