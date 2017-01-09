@@ -5,8 +5,6 @@
 - working on ROMS, TODO: extract rest of echo II female voices, rest
   of speak and spellDONE
 
-- where is TRON=sp0256 (work on those when we get to that)
-
 -lpc_split adapted for: ./lpc_split D034 0 > roms/vocab_D034.h
 
 - LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34DONE
@@ -110,15 +108,19 @@ WHY?
 
 - X/Y prototype for sp0256 TTS
 
-- test votrax vocabs and do as newsay
+- test votrax vocabs and do as newsay - same for other vocabs we might have (sp0256, what else?)
+
+- other sp0256 roms - how these are handled
 
 - add/test all TTS on ARM
 
 /////
 
-- test each init/mode
-
 - group TMS vocabs and mark chip // solution for this
+
+- test each init/mode - sp0256 as above, start with TMS -> vocab,TTS, phonemes, raw, other excitations for all, do we use talkie code?
+
+///
 
 - where we need inversion on X, Y, Z and speed? - this is marked in struct there!
 
@@ -136,10 +138,20 @@ WHY?
 
 ** 7/1
 
-- new lpcreader to get roms - 3150,3220 for ti99 - sewermania and microsurgeon
+- new lpcreader for romsDONE - 3150,3220 for ti99 - sewermania and microsurgeonDONE - added to vocab_testroms.h
+
+** 8/1
 
 - TTS votrax with multiples - compiles on both - to TEST on lap/ARM!
 
+- mapping/making TTS in_array should be in TTS/english2phoneme using
+  mapytoascii - arrays can also be there so no need to pass in ... but
+  when is mapping of X/Y called -> whole phrase only changes on end of
+  whole TTS phrase... - trigger to re-do whole/newsay but make mapping
+  faster and regular - mapping in audio.c makes sense so is
+  timed... also for all XY mappings - which are?
+
+- discs of TRON TMS5220 - in Downloads // but TRONSS is sp0256
 
 * TTS
 
@@ -283,8 +295,10 @@ X,Y,Z and speed...
 
 - LPC inverse filter as excitation and/or NOT so...
 - vocoder and experimental modes
-- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
 - clean ups, documentation, tests and release
+
+- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
+
 
 * TMS ROMS
 
@@ -292,7 +306,7 @@ classify each ROM in tms dir
 
 ** 5100-speak and spell
 
-** 5200- early echo II, disks of TRON, TI99/4 
+** 5200- early echo II, disks of TRON????, TI99/4 
 
 ** 5220- later echo II, BBC MICRO
 
