@@ -23,6 +23,10 @@ template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b,
 	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 }
 
+m_rom_f1  = bitswap(val,  0,  7, 14, 21);
+			
+BIT(val, 7) << 1 | BIT(val, 14) << 
+
 #define BITSWAP8(val,B7,B6,B5,B4,B3,B2,B1,B0) \
 	((BIT(val,B7) << 7) | (BIT(val,B6) << 6) | (BIT(val,B5) << 5) | (BIT(val,B4) << 4) | \
 		(BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))

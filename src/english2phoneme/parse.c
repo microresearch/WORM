@@ -23,49 +23,52 @@ int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *out
 
 static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
 
-static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x05}}, //IY
-				{1, {0x07}},//IH
-				{3,{0x08,0x05,0x03}},//EY
-				{1, {0x0A}},//eH
-				{1, {0x0C}},//AE
-				{1, {0x0E}},  //aa
-				{3, {0x12,0x11,0x11}},//ao
-				{2, {0x11,0x16}}, //ow
-				{1, {0x15}}, //uh
-				{3, {0x14,0x16,0x16}}, //uw
-				{1, {0x1c}}, //er
-				{2, {0x0C,0x23}},//ax
-				{1, {0x1B}},//ah
-				{4, {0x0F,0x0D,0x0B,0x03}},//ay
-				{4, {0x0F,0x10,0x11,0x16}},//aw
-				{5, {0x11,0x19,0x0F,0x07,0x06}}, //oy
-				{1, {0x27 }}, //p
-				{1, {0x24}}, //b
-				{1, {0x28}}, //t
-				{1, {0x25}}, //d
-				{2, {0x29,0x2c}},//k
-				{1, {0x26}}, // g
-				{1, {0x34}}, //f
-				{1, {0x33}}, //v
-				{1, {0x35}}, //th
-				{1, {0x36}}, //dh
-				{1, {0x30}}, //s
-				{1, {0x2f}}, //z
-				{1, {0x32}}, //sh
-				{1, {0x2f}}, //zh
-				{1, {0x2c}}, //h
-				{1, {0x37}},//m
-				{1, {0x38}}, //n
-				{1, {0x39}}, //ng
-				{1, {0x20}}, //l
-				{1, {0x23}}, //w
-				{1, {0x04}}, //y
-				{1, {0x1d}}, //r
-				{3, {0x28,0x2D,0x32}},//ch 
-				{2, {0x25,0x31}},//j
-				{1, {0x23}}, //wh
-				{1, {0}}, //pause
-				{1, {0}}//''
+//enum Phonemes {EH3, EH2, EH1, PA0, DT, A1,  A2,  ZH, 	AH2,    I3,  I2,  I1,  M,  N,   B,   V,	CH,     SH,  Z,   AW1, NG, AH1, OO1, OO,	L,      K,   J,   H,   G,  F,   D,   S,	A,      AY,  Y1,  UH3, AH, P,   O,   I,	U,      Y,   T,   R,   E,  W,   AE,  AE1,	AW2,    UH2, UH1, UH,  O2, O1,  IU,  U1,	THV,    TH,  ER,  EH,  E1, AW,  PA1, STOP};
+
+
+static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}, //IY 0 // start to convert to sc01
+				{1, {0x27}},//IH1
+				{3,{0x20,0x21,0x29}},//EY2= A, AY. Y
+				{1, {0x00}},//eH3
+				{1, {0x2f}},//AE4
+				{1, {0x24}},  //aa5 ///
+				{3, {0x35,0x26,0x26}},//ao6=OU, O, O
+				{2, {0x26,0x28}}, //ow7=O, U
+				{1, {0x28}}, //uh8
+				{3, {0x28,0x28}}, //uw9=IU, U, U
+				{1, {0x3a}}, //er10
+				{2, {0x2E,0x2d}},//ax11=AE, W
+				{1, {0x33}},//ah
+				{4, {0x15,0x2f,0x02,0x29}},//ay=ah1, ae1, eh1, Y
+				{4, {0x24,0x3d,0x26,0x28}},//aw=AH1, AW, O, U
+				{5, {0x26,0x32,0x15,0x27,0x29}}, //oy=o, uh1, ah1, I, IE
+				{1, {0x25}}, //p
+				{1, {0x0e}}, //b
+				{1, {0x2a}}, //t
+				{1, {0x1e}}, //d
+				{2, {0x19,0x1b}},//k=K, HF
+				{1, {0x1c}}, // g
+				{1, {0x1d}}, //f
+				{1, {0x0f}}, //v
+				{1, {0x38}}, //th
+				{1, {0x39}}, //dh
+				{1, {0x1F}}, //s
+				{1, {0x12}}, //z
+				{1, {0x11}}, //sh
+				{1, {0x07}}, //zh
+				{1, {0x1b}}, //h
+				{1, {0x0c}},//m
+				{1, {0x0d}}, //n
+				{1, {0x14}}, //ng
+				{1, {0x18}}, //l
+				{1, {0x2d}}, //w
+				{1, {0x29}}, //y
+				{1, {0x2b}}, //r
+				{2, {0x2A,0x11}},//ch=T, HFC?, SCH
+				{2, {0x1e,0x1a}},//j=D, J
+				{1, {0x2d}}, //wh
+				{1, {0x3e}}, //pause
+				{1, {0x3f}}//'' STOP???
   };
 
 
@@ -103,11 +106,11 @@ most *X are all special cases?
  */
 
 
-//NRL: IY, 0, IH, 1, EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
+//NRL:0, "IH", "1", EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
 
-//NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
+const char* NRL_list[54]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
 
-//KLATT: END 0,  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
+//KLATT: END 0",  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
 
 static const char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence?
 
@@ -133,7 +136,7 @@ typedef struct{
 } votmap;
 
 
-static votmap remapvotrax[] = {{1, 0x01,0x02}}; //example
+//static votmap remapvotrax[] = {{1, 0x01,0x02}}; //example
 
 
 void xlate_word(char word[]);
@@ -186,7 +189,7 @@ void main(argc, argv)
 
     //    TTSinarray[input_size] = EOF; // place in text2speech
 
-          printf("%s %d\n",TTSinarray, input_size);
+    //          printf("%s %d\n",TTSinarray, input_size);
 
   //  u8 TTSlength= text2speechfor256(9,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
 
@@ -251,12 +254,14 @@ int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *out
 
   xlate_file();
   char countme=0;
+  //      printf("Output: %d\n", output_count);
   for (char i=0;i<output_count;i++){
+    //  printf("LEN: %d\n", ourvot[output_array[i]].length);
     for (char ii=0;ii<ourvot[output_array[i]].length;ii++){
     output[countme]=ourvot[output_array[i]].mmm[ii];
+    //    printf("%s ", NRL_list[output_array[i]]);
     countme++;
 	}
-	//       output[i]=remap256[rand()%43];
   }
   return countme; 
 }

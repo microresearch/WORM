@@ -109,7 +109,7 @@ uint8_t lpc_getBits(uint8_t num_bits)
 	  //	  fprintf(stderr, "OFF: %d\n", ptrAddr-xxx);
 	  //	  fprintf(stderr, "lastbyte: 0x%x\n", *ptrAddr);
 	  lastbyte=ptrAddr-xxx;
-	  printf("0x%X, ",*ptrAddr);
+	  	  printf("0x%X, ",*ptrAddr);
 		ptrBit -= 8;
 		ptrAddr++;
 		//		didntjump=2;
@@ -157,7 +157,7 @@ void lpc_running(){  // write into audio buffer
   static u16 counterrr=0;
   int16_t samplel=lpc_get_sample()>>2; // TODO or scale samples/speed???
   
-  //        printf("%c",samplel);
+  //          printf("%c",samplel);
 }
 
 /*
@@ -216,7 +216,7 @@ void lpc_update_coeffs(void)
 			// try jump 
 			//ptrAddr++; ptrBit=0;
 			if (didntjump){
-			  printf("0x%X, ",*ptrAddr);
+			  			  printf("0x%X, ",*ptrAddr);
 
 			  ptrBit =0;
 			  ptrAddr++;
@@ -388,15 +388,15 @@ void main(int argc, char *argv[]){
    fread(xxx,lengthy,1,fp);
    fclose(fp);
    //   xxx[lengthy]=0;
-		  printf("{");
+   		  printf("{");
 
    // speak that buffer
-   //      while(flag==0){  
-   //   	      	fprintf(stderr, "OFF: %d\n\n", uffset);
+   //         while(flag==0){  
+   //     	      	fprintf(stderr, "OFF: %d\n\n", uffset);
 		lpc_say(xxx+uffset);
 	     //while(synth_running && (ptrAddr-xxx)<uuffset) lpc_running();
 	     	     while(synth_running) lpc_running();
-		     //	     	     fprintf(stderr, "LAST: %d\n\n", lastbyte);
+		     //		     	     	     fprintf(stderr, "LAST: %d\n\n", lastbyte);
 	     //	     lpc_running();
 	     //	     	  while(1) lpc_running();
 	  	  uffset++;
@@ -405,5 +405,5 @@ void main(int argc, char *argv[]){
 		  //		  printf("%d\n", uffset);
 		  //	  	                while(1) lpc_running();
 		  //		  sleep(2);
-		  //		  		  	   }
+		  //		  		  		  	   }
 }

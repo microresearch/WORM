@@ -142,7 +142,7 @@ WHY?
 
 ** 8/1
 
-- TTS votrax with multiples - compiles on both - to TEST on lap/ARM!
+- TTS votrax with multiples - compiles on both - to TEST on lapDONE/ARM!
 
 - mapping/making TTS in_array should be in TTS/english2phoneme using
   mapytoascii - arrays can also be there so no need to pass in ... but
@@ -151,7 +151,27 @@ WHY?
   faster and regular - mapping in audio.c makes sense so is
   timed... also for all XY mappings - which are?
 
-- discs of TRON TMS5220 - in Downloads // but TRONSS is sp0256
+- TMS TTS code/mappings??
+
+- discs of TRON TMS5220 - in DownloadsDONE-15 vocab->end vocabs NOW?
+  or as have good technique with lpcr/runread? // but TRONSS is sp0256
+
+** 9/1 - 10/1
+
+- TTS votrax on lap not working - sounds wrong??? - template thing
+  matches for bitswap but is 64 bit read ok - looks reasonable as
+  matches phonemes
+
+- phonemes wrongly mapped (where?) or votrax is wrong_> floats, try
+  with vocab from gamesFINE = issue in mapping: as code from
+  deladriere was for SC02 which has different phoneme codes to SC01 -
+  FIX: done in parse.c, TO_TEST, LAP-DONE, *ARM!*
+
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
+
+** 10/1
+
+- test TTS votrax on ARM
 
 * TTS
 
@@ -222,9 +242,9 @@ we started on this in parse.c
 
 - need to re-acquaint with all of klatt - where we have phonemes earlier in whole process!?
 
-** votrax sco1 phoneme list:
+** votrax sco1vs02 phoneme list:
 
-from deladriere but we converted
+from deladriere but we converted - but is for 02
 
 {0x05, 0x07,'0x08,0x05,0x03' , 0x0A, 0x0C, 0x0E,"0x12,0x11,0x11" ,
 0x11,0x16', 0x15, '0x14,0x16,0x16', 0x1c, '0x0C,0x23',
@@ -234,6 +254,9 @@ from deladriere but we converted
 0x38, 0x39, 0x20, 0x23, 0x04, 0x1d, '0x28,0x2D,0x32' , '0x25,0x31',
 0x23, 0, 0}
 
+SC01//enum Phonemes {	EH3, EH2, EH1, PA0, DT, A1,  A2,  ZH, 	AH2,    I3,  I2,  I1,  M,  N,   B,   V,	CH,     SH,  Z,   AW1, NG, AH1, OO1, OO,	L,      K,   J,   H,   G,  F,   D,   S,	A,      AY,  Y1,  UH3, AH, P,   O,   I,	U,      Y,   T,   R,   E,  W,   AE,  AE1,	AW2,    UH2, UH1, UH,  O2, O1,  IU,  U1,	THV,    TH,  ER,  EH,  E1, AW,  PA1, STOP};
+
+
 *question of accuracy and how to deal with multiples - convert multiples in parse.c but how to we flag multiple*
 
 //NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
@@ -242,7 +265,7 @@ from:
 
 #phoneme strings adapted to match the SSI-263 phoneme chart and diphthong set
 
-phons = {'AA': "0x0E", 'AE': "0x0C", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "0x0C,0x1C",
+phons = {'AA': "0x0E", 'AE': "0x2E", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "0x0C,0x1C",
          'AW': '0x0F,0x10,0x11,0x16', 'AX':'0x0C,0x23', 'AY': '0x0F,0x0D,0x0B,0x03', 'B': '0x24', 'CH': '0x28,0x2D,0x32',
          'D': '0x25', 'DH': '0x36', 'EH': '0x0A', 'EL': '0x0A,0x20', 'EN': '0x0A,0x38',
          'ER': '0x1C', 'EY': '0x08,0x05,0x03', 'F': '0x34', 'G': '0x26', 'HH': '0x2C',
