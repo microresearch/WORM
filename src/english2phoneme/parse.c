@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-
+#include "TTS.h"
 #define MAX_LENGTH 128
 
 //static FILE *In_file;
@@ -12,19 +12,12 @@ static int input_count;
 static int input_length;
 static char *input_array;
 unsigned char output_array[MAX_LENGTH];
-unsigned char  output_count = 0;
+int output_count = 0;
 
 typedef struct{
   unsigned char length;
   unsigned char mmm[5];
 } vottts;
-
-int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *output);
-
-static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
-
-//enum Phonemes {EH3, EH2, EH1, PA0, DT, A1,  A2,  ZH, 	AH2,    I3,  I2,  I1,  M,  N,   B,   V,	CH,     SH,  Z,   AW1, NG, AH1, OO1, OO,	L,      K,   J,   H,   G,  F,   D,   S,	A,      AY,  Y1,  UH3, AH, P,   O,   I,	U,      Y,   T,   R,   E,  W,   AE,  AE1,	AW2,    UH2, UH1, UH,  O2, O1,  IU,  U1,	THV,    TH,  ER,  EH,  E1, AW,  PA1, STOP};
-
 
 static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}, //IY 0 // start to convert to sc01
 				{1, {0x27}},//IH1
@@ -74,48 +67,21 @@ static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}
 
 static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
 
-// remap this index 0->42 to the 256 phonemes which are
 
-/*NRLIPAtoSPO256 = { 'AA':'AA', 'AE':'AE', 'AH':'AX AX', 'AO':'AO', 'AW':'AW',  'AX':'AX',
-                   'AY':'AY', 'b':'BB1', 'CH':'CH',  'd':'DD1', 'DH':'DH1', 'EH':'EH',
-                   'ER':'ER1','EY':'EY', 'f':'FF',   'g':'GG2', 'h':'HH1',  'IH':'IH',
-                   'IY':'IY', 'j':'JH',  'k':'KK1',  'l':'LL',  'm':'MM',   'n':'NN1',
-                   'NG':'NG', 'OW':'OW', 'OY':'OY',  'p':'PP',  'r':'RR1',  's':'SS',
-                   'SH':'SH', 't':'TT1', 'TH':'TH',  'UH':'UH',  'UW':'UW2','v':'VV',
-                   'w':'WW', 'WH':'WH', 'y':'YY1', 'z':'ZZ', 'ZH':'ZH', 'PAUSE':'PA4' };*/
-
-/* 
-
-// but what are numbers for sp0256
-
-    _allophones = { 'PA1':0, 'PA2':1, 'PA3':2, 'PA4':3, 'PA5':4, 'OY':5, 'AY':6, 'EH':7, 
-             'KK3':8, 'PP':9, 'JH':10, 'NN1':11, 'IH':12, 'TT2':13, 'RR1':14, 'AX':15, 
-             'MM':16, 'TT1':17, 'DH1':18, 'IY':19, 'EY':20, 'DD1':21, 'UW1':22, 'AO':23, 
-             'AA':24, 'YY2':25, 'AE':26, 'HH1':27, 'BB1':28, 'TH':29, 'UH':30, 'UW2':31, 
-             'AW':32, 'DD2':33, 'GG3':34, 'VV':35, 'GG1':36, 'SH':37, 'ZH':38, 'RR2':39, 
-             'FF':40, 'KK2':41, 'KK1':42, 'ZZ':43, 'NG':44, 'LL':45, 'WW':46, 'XR':47, 
-             'WH':48, 'YY1':49, 'CH':50, 'ER1':51, 'ER2':52, 'OW':53, 'DH2':54, 'SS':55, 
-             'NN2':56, 'HH2':57, 'OR':58, 'AR':59, 'YR':60, 'GG2':61, 'EL':62, 'BB2':63 };*/
-
-/* SAM:
-
-const char* phoneme_list[54]={0"IY", 1"IH", 2"EH", 3"AE", 4"AA", 5"AH", 6"AO", 7"OH", 8"UH", 9"UX", 10"ER", 11"AX", 12"IX", 13"EY", 14"AY", 15"OY", 16"AW", 17"OW", 18"UW", 19"R", 20"L", 21"W", 22"WH", 23"Y", 24"M", 25"N", 26"NX", 27"B", 28"D", 29"G", 30"J", 31"Z", 32"ZH", 33"V", 34"DH", 35"S", 36"SH", 37"F", 38"TH", 39"P", 40"T", 41"K", 42"CH", 43"/H", 44"YX", 45"WX", 46"RX", 47"LX", 48"/X", 49"DX", 50"UL", 51"UM", 52"UN", 53"Q"}; 
-
-most *X are all special cases?
-
- */
-
-
-//NRL:0, "IH", "1", EY, 2, EH, 3, AE, 4, AA, 5, AO, 6, OW, 7, UH, 8, UW, 9, ER, 10, AX, 11, AH, 12, AY, 13, AW, 14, OY, 15, p, 16, b, 17, t, 18, d, 19, k, 20, g, 21, f, 22, v, 23, TH, 24, DH, 25, s, 26, z, 27, SH, 28, ZH, 29, h, 30, m, 31, n, 32, NG, 33, l, 34, w, 35, y, 36, r, 37, CH, 38, j, 39, WH, 40, PAUSE, 41, "", 42
-
-const char* NRL_list[54]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
+//const char* NRL_list[54]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
 
 //KLATT: END 0",  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
 
-static const char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence?
+static const unsigned char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence?
 
-static const char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13, 2, 3, 4, 6, 17, 8, 18, 10, 11, 5, 14, 16, 15, 39, 27, 40, 28, 41, 29, 37, 33, 38, 34, 35, 31, 36, 32, 43, 24, 25, 26, 20, 21, 23, 19, 42, 30, 22, 54, 54};
+static const unsigned char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13, 2, 3, 4, 6, 17, 8, 18, 10, 11, 5, 14, 16, 15, 39, 27, 40, 28, 41, 29, 37, 33, 38, 34, 35, 31, 36, 32, 43, 24, 25, 26, 20, 21, 23, 19, 42, 30, 22, 54, 54};
 
+// TMS
+
+//NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
+
+static const unsigned char remaptms[43]  __attribute__ ((section (".flash"))) ={52, 59, 57, 33, 25, 2, 30, 14, 70, 71, 22, 1, 68, 27, 29, 38, 107, 85, 110, 87, 102, 89, 114, 96, 95, 94, 119, 98, 122, 100, 116, 75, 77, 79, 72, 82, 84, 81, 113, 92, 83, 125, 126};
+  
 //static const char remapklatt[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, 48, AO, OW, UH, UW, 54, AX, AH, AY, 56, OY, 2, 11, 5, 14, 8, 17, 23, 29 , 24, 31, 25, 33, 26, 35, 28, 20, 21, 22, 40, 44, 45, 43, 36, 38, WH, PAUSE, 0};
 
 // 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ //????
@@ -139,13 +105,10 @@ typedef struct{
 //static votmap remapvotrax[] = {{1, 0x01,0x02}}; //example
 
 
-void xlate_word(char word[]);
-void spell_word(char word[]);
+void xlate_word(unsigned char word[]);
+void spell_word(unsigned char word[]);
 void say_ascii(int character);
 void xlate_file();
-int text2speech(int input_len, char *input, char *output);
-int text2speechfor256(int input_len, unsigned char *input, unsigned char *output);
-int text2speechforSAM(int input_len, char *input, char *output);
 void have_letter();
 void have_special();
 void say_cardinal(long int value);
@@ -189,7 +152,7 @@ void main(argc, argv)
 
     //    TTSinarray[input_size] = EOF; // place in text2speech
 
-    //          printf("%s %d\n",TTSinarray, input_size);
+    //         printf("%s %d\n",TTSinarray, input_size);
 
   //  u8 TTSlength= text2speechfor256(9,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
 
@@ -198,8 +161,9 @@ void main(argc, argv)
 
   
   //transform text to integer code phonemes
-	  //  int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
-	    int output_count = text2speechforvotrax(input_size,TTSinarray,TTSoutarray);
+      int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
+    //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
+    printf("outcount: %d\n",output_count);
   for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
              printf("%d, ", TTSoutarray[i]);
@@ -213,7 +177,7 @@ void main(argc, argv)
 /*
 ** Transforms text to integer code phonemes.
 */
-int text2speech(int input_len, char *input, char *output){
+unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -226,7 +190,7 @@ int text2speech(int input_len, char *input, char *output){
   return output_count;
 }
 
-int text2speechfor256(int input_len, unsigned char *input, unsigned char *output){ // TODO: this is our model
+unsigned char text2speechfor256(unsigned char  input_len, unsigned char *input, unsigned char *output){ // TODO: this is our model
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -246,7 +210,7 @@ int text2speechfor256(int input_len, unsigned char *input, unsigned char *output
   return output_count; //check TODO!
 }
 
-int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *output){
+unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -266,7 +230,7 @@ int text2speechforvotrax(int input_len, unsigned char *input, unsigned char *out
   return countme; 
 }
 
-int text2speechforSAM(int input_len, char *input, char *output){
+unsigned char text2speechforSAM(unsigned char  input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -279,6 +243,24 @@ int text2speechforSAM(int input_len, char *input, char *output){
 	}
   return output_count-1;
 }
+
+unsigned char text2speechforTMS(unsigned char input_len, unsigned char *input, unsigned char  *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  input[input_len] = EOF;
+
+  xlate_file();
+  //      output_count=10;
+      printf("OC%d\n",output_count);
+
+  for (char i=0;i<output_count;i++){
+        output[i]=remaptms[output_array[i]];
+	}
+  output[output_count-1]=255; 
+  return output_count;
+}
+
 
 
 int makeupper(character)

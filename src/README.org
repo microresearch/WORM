@@ -4177,7 +4177,7 @@ ROM_LOAD( "sp0256b-019.bin",  0x1000, 0x0800, CRC(4bb43724) SHA1(49f5326ad45392d
 
 // External 16KiB speech ROM (spr128-003) from "The Voice"
 ROM_LOAD( "spr128-003.bin",   0x4000, 0x4000, CRC(509367b5) SHA1(0f31f46bc02e9272885779a6dd7102c78b18895b) )
-// Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder
+s// Additional External 16KiB speech ROM (spr128-004) from S.I.D. the Spellbinder
 ROM_LOAD( "spr128-004.bin",   0x8000, 0x4000, CRC(e79dfb75) SHA1(37f33d79ffd1739d7c2f226b010a1eac28d74ca0) )
 
 all in odyssey2.zipX

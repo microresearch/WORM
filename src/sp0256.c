@@ -8,8 +8,10 @@
 #include <string.h>
 
 #include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
+#include "sp0256vocab.h"
 
 extern uint16_t adc_buffer[10];
+extern float _selx, _sely, _selz;
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -225,7 +227,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  f->per=f->per_orig;//+(adc_buffer[SELY]>>5);
+		  f->per=f->per_orig+(90 - _selz*180.0f);//+(adc_buffer[SELY]>>5);
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -1129,6 +1131,8 @@ void micro()
 
 void sp0256_newsayTTS();
 
+void sp0256_newsayvocab();
+
 int16_t sp0256_get_sample(void){
   static int16_t output; 
   u8 dada;
@@ -1138,41 +1142,51 @@ int16_t sp0256_get_sample(void){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      sp0256_newsay();
-     //   sp0256_newsayTTS();
    }
 
       micro();
       howmany=lpc12_update(&m_filt, &output);
-      //      howmany=1;
           }
-	    //       output=rand()%32768;
-      //      int16_t test=rand()%32768;
    return output;
  }
 
  int16_t sp0256_get_sampleTTS(void){
-   int16_t* output=0;
    u8 dada;
-
+  static int16_t output; 
    u8 howmany=0;
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     //    	       sp0256_newsayTTS();
-     //     sp0256_newsay();
+          sp0256_newsayTTS();
    }
 
    micro();
-     howmany=lpc12_update(&m_filt, output);
+     howmany=lpc12_update(&m_filt, &output);
    }
-   //   output=rand()%32768;
-
-   return *output;
+   return output;
  }
+
+
+ int16_t sp0256_get_samplevocab(void){
+   u8 dada;
+  static int16_t output; 
+   u8 howmany=0;
+   while(howmany==0){
+   
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+          sp0256_newsayvocab();
+   }
+
+   micro();
+     howmany=lpc12_update(&m_filt, &output);
+   }
+   return output;
+ }
+
 
  // for text to speech we need out array, length and index...
 
-static char TTSinarray[65]="one two three four";
+extern char TTSinarray[65];
  static u8 TTSoutarray[128];
  static u8 TTSindex=0;
  static u8 TTSlength=0;
@@ -1181,7 +1195,9 @@ static char TTSinarray[65]="one two three four";
    static u8 dada=0;
    //   m_halted=1;
    //   dada=adc_buffer[SELX]>>6;
-   dada+=1;
+   //   dada+=1;
+   dada=_selx*64.0f; // there are 64
+
    m_ald = ((dada&63) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
@@ -1201,16 +1217,40 @@ void sp0256_newsayTTS(void){// called at end of phoneme
    TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
-     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray); 
    }
 
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
 
+void sp0256_newsayvocab(void){// called at end of phoneme
+   u8 dada;
+   static u8 vocabindex=0, whichone=0;
+   //   m_halted=1;
+
+   // how do we get phrase into inarray - with SELX and SELY - TODO
+   // when do we enter these characters and constrain to ascii - say
+   // 64x64 using mapy above
+   
+   dada=*(vocab_sp0256[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
+   vocabindex++;
+   if (*(vocab_sp0256[whichone]+vocabindex)==255){
+     vocabindex=0;
+     whichone=_selx*276.0f;
+   }
+   
+   
+   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+ }
+
+
  void sp0256_init(void){
    sp0256_iinit();
    reset();
      TTSindex=0;
+     TTSlength=64;
      //     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
+     for (u8 x=0;x<64;x++) TTSinarray[x]=32;
  }

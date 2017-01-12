@@ -77,9 +77,9 @@ do we have vocab as in for allophones for TMS? NO
 
 - Votrax ARM code in audio.c to test - WORKING!DONE but speed is a bit wierd - FIXED
 
-- that we can abstract out same code in audio.c - later (and need
+[- that we can abstract out same code in audio.c - later (and need
   abstract out further as does bit shifts in some cases but place this
-  in generator code)
+  in generator code)] maybe not?
 
 //////////////////////////////////////////////////
 
@@ -104,7 +104,6 @@ WHY?
 
 /// 
 
-- re-test sp0256 TTS additions on lapDONE and ARM - DONE but sp0256 speed is too fast - DIVIDE!
 
 - X/Y prototype for sp0256 TTS
 
@@ -130,7 +129,7 @@ WHY?
 
 - all readme notes for modes -> modes.org
 
-- what are all the bends? - sp0256 pitch should subtract
+- what are all the bends? - sp0256 pitch should subtract - or some kind of midpoint somehowDONE-to test
 
 - klatt re-acquaint
 
@@ -151,8 +150,6 @@ WHY?
   faster and regular - mapping in audio.c makes sense so is
   timed... also for all XY mappings - which are?
 
-- TMS TTS code/mappings??
-
 - discs of TRON TMS5220 - in DownloadsDONE-15 vocab->end vocabs NOW?
   or as have good technique with lpcr/runread? // but TRONSS is sp0256
 
@@ -169,9 +166,56 @@ WHY?
 
 *- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
 
-** 10/1
+** 10/1 - 11/1
+
+*** sp0256
+
+- re-test sp0256 TTS additions on lapDONE and ARM - DONE but sp0256 speed is too fast - DIVIDE!DONEbutstilltotweak
+
+- prototypeDONE for TTS input into TTSinarray in audio.c and tested on
+  sp0256 (that array is also inited there) - seems to work but pitch bend changed now to selz
+
+- vocab in sp0256-DONEbut maybe split into 2 banks, 
+
+in sp0256lap:
+
+- other ROMs in sp0256_>
+
+m_rom12 = phrases are at 6->42
+m_rom19 = new code for extra roms added/fixed 5-74-allophone-are same as AL2- plus some phrases, 115-123, 
+
+- what can be bent? it is instruction based but there is pitch and co-effs
+
+from currah: The intonation bit seems to be a special feature of the Currah hardware (not a
+feature of the SP0256 voice chip itself). Unknown how it is implemented... it
+might modify the CLK passed to the SP0256... so, aside from the frequency, this
+would also alter the durations, ie. the length of a "100ms" pause would vary...
+or it might modify whatever kind of external low-pass and/or high-pass
+filter...? The intonation does increase step-by-step (rather than changing
+abruptly from low to high)... the stepping rate, and the max/min values are
+unknown?
+
+we can access:
+
+  80h..BFh Allophones (same as 00h..3Fh on SP0256-AL2)    C0h "Enemy"
+  C1h "All clear"     C2h "Please"     C3h "Get off"      C4h "Open fire"
+  C5h "Watch out"     C6h "Mercy"      C7h "Hit it"       C8h "You blew it"
+  C9h "Do it again"   CAh "Incredible" FAh "U.F.O."       FBh "Monster!"
+
+but no further with extra voice.cpp vocab - banks? see http://atarihq.com/danb/files/o2doc.pdf
+
+*otherwise leave 19!*
+
+/////
 
 - test TTS votrax on ARM
+- raw votrax
+
+- bends of all LPC - start with TMS as first mode and figure out prototype
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code
 
 * TTS
 
@@ -212,17 +256,17 @@ make array of these values to remap 64x64
 
 there are 125 allophons plus pause - TODO: check these
 
-convert
+convert-> from user guide! test first before we convert
 
-{AE1, AE1, AH1, AH1, AW1, AW1, E1 , E1N, EH1, EH1, ER1, I1 , I1N, OO1,
-OW1, U1 , U1N, UH1, UH1, UH1, Y1 , Y1N, ER1, OW1, Y2 , AE2, AH2, AI2,
-AR2, AU2, AW2, E2 , EER, EH2, EHR, EI2, ER2, I2 , OI2, OO2, OOR, OR2,
-OW2, U2 , UH2, UU2, AE3, AH3, AI3, AR3, AU3, AW3, E3 , EEL, EER, EH3,
-EHR, EI3, ER3, I3 , ILL, ING, OI3, OO3, OOR, OR3, OW3, U3 , UH3, ULL,
-UHL, UU3, L , L- , LL , M , MM , N , NN , NG1, NG2, R , W , WH , Y , B
-, BB , D , DD , G1 , G2 , GG , J , JJ , THV, THV, V , VV , Z , ZZ , ZH
-, ZH-, K2 , KH , KH-, KH1, KH2, P , PH , PH-, T , TH , TH-, CH , F ,
-FF , HI , HO , HUH, S , SS , SH , SH-, THF, THF};
+{0AE1, 1AE1, 2AH1, 3AH1, 4AW1, 5AW1, 6E1 , 7E1N, 8EH1, 9EH1, 10ER1, 11I1 , 12I1N, 13OO1,
+14OW1, 15U1 , 16U1N, 17UH1, 18UH1, 19UH1, 20Y1 , 21Y1N, 22ER1, 23OW1, 24Y2 , 25AE2, 26AH2, 27AI2,
+28AR2, 29AU2, 30AW2, 31E2 , 32EER, 33EH2, 34EHR, 35EI2, 36ER2, 37I2 , 38OI2, 39OO2, 40OOR, 41OR2,
+42OW2, 43U2 , 44UH2, 45UU2, 46AE3, 47AH3, 48AI3, 49AR3, 50AU3, 51AW3, 52E3 , 53EEL, 54EER, 55EH3,
+56EHR, 57EI3, 58ER3, 59I3 , 60ILL, 61ING, 62OI3, 63OO3, 64OOR, 65OR3, 66OW3, 67U3 , 68UH3, 69ULL,
+70UHL, 71UU3, 72L , 73L- , 74LL , 75M , 76MM , 77N , 78NN , 79NG1, 80NG2, 81R , 82W , 83WH , 84Y , 85B
+, 86BB , 87D , 88DD , 89G1 , 90G2 , 91GG , 92J , 93JJ , 94THV, 95THV, 96V , 97VV , 98Z , 99ZZ , 100ZH
+, 101ZH-, 102K2 , 103KH , 104KH-, 105KH1, 106KH2, 107P , 108PH , 109PH-, 110T , 111TH , 112TH-, 113CH , 114F ,
+115FF , 116HI , 117HO , 118HUH, 119S , 120SS , 121SH , 122SH-, 123THF, 124THF};
 
 plus
 126. Pause1 <short pause>
@@ -347,7 +391,7 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 ** basic modes to do with suggested extensions - say 64 modes
 
-1. TMS -> vocab,TTS, phonemes, raw, other excitations for all
+1. TMS -> vocab,TTS?, phonemes, raw, other excitations for all
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
 3. digitalker ???
 4. votrax -> TTS, phonemes, vocab is roms, raw?

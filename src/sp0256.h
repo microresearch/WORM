@@ -10,3 +10,6 @@ void sp0256_init(void);
 
 int16_t sp0256_get_sampleTTS(void);
 void sp0256_newsayTTS(void);
+
+int16_t sp0256_get_samplevocab(void);
+void sp0256_newsayvocab(void);

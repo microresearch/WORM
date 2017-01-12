@@ -127,12 +127,19 @@ biquad* newBB;
 #define THRESH 32000
 #define THRESHLOW 30000
 
+// for TTS
+
+static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
+
+char TTSinarray[65];
+
 void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
+  samplespeed/=8.0;
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
@@ -186,12 +193,13 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   float remainder;
   // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
   // as is set to 8k samples/sec and we have 32k samplerate
+  samplespeed/=8.0;
 
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 //	 samplel=sp0256_get_sampleTTS();
+	 samplel=sp0256_get_sampleTTS();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
@@ -200,7 +208,7 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
-	 //	 sp0256_newsayTTS(); // selector is in newsay
+	  sp0256_newsayTTS(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -211,13 +219,67 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
    else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
-       //       samplel=sp0256_get_sampleTTS();
+              samplel=sp0256_get_sampleTTS();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
-	 //	 sp0256_newsayTTS(); // selector is in newsay
+	 sp0256_newsayTTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+
+  // refill back counter etc.
+};
+
+void sp0256vocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  // MODEL GENERATOR: TODO is speed and interpolation options DONE
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
+  // as is set to 8k samples/sec and we have 32k samplerate
+  samplespeed/=8.0;
+
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_samplevocab();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[xx]=samplel;
+
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	  sp0256_newsayvocab(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_samplevocab();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsayvocab(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -868,9 +930,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=2; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS
+  _intmode=20; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
@@ -883,7 +945,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (cc>AUDIO_BUFSZ) cc=0;
   }
   }
-    /*
+
+  // remapping for TTS modes
+
+  u8 TTS=1;
+  if (TTS){
+    u8 selx=_selx*64.0;
+    u8 sely=_sely*64.0;
+    TTSinarray[selx]=mapytoascii[sely];
+  }
+
+  /*
       for (x=0;x<sz/2;x++){ // STRIP_OUT - leave for TESTING
       readpos=samplepos;
       mono_buffer[x]=audio_buffer[readpos];

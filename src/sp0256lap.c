@@ -754,25 +754,51 @@ UINT32 getb( int len )
 		/*  adjacent bytes.  The byte we're interested in is extracted      */
 		/*  from the appropriate bit-boundary between them.                 */
 		/* ---------------------------------------------------------------- */
+	  // we have added 0x1000
 	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
 	  int32_t idx1 = (m_pc + 8) >> 3, d1;
-		
-	  int32_t firstadd=(idx0 & 0xffff)-0x1000;
-	  int32_t secondadd=(idx1 & 0xffff)-0x1000;
+
+	  // TO TEST: adjust according to which rom -> for 19ROM TODO!
+	  // if is 0x1000-0x1800->? -0x1000
+	  // 0x4000-0x8000
+	  // 0x8000+
+
+	  const uint8_t *whichrom;
+	  int32_t minus;
+ 	  //	  fprintf(stderr,"idx0: %d\n", idx0);
+	  data=1;
+	  if (idx0<0x1800 && idx0>=0x1000) {
+	    whichrom=m_rom19;
+	    minus=0x1000;
+	  }
+	  	  else if (idx0>=0x4000 && idx0<0x8000) {
+	    whichrom=m_rom003;
+	    minus=0x4000;
+	  }
+	  else if (idx0>=0x8000) {
+	    whichrom=m_rom004;
+	    minus=0x8000;
+	    }
+	  else {data=0;}
+
+	  if (data!=0){
+	  	  int32_t firstadd=(idx0 & 0xffff)-minus;
+	  	  int32_t secondadd=(idx1 & 0xffff)-minus;
 	  //	int firstadd=(idx0 & 0xffff);
 	  //	int secondadd=(idx1 & 0xffff);
+		  //	  	  fprintf(stderr,"addr: %d\n", firstadd);
 
-	  if (firstadd<0 || secondadd>0x800) data=0; // better check on this
-				else
-				  {
-		d0 = m_romAL2[firstadd];
-		d1 = m_romAL2[secondadd]; // was 0xffff
+		  //		  if (firstadd<0 || secondadd>0x800) data=0; // better check on this
+		  //		  		else
+		  //		  		  {
+		d0 = whichrom[firstadd];
+		d1 = whichrom[secondadd]; // was 0xffff
 
 		data = ((d1 << 8) | d0) >> (m_pc & 7);
-				}
+		//				  }
 
 		m_pc += len;
-	
+	  }
 
 	/* -------------------------------------------------------------------- */
 	/*  Mask data to the requested length.                                  */
@@ -808,10 +834,10 @@ void micro()
 		/* ---------------------------------------------------------------- */
 		if (m_halted && !m_lrq)
 		{
-		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
-		  fprintf(stderr,"m_pc %x m_ald %d\n",m_pc>>3,m_ald);
+		  		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x8000 which we shift back to 0x1000 and then subtract later when shifts back
+		  //		  fprintf(stderr,"m_pc %x m_ald %d\n",m_pc>>3,m_ald);
 		
-			  // m_pc = m_ald;
+		  // m_pc = m_ald;
 			m_fifo_sel = 0;
 			m_halted   = 0;
 			m_lrq      = 0x8000;
@@ -1126,26 +1152,19 @@ void micro()
  const u8 sp0256vocabthursday[]={ 29, 52, 43, 1, 33, 20, 255};
 
  u16 sp0256_get_sample(void){
-   u16 output; u8 dada;
+   u16 output; static u8 dada=0;
    static u8 dadaa=0;
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     //     dada=adc_buffer[SELX]>>6;
-     //     dada=0;
-     dada=testfromTTS[dadaa];
+     dada+=1;
+     fprintf(stderr,"NUM: %d\n", dada);
+
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
-     //               m_ald=dada;
-     if (testfromTTS[dadaa+1]==255) dadaa=0;
-     else dadaa+=1;
-     
-     m_lrq = 0; //from 8 bit write
-     //	fprintf(stderr, "DADA: %d\n",dada);
+          m_lrq = 0; //from 8 bit write
    }
 
    micro();
    output=lpc12_update(&m_filt);
-   //   output=rand()%32768;
-
    return output;
  }
 
@@ -1162,15 +1181,33 @@ void micro()
    reset();
  }
 
- void main(void){
-   sp0256_init();
-   //   void sp0256_newsay();
-   u8 dada=8;
-     m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
-   m_lrq = 0; //from 8 bit write
+// void main(void){
+void main(int argc, char *argv[]){
 
+  //		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
+  
+   sp0256_init();
+
+  int dada=atoi(argv[1]);
+    fprintf(stderr,"NUM: %d\n", dada);
+  fprintf(stderr,"0x%0x\n", dada<<1);
+     //		m_speech->ald_w(space, 0, offset & 0x7f);
+
+  //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
+	       m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
+          m_lrq = 0; //from 8 bit write
+	  m_halted=0;
+	  
    while(1){
-     int xx=sp0256_get_sample();
-     printf("%c",xx);
+      if (m_halted==1 && m_filt.rpt <= 0)     {
+	break;
+      }
+
+   micro();
+   u8 output=lpc12_update(&m_filt);
+     printf("%c",output);
+
    }
+   
+
  }
