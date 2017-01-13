@@ -3,8 +3,12 @@
 #include "math.h"
 #include "string.h"
 #include "forlap.h"
+#include "sp0256vocab.h"
 
-# include "sp0256vocab.h"
+// this one is stock allophone al2 rom
+
+#include "sp0romstest.h"
+
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -55,9 +59,6 @@ const unsigned char SILENT[7]={4,4,4,4,4,4,4};
                                      
 const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 255};
 
-// this one is stock allophone al2 rom
-
-#include "sp0romstest.h"
 
 struct lpc12_t
 {
@@ -78,7 +79,7 @@ struct lpc12_t m_filt;            /* 12-pole filter                             
 uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
 int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
 int32_t            m_pc;              /* Microcontroller's PC value.                  */
-uint16_t            m_stack;           /* Microcontroller's PC stack.                  */
+uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
 u8            m_fifo_sel;        /* True when executing from FIFO.               */
 u8            m_halted;          /* True when CPU is halted.                     */
 UINT32         m_mode;            /* Mode register.                               */
@@ -144,7 +145,7 @@ void sp0256_iinit()
 	m_halted   = 1; // was 1
 	m_filt.rpt = -1;
 	m_lrq      = 0x8000;
-	m_page     = 0x1000 << 3; //32768 =0x8000 // was 0x1000
+	m_page     = 0x1000 << 3; //32768 =0x8000 //
 	m_silent   = 1;
 
 	/* -------------------------------------------------------------------- */
@@ -722,7 +723,7 @@ void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
 UINT32 getb( int len )
 {
 	UINT32 data;
-	u16 d0, d1;
+	UINT32 d0, d1;
 
 
 	/* -------------------------------------------------------------------- */
@@ -754,9 +755,6 @@ UINT32 getb( int len )
 		/*  adjacent bytes.  The byte we're interested in is extracted      */
 		/*  from the appropriate bit-boundary between them.                 */
 		/* ---------------------------------------------------------------- */
-	  // we have added 0x1000
-	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
-	  int32_t idx1 = (m_pc + 8) >> 3, d1;
 
 	  // TO TEST: adjust according to which rom -> for 19ROM TODO!
 	  // if is 0x1000-0x1800->? -0x1000
@@ -765,25 +763,37 @@ UINT32 getb( int len )
 
 	  const uint8_t *whichrom;
 	  int32_t minus;
- 	  //	  fprintf(stderr,"idx0: %d\n", idx0);
+	  // we have added 0x1000
+	  int32_t idx0 = (m_pc    ) >> 3;
+	  int32_t idx1 = (m_pc + 8) >> 3;
+
+	  //	  fprintf(stderr,"m_pc %d idx0: %d idx1: %d\n", m_pc, idx0, idx1);
+
 	  data=1;
 	  if (idx0<0x1800 && idx0>=0x1000) {
 	    whichrom=m_rom19;
 	    minus=0x1000;
 	  }
-	  	  else if (idx0>=0x4000 && idx0<0x8000) {
-	    whichrom=m_rom003;
-	    minus=0x4000;
+	  else if (idx0>=0x1800 && idx0<0x4000){
+	    fprintf(stderr, "fifo?????? 0x%X\n", idx0);
+	    data=0;
 	  }
-	  else if (idx0>=0x8000) {
-	    whichrom=m_rom004;
+	  	  else if (idx0>=0x4000 && idx0<0x8000) {
+		    whichrom=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+		    minus=0x4000;
+	  }
+	  	  else if (idx0>=0x8000 && idx0<0xC000) {
+	    whichrom=m_rom004; // is never accessed?
 	    minus=0x8000;
 	    }
 	  else {data=0;}
 
+
+	  //	  int32_t d0,d1;
+	  
 	  if (data!=0){
-	  	  int32_t firstadd=(idx0 & 0xffff)-minus;
-	  	  int32_t secondadd=(idx1 & 0xffff)-minus;
+	  	  uint32_t firstadd=(idx0 & 0xffff)-minus;
+	  	  uint32_t secondadd=(idx1 & 0xffff)-minus;
 	  //	int firstadd=(idx0 & 0xffff);
 	  //	int secondadd=(idx1 & 0xffff);
 		  //	  	  fprintf(stderr,"addr: %d\n", firstadd);
@@ -794,6 +804,9 @@ UINT32 getb( int len )
 		d0 = whichrom[firstadd];
 		d1 = whichrom[secondadd]; // was 0xffff
 
+		//		fprintf(stderr,"firstadd: %d secondadd: %d minus: %d d0 %d d1 %d\n", firstadd, secondadd, minus, d0, d1);
+
+		
 		data = ((d1 << 8) | d0) >> (m_pc & 7);
 		//				  }
 
@@ -1000,8 +1013,8 @@ void micro()
 			/*  Set our "FIFO Selected" flag based on whether we're going   */
 			/*  to the FIFO's address.                                      */
 			/* ------------------------------------------------------------ */
-			m_fifo_sel = m_pc == FIFO_ADDR;
-
+		  			m_fifo_sel = m_pc == FIFO_ADDR;
+		  //		  fprintf(stderr,"FIFOI!\n");
 
 			/* ------------------------------------------------------------ */
 			/*  Control transfers to the FIFO cause it to discard the       */
@@ -1189,10 +1202,16 @@ void main(int argc, char *argv[]){
    sp0256_init();
 
   int dada=atoi(argv[1]);
-    fprintf(stderr,"NUM: %d\n", dada);
-  fprintf(stderr,"0x%0x\n", dada<<1);
-     //		m_speech->ald_w(space, 0, offset & 0x7f);
-
+  fprintf(stderr,"NUM: %d 0x%x\n", dada, dada<<1);
+    //  fprintf(stderr,"0x%0x\n", dada);
+  //		m_speech->ald_w(space, 0, offset & 0x7f);
+  //		m_fifo[m_fifo_head++ & 63] = 0xe8 & 0x3ff;
+    for (int x=75;x<114;x++){
+      m_ald=x<<4;
+      micro();
+          m_lrq = 0; //from 8 bit write
+	  m_halted=0;
+  
   //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
 	       m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
           m_lrq = 0; //from 8 bit write
@@ -1207,7 +1226,7 @@ void main(int argc, char *argv[]){
    u8 output=lpc12_update(&m_filt);
      printf("%c",output);
 
-   }
-   
+        }
+  }
 
  }

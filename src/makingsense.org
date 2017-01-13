@@ -166,7 +166,7 @@ WHY?
 
 *- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
 
-** 10/1 - 11/1
+** 10/1 - 12/1
 
 *** sp0256
 
@@ -195,6 +195,11 @@ filter...? The intonation does increase step-by-step (rather than changing
 abruptly from low to high)... the stepping rate, and the max/min values are
 unknown?
 
+m_nsp->set_clock(dotclock / (2 << voice));-> sets sample rate only!
+
+
+m_rom19 and extras:
+
 we can access:
 
   80h..BFh Allophones (same as 00h..3Fh on SP0256-AL2)    C0h "Enemy"
@@ -204,10 +209,19 @@ we can access:
 
 but no further with extra voice.cpp vocab - banks? see http://atarihq.com/danb/files/o2doc.pdf
 
-*otherwise leave 19!*
+*otherwise leave 19!* -> only possibility wrong roms but checkedSHA1 and
+003 does work to some extent, <<3 offsetsNO, what might signal a rom
+change?		
 
-/////
+check: /*  FIFO up the lower 10 bits of the data.                          */
 
+** 13/1
+
+- clean up sp0256 (crash proof on roms and ditch 019)
+
+- sp0256 vocab from book to add
+- sp0256 12 rom to add
+- split sp0256 vocab
 - test TTS votrax on ARM
 - raw votrax
 
@@ -215,7 +229,7 @@ but no further with extra voice.cpp vocab - banks? see http://atarihq.com/danb/f
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
-  but may not be so in TMS5220 code
+  but may not be so in TMS5220 code RE_TEST!
 
 * TTS
 

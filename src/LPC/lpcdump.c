@@ -275,6 +275,15 @@ int alt_lpc_update_coeffs(void)
 }
 
 
+static inline uint8_t bitrev8(uint8_t val)
+{
+	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
+	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
+	val = ((val & 0xAA) >>  1) | ((val & 0x55) <<  1);
+
+	return val;
+}
+
 
 void main(int argc, char *argv[]){
 
@@ -350,7 +359,7 @@ void main(int argc, char *argv[]){
    // dump reversed
    for (xx=0;xx<lengthy;xx++){
      //     printf("0x%X, ", byte_rev[*ptrAddr+xx]);
-     printf("0x%X, ", *(ptrAddr+xx));
+     printf("0x%X, ", bitrev8(*(ptrAddr+xx)));
      
      }
 
