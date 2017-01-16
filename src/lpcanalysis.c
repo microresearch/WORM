@@ -14,7 +14,7 @@ extern uint16_t adc_buffer[10];
 
 // seperate out crow stuff
 
-//#include "crow_lpc_coeffs.h"
+#include "crow_lpc_coeffs.h"
 
 struct crowz{
   const float* crowy;
@@ -299,10 +299,10 @@ void LPCAnalysisinit(int _windowsize) {
   windowsize=_windowsize;
   //  windowfunction=(float *)malloc(windowsize*sizeof(float));
   zeroAll();
-  //  crow_coeffz[0].crowy=own_crow_coeffs;
-  //  crow_coeffz[0].crowlength=7480;
-  //  crow_coeffz[1].crowy=single_crow_coeffs;
-  //  crow_coeffz[1].crowlength=6974;
+    crow_coeffz[0].crowy=own_crow_coeffs;
+    crow_coeffz[0].crowlength=7480;
+    crow_coeffz[1].crowy=single_crow_coeffs;
+    crow_coeffz[1].crowlength=6974;
 };
 
 void LPCAnalyzer_init() {
@@ -326,7 +326,7 @@ void update(float * newinput, float * newsource, float * output, int p,  int num
     }*/
 
   calculatenewOutput(newsource, output, numSamples);
-  calculatePoles(); // TEST!
+  //  calculatePoles(); // TEST!
 
 
  	if (adc_buffer[SELX]<2000){ //TODO: freeze!
@@ -335,18 +335,17 @@ void update(float * newinput, float * newsource, float * output, int p,  int num
 			for(i=0; i<numpoles; i++) {
 			  // switching co_effs -> 
 
-			  //			  crow_coeffz[0].crowy=own_crow_coeffs;
+			  //crow_coeffz[0].crowy=own_crow_coeffs;
 			  //			  crow_coeffz[0].crowlength=10296;
 
 
-			  coeff[i]=crow_coeffz[select].crowy[countex]; // exact length
+			  coeff[i]=crow_coeffz[0].crowy[countex]; // exact length
 			  countex++;
-			  if (countex==crow_coeffz[select].crowlength) countex=0;
 			}
-			G=crow_coeffz[select].crowy[countex]; 
+						G=crow_coeffz[0].crowy[countex]; 
 			//			G=1.0f;
 			  countex++;
-			  if (countex==crow_coeffz[select].crowlength) countex=0;
+			  if (countex>=crow_coeffz[0].crowlength) countex=0;
 			//			counter+=numpoles;
 				
 			}
@@ -358,7 +357,7 @@ void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int
 		out[i]= 0.0;
 	}
 	
-	update(inoriginal, indriver, out, inNumSamples, p); // THIS ONE FOR CROWS
+	update(inoriginal, indriver, out, p, inNumSamples); // THIS ONE FOR CROWS
 }
 
   static float oldsource[32];
