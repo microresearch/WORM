@@ -215,7 +215,7 @@ change?
 
 check: /*  FIFO up the lower 10 bits of the data.                          */
 
-** 13/1
+** 13/1 +
 
 - clean up sp0256 (crash proof on roms and ditch 019)
 
@@ -223,6 +223,8 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 - sp0256 12 rom to add
 - split sp0256 vocab
 - test TTS votrax on ARM
+
+- raw sp0256 - code and bend
 - raw votrax
 
 - bends of all LPC - start with TMS as first mode and figure out prototype
@@ -230,6 +232,10 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
+
+** 16/1 +
+
+- resurrecting crow/Lpc: lpcanaylsis.c 
 
 * TTS
 

@@ -120,7 +120,7 @@ error *= 1.0 - r * r;
     G= sqrtf(error); 
 }
 
-void zeroAll() {
+void zeroAll4() {
   int i;
   //  P_MAX=10;
   for (i=0; i<windowsize;++i) {
@@ -136,8 +136,8 @@ void zeroAll() {
   G=0.0f; //gain starts at zero;
 }
 
-void LPCAnalyzer_init() {
-  zeroAll();
+void LPCAnalyzer_init4() {
+  zeroAll4();
 }
 
 // residual= sum += source[i-j]*coeff[j];
@@ -166,7 +166,7 @@ float predict(long order,long length,float *data,float *coeffs, float * errur)
     return sqrt(power) / length;  
 }
 
-void calculateOutput(LPCfloat * source, LPCfloat * target, int startpos, int num) {
+void calculateOutput4(LPCfloat * source, LPCfloat * target, int startpos, int num) {
   u8 j; int i;
 	int basepos,posnow;
 //G=1.0; // TESTY!
@@ -202,7 +202,7 @@ void LPC_cross(LPCfloat * newinput, LPCfloat *newsource, LPCfloat * output, int 
 		  inputty[pos++]=temp;
 		  newinput[i]=temp;
 		}
-		calculateOutput(newsource, output, windowsize-left, left);
+		calculateOutput4(newsource, output, windowsize-left, left);
 
 		calculateDurbPoles(); // this calculates the coeffs so... - these all give same results
 		pos=0;
@@ -214,7 +214,7 @@ void LPC_cross(LPCfloat * newinput, LPCfloat *newsource, LPCfloat * output, int 
 			  inputty[pos++]=temp;
 			  newinput[i]=temp;
 		}
-			calculateOutput(newsource+left, output+left, pos-remainder, remainder);
+			calculateOutput4(newsource+left, output+left, pos-remainder, remainder);
 	} else {
 		lpc_preemphasis(newinput,numSamples,0.97);
 		for (i=0; i<numSamples;++i) {
@@ -223,7 +223,7 @@ void LPC_cross(LPCfloat * newinput, LPCfloat *newsource, LPCfloat * output, int 
 		  inputty[pos++]=temp;
 		  newinput[i]=temp;
 		}
-		calculateOutput(newsource, output, pos-numSamples, numSamples);
+		calculateOutput4(newsource, output, pos-numSamples, numSamples);
 	}
 }
 

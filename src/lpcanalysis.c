@@ -321,15 +321,15 @@ void update(float * newinput, float * newsource, float * output, int p,  int num
   static u16 countex=0;
   u8 select=adc_buffer[SELY]>>11;
 
-  for (i=0; i<numSamples;++i) { // for input
+  /*  for (i=0; i<numSamples;++i) { // for input
     inputty[pos++]= newinput[i];
-  }
+    }*/
 
-  //  calculateOutput(newinput, output, numSamples);
+  calculatenewOutput(newsource, output, numSamples);
   calculatePoles(); // TEST!
 
 
-  /*		if (adc_buffer[SELX]<2000){ //TODO: freeze!
+ 	if (adc_buffer[SELX]<2000){ //TODO: freeze!
 		  numpoles=p;
 				
 			for(i=0; i<numpoles; i++) {
@@ -349,7 +349,7 @@ void update(float * newinput, float * newsource, float * output, int p,  int num
 			  if (countex==crow_coeffz[select].crowlength) countex=0;
 			//			counter+=numpoles;
 				
-			}*/
+			}
 }
 
 void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples) {

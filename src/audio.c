@@ -805,19 +805,22 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   floot_to_int(outgoing,otherbuffer,size);
 };
 
-//u16 LPCanalyzer(genny* genstruct, int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples);
 
-  // LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
-  // convert in to float
-  // exciter=indriver to float
-  /* for (u8 x=0;x<size;x++){
+void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float voicebuffer[32],otherbuffer[32];
+
+  //  LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+    //  convert in to float
+    //  exciter=indriver to float
+    /*  for (u8 x=0;x<size;x++){
 	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
 	    }*/
-//        int_to_floot(incoming,flinbuffer,size);
-//	LPCAnalyzer_next(NULL, flinbuffer, floutbuffer, 10, size); //poles=10 - CROW TEST!
-    // out from float to int
-//    floot_to_int(mono_buffer,floutbuffer,size);
-//};
+       int_to_floot(incoming,voicebuffer,size);
+       LPCAnalyzer_next(NULL, voicebuffer, otherbuffer, 10, size); //poles=10 - CROW TEST!
+	//    out from float to int
+   floot_to_int(mono_buffer,otherbuffer,size);
+};
 
 void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
@@ -930,9 +933,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=20; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab
+  _intmode=21; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-lpcanalyser old crow code
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab, LPCanalyzer};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
