@@ -48,6 +48,7 @@ there are in D000 and D003)
 - any changes for others in MAME? CHECK -> files are: TMS-NOchange, digitalk-NOchange DONE!
 
 ///
+newvotrax:
 
 - proof of concept votrax working -. new mode... TODO: ARM port-compilesDONE, testTODO, all_vocabsTEST, TTS- see also deladriere code
 
@@ -217,14 +218,32 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 
 ** 13/1 +
 
-- clean up sp0256 (crash proof on roms and ditch 019)
+- clean up sp0256 (crash proof on roms and ditch 019)DONE - but needs to be tested
 
-- sp0256 vocab from book to add
-- sp0256 12 rom to add
-- split sp0256 vocab
+- sp0256 vocab from book to addDONE - but we need to split into banks all vocab there!
+
+- sp0256 12 and 19 roms (switch banks there) to addDONE - to test
+
+** 16/1 +
+
+- resurrecting crow/Lpc: lpcanalysis.c
+
+** 17/1 +
+
+GENERAL:
+
+- *do we not need to do a new_say when there is a change of mode to enter the new mode?*
+
+- *check adc _selx eg. extents for arrays say in sp0256 as model*
+
+- split sp0256 vocab into banks
 - test TTS votrax on ARM
 
-- raw sp0256 - code and bend
+- raw sp0256 - code-driven and more bend style (eg. just pitch, amp and filters)
+-> work on 2 lap versions
+
+Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+
 - raw votrax
 
 - bends of all LPC - start with TMS as first mode and figure out prototype
@@ -233,9 +252,32 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
 
-** 16/1 +
+ 
+*** sp0256
 
-- resurrecting crow/Lpc: lpcanaylsis.c 
+- check that all newsays trigger micro for new address... DONE - TEST!
+
+- dealing with different roms in sp0256.c: - DONE, with some error checking - TEST!
+
+m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank
+m_rom12 - phrases are at 6->42 - total 36
+m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 46
+
+///
+
+clearly tabulate m_rom19:
+
+5->63 - allophones as AL2
+64->74 - game phrases
+115-123 - game phrases
+from here->255 odd allophones and repeats of phrases
+142 - watchout
+222 - enemy
+
+****  	m_page     = 0x8000 << 3; // was 0x1000 // this works for last phrases
+
+0->28 = phrases
+TOTAL: 18+28=49
 
 * TTS
 

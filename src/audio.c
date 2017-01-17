@@ -785,8 +785,8 @@ void simpleklatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 void channelv(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
   dochannelv(incoming,outgoing, size);
-};
-
+}
+;
 // testing various vocoder and filter implementations:
 
 void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){

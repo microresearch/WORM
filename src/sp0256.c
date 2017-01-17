@@ -13,6 +13,8 @@
 extern uint16_t adc_buffer[10];
 extern float _selx, _sely, _selz;
 
+const unsigned char *m_romm;
+
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
 /**********************************************************************
@@ -150,7 +152,7 @@ void sp0256_iinit()
 	m_halted   = 1; // was 1
 	m_filt.rpt = -1;
 	m_lrq      = 0x8000;
-	m_page     = 0x1000 << 3; //32768 =0x8000
+ 	m_page     = 0x1000 << 3; //32768 =0x8000
 	m_silent   = 1;
 
 	/* -------------------------------------------------------------------- */
@@ -728,7 +730,7 @@ void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
 /* ======================================================================== */
 UINT32 getb( int len )
 {
-	UINT32 data;
+  UINT32 data, minus;
 	u16 d0, d1;
 
 	//	fprintf(stderr,"m_pc %d\n",m_pc>>3);
@@ -765,27 +767,49 @@ UINT32 getb( int len )
 	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
 	  int32_t idx1 = (m_pc + 8) >> 3, d1;
 		
-	  int32_t firstadd=(idx0 & 0xffff)-0x1000;
-	  int32_t secondadd=(idx1 & 0xffff)-0x1000;
 	  //	int firstadd=(idx0 & 0xffff);
 	  //	int secondadd=(idx1 & 0xffff);
 
-	  if (firstadd<0 || secondadd>0x800) data=0; // better check on this
+	  /*	  if (firstadd<0 || secondadd>0x800) data=0; // better check on this - NOT in case of m_rom19
 				else
-				  {
-		d0 = m_romAL2[firstadd];
-		d1 = m_romAL2[secondadd]; // was 0xffff
+				{*/
+
+	  data=1; minus=0x1000; // default
+	  if (idx0>=0x1800 || idx0<0x1000) data=0;
+
+	  if (m_romm==m_rom19){ // we need to choose roms
+
+	    if (idx0>=0x4000 && idx0<0x8000) {
+	      m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+	      minus=0x4000;
+	      data=1;
+	  }
+	    else if (idx0>=0x8000 && idx0<0xC000) {
+	    m_romm=m_rom004; 
+	    minus=0x8000;
+	    data=1;
+	    }
+	  else {data=0;}
+	  }
+	  
+	  if (data!=0){
+	  int32_t firstadd=(idx0 & 0xffff)-minus;
+	  int32_t secondadd=(idx1 & 0xffff)-minus;
+
+		d0 = m_romm[firstadd];
+		d1 = m_romm[secondadd]; // was 0xffff
 
 		data = ((d1 << 8) | d0) >> (m_pc & 7);
-				}
+		//				}
 
 		m_pc += len;
-	
+	  
 
 	/* -------------------------------------------------------------------- */
 	/*  Mask data to the requested length.                                  */
 	/* -------------------------------------------------------------------- */
 	data &= ((1 << len) - 1);
+	  }
 	}
 
 	return data;
@@ -1129,13 +1153,64 @@ void micro()
 	}
 }
 
-void sp0256_newsayTTS();
+int16_t sp0256_get_sample12(void){
+  static int16_t output; 
+  u8 howmany=0;
+  while(howmany==0){ 
+   
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsay12();
+   }
+      micro();
+      howmany=lpc12_update(&m_filt, &output);
+          }
+   return output;
+}
 
-void sp0256_newsayvocab();
+void sp0256_newsay12(void){
+  u8 dada;
+  m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_page = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_rom12;
+
+   dada=6+(_selx*36.0f); // they are 6->42
+   m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+}
+
+int16_t sp0256_get_sample19(void){
+  static int16_t output; 
+  u8 howmany=0;
+  while(howmany==0){    
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsay19();
+   }
+      micro();
+      howmany=lpc12_update(&m_filt, &output);
+          }
+   return output;
+}
+
+static const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
+
+void sp0256_newsay19(void){
+  u8 dada, indexy;
+  m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_romm=m_rom19;
+
+   //m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 49
+   indexy=_selx*49.0;
+   dada=remap19[indexy];
+   if (indexy>19) m_page=0x8000<<3;
+   else m_page=0x1000<<3;
+							   
+   m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+}
+
 
 int16_t sp0256_get_sample(void){
   static int16_t output; 
-  u8 dada;
    
       u8 howmany=0;
             while(howmany==0){ 
@@ -1151,7 +1226,6 @@ int16_t sp0256_get_sample(void){
  }
 
  int16_t sp0256_get_sampleTTS(void){
-   u8 dada;
   static int16_t output; 
    u8 howmany=0;
    while(howmany==0){
@@ -1168,7 +1242,6 @@ int16_t sp0256_get_sample(void){
 
 
  int16_t sp0256_get_samplevocab(void){
-   u8 dada;
   static int16_t output; 
    u8 howmany=0;
    while(howmany==0){
@@ -1184,20 +1257,24 @@ int16_t sp0256_get_sample(void){
  }
 
 
- // for text to speech we need out array, length and index...
+// for text to speech we need out array, length and index...
 
 extern char TTSinarray[65];
- static u8 TTSoutarray[128];
- static u8 TTSindex=0;
- static u8 TTSlength=0;
+static u8 TTSoutarray[128];
+static u8 TTSindex=0;
+static u8 TTSlength=0;
 
  void sp0256_newsay(void){
-   static u8 dada=0;
+   u8 dada=0;
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
+
    //   m_halted=1;
    //   dada=adc_buffer[SELX]>>6;
    //   dada+=1;
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_romAL2;
+   
    dada=_selx*64.0f; // there are 64
-
    m_ald = ((dada&63) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
@@ -1208,16 +1285,15 @@ extern char TTSinarray[65];
 void sp0256_newsayTTS(void){// called at end of phoneme
    u8 dada;
    //   m_halted=1;
-
-   // how do we get phrase into inarray - with SELX and SELY - TODO
-   // when do we enter these characters and constrain to ascii - say
-   // 64x64 using mapy above
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_romAL2;
    
    dada=TTSoutarray[TTSindex]; 
    TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
-     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray); 
+     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
    }
 
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
@@ -1226,25 +1302,23 @@ void sp0256_newsayTTS(void){// called at end of phoneme
 
 void sp0256_newsayvocab(void){// called at end of phoneme
    u8 dada;
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
    static u8 vocabindex=0, whichone=0;
    //   m_halted=1;
 
-   // how do we get phrase into inarray - with SELX and SELY - TODO
-   // when do we enter these characters and constrain to ascii - say
-   // 64x64 using mapy above
-   
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_romAL2;   
    dada=*(vocab_sp0256[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
    vocabindex++;
    if (*(vocab_sp0256[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*276.0f;
+     whichone=_selx*276.0f; // TODO: split vocab into banks
    }
    
    
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
-
 
  void sp0256_init(void){
    sp0256_iinit();
@@ -1253,4 +1327,5 @@ void sp0256_newsayvocab(void){// called at end of phoneme
      TTSlength=64;
      //     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
      for (u8 x=0;x<64;x++) TTSinarray[x]=32;
+     m_romm=m_romAL2;
  }

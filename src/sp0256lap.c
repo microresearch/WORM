@@ -783,7 +783,7 @@ UINT32 getb( int len )
 		    minus=0x4000;
 	  }
 	  	  else if (idx0>=0x8000 && idx0<0xC000) {
-	    whichrom=m_rom004; // is never accessed?
+	    whichrom=m_rom004; 
 	    minus=0x8000;
 	    }
 	  else {data=0;}
@@ -848,6 +848,8 @@ void micro()
 		if (m_halted && !m_lrq)
 		{
 		  		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x8000 which we shift back to 0x1000 and then subtract later when shifts back
+				  // Bit 12 is forced to 1 so that code executes out of page $1. 
+				  
 		  //		  fprintf(stderr,"m_pc %x m_ald %d\n",m_pc>>3,m_ald);
 		
 		  // m_pc = m_ald;
@@ -906,7 +908,9 @@ void micro()
 				/* -------------------------------------------------------- */
 				if (immed4)     /* SETPAGE */
 				{
+				  
 					m_page = bitrev32(immed4) >> 13;
+					printf("PAGE CHANGE %d\n", m_page);
 				} else
 				/* -------------------------------------------------------- */
 				/*  Otherwise, this is an RTS / HLT.                        */
@@ -1206,27 +1210,33 @@ void main(int argc, char *argv[]){
     //  fprintf(stderr,"0x%0x\n", dada);
   //		m_speech->ald_w(space, 0, offset & 0x7f);
   //		m_fifo[m_fifo_head++ & 63] = 0xe8 & 0x3ff;
-    for (int x=75;x<114;x++){
+  /*  for (int x=0;x<255;x++){ // 75-114 has no page change
+    printf("%d ",x);
       m_ald=x<<4;
+      m_lrq = 0; //from 8 bit write
+      m_halted=1;
       micro();
-          m_lrq = 0; //from 8 bit write
-	  m_halted=0;
-  
-  //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
-	       m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
-          m_lrq = 0; //from 8 bit write
-	  m_halted=0;
-	  
-   while(1){
-      if (m_halted==1 && m_filt.rpt <= 0)     {
-	break;
-      }
+      m_lrq = 0; //from 8 bit write
+      //m_halted=1;
+      */
+      //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
+  	m_page     = 0x8000 << 3; // was 0x1000 // this works!
 
+	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
+      m_lrq = 0; //from 8 bit write
+      m_halted=1;
+      	  
+   while(1){
    micro();
    u8 output=lpc12_update(&m_filt);
      printf("%c",output);
 
-        }
-  }
+     if (m_halted==1 && m_filt.rpt <= 0)     {
+	break;
+            }
+
+
+	    }
+     //        }
 
  }
