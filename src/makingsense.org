@@ -279,6 +279,49 @@ from here->255 odd allophones and repeats of phrases
 0->28 = phrases
 TOTAL: 18+28=49
 
+**** parameters
+
+- TODO: check example values/range from working lap
+
+cnt is set to 0
+amp-int16 - upto say 1280+
+per-uint32 - 255
+
+*int16 b_coef -512 to +512 - or use the calc below with IQ for values of f->r say 0-255:*
+fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+ 
+int16 f_coef -512 to +512 as above
+interp flag - 1 or 0
+
+*and handle pause - what else - how lenght/repeat counter works m_filt.rpt = repeat + 1;*
+
+- for simple version - handle changes of these parameters and pauses!
+
+	/* -------------------------------------------------------------------- */
+	/*  Decode the Amplitude and Period registers.  Force the 'cnt' to 0    */
+	/*  to get an initial impulse.  We compensate elsewhere by setting      */
+	/*  the repeat count to "repeat + 1".                                   */
+	/* -------------------------------------------------------------------- */
+	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+	f->cnt = 0;
+	f->per = f->r[1];
+	//	fprintf(stderr, "PER: %d\n",f->per);
+
+	/* -------------------------------------------------------------------- */
+	/*  Decode the filter coefficients from the quant table.                */
+	/* -------------------------------------------------------------------- */
+	for (i = 0; i < 6; i++)
+	{
+		#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
+
+		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
+		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
+	}
+
+	/*  Set the Interp flag based on whether we have interpolation parms    */
+
+	f->interp = f->r[14] || f->r[15];
+
 * TTS
 
 : gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP

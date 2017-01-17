@@ -334,7 +334,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
 	f->per = f->r[1];
-	//	fprintf(stderr, "PER: %d\n",f->per);
+	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -345,6 +345,8 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
+		fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+
 	}
 
 	/* -------------------------------------------------------------------- */
