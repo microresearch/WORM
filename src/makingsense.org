@@ -232,11 +232,12 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 
 GENERAL:
 
-- *do we not need to do a new_say when there is a change of mode to enter the new mode?*
+- *do we not need to do a new_say when there is a change of mode to enter the new mode?* - done in audio.c/sp0256 -> TEST
 
 - *check adc _selx eg. extents for arrays say in sp0256 as model*
 
-- split sp0256 vocab into banks
+- split sp0256 vocab into banks and also divide up ROMs
+
 - test TTS votrax on ARM
 
 - raw sp0256 - code-driven and more bend style (eg. just pitch, amp and filters)

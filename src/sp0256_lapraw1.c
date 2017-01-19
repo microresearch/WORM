@@ -5,7 +5,7 @@
 #include "forlap.h"
 #include "sp0256vocab.h"
 
-// this one is stock allophone al2 rom
+// this one is basic tests of non-code based raw sp0256
 
 #include "sp0romstest.h"
 
@@ -49,16 +49,6 @@
 // length is 2048 which is 2k or 0x1000
 
 void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
-
-// DICTIONARY
-
-const unsigned char HAPPIER[7]={0x2d,4,4,4};
-
-const unsigned char SILENT[7]={4,4,4,4,4,4,4};
-
-                                     
-const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 255};
-
 
 struct lpc12_t
 {
@@ -829,6 +819,48 @@ UINT32 getb( int len )
 /*                  instructions either until the repeat count != 0 or      */
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
+
+void newmicro() // TESTING first and then maybe do later as changes of contour
+{
+
+  // init as in micro
+  u8 i;
+  if (m_filt.rpt <= 0){
+
+  m_halted   = 0;
+  for (i = 0; i < 16; i++)
+    m_filt.r[i] = 0;
+  m_filt.cnt=0;
+  m_filt.amp=rand()%1280;
+  m_filt.per=rand()%255; // question of noise? 
+  m_filt.per=0;///??? - we set per to zero??? TEST!!!
+
+	/* -------------------------------------------------------------------- */
+	/*  Decode the filter coefficients from the quant table.                */
+	/* -------------------------------------------------------------------- */
+  	for (i = 0; i < 6; i++)
+	{
+#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
+
+	  m_filt.b_coef[stage_map[i]] = IQ(rand()%128);
+	  m_filt.f_coef[stage_map[i]] = IQ(rand()%128);
+	}
+
+	/*  Set the Interp flag based on whether we have interpolation parms    */
+
+  m_filt.interp=rand()%2;
+
+// - how length/repeat counter works m_filt.rpt = repeat + 1;*
+  m_filt.rpt = rand()%18;
+  }
+  // question of pause - then set this/// otherwise>>>>
+
+  //m_silent = 1;
+  //m_filt.r[1] = PER_PAUSE;
+
+  
+}
+
 void micro()
 {
 	UINT8  immed4;
@@ -1045,8 +1077,6 @@ void micro()
 		if (!repeat) continue;
 
 		m_filt.rpt = repeat + 1;
-		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
-
 		
 		i = (opcode << 3) | (m_mode & 6);
 		idx0 = sp0256_df_idx[i++];
@@ -1154,7 +1184,7 @@ void micro()
 		/* ---------------------------------------------------------------- */
 		if (opcode == 0xF)
 		{
-			m_silent = 1;
+ 			m_silent = 1;
 			m_filt.r[1] = PER_PAUSE;
 		}
 
@@ -1202,43 +1232,16 @@ void micro()
    reset();
  }
 
-// void main(void){
-void main(int argc, char *argv[]){
-
-  //		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
+ void main(void){
+//void main(int argc, char *argv[]){
   
-   sp0256_init();
-
-  int dada=atoi(argv[1]);
-  fprintf(stderr,"NUM: %d 0x%x\n", dada, dada<<1);
-    //  fprintf(stderr,"0x%0x\n", dada);
-  //		m_speech->ald_w(space, 0, offset & 0x7f);
-  //		m_fifo[m_fifo_head++ & 63] = 0xe8 & 0x3ff;
-  /*  for (int x=0;x<255;x++){ // 75-114 has no page change
-    printf("%d ",x);
-      m_ald=x<<4;
-      m_lrq = 0; //from 8 bit write
-      m_halted=1;
-      micro();
-      m_lrq = 0; //from 8 bit write
-      //m_halted=1;
-      */
-      //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
-  	m_page     = 0x8000 << 3; // was 0x1000 // this works!
-
-	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
-      m_lrq = 0; //from 8 bit write
-      m_halted=1;
       	  
    while(1){
-   micro();
+     newmicro(); // here we can set up m_filt parameters
+     
    u8 output=lpc12_update(&m_filt);
-     printf("%c",output);
-
-     if (m_halted==1 && m_filt.rpt <= 0)     {
-	break;
-            }
-
+        printf("%c",output);
+   //   fprintf(stderr, "rpt %d\n" ,  m_filt.rpt);
 
 	    }
      //        }

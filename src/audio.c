@@ -99,7 +99,7 @@ static adc_transform transform[5] = {
 };
 
 float _mode, _speed, _selx, _sely, _selz;
-u8 _intspeed, _intmode;
+u8 _intspeed, _intmode, trigger;
 
 enum adcchannel {
   MODE_,
@@ -133,8 +133,12 @@ static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) =
 
 char TTSinarray[65];
 
-void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: keep as new model
 
+  // adding trigger
+  if (trigger==1) sp0256_newsay(); // selector is in newsay
+
+  
   // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -902,7 +906,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   float samplespeed;
   static u16 cc;
-
+  u8 oldmode;
+  
   for (u8 x=0;x<5;x++){
   float value=(float)adc_buffer[transform[x].whichone]/65536.0f; // 4096.0f; // why 65536.0f as in clouds - align? - try that
 
@@ -922,8 +927,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   CONSTRAIN(_selz,0.0f,1.0f);
   _mode=smoothed_adc_value[MODE_];
   CONSTRAIN(_mode,0.0f,1.0f);
+  oldmode=_intmode;
   _intmode=_mode*transform[MODE_].multiplier; //0=32 we hope!
 
+  trigger=0;
+  if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
+  
+  
   //  samplespeed=_speed+0.01f; // TODO test this fully!
   samplespeed=_speed*transform[SPEED_].multiplier;
 
