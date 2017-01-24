@@ -236,7 +236,7 @@ GENERAL:
 
 - *check adc _selx eg. extents for arrays say in sp0256 as model*
 
-- split sp0256 vocab into banks and also divide up ROMs
+- split sp0256 vocab into banks
 
 - test TTS votrax on ARM
 
@@ -256,11 +256,16 @@ Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
  
 *** sp0256
 
+- do we need to implement  m_silent=
+
+  if (m_silent && m_filt.rpt <= 0)
+
+
 - check that all newsays trigger micro for new address... DONE - TEST!
 
 - dealing with different roms in sp0256.c: - DONE, with some error checking - TEST!
 
-m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank
+m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank?
 m_rom12 - phrases are at 6->42 - total 36
 m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 46
 
@@ -282,7 +287,7 @@ TOTAL: 18+28=49
 
 **** parameters
 
-- TODO: check example values/range from working lap
+- TODO: check example values/range from working lapDONE
 
 cnt is set to 0
 amp-int16 - upto say 1280+
@@ -322,6 +327,17 @@ interp flag - 1 or 0
 	/*  Set the Interp flag based on whether we have interpolation parms    */
 
 	f->interp = f->r[14] || f->r[15];
+
+
+** 24/1 +
+
+- what needs to be tested/done? sp0256//TMS//TTS:
+
+-- - *check adc _selx etc. extents for arrays say in sp0256 as model*
+
+0->1.0?
+
+- X/Y abstracted for settings (array of floats + length + constraints for each)
 
 * TTS
 

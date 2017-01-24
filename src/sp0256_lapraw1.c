@@ -3,6 +3,8 @@
 #include "math.h"
 #include "string.h"
 #include "forlap.h"
+#include <sys/stat.h>
+#include <time.h>    // time()
 #include "sp0256vocab.h"
 
 // this one is basic tests of non-code based raw sp0256
@@ -823,17 +825,23 @@ UINT32 getb( int len )
 void newmicro() // TESTING first and then maybe do later as changes of contour
 {
 
+  // selx,y,z-> x-axis for amp, 12x filt-coef, on/off for noise, y for value, z for per!
+  
   // init as in micro
   u8 i;
   if (m_filt.rpt <= 0){
 
   m_halted   = 0;
-  for (i = 0; i < 16; i++)
-    m_filt.r[i] = 0;
+  //  for (i = 0; i < 16; i++)
+  //    m_filt.r[i] = 0;
   m_filt.cnt=0;
   m_filt.amp=rand()%1280;
-  m_filt.per=rand()%255; // question of noise? 
-  m_filt.per=0;///??? - we set per to zero??? TEST!!!
+  m_filt.per=rand()%255; // question of noise? which is per 0
+    m_filt.per=64;
+  //  m_filt.amp=24;
+    if ((rand()%8)==0) m_filt.per=0;
+  
+  //  m_filt.per=0;///??? - we set per to zero??? TEST!!!
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -842,23 +850,28 @@ void newmicro() // TESTING first and then maybe do later as changes of contour
 	{
 #define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
 
-	  m_filt.b_coef[stage_map[i]] = IQ(rand()%128);
-	  m_filt.f_coef[stage_map[i]] = IQ(rand()%128);
+	  	  m_filt.b_coef[stage_map[i]] = IQ(rand()%128);
+	  	  m_filt.f_coef[stage_map[i]] = IQ(rand()%128);
+	  //	  	  m_filt.b_coef[stage_map[i]] = IQ(10);
+	  //	  m_filt.f_coef[stage_map[i]] = IQ(10);
+
 	}
-
-	/*  Set the Interp flag based on whether we have interpolation parms    */
-
-  m_filt.interp=rand()%2;
-
+  
 // - how length/repeat counter works m_filt.rpt = repeat + 1;*
-  m_filt.rpt = rand()%18;
+  m_filt.rpt = (rand()%18)+1;
+// m_filt.rpt=10;
   }
-  // question of pause - then set this/// otherwise>>>>
+  // question of pause - doesn't seem to work!
 
   //m_silent = 1;
-  //m_filt.r[1] = PER_PAUSE;
-
-  
+  //m_filt.r[1] = PER_PAUSE;  - this sets?/ 	f->per = f->r[1];
+      if ((rand()%130)==0) {
+    m_filt.per=PER_PAUSE;
+    m_silent = 1; // so far we don;t have m_silent - TESTING!
+    //  m_filt.rpt = 0;
+    }
+     else m_silent=0;
+ 
 }
 
 void micro()
@@ -1234,12 +1247,15 @@ void micro()
 
  void main(void){
 //void main(int argc, char *argv[]){
-  
+   u8 output;
+   srand(time(NULL));
+
+   sp0256_init();
       	  
    while(1){
      newmicro(); // here we can set up m_filt parameters
-     
-   u8 output=lpc12_update(&m_filt);
+     if (m_silent && m_filt.rpt <= 0) output=0;
+     else output=lpc12_update(&m_filt);
         printf("%c",output);
    //   fprintf(stderr, "rpt %d\n" ,  m_filt.rpt);
 
