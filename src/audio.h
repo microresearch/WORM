@@ -41,6 +41,12 @@ typedef struct adc_transformer {
   float multiplier;
 } adc_transform;
 
+typedef struct xyer_ {
+  float multiplier;
+  u8 length;
+} xyer;
+
+
 
 #endif
 

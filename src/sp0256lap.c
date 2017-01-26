@@ -773,10 +773,11 @@ UINT32 getb( int len )
 
 	  data=1;
 	  if (idx0<0x1800 && idx0>=0x1000) {
-	    whichrom=m_rom19;
+	    whichrom=m_rom12;
 	    minus=0x1000;
 	  }
-	  else if (idx0>=0x1800 && idx0<0x4000){
+
+	  /*else if (idx0>=0x1800 && idx0<0x4000){
 	    fprintf(stderr, "fifo?????? 0x%X\n", idx0);
 	    data=0;
 	  }
@@ -787,7 +788,7 @@ UINT32 getb( int len )
 	  	  else if (idx0>=0x8000 && idx0<0xC000) {
 	    whichrom=m_rom004; 
 	    minus=0x8000;
-	    }
+	    }*/
 	  else {data=0;}
 
 
@@ -1224,7 +1225,7 @@ void main(int argc, char *argv[]){
       //m_halted=1;
       */
       //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
-  	m_page     = 0x8000 << 3; // was 0x1000 // this works!
+  //  	m_page     = 0x8000 << 3; // was 0x1000 // this works!
 
 	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
       m_lrq = 0; //from 8 bit write

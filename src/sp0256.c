@@ -139,12 +139,6 @@ void sp0256_iinit()
 	/* -------------------------------------------------------------------- */
 	m_filt.rng = 1;
 
-	/*	memset(m_rom,0,65536);
-	memcpy(m_rom+0x1000,m_roma,2048);
-	memcpy(m_rom+0x4000,m_romb,0x4000);
-	memcpy(m_rom+0x8000,m_romc,0x4000);
-	*/
-
 	/* -------------------------------------------------------------------- */
 	/*  Set up the microsequencer's initial state.                          */
 	/* -------------------------------------------------------------------- */
@@ -777,9 +771,14 @@ UINT32 getb( int len )
 	  data=1; minus=0x1000; // default
 	  if (idx0>=0x1800 || idx0<0x1000) data=0;
 
-	  if (m_romm==m_rom19){ // we need to choose roms
+	  if (m_romm==m_rom19 || m_romm==m_rom003 || m_romm==m_rom004){ // we need to choose roms
 
-	    if (idx0>=0x4000 && idx0<0x8000) {
+	    if (idx0>=0x1000 && idx0<0x1800) {
+	      m_romm=m_rom19; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+	      minus=0x1000;
+	      data=1;
+	  }
+	    else if (idx0>=0x4000 && idx0<0x8000) {
 	      m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
 	      minus=0x4000;
 	      data=1;
@@ -1173,7 +1172,7 @@ void sp0256_newsay12(void){
    m_page = 0x1000 << 3; //32768 =0x8000
    m_romm=m_rom12;
 
-   dada=6+(_selx*36.0f); // they are 6->42
+   dada=6+(_selx*37.0f); // they are 6->42
    m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
 }
@@ -1199,7 +1198,7 @@ void sp0256_newsay19(void){
    m_romm=m_rom19;
 
    //m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 49
-   indexy=_selx*49.0;
+   indexy=_selx*50.0f;
    dada=remap19[indexy];
    if (indexy>19) m_page=0x8000<<3;
    else m_page=0x1000<<3;
@@ -1327,5 +1326,4 @@ void sp0256_newsayvocab(void){// called at end of phoneme
      TTSlength=64;
      //     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
      for (u8 x=0;x<64;x++) TTSinarray[x]=32;
-     m_romm=m_romAL2;
  }

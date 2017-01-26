@@ -156,8 +156,6 @@ void generate_votrax_samples(int samples)
 	}
 }
 
-// For arm we need to add votrax_get_sample - single sample and votrax_newsay TODO!
-
 #ifndef LAP
 uint16_t lenny;
 // TODO: newsay for basic phonemes, TTS and vocabulary

@@ -91,7 +91,7 @@ int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUF
 
 float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
 static adc_transform transform[5] = {
-  {MODE, 0, 0.1f, 32.0f},
+  {MODE, 0, 0.1f, 33.0f}, // only multiplier we use except speed!
   {SELX, 0, 0.1f, 32.0f},
   {SELY, 0, 0.1f, 32.0f},
   {SELZ, 0, 0.1f, 32.0f},
@@ -99,7 +99,7 @@ static adc_transform transform[5] = {
 };
 
 float _mode, _speed, _selx, _sely, _selz;
-u8 _intspeed, _intmode, trigger;
+u8 _intspeed, _intmode=0, trigger;
 
 enum adcchannel {
   MODE_,
@@ -138,14 +138,10 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   // adding trigger
   if (trigger==1) sp0256_newsay(); // selector is in newsay
 
-  
-  // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
   samplespeed/=8.0;
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -155,15 +151,11 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
-       //       outgoing[xx]=samplel;
-
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
 	 sp0256_newsay(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=samplespeed;
      }
@@ -185,9 +177,101 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
        samplepos+=1.0f;
      }
    }
-
-  // refill back counter etc.
 };
+
+void sp0256_12(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: keep as new model - TESTING!
+
+  // adding trigger
+  if (trigger==1) sp0256_newsay12(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=sp0256_get_sample12();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay12(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_sample12();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay12(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void sp0256_19(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: keep as new model - TESTING!
+
+  // adding trigger
+  if (trigger==1) sp0256_newsay19(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=sp0256_get_sample19();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay19(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_sample19();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       // TEST trigger: 
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsay19(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 
 void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
@@ -906,7 +990,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   float samplespeed;
   static u16 cc;
-  u8 oldmode;
+  u8 oldmode=255;
   
   for (u8 x=0;x<5;x++){
   float value=(float)adc_buffer[transform[x].whichone]/65536.0f; // 4096.0f; // why 65536.0f as in clouds - align? - try that
@@ -928,11 +1012,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=smoothed_adc_value[MODE_];
   CONSTRAIN(_mode,0.0f,1.0f);
   oldmode=_intmode;
-  _intmode=_mode*transform[MODE_].multiplier; //0=32 we hope!
-
+  _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   trigger=0;
+
+  _intmode=23; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-lpcanalyser old crow code, 22-256_12ROM, 23-19ROM
   if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
-  
+
   
   //  samplespeed=_speed+0.01f; // TODO test this fully!
   samplespeed=_speed*transform[SPEED_].multiplier;
@@ -943,9 +1028,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=21; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-lpcanalyser old crow code
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab, LPCanalyzer};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab, LPCanalyzer, sp0256_12, sp0256_19};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

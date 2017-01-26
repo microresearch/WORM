@@ -218,11 +218,11 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 
 ** 13/1 +
 
-- clean up sp0256 (crash proof on roms and ditch 019)DONE - but needs to be tested
+- clean up sp0256 (crash proof on roms and ditch 019)DONE - but needs to be testedDONE
 
 - sp0256 vocab from book to addDONE - but we need to split into banks all vocab there!
 
-- sp0256 12 and 19 roms (switch banks there) to addDONE - to test
+- sp0256 12 and 19 roms (switch banks there) to addDONE - to testDONE
 
 ** 16/1 +
 
@@ -232,9 +232,7 @@ check: /*  FIFO up the lower 10 bits of the data.                          */
 
 GENERAL:
 
-- *do we not need to do a new_say when there is a change of mode to enter the new mode?* - done in audio.c/sp0256 -> TEST
-
-- *check adc _selx eg. extents for arrays say in sp0256 as model*
+- *do we not need to do a new_say when there is a change of mode to enter the new mode?* - done in audio.c/sp0256 -> TESTDONE
 
 - split sp0256 vocab into banks
 
@@ -261,9 +259,9 @@ Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
   if (m_silent && m_filt.rpt <= 0)
 
 
-- check that all newsays trigger micro for new address... DONE - TEST!
+- check that all newsays trigger micro for new address... DONE - TEST!DONE
 
-- dealing with different roms in sp0256.c: - DONE, with some error checking - TEST!
+- dealing with different roms in sp0256.c: - DONE, with some error checking - TEST!DONE
 
 m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank?
 m_rom12 - phrases are at 6->42 - total 36
@@ -329,17 +327,67 @@ interp flag - 1 or 0
 	f->interp = f->r[14] || f->r[15];
 
 
-** 24/1 +
+** 24/1
 
 - what needs to be tested/done? sp0256//TMS//TTS:
 
--- - *check adc _selx etc. extents for arrays say in sp0256 as model*
+-- - *check adc _selx etc. extents for arrays say in sp0256 as model* DONE
 
-0->1.0?
+0->1.0? mapped against>>>>
 
 - X/Y abstracted for settings (array of floats + length + constraints for each)
 
-* TTS
+what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?)
+
+** 26/1 +
+
+- *ADC extent - rom12->mattel=far right=0 CHECKED! - add one to left side= *37 for left side which has 0-36 !!!! ADJUST ALL FOR THIS and CHECK!*
+
+- CHECKS: new mode triggerCHECKEDtosomextent, sp0256-12-CHECKED, sp0256-19-CHECKED! --- the shift between them, CHECKED!
+
+** TODO UPDATED:
+
+- XYZ for each in co-ordinate and bends (x pitch, y other, z- length of sample)
+and eg. for sp0256:   // selx,y,z-> x-axis for amp, 12x filt-coef, on/off for noise, y for value, z for period/pitch!
+
+how we do that mapping - port sp0256_lapraw1 to ARM and finish both raw attempts, TEST!
+
+- sp0256 vocab-split and test
+
+- TTS votrax port and test
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code
+
+- bends of TMS - first mode and start from here
+
+- also question of phoneme probability mapping for all chipsets - recap how we did this for klatt
+
+- klatt notes/re-acquaint
+
+[- start on audio.c modes/abstraction and place bitshifts in generators????]
+
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
+
+- raw sp0256 - code-driven and more bend style (eg. just pitch, amp and filters)
+-> work on 2 lap versions
+
+Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+
+- raw votrax
+
+- bends of all LPC - start with TMS as first mode and figure out prototype
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+- sp0256 do we need to implement  m_silent   if (m_silent && m_filt.rpt <= 0)
+
+- TODO below...
+
+* TTS 
 
 : gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
 
