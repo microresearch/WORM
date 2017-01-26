@@ -1,88 +1,88 @@
 // extra vocab from book: jiminez p.  43+
 
-const u8 sp_ampere[] __attribute__ ((section (".flash")))  = {0x18, 0x10, 0x9, 0x34};
+const u8 sp0256ampere[] __attribute__ ((section (".flash")))  = {0x18, 0x10, 0x9, 0x34};
 
-const u8 sp_cent[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0x11};
+const u8 sp0256cent[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0x11};
 
-const u8 sp_centi[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0xc};
+const u8 sp0256centi[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0xc};
 
-const u8 sp_danger[] __attribute__ ((section (".flash")))  = {0x21, 7, 0xb, 0x19, 0x33};
+const u8 sp0256danger[] __attribute__ ((section (".flash")))  = {0x21, 7, 0xb, 0x19, 0x33};
 
-const u8 sp_degree[] __attribute__ ((section (".flash")))  = {0x21, 0xc, 0x24, 0x27, 0xc};
+const u8 sp0256degree[] __attribute__ ((section (".flash")))  = {0x21, 0xc, 0x24, 0x27, 0xc};
 
-const u8 sp_dollar[] __attribute__ ((section (".flash")))  = {0x21, 0xf, 0x20, 0x33};
+const u8 sp0256dollar[] __attribute__ ((section (".flash")))  = {0x21, 0xf, 0x20, 0x33};
 
-const u8 sp_feet[] __attribute__ ((section (".flash")))  = {0x28, 0xc, 0x11};
+const u8 sp0256feet[] __attribute__ ((section (".flash")))  = {0x28, 0xc, 0x11};
 
-const u8 sp_farads[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x27, 0xf, 0x37};
+const u8 sp0256farads[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x27, 0xf, 0x37};
 
-const u8 sp_fuel[] ={ 0x28, 0x13, 0x2d};
+const u8 sp0256fuel[]  __attribute__ ((section (".flash"))) ={ 0x28, 0x13, 0x2d};
 
-const u8 sp_gallon[] __attribute__ ((section (".flash")))  = {0x24, 0xf, 0x2d, 0x25, 0xb};
+const u8 sp0256gallon[] __attribute__ ((section (".flash")))  = {0x24, 0xf, 0x2d, 0x25, 0xb};
 
-const u8 sp_go[] __attribute__ ((section (".flash")))  = {0x24, 0x35};
+const u8 sp0256go[] __attribute__ ((section (".flash")))  = {0x24, 0x35};
 
-const u8 sp_gram[] __attribute__ ((section (".flash")))  = {0x24, 0x27, 0x1a, 0x10};
+const u8 sp0256gram[] __attribute__ ((section (".flash")))  = {0x24, 0x27, 0x1a, 0x10};
 
-const u8 sp_high[] __attribute__ ((section (".flash")))  = {0x39, 6};
+const u8 sp0256high[] __attribute__ ((section (".flash")))  = {0x39, 6};
 
-const u8 sp_higher[] __attribute__ ((section (".flash")))  = {0x29, 6, 0x33};
+const u8 sp0256higher[] __attribute__ ((section (".flash")))  = {0x29, 6, 0x33};
 
-const u8 sp_inches[] __attribute__ ((section (".flash")))  = {0x13, 0xb, 0x25, 7, 0x37};
+const u8 sp0256inches[] __attribute__ ((section (".flash")))  = {0x13, 0xb, 0x25, 7, 0x37};
 
-const u8 sp_it[] __attribute__ ((section (".flash")))  = {0xc, 0x11};
+const u8 sp0256it[] __attribute__ ((section (".flash")))  = {0xc, 0x11};
 
-const u8 sp_kilo[] __attribute__ ((section (".flash")))  = {0x2a, 0x13, 0x2d, 0x35};
+const u8 sp0256kilo[] __attribute__ ((section (".flash")))  = {0x2a, 0x13, 0x2d, 0x35};
 
-const u8 sp_less[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x37};
+const u8 sp0256less[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x37};
 
-const u8 sp_lesser[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x33};
+const u8 sp0256lesser[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x33};
 
-const u8 sp_limitt[] __attribute__ ((section (".flash")))  = {0x2d, 0xc, 0x10, 0xc, 0x11};
+const u8 sp0256limitt[] __attribute__ ((section (".flash")))  = {0x2d, 0xc, 0x10, 0xc, 0x11};
 
-const u8 sp_low[] __attribute__ ((section (".flash")))  = {0x2d, 0x35};
+const u8 sp0256low[] __attribute__ ((section (".flash")))  = {0x2d, 0x35};
 
-const u8 sp_lower[] __attribute__ ((section (".flash")))  = {0x2d, 0x35, 0x33};
+const u8 sp0256lower[] __attribute__ ((section (".flash")))  = {0x2d, 0x35, 0x33};
 
-const u8 sp_milli[] __attribute__ ((section (".flash")))  = {0x10, 0xc, 0x2d, 0xc};
+const u8 sp0256milli[] __attribute__ ((section (".flash")))  = {0x10, 0xc, 0x2d, 0xc};
 
-const u8 sp_microo[] __attribute__ ((section (".flash")))  = {0x10, 6, 8, 0x27, 0x35};
+const u8 sp0256microo[] __attribute__ ((section (".flash")))  = {0x10, 6, 8, 0x27, 0x35};
 
-const u8 sp_minus[] __attribute__ ((section (".flash")))  = {0x10, 6, 0xb, 0xf, 0x37};
+const u8 sp0256minus[] __attribute__ ((section (".flash")))  = {0x10, 6, 0xb, 0xf, 0x37};
 
-const u8 sp_number[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x10, 0x3f, 0x33};
+const u8 sp0256number[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x10, 0x3f, 0x33};
 
-const u8 sp_off[] __attribute__ ((section (".flash")))  = {0x18, 0x28, 0x28};
+const u8 sp0256off[] __attribute__ ((section (".flash")))  = {0x18, 0x28, 0x28};
 
-const u8 sp_on[] __attribute__ ((section (".flash")))  = {0x18, 0xb};
+const u8 sp0256on[] __attribute__ ((section (".flash")))  = {0x18, 0xb};
 
-const u8 sp_percent[] __attribute__ ((section (".flash")))  = {9, 0x33, 0x37, 7, 0x28, 0x11};
+const u8 sp0256percent[] __attribute__ ((section (".flash")))  = {9, 0x33, 0x37, 7, 0x28, 0x11};
 
-const u8 sp_pico[] __attribute__ ((section (".flash")))  = {0x9, 0x33, 0x37, 0x7, 0x38, 0x11};
+const u8 sp0256pico[] __attribute__ ((section (".flash")))  = {0x9, 0x33, 0x37, 0x7, 0x38, 0x11};
 
-const u8 sp_please[] __attribute__ ((section (".flash")))  = {0x9, 0x2d, 0x13, 0x37};
+const u8 sp0256please[] __attribute__ ((section (".flash")))  = {0x9, 0x2d, 0x13, 0x37};
 
-const u8 sp_point[] __attribute__ ((section (".flash")))  = {0x9, 0x5, 0xb, 0x11};
+const u8 sp0256point[] __attribute__ ((section (".flash")))  = {0x9, 0x5, 0xb, 0x11};
 
-const u8 sp_pulses[] __attribute__ ((section (".flash")))  = {0x9, 0x1e, 0x2d, 0x37, 0x7, 0x37};
+const u8 sp0256pulses[] __attribute__ ((section (".flash")))  = {0x9, 0x1e, 0x2d, 0x37, 0x7, 0x37};
 
-const u8 sp_rate[] __attribute__ ((section (".flash")))  = {0xe, 0x14, 0x11};
+const u8 sp0256rate[] __attribute__ ((section (".flash")))  = {0xe, 0x14, 0x11};
 
-const u8 sp_right[] __attribute__ ((section (".flash")))  = {0xe, 0x6, 0x11};
+const u8 sp0256right[] __attribute__ ((section (".flash")))  = {0xe, 0x6, 0x11};
 
-const u8 sp_rpm[] __attribute__ ((section (".flash")))  = {0x3b, 0x9, 0x13, 0x7, 0x10};
+const u8 sp0256rpm[] __attribute__ ((section (".flash")))  = {0x3b, 0x9, 0x13, 0x7, 0x10};
 
-const u8 sp_set[] __attribute__ ((section (".flash")))  = {0x37, 0x7, 0xd};
+const u8 sp0256set[] __attribute__ ((section (".flash")))  = {0x37, 0x7, 0xd};
 
-const u8 sp_speedddd[] __attribute__ ((section (".flash")))  = {0x37, 0x2, 0x9, 0xc, 0x21};
+const u8 sp0256speedddd[] __attribute__ ((section (".flash")))  = {0x37, 0x2, 0x9, 0xc, 0x21};
 
-const u8 sp_than[] __attribute__ ((section (".flash")))  = {0x36, 0x1a, 0x18};
+const u8 sp0256than[] __attribute__ ((section (".flash")))  = {0x36, 0x1a, 0x18};
 
-const u8 sp_try[] __attribute__ ((section (".flash")))  = {0xd, 0x27, 0x6};
+const u8 sp0256try[] __attribute__ ((section (".flash")))  = {0xd, 0x27, 0x6};
 
-const u8 sp_temperature[] __attribute__ ((section (".flash")))  = {0xd, 0x7, 0x10, 0x9, 0x33, 0x25, 0x34};
+const u8 sp0256temperature[] __attribute__ ((section (".flash")))  = {0xd, 0x7, 0x10, 0x9, 0x33, 0x25, 0x34};
 
-const u8 sp_volt[] __attribute__ ((section (".flash")))  = {0x25, 0x35, 0x2d, 0x11};
+const u8 sp0256volt[] __attribute__ ((section (".flash")))  = {0x25, 0x35, 0x2d, 0x11};
   
 
 /// length is 276 - where did this come from? retrospeak?
@@ -364,7 +364,8 @@ const u8 sp0256starting[10] __attribute__ ((section (".flash")))  ={55, 55, 2, 1
 const u8 sp0256hello[6] __attribute__ ((section (".flash")))  ={27, 7, 45, 15, 53, 255};
 const u8 sp0256talk[6] __attribute__ ((section (".flash")))  ={13, 23, 23, 1, 41, 255};
 
+// TODO: split into two sections 276+42=318/2=159 each
 
-const uint8_t *vocab_sp0256[276] =  {sp0256thirty, sp0256bathing, sp0256twentieth, sp0256gauges, sp0256switched, sp0256september, sp0256talkers, sp0256ninth, sp0256fifty, sp0256four, sp0256gauged, sp0256gauge, sp0256talks, sp0256yes, sp0256fifth, sp0256spells, sp0256fir, sp0256sixteen, sp0256system, sp0256pledged, sp0256thursday, sp0256the, sp0256to, sp0256whale, sp0256systems, sp0256pledges, sp0256then, sp0256seventy, sp0256coop, sp0256march, sp0256checking, sp0256gauging, sp0256freezing, sp0256collide, sp0256october, sp0256five, sp0256month, sp0256correcting, sp0256day, sp0256minute, sp0256bread, sp0256switches, sp0256february, sp0256cognitive, sp0256investigator, sp0256h, sp0256l, sp0256clown, sp0256correct, sp0256p, sp0256intrigued, sp0256ninety, sp0256stopped, sp0256q, sp0256january, sp0256zero, sp0256x, sp0256investigators, sp0256legislates, sp0256seventeen, sp0256talked, sp0256pledge, sp0256ten, sp0256starts, sp0256sensitivity, sp0256thirteenth, sp0256crown, sp0256eighteenth, sp0256d, sp0256engaging, sp0256thread, sp0256litter, sp0256computer, sp0256talker, sp0256legislated, sp0256escape, sp0256twelve, sp0256pi, sp0256calendar, sp0256enraging, sp0256tenth, sp0256saturday, sp0256checkers, sp0256sweats, sp0256for, sp0256clock, sp0256memories, sp0256forty, sp0256stops, sp0256score, sp0256sixth, sp0256sweaters, sp0256checks, sp0256red, sp0256t, sp0256thirtieth, sp0256million, sp0256escaping, sp0256august, sp0256june, sp0256friday, sp0256seventh, sp0256equals, sp0256fifteenth, sp0256wednesday, sp0256fourteen, sp0256cookie, sp0256corrects, sp0256extent, sp0256investigating, sp0256sixty, sp0256talking, sp0256november, sp0256raspberry, sp0256fifteen, sp0256by, sp0256legislature, sp0256c, sp0256ate, sp0256daughter, sp0256g, sp0256of, sp0256k, sp0256equal, sp0256o, sp0256times, sp0256pinning, sp0256april, sp0256s, sp0256plus, sp0256sweat, sp0256w, sp0256whaler, sp0256investigates, sp0256intrigue, sp0256first, sp0256key, sp0256enraged, sp0256investigate, sp0256threading, sp0256tuesday, sp0256one, sp0256sincerely, sp0256nipping, sp0256eleventh, sp0256stopper, sp0256enrages, sp0256twelfth, sp0256seventeenth, sp0256spelling, sp0256speak, sp0256sweating, sp0256little, sp0256checked, sp0256start, sp0256whales, sp0256twenty, sp0256sweater, sp0256engagement, sp0256checker, sp0256intrigues, sp0256pinned, sp0256eleven, sp0256beer, sp0256too, sp0256memory, sp0256whalers, sp0256hundred, sp0256sweated, sp0256sincere, sp0256today, sp0256freezers, sp0256sixteenth, sp0256started, sp0256infinitive, sp0256thousand, sp0256corrected, sp0256sister, sp0256fore, sp0256subjectv, sp0256engage, sp0256uncle, sp0256july, sp0256freeze, sp0256nineteen, sp0256starter, sp0256intriguing, sp0256b, sp0256threads, sp0256spellers, sp0256hour, sp0256f, sp0256frozen, sp0256legislating, sp0256j, sp0256second, sp0256n, sp0256r, sp0256nine, sp0256three, sp0256error, sp0256stopping, sp0256emotional, sp0256z, sp0256thirteen, sp0256and, sp0256bathe, sp0256seven, sp0256v, sp0256pin, sp0256escapes, sp0256december, sp0256is, sp0256year, sp0256am, sp0256spelled, sp0256escaped, sp0256speller, sp0256eighteen, sp0256sincerity, sp0256fourteenth, sp0256ready, sp0256engages, sp0256check, sp0256physical, sp0256legislate, sp0256spell, sp0256rays, sp0256pledging, sp0256no, sp0256divided, sp0256six, sp0256freezer, sp0256sunday, sp0256fourth, sp0256pins, sp0256ray, sp0256nips, sp0256switching, sp0256investigated, sp0256monday, sp0256may, sp0256stop, sp0256eighty, sp0256robots, sp0256threaders, sp0256y, sp0256eight, sp0256two, sp0256letter, sp0256subject, sp0256date, sp0256nip, sp0256eighth, sp0256nipped, sp0256whaling, sp0256a, sp0256threaded, sp0256e, sp0256third, sp0256won, sp0256i, sp0256alarm, sp0256sensitive, sp0256m, sp0256robot, sp0256enrage, sp0256switch, sp0256u, sp0256threader, sp0256time, sp0256bather, sp0256nineteenth, sp0256starting, sp0256hello, sp0256talk};
+const uint8_t *vocab_sp0256_bankone[151] =  {sp0256a, sp0256ampere, sp0256april, sp0256august, sp0256b,  sp0256c, sp0256cent, sp0256centi, sp0256cognitive, sp0256collide, sp0256computer,  sp0256d, sp0256december, sp0256degree, sp0256divided, sp0256dollar, sp0256e, sp0256eight, sp0256eighteen, sp0256eighteenth, sp0256eighth, sp0256eighty, sp0256eleven, sp0256eleventh,  sp0256equal, sp0256equals, sp0256error, sp0256f, sp0256farads, sp0256february, sp0256feet, sp0256fifteen, sp0256fifteenth, sp0256fifth, sp0256fifty, sp0256first, sp0256five, sp0256forty, sp0256four, sp0256fourteen, sp0256fourteenth, sp0256fourth, sp0256friday, sp0256g, sp0256gallon, sp0256gauge, sp0256gauged, sp0256gauges, sp0256gauging, sp0256gram, sp0256h, sp0256hour, sp0256hundred, sp0256i, sp0256inches, sp0256infinitive, sp0256j, sp0256january, sp0256july, sp0256june, sp0256k, sp0256kilo, sp0256l, sp0256legislate, sp0256legislated, sp0256legislates, sp0256legislating, sp0256legislature, sp0256m, sp0256march, sp0256may, sp0256memories, sp0256memory, sp0256microo, sp0256milli, sp0256million, sp0256minus, sp0256minute, sp0256monday, sp0256month, sp0256n, sp0256nine, sp0256nineteen, sp0256nineteenth, sp0256ninety, sp0256ninth, sp0256november, sp0256number, sp0256o, sp0256october, sp0256one, sp0256p, sp0256percent, sp0256pi, sp0256pico, sp0256pulses, sp0256q, sp0256r, sp0256robot, sp0256robots, sp0256rpm, sp0256s, sp0256saturday, sp0256score, sp0256second, sp0256september, sp0256set, sp0256seven, sp0256seventeen, sp0256seventeenth, sp0256seventh, sp0256seventy, sp0256six, sp0256sixteen, sp0256sixteenth, sp0256sixth, sp0256sixty, sp0256sunday, sp0256system, sp0256systems, sp0256t, sp0256temperature, sp0256ten, sp0256tenth, sp0256third, sp0256thirteen, sp0256thirteenth, sp0256thirtieth, sp0256thirty, sp0256thousand, sp0256three, sp0256thursday, sp0256time, sp0256times, sp0256today, sp0256tuesday, sp0256twelfth, sp0256twelve, sp0256twentieth, sp0256twenty, sp0256two, sp0256u, sp0256v, sp0256volt, sp0256w, sp0256wednesday, sp0256x, sp0256y, sp0256year, sp0256z, sp0256zero};
 
-const uint8_t *vocab_sp0256extra[42] =  {sp_ampere, sp_cent, sp_centi, sp_danger, sp_degree, sp_dollar, sp_feet, sp_farads, sp_fuel, sp_gallon, sp_go, sp_gram, sp_high, sp_higher, sp_inches, sp_it, sp_kilo, sp_less, sp_lesser, sp_limitt, sp_low, sp_lower, sp_milli, sp_microo, sp_minus, sp_number, sp_off, sp_on, sp_percent, sp_pico, sp_please, sp_point, sp_pulses, sp_rate, sp_right, sp_rpm, sp_set, sp_speedddd, sp_than, sp_try, sp_temperature, sp_volt};
+const uint8_t *vocab_sp0256_banktwo[167] =  {sp0256alarm, sp0256am, sp0256and, sp0256ate, sp0256bathe, sp0256bather, sp0256bathing, sp0256beer, sp0256bread, sp0256by, sp0256calendar, sp0256check, sp0256checked, sp0256checker, sp0256checkers, sp0256checking, sp0256checks, sp0256clock, sp0256clown, sp0256cookie, sp0256coop, sp0256correct, sp0256corrected, sp0256correcting, sp0256corrects, sp0256crown, sp0256danger, sp0256date, sp0256daughter, sp0256day, sp0256emotional, sp0256engage, sp0256engagement, sp0256engages, sp0256engaging, sp0256enrage, sp0256enraged, sp0256enrages, sp0256enraging, sp0256escape, sp0256escaped, sp0256escapes, sp0256escaping, sp0256extent, sp0256fir, sp0256for, sp0256fore, sp0256freeze, sp0256freezer, sp0256freezers, sp0256freezing, sp0256frozen, sp0256fuel, sp0256go, sp0256hello, sp0256high, sp0256higher, sp0256intrigue, sp0256intrigued, sp0256intrigues, sp0256intriguing, sp0256investigate, sp0256investigated, sp0256investigates, sp0256investigating, sp0256investigator, sp0256investigators, sp0256is, sp0256it, sp0256key, sp0256less, sp0256lesser, sp0256letter, sp0256limitt, sp0256litter, sp0256little, sp0256low, sp0256lower, sp0256nip, sp0256nipped, sp0256nipping, sp0256nips, sp0256no, sp0256of, sp0256off, sp0256on, sp0256physical, sp0256pin, sp0256pinned, sp0256pinning, sp0256pins, sp0256please, sp0256pledge, sp0256pledged, sp0256pledges, sp0256pledging, sp0256plus, sp0256point, sp0256raspberry, sp0256rate, sp0256ray, sp0256rays, sp0256ready, sp0256red, sp0256right, sp0256sensitive, sp0256sensitivity, sp0256sincere, sp0256sincerely, sp0256sincerity, sp0256sister, sp0256speak, sp0256speedddd, sp0256spell, sp0256spelled, sp0256speller, sp0256spellers, sp0256spelling, sp0256spells, sp0256start, sp0256started, sp0256starter, sp0256starting, sp0256starts, sp0256stop, sp0256stopped, sp0256stopper, sp0256stopping, sp0256stops, sp0256subject, sp0256subjectv, sp0256sweat, sp0256sweated, sp0256sweater, sp0256sweaters, sp0256sweating, sp0256sweats, sp0256switch, sp0256switched, sp0256switches, sp0256switching, sp0256talk, sp0256talked, sp0256talker, sp0256talkers, sp0256talking, sp0256talks, sp0256than, sp0256the, sp0256then, sp0256thread, sp0256threaded, sp0256threader, sp0256threaders, sp0256threading, sp0256threads, sp0256to, sp0256too, sp0256try, sp0256uncle, sp0256whale, sp0256whaler, sp0256whalers, sp0256whales, sp0256whaling, sp0256won, sp0256yes};

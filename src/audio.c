@@ -133,9 +133,11 @@ static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) =
 
 char TTSinarray[65];
 
-void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: keep as new model
+/// start with SP0256 sets
 
-  // adding trigger
+void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: keep as new model - ALLOPHONES
+
+  // added trigger
   if (trigger==1) sp0256_newsay(); // selector is in newsay
 
   static u8 triggered=0;
@@ -271,16 +273,13 @@ void sp0256_19(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
 };
 
-
-
 void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  // MODEL GENERATOR: TODO is speed and interpolation options DONE
+    if (trigger==1) sp0256_newsayTTS (); // selector is in newsay
+    
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
   samplespeed/=8.0;
 
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
@@ -327,30 +326,24 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   // refill back counter etc.
 };
 
-void sp0256vocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  // MODEL GENERATOR: TODO is speed and interpolation options DONE
+  if (trigger==1) sp0256_newsayvocabbankone(); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
   samplespeed/=8.0;
-
    if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=sp0256_get_samplevocab();
+	 samplel=sp0256_get_samplevocabbankone();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
-       //       outgoing[xx]=samplel;
-
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayvocab(); // selector is in newsay
+	  sp0256_newsayvocabbankone(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -361,13 +354,12 @@ void sp0256vocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
-              samplel=sp0256_get_samplevocab();
+              samplel=sp0256_get_samplevocabbankone();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayvocab(); // selector is in newsay
+	 sp0256_newsayvocabbankone(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -377,8 +369,96 @@ void sp0256vocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
        samplepos+=1.0f;
      }
    }
+};
 
-  // refill back counter etc.
+void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  if (trigger==1) sp0256_newsayvocabbanktwo(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_samplevocabbanktwo();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       if (incoming[xx]>THRESH && !triggered) {
+	  sp0256_newsayvocabbanktwo(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_samplevocabbanktwo();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsayvocabbanktwo(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void sp0256rawone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  if (trigger==1) sp0256_newsayrawone(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_samplerawone();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       if (incoming[xx]>THRESH && !triggered) {
+	  sp0256_newsayrawone(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_samplerawone();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsayrawone(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
 };
 
 
@@ -893,7 +973,7 @@ void testvoc(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   floot_to_int(outgoing,otherbuffer,size);
 };
 
-void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples);
+/*void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples);
 
 void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float voicebuffer[32],otherbuffer[32];
@@ -901,14 +981,11 @@ void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
   //  LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
     //  convert in to float
     //  exciter=indriver to float
-    /*  for (u8 x=0;x<size;x++){
-	    flinbufferz[x]=(float)((rand()%65536)-32768)/32768.0f;
-	    }*/
        int_to_floot(incoming,voicebuffer,size);
        LPCAnalyzer_next(NULL, voicebuffer, otherbuffer, 10, size); //poles=10 - CROW TEST!
 	//    out from float to int
    floot_to_int(mono_buffer,otherbuffer,size);
-};
+};*/
 
 void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
@@ -1015,7 +1092,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   trigger=0;
 
-  _intmode=23; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-lpcanalyser old crow code, 22-256_12ROM, 23-19ROM
+  _intmode=22; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-vocab 22-vocab, 23-256_12ROM, 24-19ROM, 25-rawone
   if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
 
   
@@ -1029,7 +1106,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
 
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocab, LPCanalyzer, sp0256_12, sp0256_19};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, nvpSR, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12, sp0256_19, sp0256rawone};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

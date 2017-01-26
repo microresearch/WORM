@@ -1,3 +1,4 @@
+#ifdef LAP
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -6,10 +7,17 @@
 #include <sys/stat.h>
 #include <time.h>    // time()
 #include "sp0256vocab.h"
+#else
+#include "sp0256.h"
+#include "audio.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#endif
 
 // this one is basic tests of non-code based raw sp0256
 
-#include "sp0romstest.h"
+///#include "sp0romstest.h"
 
 
 // license:BSD-3-Clause

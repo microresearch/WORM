@@ -10,7 +10,7 @@
 extern float _selx, _sely, _selz;
 
 typedef u8 UINT8;
-typedef char INT8;
+//typedef char INT8;
 typedef uint16_t UINT16;
 typedef int16_t INT16;
 typedef uint32_t UINT32;

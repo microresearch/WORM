@@ -96,7 +96,7 @@ void main(void)
 {
   int16_t x;
   // all generator inits
-       LPCAnalyzer_init();
+  //       LPCAnalyzer_init();
   init_synth(); // which one? --> klatt rsynth !!!! RENAME!
   sp0256_init();
    lpc_init(); 

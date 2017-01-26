@@ -347,37 +347,60 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 ** TODO UPDATED:
 
-- XYZ for each in co-ordinate and bends (x pitch, y other, z- length of sample)
-and eg. for sp0256:   // selx,y,z-> x-axis for amp, 12x filt-coef, on/off for noise, y for value, z for period/pitch!
+*** sp0256
 
-how we do that mapping - port sp0256_lapraw1 to ARM and finish both raw attempts, TEST!
+- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!
 
-- sp0256 vocab-split and test
+- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
 
-- TTS votrax port and test
+- XYZ for each in co-ordinate and bends (x sel/pitch, y pitch/other, z- length of sample)
+and eg. for sp0256: // selx,y,z-> x-axis for amp, 12x filt-coef,
+on/off for noise, y for value, z for period/pitch! how we do that
+mapping 
+
+- port sp0256_lapraw1 to ARM-DONE-> TEST!
+
+- raw2 - code version on lap for sp0256: Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+
+-- we need buffer (how long?) for xy entry as ROM, no jumps etc...
+
+- AND add bends which shift the ROM values! 
+
+*- whether we do changes to x,y,z in audio.c on timer or in sp0256?*
+
+- finalise all sp0256 and use as model - how many modes now??:
+
+sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12, sp0256_19, sp0256rawone + 2nd raw, bending of roms, other excitations = 8+
+
+
+
+
+*** //////////////////upto here
+
+
+- TTS votrax port and test - we need to fix x, y and z also! - x-sel,
+  y-inflection/pitch, z-length - decide on this for all basics and integrate
+  with audio.c model
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code - ditch other lpc code
 
 - where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
 
-- grouping of TMS vocabs and clear chipsets marked for arm mame code
+- bends of TMS
 
-- bends of TMS - first mode and start from here
-
-- also question of phoneme probability mapping for all chipsets - recap how we did this for klatt
+- also question of phoneme probability mapping for all chipsets - recap how we did this for klatt or do by hand... - TTS and probability-NLTK?
 
 - klatt notes/re-acquaint
 
-[- start on audio.c modes/abstraction and place bitshifts in generators????]
+[- start on audio.c modes/abstraction if we like - but not all fits the same model]
 
 *- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
 
-- raw sp0256 - code-driven and more bend style (eg. just pitch, amp and filters)
--> work on 2 lap versions
-
-Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+*RAW/bend present LPC/usual but do pitch etc....*
 
 - raw votrax
 
-- bends of all LPC - start with TMS as first mode and figure out prototype
+- bends of all LPC
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -

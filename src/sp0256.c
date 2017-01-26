@@ -10,7 +10,6 @@
 #include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
 #include "sp0256vocab.h"
 
-extern uint16_t adc_buffer[10];
 extern float _selx, _sely, _selz;
 
 const unsigned char *m_romm;
@@ -1240,13 +1239,28 @@ int16_t sp0256_get_sample(void){
  }
 
 
- int16_t sp0256_get_samplevocab(void){
+ int16_t sp0256_get_samplevocabbankone(void){
   static int16_t output; 
    u8 howmany=0;
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayvocab();
+          sp0256_newsayvocabbankone();
+   }
+
+   micro();
+     howmany=lpc12_update(&m_filt, &output);
+   }
+   return output;
+ }
+
+ int16_t sp0256_get_samplevocabbanktwo(void){
+  static int16_t output; 
+   u8 howmany=0;
+   while(howmany==0){
+   
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+          sp0256_newsayvocabbanktwo();
    }
 
    micro();
@@ -1256,6 +1270,7 @@ int16_t sp0256_get_sample(void){
  }
 
 
+
 // for text to speech we need out array, length and index...
 
 extern char TTSinarray[65];
@@ -1263,7 +1278,7 @@ static u8 TTSoutarray[128];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
 
- void sp0256_newsay(void){
+void sp0256_newsay(void){
    u8 dada=0;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
 
@@ -1299,7 +1314,7 @@ void sp0256_newsayTTS(void){// called at end of phoneme
    m_lrq = 0; //from 8 bit write
  }
 
-void sp0256_newsayvocab(void){// called at end of phoneme
+void sp0256_newsayvocabbankone(void){// called at end of phoneme
    u8 dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    static u8 vocabindex=0, whichone=0;
@@ -1307,17 +1322,39 @@ void sp0256_newsayvocab(void){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   dada=*(vocab_sp0256[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
+   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
    vocabindex++;
-   if (*(vocab_sp0256[whichone]+vocabindex)==255){
+   if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*276.0f; // TODO: split vocab into banks
+     whichone=_selx*151.0f; // TODO: split vocab into banks
    }
    
    
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
+
+
+void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
+   u8 dada;
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
+   static u8 vocabindex=0, whichone=0;
+   //   m_halted=1;
+
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_romAL2;   
+   dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
+   vocabindex++;
+   if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
+     vocabindex=0;
+     whichone=_selx*168.0f; // TODO: split vocab into banks
+   }
+   
+   
+   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_lrq = 0; //from 8 bit write
+ }
+
 
  void sp0256_init(void){
    sp0256_iinit();

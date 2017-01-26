@@ -24,6 +24,8 @@ uint8_t byte_rev[256];
 
 //extern uint16_t adc_buffer[10];
 
+
+
 //#include "vocab_testroms.h"
 //#include "vocab_custom.h"
 #include "roms/vocab_talko.h"

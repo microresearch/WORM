@@ -3,12 +3,8 @@
 #include "math.h"
 #include "string.h"
 #include "forlap.h"
-#include "sp0256vocab.h"
 
-// this one is basic tests of non-code based raw sp0256
-
-#include "sp0romstest.h"
-
+// this one is basic tests of code based raw sp0256
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -121,12 +117,6 @@ void sp0256_iinit()
 	/*  Configure our internal variables.                                   */
 	/* -------------------------------------------------------------------- */
 	m_filt.rng = 1;
-
-	/*	memset(m_rom,0,65536);
-	memcpy(m_rom+0x1000,m_roma,2048);
-	memcpy(m_rom+0x4000,m_romb,0x4000); // 16384....
-	memcpy(m_rom+0x8000,m_romc,0x4000);
-	*/
 
 	/* -------------------------------------------------------------------- */
 	/*  Set up the microsequencer's initial state.                          */
@@ -820,47 +810,6 @@ UINT32 getb( int len )
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
 
-void newmicro() // TESTING first and then maybe do later as changes of contour
-{
-
-  // init as in micro
-  u8 i;
-  if (m_filt.rpt <= 0){
-
-  m_halted   = 0;
-  for (i = 0; i < 16; i++)
-    m_filt.r[i] = 0;
-  m_filt.cnt=0;
-  m_filt.amp=rand()%1280;
-  m_filt.per=rand()%255; // question of noise? 
-  m_filt.per=0;///??? - we set per to zero??? TEST!!!
-
-	/* -------------------------------------------------------------------- */
-	/*  Decode the filter coefficients from the quant table.                */
-	/* -------------------------------------------------------------------- */
-  	for (i = 0; i < 6; i++)
-	{
-#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
-
-	  m_filt.b_coef[stage_map[i]] = IQ(rand()%128);
-	  m_filt.f_coef[stage_map[i]] = IQ(rand()%128);
-	}
-
-	/*  Set the Interp flag based on whether we have interpolation parms    */
-
-  m_filt.interp=rand()%2;
-
-// - how length/repeat counter works m_filt.rpt = repeat + 1;*
-  m_filt.rpt = rand()%18;
-  }
-  // question of pause - then set this/// otherwise>>>>
-
-  //m_silent = 1;
-  //m_filt.r[1] = PER_PAUSE;
-
-  
-}
-
 void micro()
 {
 	UINT8  immed4;
@@ -1199,8 +1148,6 @@ void micro()
 		break;
 	}
 }
-
- const u8 sp0256vocabthursday[]={ 29, 52, 43, 1, 33, 20, 255};
 
  u16 sp0256_get_sample(void){
    u16 output; static u8 dada=0;

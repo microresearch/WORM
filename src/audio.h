@@ -44,8 +44,15 @@ typedef struct adc_transformer {
 typedef struct xyer_ {
   float multiplier;
   u8 length;
-} xyer;
+} xyer; // we don;t use this as each changes...
 
+
+typedef unsigned char UINT8;
+typedef signed char INT8;
+typedef u16 UINT16;
+typedef int16_t INT16;
+typedef uint32_t UINT32;
+typedef int32_t INT32;
 
 
 #endif
