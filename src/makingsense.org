@@ -1,3 +1,88 @@
+* general TODO/notes
+
+- do we fit all in RAM? - removed samplerate.c with 8192 array!
+
+- basics eg. ROMS, filenamings, compost, 
+
+- XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
+
+- ADC extent is 128 at least
+
+-  control models:
+
+eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
+
+- split of glottal sources
+
+- basic modes templated: XYZ, speed, triggering, compost
+
+each source/filter mode has regular in (eg. TMS, external in, other glottal sources)
+X,Y,Z and speed...
+
+///////
+
+- LPC inverse filter as excitation to TEST!
+- vocoder and experimental modes
+- clean ups, documentation, tests and release
+
+- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
+
+* TODO  UPDATED:
+
+** sp0256 as first model mode for others!
+
+- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!
+
+- join ROMs...DONE - TEST!
+
+- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
+
+*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST!*
+
+- AND add bends which shift the ROM values! 
+
+*- whether we do changes to x,y,z in audio.c on timer or in sp0256? - in audio.c*
+
+- finalise all sp0256 and use as model - how many modes now??:
+
+sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12+*JOIN+sp0256_19, sp0256rawone, sp0256rawtwo, bending of roms, other excitations = 8+
+
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?
+
+** other
+
+- TTS votrax port and test - try also votrax typetalk.bin
+
+- recent BBC bins for TMS
+
+-  we need to fix x, y and z also! - x-select, y-inflection/pitch,
+   z-length - decide on this for all basics and integrate with audio.c
+   model
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code - ditch other lpc code
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- bends of TMS
+
+[- remap phoneme probability mapping for all chipsets  see Cater p.52] decided AGAINST
+
+- klatt notes/re-acquaint
+
+[- start on audio.c modes/abstraction if we like - but not all fits the same model]
+
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
+
+*RAW/bend present LPC/usual but do pitch etc....*
+
+- raw votrax
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
 * new progress
 
 ** 2/1/2017
@@ -326,7 +411,6 @@ interp flag - 1 or 0
 
 	f->interp = f->r[14] || f->r[15];
 
-
 ** 24/1
 
 - what needs to be tested/done? sp0256//TMS//TTS:
@@ -343,74 +427,19 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 - CHECKS: new mode triggerCHECKEDtosomextent, sp0256-12-CHECKED, sp0256-19-CHECKED! --- the shift between them, CHECKED!
 
-** TODO UPDATED:
+** 30/1
 
-*** sp0256
+- sp0256 raw 1 and 2 versions DONE to test on ARM
 
-- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!
+- also sp0256 following/ bend ROM settings
 
-- join ROMs...
+- move xy for raw1 and raw2 into audio.c functions DONE// 
 
-- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
+- also new inits for both as they are now statics DONE// test ALL
 
-- XYZ for each in co-ordinate and bends (x sel/pitch, y pitch/other, z- length of sample)
-and eg. for sp0256: // selx,y,z-> x-axis for amp, 12x filt-coef,
-on/off for noise, y for value, z for period/pitch! how we do that
-mapping 
+- sp0256 vocab-splitDONE - 2 banksDONE TEST!
 
-*- port sp0256_lapraw1 to ARM-DONE-> TEST!*
-
-- raw2 - code version on lap for sp0256: Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html DONE but port to ARM and TEST!
-
--- we need buffer (how long?) for xy entry as ROM, no jumps etc...
-
-- AND add bends which shift the ROM values! 
-
-*- whether we do changes to x,y,z in audio.c on timer or in sp0256?*
-
-- finalise all sp0256 and use as model - how many modes now??:
-
-sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12+JOIN+sp0256_19, sp0256rawone + 2nd raw, bending of roms, other excitations = 8+
-
-- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
-
-*** other
-
-- TTS votrax port and test - try also votrax typetalk.bin
-
-- recent BBC bins for...
-
--  we need to fix x, y and z also! - x-sel, y-inflection/pitch,
-   z-length - decide on this for all basics and integrate with audio.c
-   model
-
-- grouping of TMS vocabs and clear chipsets marked for arm mame code - ditch other lpc code
-
-- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
-
-- bends of TMS
-
-[- remap phoneme probability mapping for all chipsets  see Cater p.52] decided AGAINST
-
-- klatt notes/re-acquaint
-
-[- start on audio.c modes/abstraction if we like - but not all fits the same model]
-
-*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
-
-*RAW/bend present LPC/usual but do pitch etc....*
-
-- raw votrax
-
-- bends of all LPC
-
-- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
-  choppy???// also signal end of with 255->DONE - testing in lpc_say -
-  but may not be so in TMS5220 code RE_TEST!
-
-- sp0256 do we need to implement  m_silent   if (m_silent && m_filt.rpt <= 0)
-
-- TODO below...
+- join ROMs...DONE - TEST!
 
 * TTS 
 
@@ -550,38 +579,6 @@ but we need to group/cross off phonemes
 - flaw is that TTS method doesn't use all of each phoneme
 - awky and -DLAP version of TTS
 
-
-* general TODO
-
-- test new x220 flash and run! cableDONE
-
-- start with one mode and its extensions and define/clean below from there
-
-- basics eg. ROMS, filenamings, compost, 
-
-XYZSPEED arrangement
-
-, ADC extent,-128 at least
-
-  control models:
-
-eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
-
-, layout, interpolXNO!, split of glottal sources, new code,
-  TTS and where it is relevant, what else?
-
-- basic modes templated: XYZ, speed, triggering, compost
-
-each source/filter mode has regular in (eg. TMS, external in, other glottal sources)
-X,Y,Z and speed...
-
-///////
-
-- LPC inverse filter as excitation and/or NOT so...
-- vocoder and experimental modes
-- clean ups, documentation, tests and release
-
-- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
 
 
 * TMS ROMS

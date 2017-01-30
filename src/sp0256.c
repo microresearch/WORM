@@ -1151,37 +1151,15 @@ void micro()
 	}
 }
 
-int16_t sp0256_get_sample12(void){
+//TODO: merge 12 and 19 roms as get_sampleROM1219
+
+int16_t sp0256_get_sample1219(void){
   static int16_t output; 
   u8 howmany=0;
   while(howmany==0){ 
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay12();
-   }
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
-   return output;
-}
-
-void sp0256_newsay12(void){
-  u8 dada;
-  m_lrq=0; m_halted=1; m_filt.rpt=0;
-   m_page = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_rom12;
-
-   dada=6+(_selx*37.0f); // they are 6->42
-   m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
-   m_lrq = 0; //from 8 bit write
-}
-
-int16_t sp0256_get_sample19(void){
-  static int16_t output; 
-  u8 howmany=0;
-  while(howmany==0){    
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay19();
+     sp0256_newsay1219();
    }
       micro();
       howmany=lpc12_update(&m_filt, &output);
@@ -1191,20 +1169,38 @@ int16_t sp0256_get_sample19(void){
 
 static const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
 
-void sp0256_newsay19(void){
-  u8 dada, indexy;
-  m_lrq=0; m_halted=1; m_filt.rpt=0;
-   m_romm=m_rom19;
 
-   //m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 49
-   indexy=_selx*50.0f;
-   dada=remap19[indexy];
-   if (indexy>19) m_page=0x8000<<3;
-   else m_page=0x1000<<3;
-							   
+/*void sp0256_newsay12(void){
+  u8 dada;
+  m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_page = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_rom12;
+
+   dada=6+(_selx*37.0f); // they are 6->42
    m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
-}
+   }*/
+
+void sp0256_newsay1219(void){
+  u8 dada, indexy;
+  m_lrq=0; m_halted=1; m_filt.rpt=0;
+
+  u8 selector=_selx*86.0f; // total is 36+49=85
+
+    if (selector<37) {
+   m_romm=m_rom12;
+   dada=6+selector; // they are 6->42
+    }
+    else {    
+      m_romm=m_rom19;
+      indexy=selector-37;
+      dada=remap19[indexy];
+      if (indexy>19) m_page=0x8000<<3;
+      else m_page=0x1000<<3;
+    }
+      m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
+      m_lrq = 0; //from 8 bit write
+    }
 
 
 int16_t sp0256_get_sample(void){

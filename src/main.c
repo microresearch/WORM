@@ -99,6 +99,8 @@ void main(void)
   //       LPCAnalyzer_init();
   init_synth(); // which one? --> klatt rsynth !!!! RENAME!
   sp0256_init();
+  sp0256_raw1_init();
+  sp0256_raw2_init();
    lpc_init(); 
 /*   simpleklatt_init(); */
 /* sam_init(); */
