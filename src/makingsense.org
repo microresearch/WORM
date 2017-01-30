@@ -333,8 +333,6 @@ interp flag - 1 or 0
 
 -- - *check adc _selx etc. extents for arrays say in sp0256 as model* DONE
 
-0->1.0? mapped against>>>>
-
 - X/Y abstracted for settings (array of floats + length + constraints for each)
 
 what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?)
@@ -351,6 +349,8 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 - sp0256 vocab-splitDONE and testTODO - 2 banksTEST!
 
+- join ROMs...
+
 - Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
 
 - XYZ for each in co-ordinate and bends (x sel/pitch, y pitch/other, z- length of sample)
@@ -358,9 +358,9 @@ and eg. for sp0256: // selx,y,z-> x-axis for amp, 12x filt-coef,
 on/off for noise, y for value, z for period/pitch! how we do that
 mapping 
 
-- port sp0256_lapraw1 to ARM-DONE-> TEST!
+*- port sp0256_lapraw1 to ARM-DONE-> TEST!*
 
-- raw2 - code version on lap for sp0256: Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+- raw2 - code version on lap for sp0256: Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html DONE but port to ARM and TEST!
 
 -- we need buffer (how long?) for xy entry as ROM, no jumps etc...
 
@@ -370,17 +370,19 @@ mapping
 
 - finalise all sp0256 and use as model - how many modes now??:
 
-sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12, sp0256_19, sp0256rawone + 2nd raw, bending of roms, other excitations = 8+
+sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12+JOIN+sp0256_19, sp0256rawone + 2nd raw, bending of roms, other excitations = 8+
 
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
+*** other
 
+- TTS votrax port and test - try also votrax typetalk.bin
 
-*** //////////////////upto here
+- recent BBC bins for...
 
-
-- TTS votrax port and test - we need to fix x, y and z also! - x-sel,
-  y-inflection/pitch, z-length - decide on this for all basics and integrate
-  with audio.c model
+-  we need to fix x, y and z also! - x-sel, y-inflection/pitch,
+   z-length - decide on this for all basics and integrate with audio.c
+   model
 
 - grouping of TMS vocabs and clear chipsets marked for arm mame code - ditch other lpc code
 
@@ -388,7 +390,7 @@ sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12, sp0256_19, sp0256rawone + 
 
 - bends of TMS
 
-- also question of phoneme probability mapping for all chipsets - recap how we did this for klatt or do by hand... - TTS and probability-NLTK?
+[- remap phoneme probability mapping for all chipsets  see Cater p.52] decided AGAINST
 
 - klatt notes/re-acquaint
 
@@ -513,6 +515,15 @@ phons = {'AA': "0x0E", 'AE': "0x2E", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "
          'V': '0x33', 'W': '0x23', 'Y': '0x04', 'Z': '0x2F', 'ZH': '0x2F', 'SIL': '0'}
 
 
+
+* phonemes probabilty map high->low ABANDON
+
+** TMS
+
+** SP0256
+
+** VOTRAX
+
 const char *const votrax_sc01_device::s_phone_table[64] =
 {
 	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
@@ -525,6 +536,19 @@ const char *const votrax_sc01_device::s_phone_table[64] =
 	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
 };
 
+from book:
+
+27, 0d, 2a, 2b, 32, 1f, 1e, 2e, 3c, 18, 01, 38, 24, 12, 0c, 19, 20,
+0f, 2d, 25, 1d, 1b, 0e, TONE, 16, 17, BIKE, 13, 14, 11, 1c, 28, 22,
+26, 10, 1a, 39, 36, 37. 35, 07
+
+but we need to group/cross off phonemes
+
+///
+
+- but maybe use other method as we don't know where to put other phonemes not in book list
+- flaw is that TTS method doesn't use all of each phoneme
+- awky and -DLAP version of TTS
 
 
 * general TODO

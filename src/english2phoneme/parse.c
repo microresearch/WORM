@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "stdlib.h"
 #include "TTS.h"
-#define MAX_LENGTH 128
+#define MAX_LENGTH 1280
 
 //static FILE *In_file;
 //static FILE *Out_file;
@@ -121,9 +122,21 @@ void main(argc, argv)
 	int argc;
 	char *argv[];
 	{
- 
+
+   FILE *fp = fopen(argv[1], "r");
+   //   fseek(fp,0, SEEK_END);
+   // read in and how long is it?
+   //   int lengthy=ftell(fp);
+   //   fseek(fp,0, SEEK_SET);
+   unsigned char xxx;
+   // malloc and reverse into buffer
+   //   unsigned char *xxx=malloc(lengthy+1);
+   //   fread(xxx,lengthy,1,fp);
+   //   fclose(fp);
+
+	  
   //allocate space for the output
-	  char output[MAX_LENGTH];
+	  //	  char output[MAX_LENGTH];
 	  //	  char output[MAX_LENGTH*MAX_PHONEME_LENGTH];
 
 	  //	  for(int i = 0; i < MAX_LENGTH; i++){
@@ -131,13 +144,8 @@ void main(argc, argv)
 	  //    }
   
   //allocate space for the input
-  int num_words = argc - 1;
   int input_size = 0;
   int space_count = 0;
-  for(int i = 0; i < num_words; i++){
-      input_size += strlen(argv[1 + i]);
-      space_count += 1;
-  }
 
   //char input[input_size + space_count];
   
@@ -145,12 +153,23 @@ void main(argc, argv)
   int index = 0;
 
   //  static char TTSinarray[64]={"testing "};
-    static char TTSinarray[64];
-    static unsigned char TTSoutarray[128];
+  static char TTSinarray[640], buffer[640];
+    static unsigned char TTSoutarray[1280];
+    char flag=1;
+    while(flag==1){
+    int count=0;
+    xxx=0;
+    while (xxx!=' ' && xxx!='\n'){
+    int xx=fread(&xxx,1,1,fp);
+    //    printf("%c",xxx);
+      buffer[count++]=xxx;
+      if (xx!=1) { flag=0; break;}
+    }
+    //    fread(&xxx,1,1,fp);
+    
+    strcpy(TTSinarray,buffer);
 
-    strcpy(TTSinarray,argv[1]);
-
-    //    TTSinarray[input_size] = EOF; // place in text2speech
+    //        TTSinarray[count] = 0; // place in text2speech
 
     //         printf("%s %d\n",TTSinarray, input_size);
 
@@ -161,17 +180,20 @@ void main(argc, argv)
 
   
   //transform text to integer code phonemes
-      int output_count = text2speechfor256(input_size,TTSinarray,TTSoutarray);
+      int output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
-    printf("outcount: %d\n",output_count);
+      //      printf("%s outcount: %d\n",TTSinarray, output_count);
   for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
              printf("%d, ", TTSoutarray[i]);
 	     //	      }
 	     //      printf("\n");
+
+	     // how can we get frequencies
   }
   //  return output_count;
   }
+	}
 #endif
 
 /*
