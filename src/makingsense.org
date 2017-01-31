@@ -1,8 +1,10 @@
+* for march 20 spring equinox release
+
 * general TODO/notes
 
-- FIX ADC extents! - see newsaybankone - works on new hardware but would need to test across other HW versions and tune the filter coeffs
+- FIX ADC extents! - see newsaybankone - works on new hardware but would *need to test across other HW versions* and tune the filter coeffs
 
-//fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
+//on old hardware - fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
 
 - use generic multiplier, how does integral work in warps:
 
@@ -29,8 +31,6 @@ why is scaled by 2.0
   }
 
 - try different filter coeffs... (0.01f)
-
-///////////////////////////////////////////////////
 
 - refine and test triggers in all sp0256 modes
 
@@ -65,27 +65,28 @@ X,Y,Z and speed...
 
 ** sp0256 as first model mode for others!
 
-sp0256 AL2 - how to map allophones as all pauses are at one end?
-
+- sp0256 AL2 - how to map allophones as all pauses are at one end?
 
 - sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
 
 - join ROMs...DONE - TEST!DONE
 
-rom12=mattel (*why is lost before "presents"?*)FIXED was uint32!->aend
+rom12=mattel (why is lost before "presents"?)FIXED was uint32!->aend
 rom19=score->fat/fast
 
 but glitches to blank when wind backFIXED
 
-*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
+- whether we do changes to x,y,z in audio.c on timer or in sp0256? DONE- in audio.c
+
+- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?DONE - length as repeat
 
 /////
 
-TODO - Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
+*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
 
-- AND add bends which shift the ROM values! 
+- add bend mode which shifts the ROM values ->
 
-*- whether we do changes to x,y,z in audio.c on timer or in sp0256? - in audio.c*
+///
 
 - finalise all sp0256 and use as model - how many modes now??:
 
@@ -492,7 +493,25 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 - tests and fixes for sp0256
 - looking at ADC extents
 
-- for 1/2 - finalise ADC/ test triggers/ all sp0256 modes/ new working format?
+- add bend mode which shifts the ROM values -> which roms? AL2/and/or/12-19? - x/y bend and z select! 
+
+** 1/2 TODO
+
+- sp0256 - test triggers/ all modes - try different filter coeffs... (0.01f)
+
+- sp0256 AL2 - how to map allophones as all pauses are at one end?
+
+- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
+
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?
+
+//////
+
+- new hardware tests for ADC extents
+
+- announce 20 march release and do soundclouds
 
 * TTS 
 

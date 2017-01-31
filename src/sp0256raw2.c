@@ -6,7 +6,7 @@
 #include "forlap.h"
 #include <sys/stat.h>
 #include <time.h>    // time()
-#include "sp0256vocab.h"
+//#include "sp0256vocab.h"
 #else
 #include "sp0256.h"
 #include "audio.h"

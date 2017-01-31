@@ -824,7 +824,7 @@ void micro()
 	UINT8  opcode;
 	UINT16 cr;
 	u8 ctrl_xfer;
-	u8 repeat;
+	int8_t repeat;
 	u8 i, idx0, idx1;
 
 	/* -------------------------------------------------------------------- */
@@ -986,6 +986,9 @@ void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
+				repeat += 32-((u8)(_selz*64.0f));
+				if (repeat<1) repeat=1;
+					    
 				break;
 			}
 		}
@@ -1151,7 +1154,6 @@ void micro()
 	}
 }
 
-//TODO: merge 12 and 19 roms as get_sampleROM1219
 
 int16_t sp0256_get_sample1219(void){
   static int16_t output; 
@@ -1168,18 +1170,6 @@ int16_t sp0256_get_sample1219(void){
 }
 
 static const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
-
-
-/*void sp0256_newsay12(void){
-  u8 dada;
-  m_lrq=0; m_halted=1; m_filt.rpt=0;
-   m_page = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_rom12;
-
-   dada=6+(_selx*37.0f); // they are 6->42
-   m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
-   m_lrq = 0; //from 8 bit write
-   }*/
 
 void sp0256_newsay1219(void){
   u8 dada, indexy;
@@ -1199,7 +1189,7 @@ void sp0256_newsay1219(void){
       if (indexy>19) m_page=0x8000<<3;
       else m_page=0x1000<<3;
     }
-      m_ald = ((dada) << 4); // or do as index <<3 and store this index TODO! 		
+      m_ald = ((dada) << 4); // or do as index <<3 and store this index 		
       m_lrq = 0; //from 8 bit write
     }
 
@@ -1286,7 +1276,7 @@ void sp0256_newsay(void){
    m_romm=m_romAL2;
    
    dada=_selx*65.0f; // there are 64 
-   m_ald = ((dada&63) << 4); // or do as index <<3 and store this index TODO! 		
+   m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
 
@@ -1307,7 +1297,7 @@ void sp0256_newsayTTS(void){// called at end of phoneme
      TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
    }
 
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index 		
    m_lrq = 0; //from 8 bit write
  }
 
@@ -1319,14 +1309,14 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  // TODO question if merge vocab words or wait till end to switch - in this case end switch
+   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*151.9f; // TODO: split vocab into banks - on this one we need 0-150 values
+     whichone=_selx*151.9f; // split vocab into banks - on this one we need 0-150 values
      if (whichone>150) whichone=150;
    }   
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_ald = ((dada&0xff) << 4); 		
    m_lrq = 0; //from 8 bit write
  }
 
@@ -1343,11 +1333,11 @@ void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*168.0f; // TODO: split vocab into banks
+     whichone=_selx*168.0f; 
    }
    
    
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
+   m_ald = ((dada&0xff) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
 

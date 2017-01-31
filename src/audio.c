@@ -470,6 +470,54 @@ void sp0256rawtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    }
 };
 
+void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  u8 xaxis=_selx*17.0f; //0-16 check
+  exy[xaxis]=_sely; // no multiplier
+    
+  if (trigger==1) sp0256_newsayrawone(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_samplerawone();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       if (incoming[xx]>THRESH && !triggered) {
+	  sp0256_newsayrawone(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+     while (xx<size){
+              samplel=sp0256_get_samplerawone();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 sp0256_newsayrawone(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
 
 void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
@@ -1112,7 +1160,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256rawone, sp0256rawtwo};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256rawone, sp0256rawtwo, sp0256bend};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
