@@ -2,7 +2,7 @@
 
 - do we fit all in RAM? - removed samplerate.c with 8192 array!
 
-- basics eg. ROMS, filenamings, compost, 
+- basics eg. ROMS, filenamings, compost
 
 - XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
 
@@ -12,7 +12,7 @@
 
 eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
 
-- split of glottal sources
+- split/catalogue of glottal sources
 
 - basic modes templated: XYZ, speed, triggering, compost
 
