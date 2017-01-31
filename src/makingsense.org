@@ -42,24 +42,23 @@ why is scaled by 2.0
 
 - XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
 
--  control models:
-
-eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
+-  control models: eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
 
 - split/catalogue of glottal sources
 
 - basic modes templated: XYZ, speed, triggering, compost
 
-each source/filter mode has regular in (eg. TMS, external in, other glottal sources)
-X,Y,Z and speed...
+- each source/filter mode has regular in (eg. TMS, external in, other glottal sources) X,Y,Z and speed...
 
 ///////
 
 - LPC inverse filter as excitation to TEST!
+
 - vocoder and experimental modes
+
 - clean ups, documentation, tests and release
 
-- *worm control - MOVE OUT TO NEW MODULE alongside RAVEN!*
+- *worm control - MOVED OUT TO NEW MODULE alongside RAVEN! = except for wavetable maybe*
 
 * TODO  UPDATED:
 
@@ -67,32 +66,19 @@ X,Y,Z and speed...
 
 - sp0256 AL2 - how to map allophones as all pauses are at one end?
 
-- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
-
-- join ROMs...DONE - TEST!DONE
-
-rom12=mattel (why is lost before "presents"?)FIXED was uint32!->aend
-rom19=score->fat/fast
-
-but glitches to blank when wind backFIXED
-
-- whether we do changes to x,y,z in audio.c on timer or in sp0256? DONE- in audio.c
-
-- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?DONE - length as repeat
-
 /////
 
 *- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
 
-- add bend mode which shifts the ROM values ->
+- add bend mode which shifts the ROM values ->DONE TO TEST!
 
 ///
 
 - finalise all sp0256 and use as model - how many modes now??:
 
 sp0256 allophones, sp0256TTS, sp0256vocabone, sp0256vocabtwo,
-sp0256_12+*JOIN+sp0256_19, sp0256rawone, sp0256rawtwo, bending of
-roms, other excitations = 9+
+sp0256_1219, sp0256rawone, sp0256rawtwo, sp0256bend,
+other excitations = 9+
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
@@ -101,8 +87,6 @@ roms, other excitations = 9+
 ** other
 
 - TTS votrax port and test - try also votrax typetalk.bin
-
-- recent BBC bins for TMS
 
 -  we need to fix x, y and z also! - x-select, y-inflection/pitch,
    z-length - decide on this for all basics and integrate with audio.c
@@ -130,6 +114,22 @@ roms, other excitations = 9+
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
 
+** DONE
+
+- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
+
+- join ROMs...DONE - TEST!DONE
+
+rom12=mattel (why is lost before "presents"?)FIXED was uint32!->aend
+rom19=score->fat/fast
+
+but glitches to blank when wind backFIXED
+
+- whether we do changes to x,y,z in audio.c on timer or in sp0256? DONE- in audio.c
+
+- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?DONE - length as repeat
+
+  
 * new progress
 
 ** 2/1/2017
@@ -493,9 +493,11 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 - tests and fixes for sp0256
 - looking at ADC extents
 
-- add bend mode which shifts the ROM values -> which roms? AL2/and/or/12-19? - x/y bend and z select! 
+- added bend mode which shifts the ROM values -> which roms? AL2/and/or/12-19? - x/y bend and z select! DONE - to TEST
 
 ** 1/2 TODO
+
+- test sp0256 bend mode
 
 - sp0256 - test triggers/ all modes - try different filter coeffs... (0.01f)
 
@@ -505,13 +507,13 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
-- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)??
 
 //////
 
-- new hardware tests for ADC extents
+*- new hardware tests for ADC extents - extra boards*
 
-- announce 20 march release and do soundclouds
+*- announce 20 march release and do soundclouds*
 
 * TTS 
 
