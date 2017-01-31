@@ -19,9 +19,13 @@
 
 ///#include "sp0romstest.h"
 
+#ifdef LAP
+float exy[64];
+float _selx, _sely, _selz;
+#else
 extern float exy[64];
 extern float _selx, _sely, _selz;
-
+#endif
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -182,7 +186,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 				f->cnt += f->per;
 				samp    = f->amp;
 				f->rpt--;
-				do_int  = f->interp;
+				do_int  = 0;
 
 				for (j = 0; j < 6; j++)
 					f->z_data[j][1] = f->z_data[j][0] = 0;
@@ -199,7 +203,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 
 			if (--f->cnt <= 0)
 			{
-				do_int = f->interp;
+				do_int = 0;
 				f->cnt = PER_NOISE;
 				f->rpt--;
 				for (j = 0; j < 6; j++)
@@ -216,7 +220,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		/*  If we need to, process the interpolation registers.             */
 		/* ---------------------------------------------------------------- */
-		if (do_int)
+		/*		if (do_int)
 		{
 			f->r[0] += f->r[14];
 			f->r[1] += f->r[15];
@@ -225,7 +229,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->per   = f->r[1];
 
 			do_int   = 0;
-		}
+			}*/
 
 		/* ---------------------------------------------------------------- */
 		/*  Stop if we expire our repeat counter and return the actual      */
@@ -273,7 +277,6 @@ static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 		//		return (samp>>2)+128;
 		*out= limit(samp)<<2;
 		return 1;
-
 }
 
 static const u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
@@ -643,7 +646,7 @@ static const INT16 sp0256_df_idx[16 * 8]  __attribute__ ((section (".flash"))) =
 	/*  OPCODE 1111 */      0,  0,      0,  0,      0,  0,      0,  0
 };
 
-void newmicro() // TESTING - xy and z for per - or this is done in audio.c???
+static void newmicro() // TESTING - xy and z for per - or this is done in audio.c???
 {
 
   // selx,y,z-> x-axis for amp, 12x filt-coef, rpt, y for value, z for per!
@@ -666,16 +669,16 @@ void newmicro() // TESTING - xy and z for per - or this is done in audio.c???
 	{
 #define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
 
-	  m_filt.b_coef[stage_map[i]] = IQ((u8)(exy[2+i]*128.0f));
-	  m_filt.f_coef[stage_map[i]] = IQ((u8)(exy[8+i]*128.0f)); // so length is 14 with rpt below
+	  m_filt.b_coef[stage_map[i]] = IQ((u8)(exy[2+i]*256.0f));
+	  m_filt.f_coef[stage_map[i]] = IQ((u8)(exy[8+i]*256.0f)); // so length is 14 with rpt below
 	  //	  	  m_filt.b_coef[stage_map[i]] = IQ(10);
 	  //	  m_filt.f_coef[stage_map[i]] = IQ(10);
 
 	}
   
 // - how length/repeat counter works m_filt.rpt = repeat + 1;*
-  m_filt.rpt = exy[1]*18.0f + 1;
-// m_filt.rpt=10;
+	m_filt.rpt = (int16_t)(exy[1]*18.0f) + 2;
+//	m_filt.rpt=10;
   }
   // question of pause - doesn't seem to work!
 
@@ -690,30 +693,31 @@ void newmicro() // TESTING - xy and z for per - or this is done in audio.c???
  
 }
 
-// generate with newmicro - newsay is newmicro
-
- int16_t sp0256_get_samplerawone(void){
-   int16_t output; 
-   u8 howmany=0;
-   /*  newmicro();
-  lpc12_update(&m_filt, &output);
-  return output;*/
-
-     while(howmany==0){ 
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsayrawone();
-   }
-      newmicro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
-   return output;   
- }
 
 void sp0256_newsayrawone(void){ // prompt new 
   m_filt.rpt = 0;
   newmicro();
 }
+
+// generate with newmicro - newsay is newmicro
+
+ int16_t sp0256_get_samplerawone(void){
+   int16_t output; 
+   int16_t howmany=0;
+   /*  newmicro();
+  lpc12_update(&m_filt, &output);
+  return output;*/
+
+      while(howmany==0){ 
+	 if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsayrawone();
+     }
+      newmicro();
+      howmany=lpc12_update(&m_filt, &output);
+      }
+   return output;   
+ }
+
 
 void sp0256_raw1_init(void){
   reset();
@@ -722,21 +726,25 @@ void sp0256_raw1_init(void){
 
 ///
 
-#ifdef LAP
+#ifdef LAP // this works
  void main(void){
 //void main(int argc, char *argv[]){
-   u8 output;
+   int16_t output,res;
    srand(time(NULL));
 
-   sp0256_init();
+   _selz=0.9f;
+
+   for (int i=0;i<16;i++){
+     exy[i]=0.1f;
+   }
+   exy[1]=0.0f;
+
+   //   sp0256_init();
+   reset();
       	  
    while(1){
-     newmicro(); // here we can set up m_filt parameters
-     if (m_silent && m_filt.rpt <= 0) output=0;
-     else output=lpc12_update(&m_filt);
-        printf("%c",output);
-   //   fprintf(stderr, "rpt %d\n" ,  m_filt.rpt);
-
+     output=sp0256_get_samplerawone();
+     printf("%d\n",output);
 	    }
      //        }
 

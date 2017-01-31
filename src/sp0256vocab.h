@@ -1,88 +1,88 @@
 // extra vocab from book: jiminez p.  43+
 
-const u8 sp0256ampere[] __attribute__ ((section (".flash")))  = {0x18, 0x10, 0x9, 0x34};
+const u8 sp0256ampere[] __attribute__ ((section (".flash")))  = {0x18, 0x10, 0x9, 0x34,255};
 
-const u8 sp0256cent[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0x11};
+const u8 sp0256cent[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0x11,255};
 
-const u8 sp0256centi[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0xc};
+const u8 sp0256centi[] __attribute__ ((section (".flash")))  = {0x37, 0x37, 7, 0xb, 0xc,255};
 
-const u8 sp0256danger[] __attribute__ ((section (".flash")))  = {0x21, 7, 0xb, 0x19, 0x33};
+const u8 sp0256danger[] __attribute__ ((section (".flash")))  = {0x21, 7, 0xb, 0x19, 0x33,255};
 
-const u8 sp0256degree[] __attribute__ ((section (".flash")))  = {0x21, 0xc, 0x24, 0x27, 0xc};
+const u8 sp0256degree[] __attribute__ ((section (".flash")))  = {0x21, 0xc, 0x24, 0x27, 0xc,255};
 
-const u8 sp0256dollar[] __attribute__ ((section (".flash")))  = {0x21, 0xf, 0x20, 0x33};
+const u8 sp0256dollar[] __attribute__ ((section (".flash")))  = {0x21, 0xf, 0x20, 0x33,255};
 
-const u8 sp0256feet[] __attribute__ ((section (".flash")))  = {0x28, 0xc, 0x11};
+const u8 sp0256feet[] __attribute__ ((section (".flash")))  = {0x28, 0xc, 0x11,255};
 
-const u8 sp0256farads[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x27, 0xf, 0x37};
+const u8 sp0256farads[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x27, 0xf, 0x37,255};
 
-const u8 sp0256fuel[]  __attribute__ ((section (".flash"))) ={ 0x28, 0x13, 0x2d};
+const u8 sp0256fuel[]  __attribute__ ((section (".flash"))) ={ 0x28, 0x13, 0x2d,255};
 
-const u8 sp0256gallon[] __attribute__ ((section (".flash")))  = {0x24, 0xf, 0x2d, 0x25, 0xb};
+const u8 sp0256gallon[] __attribute__ ((section (".flash")))  = {0x24, 0xf, 0x2d, 0x25, 0xb,255};
 
-const u8 sp0256go[] __attribute__ ((section (".flash")))  = {0x24, 0x35};
+const u8 sp0256go[] __attribute__ ((section (".flash")))  = {0x24, 0x35,255};
 
-const u8 sp0256gram[] __attribute__ ((section (".flash")))  = {0x24, 0x27, 0x1a, 0x10};
+const u8 sp0256gram[] __attribute__ ((section (".flash")))  = {0x24, 0x27, 0x1a, 0x10,255};
 
-const u8 sp0256high[] __attribute__ ((section (".flash")))  = {0x39, 6};
+const u8 sp0256high[] __attribute__ ((section (".flash")))  = {0x39, 6,255};
 
-const u8 sp0256higher[] __attribute__ ((section (".flash")))  = {0x29, 6, 0x33};
+const u8 sp0256higher[] __attribute__ ((section (".flash")))  = {0x29, 6, 0x33,255};
 
-const u8 sp0256inches[] __attribute__ ((section (".flash")))  = {0x13, 0xb, 0x25, 7, 0x37};
+const u8 sp0256inches[] __attribute__ ((section (".flash")))  = {0x13, 0xb, 0x25, 7, 0x37,255};
 
-const u8 sp0256it[] __attribute__ ((section (".flash")))  = {0xc, 0x11};
+const u8 sp0256it[] __attribute__ ((section (".flash")))  = {0xc, 0x11,255};
 
-const u8 sp0256kilo[] __attribute__ ((section (".flash")))  = {0x2a, 0x13, 0x2d, 0x35};
+const u8 sp0256kilo[] __attribute__ ((section (".flash")))  = {0x2a, 0x13, 0x2d, 0x35,255};
 
-const u8 sp0256less[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x37};
+const u8 sp0256less[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x37,255};
 
-const u8 sp0256lesser[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x33};
+const u8 sp0256lesser[] __attribute__ ((section (".flash")))  = {0x2d, 7, 0x37, 0x33,255};
 
-const u8 sp0256limitt[] __attribute__ ((section (".flash")))  = {0x2d, 0xc, 0x10, 0xc, 0x11};
+const u8 sp0256limitt[] __attribute__ ((section (".flash")))  = {0x2d, 0xc, 0x10, 0xc, 0x11,255};
 
-const u8 sp0256low[] __attribute__ ((section (".flash")))  = {0x2d, 0x35};
+const u8 sp0256low[] __attribute__ ((section (".flash")))  = {0x2d, 0x35,255};
 
-const u8 sp0256lower[] __attribute__ ((section (".flash")))  = {0x2d, 0x35, 0x33};
+const u8 sp0256lower[] __attribute__ ((section (".flash")))  = {0x2d, 0x35, 0x33,255};
 
-const u8 sp0256milli[] __attribute__ ((section (".flash")))  = {0x10, 0xc, 0x2d, 0xc};
+const u8 sp0256milli[] __attribute__ ((section (".flash")))  = {0x10, 0xc, 0x2d, 0xc,255};
 
-const u8 sp0256microo[] __attribute__ ((section (".flash")))  = {0x10, 6, 8, 0x27, 0x35};
+const u8 sp0256microo[] __attribute__ ((section (".flash")))  = {0x10, 6, 8, 0x27, 0x35,255};
 
-const u8 sp0256minus[] __attribute__ ((section (".flash")))  = {0x10, 6, 0xb, 0xf, 0x37};
+const u8 sp0256minus[] __attribute__ ((section (".flash")))  = {0x10, 6, 0xb, 0xf, 0x37,255};
 
-const u8 sp0256number[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x10, 0x3f, 0x33};
+const u8 sp0256number[] __attribute__ ((section (".flash")))  = {0x28, 0xf, 0x10, 0x3f, 0x33,255};
 
-const u8 sp0256off[] __attribute__ ((section (".flash")))  = {0x18, 0x28, 0x28};
+const u8 sp0256off[] __attribute__ ((section (".flash")))  = {0x18, 0x28, 0x28,255};
 
-const u8 sp0256on[] __attribute__ ((section (".flash")))  = {0x18, 0xb};
+const u8 sp0256on[] __attribute__ ((section (".flash")))  = {0x18, 0xb,255};
 
-const u8 sp0256percent[] __attribute__ ((section (".flash")))  = {9, 0x33, 0x37, 7, 0x28, 0x11};
+const u8 sp0256percent[] __attribute__ ((section (".flash")))  = {9, 0x33, 0x37, 7, 0x28, 0x11,255};
 
-const u8 sp0256pico[] __attribute__ ((section (".flash")))  = {0x9, 0x33, 0x37, 0x7, 0x38, 0x11};
+const u8 sp0256pico[] __attribute__ ((section (".flash")))  = {0x9, 0x33, 0x37, 0x7, 0x38, 0x11,255};
 
-const u8 sp0256please[] __attribute__ ((section (".flash")))  = {0x9, 0x2d, 0x13, 0x37};
+const u8 sp0256please[] __attribute__ ((section (".flash")))  = {0x9, 0x2d, 0x13, 0x37,255};
 
-const u8 sp0256point[] __attribute__ ((section (".flash")))  = {0x9, 0x5, 0xb, 0x11};
+const u8 sp0256point[] __attribute__ ((section (".flash")))  = {0x9, 0x5, 0xb, 0x11,255};
 
-const u8 sp0256pulses[] __attribute__ ((section (".flash")))  = {0x9, 0x1e, 0x2d, 0x37, 0x7, 0x37};
+const u8 sp0256pulses[] __attribute__ ((section (".flash")))  = {0x9, 0x1e, 0x2d, 0x37, 0x7, 0x37,255};
 
-const u8 sp0256rate[] __attribute__ ((section (".flash")))  = {0xe, 0x14, 0x11};
+const u8 sp0256rate[] __attribute__ ((section (".flash")))  = {0xe, 0x14, 0x11,255};
 
-const u8 sp0256right[] __attribute__ ((section (".flash")))  = {0xe, 0x6, 0x11};
+const u8 sp0256right[] __attribute__ ((section (".flash")))  = {0xe, 0x6, 0x11,255};
 
-const u8 sp0256rpm[] __attribute__ ((section (".flash")))  = {0x3b, 0x9, 0x13, 0x7, 0x10};
+const u8 sp0256rpm[] __attribute__ ((section (".flash")))  = {0x3b, 0x9, 0x13, 0x7, 0x10,255};
 
-const u8 sp0256set[] __attribute__ ((section (".flash")))  = {0x37, 0x7, 0xd};
+const u8 sp0256set[] __attribute__ ((section (".flash")))  = {0x37, 0x7, 0xd,255};
 
-const u8 sp0256speedddd[] __attribute__ ((section (".flash")))  = {0x37, 0x2, 0x9, 0xc, 0x21};
+const u8 sp0256speedddd[] __attribute__ ((section (".flash")))  = {0x37, 0x2, 0x9, 0xc, 0x21,255};
 
-const u8 sp0256than[] __attribute__ ((section (".flash")))  = {0x36, 0x1a, 0x18};
+const u8 sp0256than[] __attribute__ ((section (".flash")))  = {0x36, 0x1a, 0x18,255};
 
-const u8 sp0256try[] __attribute__ ((section (".flash")))  = {0xd, 0x27, 0x6};
+const u8 sp0256try[] __attribute__ ((section (".flash")))  = {0xd, 0x27, 0x6,255};
 
-const u8 sp0256temperature[] __attribute__ ((section (".flash")))  = {0xd, 0x7, 0x10, 0x9, 0x33, 0x25, 0x34};
+const u8 sp0256temperature[] __attribute__ ((section (".flash")))  = {0xd, 0x7, 0x10, 0x9, 0x33, 0x25, 0x34,255};
 
-const u8 sp0256volt[] __attribute__ ((section (".flash")))  = {0x25, 0x35, 0x2d, 0x11};
+const u8 sp0256volt[] __attribute__ ((section (".flash")))  = {0x25, 0x35, 0x2d, 0x11,255};
   
 
 /// length is 276 - where did this come from? retrospeak?

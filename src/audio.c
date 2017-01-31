@@ -374,7 +374,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 
 void sp0256rawone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  u8 xaxis=_selx*16.0f;
+  u8 xaxis=_selx*14.0f;
   exy[xaxis]=_sely; // no multiplier
     
   if (trigger==1) sp0256_newsayrawone(); // selector is in newsay
@@ -425,7 +425,7 @@ void sp0256rawtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
   // write into m_rome
   
   u8 xaxis=_selx*256.0f;
-  m_rome[xaxis]=_sely*256.0f; // no multiplier
+  m_rome[xaxis]=(u8)(_sely*256.0f); // no multiplier
     
   if (trigger==1) sp0256_newsayrawtwo(); // selector is in newsay
   static u8 triggered=0;
@@ -1101,11 +1101,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   trigger=0;
 
-  _intmode=22; // 15-> test_wave // checked=0,1,2,3,4,5,6,7,8 18,19 is last=sp0256TTS, 20->vocab, 21-vocab 22-vocab, 23-256_12ROM, 24-19ROM, 25-rawone minus nvp2sr -1 -> 25 is rawtwo
+  _intmode=24; // 18=256 - 24 is last
   if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
 
-  
-  //  samplespeed=_speed+0.01f; // TODO test this fully!
   samplespeed=_speed*transform[SPEED_].multiplier;
 
   // splitting input
@@ -1114,8 +1112,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256rawone, sp0256rawtwo};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={tms5220talkie, fullklatt, sp0256, simpleklatt, sammy, tms5200mame, tubes, channelv, testvoc, digitalker, nvp, foffy, voicformy, lpc_error, test_wave, wormas_wave, test_worm_wave, newvotrax, sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256rawone, sp0256rawtwo};
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

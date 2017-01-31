@@ -20,9 +20,8 @@
 
 unsigned char m_rome[256];
 
-extern float exy[64];
+//extern float exy[64];
 extern float _selx, _sely, _selz;
-
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -341,8 +340,9 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
-	f->per = f->r[1];
-	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
+	//	f->per = f->r[1];
+	f->per=_selz*255.0f; // question of noise? which is per 0// TESTING
+	//	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -758,8 +758,8 @@ static UINT32 getb( int len )
 	  int32_t idx0 = (m_pc    ) >> 3;
 	  int32_t idx1 = (m_pc + 8) >> 3;
 
-	  uint32_t firstadd=(idx0 & 0x00ff);
-	  uint32_t secondadd=(idx1 & 0x00ff);
+	  u8 firstadd=(idx0 & 0x00ff);
+	  u8 secondadd=(idx1 & 0x00ff);
 
 	  d0 = m_rome[firstadd];
 	  d1 = m_rome[secondadd]; // was 0xffff
@@ -1065,10 +1065,12 @@ int16_t sp0256_get_samplerawtwo(void){ // set m_rome array with x/y in audio.c T
  }
 
  void sp0256_newsayrawtwo(void){
-   u8 dada=_selz*128.0; // dada is selz
-   m_ald = (dada << 4); // or do as index <<3 and store this index TODO! 		
+   //   u8 dada=_selz*128.0f; // dada is selz
+   //   m_ald = (dada << 4); // or do as index <<3 and store this index TODO! 		
+   //   m_ald=0;
    m_lrq = 0; //from 8 bit write
    m_halted=1;
+   m_filt.rpt = 0;
  }
 
 void sp0256_raw2_init(void){

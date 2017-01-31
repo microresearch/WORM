@@ -1,12 +1,14 @@
 * general TODO/notes
 
+- how do we hit desired ADC end value as we always seem to fall short!
+
+fine up to 64 but above we lose the end with +1
+
 - do we fit all in RAM? - removed samplerate.c with 8192 array!
 
 - basics eg. ROMS, filenamings, compost
 
 - XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
-
-- ADC extent is 128 at least
 
 -  control models:
 
@@ -29,15 +31,24 @@ X,Y,Z and speed...
 
 * TODO  UPDATED:
 
+sp0256 AL2 - how to map allophones as all pauses are at one end?
+
 ** sp0256 as first model mode for others!
 
-- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!
+- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
 
-- join ROMs...DONE - TEST!
+- join ROMs...DONE - TEST!DONE
 
-- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
+rom12=mattel (why is lost before "presents"?)->aend
+rom19=score->fat/fast
 
-*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST!*
+but glitches to blank when wind backFIXED
+
+TODO - Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
+
+*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 crashes, raw1 fixed but needs tweaking for speeds and so on
+
+/////
 
 - AND add bends which shift the ROM values! 
 
@@ -45,7 +56,9 @@ X,Y,Z and speed...
 
 - finalise all sp0256 and use as model - how many modes now??:
 
-sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_12+*JOIN+sp0256_19, sp0256rawone, sp0256rawtwo, bending of roms, other excitations = 8+
+sp0256 allophones, sp0256TTS, sp0256vocabone, sp0256vocabtwo,
+sp0256_12+*JOIN+sp0256_19, sp0256rawone, sp0256rawtwo, bending of
+roms, other excitations = 9+
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
@@ -440,6 +453,10 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 - sp0256 vocab-splitDONE - 2 banksDONE TEST!
 
 - join ROMs...DONE - TEST!
+
+** 31/1
+
+- tests and fixes for sp0256
 
 * TTS 
 

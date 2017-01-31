@@ -130,7 +130,7 @@ static const INT16 qtbl[128]   __attribute__ ((section (".flash")))  =
 	504,    505,    506,    507,    508,    509,    510,    511
 };
 
-void sp0256_iinit()
+static void sp0256_iinit()
 {
 
 	/* -------------------------------------------------------------------- */
@@ -222,7 +222,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  f->per=f->per_orig+(90 - _selz*180.0f);//+(adc_buffer[SELY]>>5);
+		  f->per=f->per_orig+(90 - _sely*180.0f);//+(adc_buffer[SELY]>>5);
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -1187,7 +1187,8 @@ void sp0256_newsay1219(void){
 
   u8 selector=_selx*86.0f; // total is 36+49=85
 
-    if (selector<37) {
+  if (selector<37) { // so top is 36
+    m_page=0x1000<<3;
    m_romm=m_rom12;
    dada=6+selector; // they are 6->42
     }
@@ -1284,7 +1285,7 @@ void sp0256_newsay(void){
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
-   dada=_selx*64.0f; // there are 64
+   dada=_selx*65.0f; // there are 64 
    m_ald = ((dada&63) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
@@ -1322,10 +1323,8 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*151.0f; // TODO: split vocab into banks
-   }
-   
-   
+     whichone=_selx*65.0f; // TODO: split vocab into banks
+   }   
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
  }
