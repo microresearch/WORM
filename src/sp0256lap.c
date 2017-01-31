@@ -63,7 +63,7 @@ const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40,
 struct lpc12_t
 {
 	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-	UINT32  per, rng;       /* Period, Amplitude, Random Number Generator   */
+  UINT32  per, per_orig,rng;       /* Period, Amplitude, Random Number Generator   */
 	INT16     amp;
 	INT16   f_coef[6];      /* F0 through F5.                               */
 	INT16   b_coef[6];      /* B0 through B5.                               */
@@ -131,12 +131,6 @@ void sp0256_iinit()
 	/*  Configure our internal variables.                                   */
 	/* -------------------------------------------------------------------- */
 	m_filt.rng = 1;
-
-	/*	memset(m_rom,0,65536);
-	memcpy(m_rom+0x1000,m_roma,2048);
-	memcpy(m_rom+0x4000,m_romb,0x4000); // 16384....
-	memcpy(m_rom+0x8000,m_romc,0x4000);
-	*/
 
 	/* -------------------------------------------------------------------- */
 	/*  Set up the microsequencer's initial state.                          */
@@ -220,8 +214,9 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		if (f->per)
+		if (f->per_orig)
 		{
+		  f->per=f->per_orig+40;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -267,7 +262,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			f->r[1] += f->r[15];
 
 			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-			f->per   = f->r[1];
+			f->per_orig   = f->r[1];
 
 			do_int   = 0;
 		}
@@ -333,7 +328,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
-	f->per = f->r[1];
+	f->per_orig = f->r[1];
 	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
 
 	/* -------------------------------------------------------------------- */
@@ -814,14 +809,14 @@ UINT32 getb( int len )
 		//				  }
 
 		m_pc += len;
-	  }
+		//	  }
 
 	/* -------------------------------------------------------------------- */
 	/*  Mask data to the requested length.                                  */
 	/* -------------------------------------------------------------------- */
 	data &= ((1 << len) - 1);
 	}
-
+	}
 	return data;
 }
 
@@ -1180,7 +1175,6 @@ void micro()
    if (m_halted==1 && m_filt.rpt <= 0)     {
      dada+=1;
      fprintf(stderr,"NUM: %d\n", dada);
-
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
           m_lrq = 0; //from 8 bit write
    }

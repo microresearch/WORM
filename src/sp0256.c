@@ -85,7 +85,7 @@ struct lpc12_t m_filt;            /* 12-pole filter                             
 uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
 int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
 int32_t            m_pc;              /* Microcontroller's PC value.                  */
-int16_t            m_stack;           /* Microcontroller's PC stack.                  */
+uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
 u8            m_fifo_sel;        /* True when executing from FIFO.               */
 u8            m_halted;          /* True when CPU is halted.                     */
 UINT32         m_mode;            /* Mode register.                               */
@@ -801,7 +801,7 @@ UINT32 getb( int len )
 		//				}
 
 		m_pc += len;
-	  
+		  
 
 	/* -------------------------------------------------------------------- */
 	/*  Mask data to the requested length.                                  */
@@ -1323,7 +1323,8 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*65.0f; // TODO: split vocab into banks
+     whichone=_selx*151.9f; // TODO: split vocab into banks - on this one we need 0-150 values
+     if (whichone>150) whichone=150;
    }   
    m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write

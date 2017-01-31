@@ -1,10 +1,42 @@
 * general TODO/notes
 
-- how do we hit desired ADC end value as we always seem to fall short!
+- FIX ADC extents! - see newsaybankone - works on new hardware but would need to test across other HW versions and tune the filter coeffs
 
-fine up to 64 but above we lose the end with +1
+//fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
 
-- do we fit all in RAM? - removed samplerate.c with 8192 array!
+- use generic multiplier, how does integral work in warps:
+
+#define MAKE_INTEGRAL_FRACTIONAL(x) \
+  int32_t x ## _integral = static_cast<int32_t>(x); \
+  float x ## _fractional = x - static_cast<float>(x ## _integral);
+
+eg.     float algorithm = min(parameters_.modulation_algorithm * 8.0f, 5.999f);
+(for 6 algorithms 0-5?)
+
+why is scaled by 2.0
+
+  //  BIND(p->modulation_algorithm, ALGORITHM, true, 2.0f, 0.08f, false);  
+#define BIND(destination, NAME, unwrap, scale, lp_coefficient, attenuate) \
+  { \
+    lp_state_[ADC_ ## NAME ## _POT] += 0.33f * lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _POT) - lp_state_[ADC_ ## NAME ## _POT]); \
+    lp_state_[ADC_ ## NAME ## _CV] += lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _CV) - lp_state_[ADC_ ## NAME ## _CV]); \
+    float pot = lp_state_[ADC_ ## NAME ## _POT]; \
+    if (unwrap) pot = UnwrapPot(pot); \
+    float cv = calibration_data_->offset[ADC_ ## NAME ## _CV] - lp_state_[ADC_ ## NAME ## _CV]; \
+    float value = attenuate ? (pot * pot * cv * scale) : (pot + cv * scale); \
+    CONSTRAIN(value, 0.0f, 1.0f); \
+    destination = value; \
+  }
+
+- try different filter coeffs... (0.01f)
+
+///////////////////////////////////////////////////
+
+- refine and test triggers in all sp0256 modes
+
+////
+
+[- do we fit all in RAM? - removed samplerate.c with 8192 array!]
 
 - basics eg. ROMS, filenamings, compost
 
@@ -31,24 +63,25 @@ X,Y,Z and speed...
 
 * TODO  UPDATED:
 
+** sp0256 as first model mode for others!
+
 sp0256 AL2 - how to map allophones as all pauses are at one end?
 
-** sp0256 as first model mode for others!
 
 - sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
 
 - join ROMs...DONE - TEST!DONE
 
-rom12=mattel (why is lost before "presents"?)->aend
+rom12=mattel (*why is lost before "presents"?*)FIXED was uint32!->aend
 rom19=score->fat/fast
 
 but glitches to blank when wind backFIXED
 
-TODO - Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
-
-*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 crashes, raw1 fixed but needs tweaking for speeds and so on
+*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
 
 /////
+
+TODO - Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?
 
 - AND add bends which shift the ROM values! 
 
@@ -457,6 +490,9 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 ** 31/1
 
 - tests and fixes for sp0256
+- looking at ADC extents
+
+- for 1/2 - finalise ADC/ test triggers/ all sp0256 modes/ new working format?
 
 * TTS 
 
