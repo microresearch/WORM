@@ -118,7 +118,7 @@ int16_t lastval;//=genstruct->prevsample;
 
 // for TTS
 
-static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
+static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
 
 char TTSinarray[65];
 
@@ -217,7 +217,7 @@ TTS=0;
 
 void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=1;
-    if (trigger==1) sp0256_newsayTTS (); // selector is in newsay
+  if (trigger==1) sp0256_retriggerTTS(); // selector is in newsay
     
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -234,7 +234,8 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayTTS(); // selector is in newsay
+	 //	  sp0256_newsayTTS(); // selector is in newsay
+	 sp0256_retriggerTTS();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -250,7 +251,8 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayTTS(); // selector is in newsay
+	 //	 sp0256_newsayTTS(); // selector is in newsay
+	 sp0256_retriggerTTS();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -487,7 +489,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=4; 
+  _intmode=1; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -516,6 +518,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     u8 sely=_sely*65.0f;
     MAXED(selx,63);
     MAXED(sely,63);
+    selx=63-selx;
+    sely=63-sely;
     TTSinarray[selx]=mapytoascii[sely];
   }
 

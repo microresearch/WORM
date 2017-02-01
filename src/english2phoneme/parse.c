@@ -180,7 +180,7 @@ void main(argc, argv)
 
   
   //transform text to integer code phonemes
-      int output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
+      int output_count = text2speech(count,TTSinarray,TTSoutarray);
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
       //      printf("%s outcount: %d\n",TTSinarray, output_count);
   for(int i = 0; i < output_count; i++){
@@ -188,8 +188,6 @@ void main(argc, argv)
              printf("%d, ", TTSoutarray[i]);
 	     //	      }
 	     //      printf("\n");
-
-	     // how can we get frequencies
   }
   //  return output_count;
   }
@@ -204,9 +202,9 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
   input_length = input_len;
   input_count = 0; output_count=0;
   input[input_len] = EOF;
-
   xlate_file();
-  for (char i=0;i<output_count;i++){
+  //  printf("xxxxx %d\n", output_count);
+  for (unsigned char i=0;i<output_count;i++){
     output[i]=output_array[i]; 
   }
   return output_count;
@@ -217,19 +215,19 @@ unsigned char text2speechfor256(unsigned char  input_len, unsigned char *input, 
   input_length = input_len;
   input_count = 0; output_count=0;
   input[input_len] = EOF;
-
   xlate_file();
   //      output_count=10;
-  for (char i=0;i<output_count;i++){
+  if (output_count>255) output_count=255;
+  for (unsigned char i=0;i<output_count;i++){
         output[i]=remap256[output_array[i]];
 	if (output_array[i]==12){
 	  output_array[++i]=12;
 	  output_count++;
-	}
+	  }
 	//       output[i]=remap256[rand()%43];
   }
-  output[output_count-1]=255; 
-  return output_count; //check TODO!
+  //  output[output_count-1]=255; 
+  return output_count-1; //check TODO!
 }
 
 unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *input, unsigned char *output){
@@ -239,11 +237,13 @@ unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *inpu
   input[input_len] = EOF;
 
   xlate_file();
+  if (output_count>255) output_count=255;
+
   char countme=0;
   //      printf("Output: %d\n", output_count);
-  for (char i=0;i<output_count;i++){
+  for (unsigned char i=0;i<output_count;i++){
     //  printf("LEN: %d\n", ourvot[output_array[i]].length);
-    for (char ii=0;ii<ourvot[output_array[i]].length;ii++){
+    for (unsigned char ii=0;ii<ourvot[output_array[i]].length;ii++){
     output[countme]=ourvot[output_array[i]].mmm[ii];
     //    printf("%s ", NRL_list[output_array[i]]);
     countme++;
@@ -259,8 +259,10 @@ unsigned char text2speechforSAM(unsigned char  input_len, unsigned char *input, 
   input[input_len] = EOF;
 
   xlate_file();
+    if (output_count>255) output_count=255;
+
   //      output_count=10;
-  for (char i=0;i<output_count;i++){
+  for (unsigned char i=0;i<output_count;i++){
         output[i]=remapsam[output_array[i]];
 	}
   return output_count-1;
@@ -273,10 +275,12 @@ unsigned char text2speechforTMS(unsigned char input_len, unsigned char *input, u
   input[input_len] = EOF;
 
   xlate_file();
+    if (output_count>255) output_count=255;
+
   //      output_count=10;
       printf("OC%d\n",output_count);
 
-  for (char i=0;i<output_count;i++){
+  for (unsigned char i=0;i<output_count;i++){
         output[i]=remaptms[output_array[i]];
 	}
   output[output_count-1]=255; 

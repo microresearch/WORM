@@ -525,30 +525,27 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 sp0256.c* // sp0256bend.c* // sp0256raw.c* - check all extentsDONE - test all!
 
-- start to document our modes for the manual
+- ditch raw1DONE, tweak and clean all sp0256 for release  DONE
 
-- ditch raw1DONE, tweak and clean all sp0256 for release 
+CHECK- what needs be inverted-ALL inverted now in audio.c but we need
+to check this - doesn't work as then we lose 0 so now invert in sp0256
+files
 
-CHECK- what needs be inverted-ALL inverted now in audio.c but we need to check this - doesn't work as then we lose 0:
-
-mode: allophonesYES, TTS-Glitch somewhere, vocabone.two fine, 
-
-test RAW and bend
-
-/////
-
-, ADC extents, triggers
-
-- check again how ADC works with CV in...
-
-
-//////
+mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine, 
 
 ** 2/2+ TODO:
 
-- test all sp0256 modes
+- *fixed major bug in TTS with char/counter - still to test ALL!*
 
-- new hardware tests for ADC extents - extra boards
+- retrigger also of TTS
+
+- sp0256: test RAW and bend, ADC extents, triggers
+
+- check again how ADC works with CV in...
+
+- re-test all sp0256 modes and extents
+
+- new hardware tests for ADC extents - extra board
 
 - announce 20 march release and do soundclouds
 

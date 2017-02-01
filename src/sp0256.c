@@ -222,7 +222,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  int16_t val = (_selz*140.0f);
+		  int16_t val = (_selz*142.0f);
 		  MAXED(val,140)
 		    val=140-val;
 		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
@@ -1230,7 +1230,7 @@ int16_t sp0256_get_sample(void){
    }
 
    micro();
-     howmany=lpc12_update(&m_filt, &output);
+   howmany=lpc12_update(&m_filt, &output);
    }
    return output;
  }
@@ -1271,7 +1271,7 @@ int16_t sp0256_get_sample(void){
 // for text to speech we need out array, length and index...
 
 extern char TTSinarray[65];
-static u8 TTSoutarray[128];
+static u8 TTSoutarray[255];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
 
@@ -1309,9 +1309,28 @@ void sp0256_newsayTTS(void){// called at end of phoneme
      TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
    }
 
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index 		
+   m_ald = ((dada&63) << 4); 
    m_lrq = 0; //from 8 bit write
  }
+
+// new code to retrigger TTS
+
+void sp0256_retriggerTTS(void){// called on a trigger
+   u8 dada;
+   //   m_halted=1;
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   m_romm=m_romAL2;
+   
+   //     TTSindex=0;
+     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
+     if (TTSindex>=TTSlength)     TTSindex=0;
+     dada=TTSoutarray[TTSindex]; 
+
+     m_ald = ((dada&63) << 4); 
+     m_lrq = 0; //from 8 bit write
+ }
+
 
 void sp0256_newsayvocabbankone(void){// called at end of phoneme
    u8 dada;

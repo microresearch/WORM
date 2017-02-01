@@ -8,6 +8,8 @@ void sp0256_raw_init(void);
 void sp0256_initbend(void);
 void sp0256_init(void);
 
+void sp0256_retriggerTTS(void);
+
 int16_t sp0256_get_sample(void);
 void sp0256_newsay(void);
 
