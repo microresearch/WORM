@@ -222,7 +222,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  f->per=f->per_orig+(90 - _sely*180.0f);//+(adc_buffer[SELY]>>5);
+		  f->per=f->per_orig+(70 - _sely*140.0f);//+(adc_buffer[SELY]>>5);
+		  //		  f->per=f->per_orig;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -985,8 +986,8 @@ void micro()
 			/* ------------------------------------------------------------ */
 			default:
 			{
-				repeat = immed4 | (m_mode & 0x30);
-				repeat += 32-((u8)(_selz*64.0f));
+			  repeat = immed4 | (m_mode & 0x30);
+			  repeat += 18-((u8)(_selz*24.0f)); // seems to have dead zone at start for minus so shift TEST!
 				if (repeat<1) repeat=1;
 					    
 				break;
@@ -1275,7 +1276,7 @@ void sp0256_newsay(void){
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
-   dada=64-(_selx*65.0f); // there are 64 - but we want to reverse this! DONE/TEST!
+   dada=64-(_selx*65.0f); // there are 64 - but we want to reverse this! DONE/TESTED
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
@@ -1313,7 +1314,7 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*151.9f; // split vocab into banks - on this one we need 0-150 values
+     whichone=_selx*156.0f; // split vocab into banks - on this one we need 0-150 values 
      if (whichone>150) whichone=150;
    }   
    m_ald = ((dada&0xff) << 4); 		

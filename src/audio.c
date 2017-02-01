@@ -126,8 +126,8 @@ Wavetable wavtable;
 wormy myworm;
 biquad* newBB;
 
-#define THRESH 32000
-#define THRESHLOW 30000
+#define THRESH 16000
+#define THRESHLOW 10000
 
 // for TTS
 
@@ -1149,7 +1149,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   trigger=0;
 
-  _intmode=25; // 18=256 - 24: rawtwo
+  _intmode=25; // 18=256 -20=vocabone 1219=22
   if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
 
   samplespeed=_speed*transform[SPEED_].multiplier;

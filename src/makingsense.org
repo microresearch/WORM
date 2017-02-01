@@ -4,35 +4,11 @@
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but would *need to test across other HW versions* and tune the filter coeffs
 
-//on old hardware - fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
-
-- use generic multiplier, how does integral work in warps:
-
-#define MAKE_INTEGRAL_FRACTIONAL(x) \
-  int32_t x ## _integral = static_cast<int32_t>(x); \
-  float x ## _fractional = x - static_cast<float>(x ## _integral);
-
-eg.     float algorithm = min(parameters_.modulation_algorithm * 8.0f, 5.999f);
-(for 6 algorithms 0-5?)
-
-why is scaled by 2.0
-
-  //  BIND(p->modulation_algorithm, ALGORITHM, true, 2.0f, 0.08f, false);  
-#define BIND(destination, NAME, unwrap, scale, lp_coefficient, attenuate) \
-  { \
-    lp_state_[ADC_ ## NAME ## _POT] += 0.33f * lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _POT) - lp_state_[ADC_ ## NAME ## _POT]); \
-    lp_state_[ADC_ ## NAME ## _CV] += lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _CV) - lp_state_[ADC_ ## NAME ## _CV]); \
-    float pot = lp_state_[ADC_ ## NAME ## _POT]; \
-    if (unwrap) pot = UnwrapPot(pot); \
-    float cv = calibration_data_->offset[ADC_ ## NAME ## _CV] - lp_state_[ADC_ ## NAME ## _CV]; \
-    float value = attenuate ? (pot * pot * cv * scale) : (pot + cv * scale); \
-    CONSTRAIN(value, 0.0f, 1.0f); \
-    destination = value; \
-  }
+*new hardware is not so bad but we should fix with over-multiply but ALWAYS constrain if it is IMPORTANT!*
 
 - try different filter coeffs... (0.01f)
 
-- refine and test triggers in all sp0256 modes
+- refine and test triggers in all sp0256 modes - changing trigger thresholds
 
 ////
 
@@ -112,7 +88,36 @@ other excitations = 9+
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
 
-** DONE
+* DONE
+
+- question of ADC extents
+
+//on old hardware - fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
+
+- use generic multiplier, how does integral work in warps:
+
+#define MAKE_INTEGRAL_FRACTIONAL(x) \
+  int32_t x ## _integral = static_cast<int32_t>(x); \
+  float x ## _fractional = x - static_cast<float>(x ## _integral);
+
+eg.     float algorithm = min(parameters_.modulation_algorithm * 8.0f, 5.999f);
+(for 6 algorithms 0-5?)
+
+why is scaled by 2.0
+
+  //  BIND(p->modulation_algorithm, ALGORITHM, true, 2.0f, 0.08f, false);  
+#define BIND(destination, NAME, unwrap, scale, lp_coefficient, attenuate) \
+  { \
+    lp_state_[ADC_ ## NAME ## _POT] += 0.33f * lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _POT) - lp_state_[ADC_ ## NAME ## _POT]); \
+    lp_state_[ADC_ ## NAME ## _CV] += lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _CV) - lp_state_[ADC_ ## NAME ## _CV]); \
+    float pot = lp_state_[ADC_ ## NAME ## _POT]; \
+    if (unwrap) pot = UnwrapPot(pot); \
+    float cv = calibration_data_->offset[ADC_ ## NAME ## _CV] - lp_state_[ADC_ ## NAME ## _CV]; \
+    float value = attenuate ? (pot * pot * cv * scale) : (pot + cv * scale); \
+    CONSTRAIN(value, 0.0f, 1.0f); \
+    destination = value; \
+  }
+
 
 [- try different filter coeffs for ADC... (0.01f)]
 
@@ -498,26 +503,29 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 
 - added bend mode which shifts the ROM values -> which roms? AL2/and/or/*12-19*? - x/y bend and z select! DONE - to TEST/DONE
 
-** 1/2 TODO
+** 1/2 
 
-- test sp0256 bend mode - working in principle but is only update at
-  end when we call micro? - alt bend of all freq parameters
-  (interpolation question?) DONE - makes more sense than raw1 so maybe
-  ditch raw1 - also question of freeze/toggle on trigger in but we use trigger for newsay!
+- tested sp0256 bend mode - working in principle but is only update at
+  end when we call micro? so replacing with bend of all freq
+  parameters (interpolation question?) DONE - makes more sense than
+  raw1 so maybe ditch raw1 - also question of freeze/toggle on trigger
+  in but we use trigger for newsay!TESTED - maybe some tweaks 
 
 - interpol adds 14 and 15 to amp and per! - see what kind of params
   these are? - mostly 0 so can leave out
 
 - sp0256 AL2 - how to re=map allophones as all pauses are at one end
-  and we need to reverse - simply reverse - RE_TEST!
+  and we need to reverse - simply reverse - RE_TEST!DONE
 
-////.......
+////TODO
 
-- sp0256 - test triggers/ all modes
+- sp0256 - test triggers/ all modes 
 
 - ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed/ditch but both need tweaking for speeds and so on
 
-- tweak and clean all sp0256 for release
+*- tweak and clean all sp0256 for release - what needs be inverted, ADC extents, triggers as main things*
+
+- how this ADC stuff can all be a bit cleaner?
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
