@@ -83,12 +83,13 @@ typedef int32_t INT32;
 struct lpc12_t
 {
 	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-  UINT32  per, per_orig, rng;       /* Period, Amplitude, Random Number Generator   */
-	INT16     amp;
-	INT16   f_coef[6];      /* F0 through F5.                               */
-	INT16   b_coef[6];      /* B0 through B5.                               */
+  UINT32  per, perorig,rng;       /* Period, Amplitude, Random Number Generator   */
+  INT16     amp, amporig;
+  INT16   f_coef[6],f_coeforig[6];      /* F0 through F5.                               */
+  INT16   b_coef[6], b_coeforig[6];      /* B0 through B5.                               */
 	INT16   z_data[6][2];   /* Time-delay data for the filter stages.       */
 	UINT8   r[16];          /* The encoded register set.                    */
+  //  	UINT8   rorig[16];          /* The ORIGINAL encoded register set.                    */
 	INT16     interp;
 };
 
@@ -234,15 +235,16 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		if (f->per_orig)
+		f->amp=f->amporig+(320-exy[1]*640.0f); // amp values? 1280 - so
+		if (f->perorig)
 		{
-		  f->per=f->per_orig+(90 - _sely*180.0f);//+(adc_buffer[SELY]>>5);
+		  f->per=f->perorig+(90 - exy[0]*180.0f);//+(adc_buffer[SELY]>>5);
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
 				f->rpt--;
-				do_int  = f->interp;
+				//				do_int  = f->interp;
 
 				for (j = 0; j < 6; j++)
 					f->z_data[j][1] = f->z_data[j][0] = 0;
@@ -259,7 +261,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 
 			if (--f->cnt <= 0)
 			{
-				do_int = f->interp;
+			  //				do_int = f->interp;
 				f->cnt = PER_NOISE;
 				f->rpt--;
 				for (j = 0; j < 6; j++)
@@ -276,16 +278,16 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		/*  If we need to, process the interpolation registers.             */
 		/* ---------------------------------------------------------------- */
-		if (do_int)
+		/*		if (do_int)
 		{
 			f->r[0] += f->r[14];
 			f->r[1] += f->r[15];
 
-			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-			f->per_orig   = f->r[1];
+			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0); 
+			f->per   = f->r[1];
 
 			do_int   = 0;
-		}
+			}*/
 
 		/* ---------------------------------------------------------------- */
 		/*  Stop if we expire our repeat counter and return the actual      */
@@ -323,8 +325,11 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		for (j = 0; j < 6; j++)
 		{
-			samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-			samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+		  // intersperse
+		  f->b_coef[j]=f->b_coeforig[j]+ (256-(exy[2 + 2*j]*512.0));
+		  f->f_coef[j]=f->f_coeforig[j]+ (256-(exy[3 + 2*j]*512.0));
+		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
@@ -342,19 +347,20 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 {
 	u8 i;
 
-	for (i = 0; i < 16; i++) // the bends
+	/*	for (i = 0; i < 16; i++) // the bends
 	{
-	  f->r[i]+=exy[i]*256.0f;
-	}
+	  //	  f->r[i]=f->rorig[i]+(exy[i]*256.0f); // scheme to keep original!
+	  f->r[i]=f->rorig[i];//+(exy[i]*256.0f); // no bend
+	  }*/
 	
 	/* -------------------------------------------------------------------- */
 	/*  Decode the Amplitude and Period registers.  Force the 'cnt' to 0    */
 	/*  to get an initial impulse.  We compensate elsewhere by setting      */
 	/*  the repeat count to "repeat + 1".                                   */
 	/* -------------------------------------------------------------------- */
-	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+	f->amporig = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
-	f->per_orig = f->r[1];
+	f->perorig = f->r[1];
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -363,14 +369,14 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	{
 		#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
 
-		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
-		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
+		f->b_coeforig[stage_map[i]] = IQ(f->r[2 + 2*i]);
+		f->f_coeforig[stage_map[i]] = IQ(f->r[3 + 2*i]);
 	}
 
 	/* -------------------------------------------------------------------- */
 	/*  Set the Interp flag based on whether we have interpolation parms    */
 	/* -------------------------------------------------------------------- */
-	f->interp = f->r[14] || f->r[15];
+	//	f->interp = f->r[14] || f->r[15];
 
 	return;
 }
@@ -997,7 +1003,7 @@ static void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
-				repeat += 32-((u8)(_selz*64.0f));
+				//				repeat += 32-((u8)(_selz*64.0f));
 				if (repeat<1) repeat=1;
 					    
 				break;

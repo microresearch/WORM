@@ -36,8 +36,6 @@ why is scaled by 2.0
 
 ////
 
-[- do we fit all in RAM? - removed samplerate.c with 8192 array!]
-
 - basics eg. ROMS, filenamings, compost
 
 - XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
@@ -86,7 +84,7 @@ other excitations = 9+
 
 ** other
 
-- TTS votrax port and test - try also votrax typetalk.bin
+- TTS votrax port and test 
 
 -  we need to fix x, y and z also! - x-select, y-inflection/pitch,
    z-length - decide on this for all basics and integrate with audio.c
@@ -115,6 +113,12 @@ other excitations = 9+
   but may not be so in TMS5220 code RE_TEST!
 
 ** DONE
+
+[- try different filter coeffs for ADC... (0.01f)]
+
+[- do we fit all in RAM? - removed samplerate.c with 8192 array!]
+
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?? CHECK - it is used but doesn;t effect IGNORE
 
 - sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
 
@@ -383,8 +387,7 @@ Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
 
- 
-*** sp0256
+ *** sp0256
 
 - do we need to implement  m_silent=
 
@@ -493,21 +496,30 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 - tests and fixes for sp0256
 - looking at ADC extents
 
-- added bend mode which shifts the ROM values -> which roms? AL2/and/or/12-19? - x/y bend and z select! DONE - to TEST
+- added bend mode which shifts the ROM values -> which roms? AL2/and/or/*12-19*? - x/y bend and z select! DONE - to TEST/DONE
 
 ** 1/2 TODO
 
-- test sp0256 bend mode
+- test sp0256 bend mode - working in principle but is only update at
+  end when we call micro? - alt bend of all freq parameters
+  (interpolation question?) DONE - makes more sense than raw1 so maybe
+  ditch raw1 - also question of freeze/toggle on trigger in but we use trigger for newsay!
 
-- sp0256 - test triggers/ all modes - try different filter coeffs... (0.01f)
+- interpol adds 14 and 15 to amp and per! - see what kind of params
+  these are? - mostly 0 so can leave out
 
-- sp0256 AL2 - how to map allophones as all pauses are at one end?
+- sp0256 AL2 - how to re=map allophones as all pauses are at one end
+  and we need to reverse - simply reverse - RE_TEST!
 
-- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
+////.......
+
+- sp0256 - test triggers/ all modes
+
+- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed/ditch but both need tweaking for speeds and so on
+
+- tweak and clean all sp0256 for release
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
-
-- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)??
 
 //////
 

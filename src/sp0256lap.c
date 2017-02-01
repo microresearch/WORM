@@ -64,9 +64,9 @@ struct lpc12_t
 {
 	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
   UINT32  per, per_orig,rng;       /* Period, Amplitude, Random Number Generator   */
-	INT16     amp;
-	INT16   f_coef[6];      /* F0 through F5.                               */
-	INT16   b_coef[6];      /* B0 through B5.                               */
+  INT16     amp, amp_orig;
+  INT16   f_coef[6],f_coeforig[6];      /* F0 through F5.                               */
+  INT16   b_coef[6], b_coeforig[6];      /* B0 through B5.                               */
 	INT16   z_data[6][2];   /* Time-delay data for the filter stages.       */
 	UINT8   r[16];          /* The encoded register set.                    */
 	INT16     interp;
@@ -329,7 +329,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
 	f->per_orig = f->r[1];
-	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
+	//	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -340,7 +340,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
-		fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+		fprintf(stderr, "i %d f_coeff: %d b_coeff %d\n",i, f->b_coef[stage_map[i]], f->f_coef[stage_map[i]]);
 
 	}
 
@@ -349,6 +349,9 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->interp = f->r[14] || f->r[15];
 
+	//	fprintf(stderr, "INTERP: 14 %d  15 %d\n",f->r[14], f->r[15]);
+
+	
 	return;
 }
 
@@ -1041,7 +1044,7 @@ void micro()
 		if (!repeat) continue;
 
 		m_filt.rpt = repeat + 1;
-		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
+		//		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
 
 		
 		i = (opcode << 3) | (m_mode & 6);
@@ -1164,6 +1167,8 @@ void micro()
 		/* ---------------------------------------------------------------- */
 		break;
 	}
+
+	//	fprintf(stderr, "m_silent %d\n",m_silent);
 }
 
  const u8 sp0256vocabthursday[]={ 29, 52, 43, 1, 33, 20, 255};
@@ -1174,13 +1179,15 @@ void micro()
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      dada+=1;
-     fprintf(stderr,"NUM: %d\n", dada);
+     //     fprintf(stderr,"NUM: %d\n", dada);
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
           m_lrq = 0; //from 8 bit write
    }
 
    micro();
-   output=lpc12_update(&m_filt);
+   //      if (m_silent) output=0;
+   //      else output=lpc12_update(&m_filt);
+      output=lpc12_update(&m_filt);
    return output;
  }
 
@@ -1201,11 +1208,11 @@ void micro()
 void main(int argc, char *argv[]){
 
   //		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
-  
+  u8 output;
    sp0256_init();
 
   int dada=atoi(argv[1]);
-  fprintf(stderr,"NUM: %d 0x%x\n", dada, dada<<1);
+  //  fprintf(stderr,"NUM: %d 0x%x\n", dada, dada<<1);
     //  fprintf(stderr,"0x%0x\n", dada);
   //		m_speech->ald_w(space, 0, offset & 0x7f);
   //		m_fifo[m_fifo_head++ & 63] = 0xe8 & 0x3ff;
@@ -1227,7 +1234,14 @@ void main(int argc, char *argv[]){
       	  
    while(1){
    micro();
-   u8 output=lpc12_update(&m_filt);
+   //   u8 output=lpc12_update(&m_filt);
+
+   if (m_silent && m_filt.rpt <= 0) {
+     // 	fprintf(stderr, "XXXXX");
+     output=0;
+   }
+   else output=lpc12_update(&m_filt);
+
      printf("%c",output);
 
      if (m_halted==1 && m_filt.rpt <= 0)     {

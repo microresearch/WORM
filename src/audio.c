@@ -472,10 +472,10 @@ void sp0256rawtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-  u8 xaxis=_selx*17.0f; //0-16 check
+  u8 xaxis=_selx*14.0f; //0-16 for r, but now 14 params
   exy[xaxis]=_sely; // no multiplier
     
-  if (trigger==1) sp0256_newsayrawone(); // selector is in newsay
+  if (trigger==1) sp0256_newsaybend(); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -484,13 +484,13 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=sp0256_get_samplerawone();
+	 samplel=sp0256_get_samplebend();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
        if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayrawone(); // selector is in newsay
+	  sp0256_newsaybend(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -501,12 +501,12 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
      while (xx<size){
-              samplel=sp0256_get_samplerawone();
+              samplel=sp0256_get_samplebend();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayrawone(); // selector is in newsay
+	 sp0256_newsaybend(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -1149,7 +1149,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   trigger=0;
 
-  _intmode=20; // 18=256 - 24 is last: rawtwo
+  _intmode=25; // 18=256 - 24: rawtwo
   if (oldmode!=_intmode) trigger=1; // mode change TO TEST!
 
   samplespeed=_speed*transform[SPEED_].multiplier;

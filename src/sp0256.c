@@ -1275,7 +1275,7 @@ void sp0256_newsay(void){
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
-   dada=_selx*65.0f; // there are 64 
+   dada=64-(_selx*65.0f); // there are 64 - but we want to reverse this! DONE/TEST!
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
