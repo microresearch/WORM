@@ -17,6 +17,19 @@
 //#define AUDIO_BUFSZ 58870 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 #define AUDIO_BUFSZ 32768 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 
+#define MAXED(var, max) \
+  if (var > (max)) {	\
+    var = (max);	\
+  }
+
+#define CONSTRAIN(var, min, max) \
+  if (var < (min)) { \
+    var = (min); \
+  } else if (var > (max)) { \
+    var = (max); \
+  }
+
+
 #ifdef TEST
 #define MODE 3 // for pcb=2
 #define SELX 0 //3

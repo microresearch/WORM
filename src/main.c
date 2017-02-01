@@ -66,14 +66,6 @@ __IO uint16_t adc_buffer[5];
   } while (0)
 
 extern int errno;
-extern Formlet *formy;
-extern Formant *formanty;
-extern Blip *blipper;
-extern RLPF *RLPFer;
-extern NTube tuber;
-extern Wavetable wavtable;
-extern wormy myworm;
-extern biquad* newBB;
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
@@ -96,45 +88,9 @@ void main(void)
 {
   int16_t x;
   // all generator inits
-  //       LPCAnalyzer_init();
-  init_synth(); // which one? --> klatt rsynth !!!! RENAME!
   sp0256_init();
   sp0256_initbend();
-  sp0256_raw1_init();
-  sp0256_raw2_init();
-  lpc_init(); 
-/*   simpleklatt_init(); */
-/* sam_init(); */
-/* sam_newsay(); // TEST! */
-/* tms5200_init(); */
-/* tms5200_newsay(); */
-/* channelv_init(); */
-/* tube_init(); */
-/* tube_newsay(); */
-/* BANDS_Init_(); */
-/* Vocoder_Init(32000.0f); */
-/* digitalk_init(); */
-/* digitalk_newsay(0); */
-/* nvp_init(); */
-/* sample_rate_init(); */
-/* initbraidworm(); // re_name */
-/* initvoicform(); */
-/*   formy=malloc(sizeof(Formlet)); */
-/*   formanty=malloc(sizeof(Formant)); */
-/*   blipper=malloc(sizeof(Blip)); */
-/*   RLPFer=malloc(sizeof(RLPF)); */
-/*   Formlet_init(formy); */
-/*   Formant_init(formanty); */
-/*   Blip_init(blipper); */
-/*   RLPF_init(RLPFer); */
-/*   NTube_init(&tuber); */
-/*    wavetable_init(&wavtable, crowtable_slower, 283); // now last arg as length of table=less than 512 */
-/*   //    wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 */
-/*   //  wavetable_init(&wavtable, table_kahrs000, 160); // now last arg as length of table=less than 512 */
-/*     //  addwormsans(&myworm, 10.0f,10.0f,200.0f, 200.0f, wanderworm); */
-/*   //  RavenTube_init(); */
-   newBB=BiQuad_new(LPF, 1.0, 1500, 32000, 0.68); // TEST? 
-        votrax_init(); 
+  sp0256_raw_init();
     
  ////////
   ADC1_Init((uint16_t *)adc_buffer);

@@ -162,15 +162,6 @@ static void sp0256_iinit()
 	m_lrq      = 0x8000;
  	m_page     = 0x1000 << 3; //32768 =0x8000
 	m_silent   = 1;
-
-	/* -------------------------------------------------------------------- */
-	/*  Setup the ROM.                                                      */
-	/* -------------------------------------------------------------------- */
-	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
-	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
-	// TODO: because of this, check if the bitrev functions are even used anywhere else
-	//	bitrevbuff(m_rom, 0, 0xffff);
-
 }
 
 
@@ -235,10 +226,11 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
+		// invert the values here - but do in exy in audio.c
 		f->amp=f->amporig+(320-exy[1]*640.0f); // amp values? 1280 - so
 		if (f->perorig)
 		{
-		  f->per=f->perorig+(90 - exy[0]*180.0f);//+(adc_buffer[SELY]>>5);
+		  f->per=f->perorig+(90 - exy[0]*180.0f);
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -293,7 +285,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		if (f->rpt <= 0) return 0; // HOWTO break out of single loop and signal this! TODO!
+		if (f->rpt <= 0) return 0; 
 
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
@@ -367,8 +359,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	for (i = 0; i < 6; i++)
 	{
-		#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
-
+#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
 		f->b_coeforig[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coeforig[stage_map[i]] = IQ(f->r[3 + 2*i]);
 	}
@@ -1003,9 +994,7 @@ static void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
-				//				repeat += 32-((u8)(_selz*64.0f));
 				if (repeat<1) repeat=1;
-					    
 				break;
 			}
 		}
@@ -1196,8 +1185,9 @@ void sp0256_newsaybend(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selz*86.0f; // total is 36+49=85
-
+  u8 selector=_selz*87.0f; // total is 36+49=85
+  MAXED(selector,85);
+  selector=85-selector;
   if (selector<37) { // so top is 36
     m_page=0x1000<<3;
    m_romm=m_rom12;
@@ -1210,6 +1200,6 @@ void sp0256_newsaybend(void){
       if (indexy>19) m_page=0x8000<<3;
       else m_page=0x1000<<3;
     }
-      m_ald = ((dada) << 4); // or do as index <<3 and store this index 		
+      m_ald = ((dada) << 4);
       m_lrq = 0; //from 8 bit write
     }

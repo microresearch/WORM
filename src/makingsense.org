@@ -2,7 +2,8 @@
 
 * general TODO/notes
 
-- FIX ADC extents! - see newsaybankone - works on new hardware but would *need to test across other HW versions* and tune the filter coeffs
+- FIX ADC extents! - see newsaybankone - works on new hardware but
+  would *need to test across other HW versions - tested so far on one*
 
 *new hardware is not so bad but we should fix with over-multiply but ALWAYS constrain if it is IMPORTANT!*
 
@@ -34,8 +35,7 @@
 
 - *worm control - MOVED OUT TO NEW MODULE alongside RAVEN! = except for wavetable maybe*
 
-* TODO  UPDATED:
-
+* TODO  UPDATED:1/2
 ** sp0256 as first model mode for others!
 
 - sp0256 AL2 - how to map allophones as all pauses are at one end?
@@ -517,23 +517,42 @@ what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?
 - sp0256 AL2 - how to re=map allophones as all pauses are at one end
   and we need to reverse - simply reverse - RE_TEST!DONE
 
-////TODO
-
-- sp0256 - test triggers/ all modes 
-
 - ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed/ditch but both need tweaking for speeds and so on
 
-*- tweak and clean all sp0256 for release - what needs be inverted, ADC extents, triggers as main things*
+- clean audio.c to newdiscard.cDONE
 
-- how this ADC stuff can all be a bit cleaner?
+//// WED EVE:
 
-- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+sp0256.c* // sp0256bend.c* // sp0256raw.c* - check all extentsDONE - test all!
+
+- start to document our modes for the manual
+
+- ditch raw1DONE, tweak and clean all sp0256 for release 
+
+CHECK- what needs be inverted-ALL inverted now in audio.c but we need to check this - doesn't work as then we lose 0:
+
+mode: allophonesYES, TTS-Glitch somewhere, vocabone.two fine, 
+
+test RAW and bend
+
+/////
+
+, ADC extents, triggers
+
+- check again how ADC works with CV in...
+
 
 //////
 
-*- new hardware tests for ADC extents - extra boards*
+** 2/2+ TODO:
 
-*- announce 20 march release and do soundclouds*
+- test all sp0256 modes
+
+- new hardware tests for ADC extents - extra boards
+
+- announce 20 march release and do soundclouds
+
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
 * TTS 
 

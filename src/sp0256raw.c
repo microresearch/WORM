@@ -1,18 +1,26 @@
-// port towards ARM now
-
+#ifdef LAP
+#include "stdio.h"
+#include "stdlib.h"
+#include "math.h"
+#include "string.h"
+#include "forlap.h"
+#include <sys/stat.h>
+#include <time.h>    // time()
+//#include "sp0256vocab.h"
+#else
 #include "sp0256.h"
 #include "audio.h"
-#include "english2phoneme/TTS.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#endif
 
-#include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
-#include "sp0256vocab.h"
+// this one is basic tests of code based raw sp0256
+// test say a buffer of 256 
+
+unsigned char m_rome[256];
 
 extern float _selx, _sely, _selz;
-extern u8 TTS;
-const unsigned char *m_romm;
 
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
@@ -46,30 +54,10 @@ const unsigned char *m_romm;
 
 */
 
-typedef unsigned char UINT8;
-typedef signed char INT8;
-typedef u16 UINT16;
-typedef int16_t INT16;
-typedef uint32_t UINT32;
-typedef int32_t INT32;
-
-// al2.bin dumped here// now we use one from sauro.zip
-
-// needs to start at 0x1000  and rom is till 0x10000 but only 2k...
-
-// length is 2048 which is 2k or 0x1000
-
-void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
-
-
-// this one is stock allophone al2 rom
-
-
-
 struct lpc12_t
 {
 	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-  UINT32  per, per_orig, rng;       /* Period, Amplitude, Random Number Generator   */
+	UINT32  per, rng;       /* Period, Amplitude, Random Number Generator   */
 	INT16     amp;
 	INT16   f_coef[6];      /* F0 through F5.                               */
 	INT16   b_coef[6];      /* B0 through B5.                               */
@@ -78,23 +66,22 @@ struct lpc12_t
 	INT16     interp;
 };
 
-u8           m_silent;          /* Flag: SP0256 is silent.                      */
+static u8           m_silent;          /* Flag: SP0256 is silent.                      */
 
 
-struct lpc12_t m_filt;            /* 12-pole filter                               */
-uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
-int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
-int32_t            m_pc;              /* Microcontroller's PC value.                  */
-uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
-u8            m_fifo_sel;        /* True when executing from FIFO.               */
-u8            m_halted;          /* True when CPU is halted.                     */
-UINT32         m_mode;            /* Mode register.                               */
-UINT32         m_page;            /* Page set by SETPAGE                          */
+static struct lpc12_t m_filt;            /* 12-pole filter                               */
+static uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
+static int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
+static int32_t            m_pc;              /* Microcontroller's PC value.                  */
+static uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
+static u8            m_fifo_sel;        /* True when executing from FIFO.               */
+static u8            m_halted;          /* True when CPU is halted.                     */
+static UINT32         m_mode;            /* Mode register.                               */
 
-UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
-UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
-UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
-UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
+static UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
+static UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
+static UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
+static UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
 
 
 #define CLOCK_DIVIDER (7*6*8)
@@ -110,7 +97,7 @@ UINT16         m_fifo[64];        /* The 64-decle FIFO.                         
 /*  qtbl  -- Coefficient Quantization Table.  This comes from a             */
 /*              SP0250 data sheet, and should be correct for SP0256.        */
 /* ======================================================================== */
-static const INT16 qtbl[128]   __attribute__ ((section (".flash")))  =
+static const INT16 qtbl[128] __attribute__ ((section (".flash"))) =
 {
 	0,      9,      17,     25,     33,     41,     49,     57,
 	65,     73,     81,     89,     97,     105,    113,    121,
@@ -145,16 +132,7 @@ static void sp0256_iinit()
 	m_halted   = 1; // was 1
 	m_filt.rpt = -1;
 	m_lrq      = 0x8000;
- 	m_page     = 0x1000 << 3; //32768 =0x8000
 	m_silent   = 1;
-
-	/* -------------------------------------------------------------------- */
-	/*  Setup the ROM.                                                      */
-	/* -------------------------------------------------------------------- */
-	// the rom is not supposed to be reversed first; according to Joe Zbiciak.
-	// see http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=72385#Post72385
-	// TODO: because of this, check if the bitrev functions are even used anywhere else
-	//	bitrevbuff(m_rom, 0, 0xffff);
 
 }
 
@@ -178,11 +156,8 @@ static void reset()
 	m_stack    = 0x0000;
 	m_fifo_sel = 0;
 	m_mode     = 0;
-	m_page     = 0x1000 << 3;
 	m_silent   = 1;
-	//	m_sby_line = 0;
-
-	  m_lrq = 0;
+	m_lrq = 0;
 }
 
 
@@ -205,7 +180,7 @@ static inline INT16 limit(INT16 s)
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
+static inline INT16 lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
 	INT16 samp;
@@ -220,13 +195,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		if (f->per_orig)
+		if (f->per)
 		{
-		  int16_t val = (_selz*140.0f);
-		  MAXED(val,140)
-		    val=140-val;
-		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
-		  //		  f->per=f->per_orig;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -272,7 +242,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->r[1] += f->r[15];
 
 			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-			f->per_orig   = f->r[1];
+			f->per   = f->r[1];
 
 			do_int   = 0;
 		}
@@ -281,8 +251,11 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		if (f->rpt <= 0) return 0; 
+		if (f->rpt <= 0) {
 
+		  return 0;
+		}
+		  
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
 		/*  gives the first form, the patent gives the second form.         */
@@ -319,11 +292,12 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		*out= limit(samp)<<2;
+				*out= limit(samp)<<2;
 		return 1;
+
 }
 
-static u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
+static const u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
 
 /* ======================================================================== */
 /*  LPC12_REGDEC -- Decode the register set in the filter bank.             */
@@ -339,7 +313,8 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
-	f->per_orig = f->r[1];
+	
+     	f->per=(1.0f-_selz)*256.0f; // question of noise? which is per 0// TESTING - inversion TEST
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -350,6 +325,8 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
+		fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+
 	}
 
 	/* -------------------------------------------------------------------- */
@@ -393,7 +370,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 enum { AM = 0, PR, B0, F0, B1, F1, B2, F2, B3, F3, B4, F4, B5, F5, IA, IP };
 
-static const UINT16 sp0256_datafmt[]   __attribute__ ((section (".flash")))  =
+static const UINT16 sp0256_datafmt[] __attribute__ ((section (".flash"))) =
 {
 	/* -------------------------------------------------------------------- */
 	/*  OPCODE 1111: PAUSE                                                  */
@@ -667,7 +644,7 @@ static const UINT16 sp0256_datafmt[]   __attribute__ ((section (".flash")))  =
 	/*  176 */  CR( 5,  0,  IP, 0,  0,  0,  0),     /*  Per. Intr.  */
 };
 
-static const INT16 sp0256_df_idx[16 * 8]   __attribute__ ((section (".flash"))) =
+static const INT16 sp0256_df_idx[16 * 8]  __attribute__ ((section (".flash"))) =
 {
 	/*  OPCODE 0000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
 	/*  OPCODE 1000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
@@ -704,33 +681,15 @@ static inline UINT32 bitrev32(UINT32 val)
 /* ======================================================================== */
 /*  BITREV8       -- Bit-reverse a 8-bit number.                            */
 /* ======================================================================== */
-static inline UINT8 bitrev8(UINT8 val)
-{
-	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
-	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
-	val = ((val & 0xAA) >>  1) | ((val & 0x55) <<  1);
-
-	return val;
-}
-
-/* ======================================================================== */
-/*  BITREVBUFF       -- Bit-reverse a buffer.                               */
-/* ======================================================================== */
-void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
-{
-	for (unsigned int i = start; i < length; i++ )
-		buffer[i] = bitrev8(buffer[i]);
-}
 
 /* ======================================================================== */
 /*  SP0256_GETB  -- Get up to 8 bits at the current PC.                     */
 /* ======================================================================== */
-UINT32 getb( int len )
+static UINT32 getb( int len )
 {
-  UINT32 data, minus;
-	u16 d0, d1;
+	UINT32 data;
+	UINT32 d0, d1;
 
-	//	fprintf(stderr,"m_pc %d\n",m_pc>>3);
 
 	/* -------------------------------------------------------------------- */
 	/*  Fetch data from the FIFO or from the MASK                           */
@@ -754,65 +713,27 @@ UINT32 getb( int len )
 			m_fifo_tail++;
 			m_fifo_bitp -= 10;
 		}
+
 	} else
 	{
-		/* ---------------------------------------------------------------- */
-		/*  Figure out which ROMs are being fetched into, and grab two      */
-		/*  adjacent bytes.  The byte we're interested in is extracted      */
-		/*  from the appropriate bit-boundary between them.                 */
-		/* ---------------------------------------------------------------- */
-	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
-	  int32_t idx1 = (m_pc + 8) >> 3, d1;
+
+	  int32_t idx0 = (m_pc    ) >> 3;
+	  int32_t idx1 = (m_pc + 8) >> 3;
+
+	  u8 firstadd=(idx0 & 0x00ff);
+	  u8 secondadd=(idx1 & 0x00ff);
+
+	  d0 = m_rome[firstadd];
+	  d1 = m_rome[secondadd]; // was 0xffff
 		
-	  //	int firstadd=(idx0 & 0xffff);
-	  //	int secondadd=(idx1 & 0xffff);
-
-	  /*	  if (firstadd<0 || secondadd>0x800) data=0; // better check on this - NOT in case of m_rom19
-				else
-				{*/
-
-	  data=1; minus=0x1000; // default
-	  if (idx0>=0x1800 || idx0<0x1000) data=0;
-
-	  if (m_romm==m_rom19 || m_romm==m_rom003 || m_romm==m_rom004){ // we need to choose roms
-
-	    if (idx0>=0x1000 && idx0<0x1800) {
-	      m_romm=m_rom19; // 003 has phonemes as AL2 and some phrases but not so many WHY?
-	      minus=0x1000;
-	      data=1;
+	  data = ((d1 << 8) | d0) >> (m_pc & 7);
+	  m_pc += len;
 	  }
-	    else if (idx0>=0x4000 && idx0<0x8000) {
-	      m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
-	      minus=0x4000;
-	      data=1;
-	  }
-	    else if (idx0>=0x8000 && idx0<0xC000) {
-	    m_romm=m_rom004; 
-	    minus=0x8000;
-	    data=1;
-	    }
-	  else {data=0;}
-	  }
-	  
-	  if (data!=0){
-	  int32_t firstadd=(idx0 & 0xffff)-minus;
-	  int32_t secondadd=(idx1 & 0xffff)-minus;
-
-		d0 = m_romm[firstadd];
-		d1 = m_romm[secondadd]; // was 0xffff
-
-		data = ((d1 << 8) | d0) >> (m_pc & 7);
-		//				}
-
-		m_pc += len;
-		  
 
 	/* -------------------------------------------------------------------- */
 	/*  Mask data to the requested length.                                  */
 	/* -------------------------------------------------------------------- */
 	data &= ((1 << len) - 1);
-	  }
-	}
 
 	return data;
 }
@@ -822,28 +743,34 @@ UINT32 getb( int len )
 /*                  instructions either until the repeat count != 0 or      */
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
-void micro()
+
+static void micro()
 {
 	UINT8  immed4;
 	UINT8  opcode;
 	UINT16 cr;
 	u8 ctrl_xfer;
-	int8_t repeat;
+	u8 repeat,j;
 	u8 i, idx0, idx1;
-	int16_t val;
+
 	/* -------------------------------------------------------------------- */
 	/*  Only execute instructions while the filter is not busy.             */
 	/* -------------------------------------------------------------------- */
 	while (m_filt.rpt <= 0)
-	{
+	  {
 		/* ---------------------------------------------------------------- */
 		/*  If the CPU is halted, see if we have a new command pending      */
 		/*  in the Address LoaD buffer.                                     */
 		/* ---------------------------------------------------------------- */
 		if (m_halted && !m_lrq)
 		{
-		 	  m_pc       = m_ald | (0x1000 << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
-			  // m_pc = m_ald;
+		  m_pc       = m_ald;// | (0x1000  << 3); // OR with 0x8000 this adds 0x8000 which we shift back to 0x1000 and then subtract later when shifts back
+				  // Bit 12 is forced to 1 so that code executes out of page $1. 
+		  //	fprintf(stderr,"m_pc %d m_ald %d\n",m_pc,m_ald);
+				  
+		  //		  fprintf(stderr,"m_pc %x m_ald %d\n",m_pc>>3,m_ald);
+		
+		  // m_pc = m_ald;
 			m_fifo_sel = 0;
 			m_halted   = 0;
 			m_lrq      = 0x8000;
@@ -865,7 +792,7 @@ void micro()
 				m_filt.r[i] = 0;
 
 			//			SET_SBY(1)
-
+			fprintf(stderr, "HLATED!\n");
 			return;
 		}
 
@@ -878,91 +805,14 @@ void micro()
 		repeat = 0;
 		ctrl_xfer = 0;
 
-		//		printf("$%.4X.%.1X: OPCODE %d%d%d%d.%d%d\n",
-		//		(m_pc >> 3) - 1, m_pc & 7,
-		//		!!(opcode & 1), !!(opcode & 2),
-		//		!!(opcode & 4), !!(opcode & 8),
-		//		!!(m_mode&4), !!(m_mode&2));
-
 		/* ---------------------------------------------------------------- */
 		/*  Handle the special cases for specific opcodes.                  */
 		/* ---------------------------------------------------------------- */
+		fprintf(stderr,"OPCODE %d\n",opcode);
+
+
 		switch (opcode)
 		{
-			/* ------------------------------------------------------------ */
-			/*  OPCODE 0000:  RTS / SETPAGE                                 */
-			/* ------------------------------------------------------------ */
-			case 0x0:
-			{
-				/* -------------------------------------------------------- */
-				/*  If immed4 != 0, then this is a SETPAGE instruction.     */
-				/* -------------------------------------------------------- */
-				if (immed4)     /* SETPAGE */
-				{
-					m_page = bitrev32(immed4) >> 13;
-				} else
-				/* -------------------------------------------------------- */
-				/*  Otherwise, this is an RTS / HLT.                        */
-				/* -------------------------------------------------------- */
-				{
-					UINT32 btrg;
-
-					/* ---------------------------------------------------- */
-					/*  Figure out our branch target.                       */
-					/* ---------------------------------------------------- */
-					btrg = m_stack;
-
-					m_stack = 0;
-
-					/* ---------------------------------------------------- */
-					/*  If the branch target is zero, this is a HLT.        */
-					/*  Otherwise, it's an RTS, so set the PC.              */
-					/* ---------------------------------------------------- */
-					if (!btrg)
-					{
-						m_halted   = 1;
-						m_pc       = 0;
-						ctrl_xfer  = 1;
-					} else
-					{
-						m_pc      = btrg;
-						ctrl_xfer = 1;
-					}
-				}
-
-				break;
-			}
-
-			/* ------------------------------------------------------------ */
-			/*  OPCODE 0111:  JMP          Jump to 12-bit/16-bit Abs Addr   */
-			/*  OPCODE 1011:  JSR          Jump to Subroutine               */
-			/* ------------------------------------------------------------ */
-			case 0xE:
-			case 0xD:
-			{
-				uint32_t btrg;
-
-				/* -------------------------------------------------------- */
-				/*  Figure out our branch target.                           */
-				/* -------------------------------------------------------- */
-				btrg = m_page                     |
-						(bitrev32(immed4)  >> 17) |
-						(bitrev32(getb(8)) >> 21);
-				ctrl_xfer = 1;
-
-				/* -------------------------------------------------------- */
-				/*  If this is a JSR, push our return address on the        */
-				/*  stack.  Make sure it's byte aligned.                    */
-				/* -------------------------------------------------------- */
-				if (opcode == 0xD)
-					m_stack = (m_pc + 7) & ~7;
-
-				/* -------------------------------------------------------- */
-				/*  Jump to the new location!                               */
-				/* -------------------------------------------------------- */
-				m_pc = btrg;
-				break;
-			}
 
 			/* ------------------------------------------------------------ */
 			/*  OPCODE 1000:  SETMODE      Set the Mode and Repeat MSBs     */
@@ -988,16 +838,9 @@ void micro()
 			/*  OPCODE 1111:  PAUSE        Silent pause                     */
 			/* ------------------------------------------------------------ */
 			default:
-			{			  
-			  repeat = immed4 | (m_mode & 0x30);
-			  if (TTS==0) {
-			    val = (_sely*24.0f); // only if we are not in TTS mode
-			    MAXED(val,24);
-			    val=24-val;
-			    repeat += 18-val; // seems to have dead zone at start for minus so shift TEST!
-			  }
-			  if (repeat<1) repeat=1;
-			  break;
+			{
+				repeat = immed4 | (m_mode & 0x30);
+				break;
 			}
 		}
 		if (opcode != 1) m_mode &= 0xF;
@@ -1013,8 +856,8 @@ void micro()
 			/*  Set our "FIFO Selected" flag based on whether we're going   */
 			/*  to the FIFO's address.                                      */
 			/* ------------------------------------------------------------ */
-			m_fifo_sel = m_pc == FIFO_ADDR;
-
+		  			m_fifo_sel = m_pc == FIFO_ADDR;
+		  		  fprintf(stderr,"FIFOI!\n");
 
 			/* ------------------------------------------------------------ */
 			/*  Control transfers to the FIFO cause it to discard the       */
@@ -1029,30 +872,31 @@ void micro()
 			}
 
 
-			continue;
+						continue;
 		}
 
 		/* ---------------------------------------------------------------- */
 		/*  Otherwise, if we have a repeat count, then go grab the data     */
 		/*  block and feed it to the filter.                                */
 		/* ---------------------------------------------------------------- */
-		if (!repeat) continue;
+				if (!repeat) continue;
 
 		m_filt.rpt = repeat + 1;
-
+		
 		i = (opcode << 3) | (m_mode & 6);
 		idx0 = sp0256_df_idx[i++];
 		idx1 = sp0256_df_idx[i  ];
 
-		//		assert(idx0 >= 0 && idx1 >= 0 && idx1 >= idx0);
 
 		/* ---------------------------------------------------------------- */
 		/*  Step through control words in the description for data block.   */
 		/* ---------------------------------------------------------------- */
+		if (idx0!=idx1){
 		for (i = idx0; i <= idx1; i++)
 		{
 			int16_t len, shf, delta, field, prm, clra, clr5;
 			INT8 value;
+			fprintf(stderr,"IDX %d %d %d\n",idx0, idx1, i);
 
 			/* ------------------------------------------------------------ */
 			/*  Get the control word and pull out some important fields.    */
@@ -1073,7 +917,7 @@ void micro()
 			/* ------------------------------------------------------------ */
 			if (clra)
 			{
-				for (u8 j = 0; j < 16; j++)
+				for (j = 0; j < 16; j++)
 					m_filt.r[j] = 0;
 
 				m_silent = 1;
@@ -1140,15 +984,10 @@ void micro()
 			/* ------------------------------------------------------------ */
 			m_filt.r[prm] = value;
 		}
-
+		}
 		/* ---------------------------------------------------------------- */
 		/*  Special case:  Set PAUSE's equivalent period.                   */
 		/* ---------------------------------------------------------------- */
-		if (opcode == 0xF)
-		{
-			m_silent = 1;
-			m_filt.r[1] = PER_PAUSE;
-		}
 
 		/* ---------------------------------------------------------------- */
 		/*  Now that we've updated the registers, go decode them.           */
@@ -1158,209 +997,57 @@ void micro()
 		/* ---------------------------------------------------------------- */
 		/*  Break out since we now have a repeat count.                     */
 		/* ---------------------------------------------------------------- */
-		break;
-	}
+				break;
+			}
 }
 
-
-int16_t sp0256_get_sample1219(void){
-  static int16_t output; 
-  u8 howmany=0;
-  while(howmany==0){ 
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay1219();
+int16_t sp0256_get_sampleraw(void){ 
+   int16_t output; 
+   u8 howmany=0;
+     while(howmany==0){ 
+      if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsayraw();
    }
       micro();
       howmany=lpc12_update(&m_filt, &output);
           }
-   return output;
+   return output;   
+ }
+
+ void sp0256_newsayraw(void){
+   //   u8 dada=_selz*128.0f; // dada is selz
+   //   m_ald = (dada << 4); 
+   //   m_ald=0;
+   m_lrq = 0; //from 8 bit write
+   m_halted=1;
+   m_filt.rpt = 0;
+ }
+
+void sp0256_raw_init(void){
+  reset();
 }
 
-static const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
+#ifdef LAP
+ void main(void){
+   int x;
+      srand(time(NULL));
 
-void sp0256_newsay1219(void){
-  u8 dada, indexy;
-  m_lrq=0; m_halted=1; m_filt.rpt=0;
-
-  u8 selector=_selx*86.0f; // total is 36+49=85
-  MAXED(selector, 84); //0-84
-  selector=84-selector;
-  
-  if (selector<37) { // so top is 36
-    m_page=0x1000<<3;
-   m_romm=m_rom12;
-   dada=6+selector; // they are 6->42
-    }
-    else {    
-      m_romm=m_rom19;
-      indexy=selector-37;
-      dada=remap19[indexy];
-      if (indexy>19) m_page=0x8000<<3;
-      else m_page=0x1000<<3;
-    }
-      m_ald = ((dada) << 4); // or do as index <<3 and store this index 		
-      m_lrq = 0; //from 8 bit write
-    }
-
-
-int16_t sp0256_get_sample(void){
-  static int16_t output; 
+   // fill buffer with random data
+   for (x=0;x<256;x++) m_rom[x]=rand()%128;
+   sp0256_init();
    
-      u8 howmany=0;
-            while(howmany==0){ 
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay();
-   }
+   while(1){
 
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
-   return output;
+     micro();
+   u8 output=lpc12_update(&m_filt);
+     printf("%c",output);
+     if (m_filt.rpt <= 0){
+       m_ald = ((rand()%255) << 4);
+       m_lrq = 0; //from 8 bit write
+       m_halted=1;
+       fprintf(stderr,"RPT: %d\n", m_filt.rpt);
+       for (x=0;x<256;x++) m_rom[x]=rand()%255;// in real version these would be updated over time
+     }
+	    }
  }
-
- int16_t sp0256_get_sampleTTS(void){
-  static int16_t output; 
-   u8 howmany=0;
-   while(howmany==0){
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayTTS();
-   }
-
-   micro();
-     howmany=lpc12_update(&m_filt, &output);
-   }
-   return output;
- }
-
-
- int16_t sp0256_get_samplevocabbankone(void){
-  static int16_t output; 
-   u8 howmany=0;
-   while(howmany==0){
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayvocabbankone();
-   }
-
-   micro();
-   howmany=lpc12_update(&m_filt, &output);
-   }
-   return output;
- }
-
- int16_t sp0256_get_samplevocabbanktwo(void){
-  static int16_t output; 
-   u8 howmany=0;
-   while(howmany==0){
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayvocabbanktwo();
-   }
-
-   micro();
-     howmany=lpc12_update(&m_filt, &output);
-   }
-   return output;
- }
-
-
-
-// for text to speech we need out array, length and index...
-
-extern char TTSinarray[65];
-static u8 TTSoutarray[128];
-static u8 TTSindex=0;
-static u8 TTSlength=0;
-
-void sp0256_newsay(void){
-   u8 dada=0;
-   m_lrq=0; m_halted=1; m_filt.rpt=0;
-
-   //   m_halted=1;
-   //   dada=adc_buffer[SELX]>>6;
-   //   dada+=1;
-   m_page     = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_romAL2;
-   
-   dada=_selx*65.0f; 
-   MAXED(dada,63);
-   dada=63-dada;
-   m_ald = ((dada&63) << 4);  		
-   m_lrq = 0; //from 8 bit write
- }
-
-//static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
-
-
-void sp0256_newsayTTS(void){// called at end of phoneme
-   u8 dada;
-   //   m_halted=1;
-   m_lrq=0; m_halted=1; m_filt.rpt=0;
-   m_page     = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_romAL2;
-   
-   dada=TTSoutarray[TTSindex]; 
-   TTSindex++;
-   if (TTSindex>=TTSlength) {
-     TTSindex=0;
-     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
-   }
-
-   m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index 		
-   m_lrq = 0; //from 8 bit write
- }
-
-void sp0256_newsayvocabbankone(void){// called at end of phoneme
-   u8 dada;
-   m_lrq=0; m_halted=1; m_filt.rpt=0;
-   static u8 vocabindex=0, whichone=0;
-   //   m_halted=1;
-
-   m_page     = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_romAL2;   
-   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
-   vocabindex++;
-   if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
-     vocabindex=0;
-     whichone=_selx*152.0f; // split vocab into banks - on this one we need 0-150 values 
-     MAXED(whichone,150);
-     whichone=150-whichone;
-   }   
-   m_ald = ((dada&63) << 4); 		
-   m_lrq = 0; //from 8 bit write
- }
-
-
-void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
-   u8 dada;
-   m_lrq=0; m_halted=1; m_filt.rpt=0;
-   static u8 vocabindex=0, whichone=0;
-   //   m_halted=1;
-
-   m_page     = 0x1000 << 3; //32768 =0x8000
-   m_romm=m_romAL2;   
-   dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
-   vocabindex++;
-   if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
-     vocabindex=0;
-     whichone=_selx*168.0f;
-     MAXED(whichone,166);
-     whichone=166-whichone;
-
-   }
-   m_ald = ((dada&63) << 4);  		
-   m_lrq = 0; //from 8 bit write
- }
-
-
- void sp0256_init(void){
-   sp0256_iinit();
-   reset();
-     TTSindex=0;
-     TTSlength=64;
-     //     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
-     for (u8 x=0;x<64;x++) TTSinarray[x]=32;
- }
+#endif

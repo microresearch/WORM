@@ -3912,6 +3912,7 @@ and sp0256), and those on code (also sp0256, talkie and associated TMS series, n
   LEFT - zero should be far right which has NO addition of CV - so do
   we need to invert, for SPEED not but for other params then maybe makes sense for PITCH say PER CASE!
 
+
 - triggers, threshold and repeat policy???
 
 
