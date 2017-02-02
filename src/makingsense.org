@@ -537,7 +537,7 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 - *fixed major bug in TTS with char/counter - still to test ALL!*
 
-- retrigger also of TTS
+- retrigger also of TTS to test!
 
 - sp0256: test RAW and bend, ADC extents, triggers
 
@@ -547,7 +547,7 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 - new hardware tests for ADC extents - extra board
 
-- announce 20 march release and do soundclouds
+- announce 20 march release and do soundclouds next week
 
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
 
