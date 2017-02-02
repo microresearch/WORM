@@ -172,7 +172,7 @@ typedef struct{ // 44 bytes
 
 void Formlet_setfreq(Formlet *unit, float frequency){
   const float log001=logf(0.001);
-  const float mRadiansPerSample=(2 * M_PI) /32000.0f;
+  const float mRadiansPerSample=(2 * 3.12) /32000.0f;
   float b01,b02,b11,b12;
   float attackTime = unit->m_attackTime;
   float decayTime = unit->m_decayTime;
@@ -272,9 +272,15 @@ void main(){
 
   //  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
 
+  //(256-(exy[2 + 2*j]*512.0));
+
+  float tester=0.5f; 
+  y=(256-(tester*512.0));
+  printf("FFFFF: %d\n",y); 
+
   for (y=0;y<3200;y++){
     x=sinf(y);
-    printf("sinf(%d)=%f\n",y,x);
+    //    printf("sinf(%d)=%f\n",y,x);
   }
 
 

@@ -535,17 +535,21 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 ** 2/2+ TODO:
 
-- *fixed major bug in TTS with char/counter - still to test ALL!*
+- *fixed major bug in TTS with char/counter - still to test ALL! - still a crash FIXED I hope*
 
-- retrigger also of TTS to test!
+- retrigger also of TTS to test - DONE
 
-- sp0256: test RAW and bend, ADC extents, triggers
+- sp0256: test RAW and bend, ADC extentsDONE-adjusting for each mode - test with extra hardware
 
-- check again how ADC works with CV in...
+* - decide if we keep RAW*
 
-- re-test all sp0256 modes and extents
+- check again how ADC works with CV in... - with reversal works as it should -> ZERO is far left and has MOST CV influence!DONE
 
-- new hardware tests for ADC extents - extra board
+- re-test all sp0256 modes, triggers and extents DONE-all good so far - stress test TTS!
+
+- new hardware tests for ADC extents - extra board TODO
+
+////
 
 - announce 20 march release and do soundclouds next week
 

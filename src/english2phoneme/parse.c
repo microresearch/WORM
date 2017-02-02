@@ -217,13 +217,14 @@ unsigned char text2speechfor256(unsigned char  input_len, unsigned char *input, 
   input[input_len] = EOF;
   xlate_file();
   //      output_count=10;
-  if (output_count>255) output_count=255;
+   if (output_count>=255) output_count=254;
   for (unsigned char i=0;i<output_count;i++){
         output[i]=remap256[output_array[i]];
 	if (output_array[i]==12){
 	  output_array[++i]=12;
 	  output_count++;
-	  }
+	  if (output_count>=255) output_count=254;
+ 	  }
 	//       output[i]=remap256[rand()%43];
   }
   //  output[output_count-1]=255; 

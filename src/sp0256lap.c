@@ -1044,7 +1044,7 @@ void micro()
 		if (!repeat) continue;
 
 		m_filt.rpt = repeat + 1;
-		//		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
+		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
 
 		
 		i = (opcode << 3) | (m_mode & 6);

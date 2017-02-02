@@ -314,7 +314,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
 	
-     	f->per=(1.0f-_selz)*256.0f; // question of noise? which is per 0// TESTING - inversion TEST
+     	f->per=_selz*256.0f; // question of noise? which is per 0// TESTING - inversion TEST
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -325,7 +325,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
-		fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+		//		fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
 
 	}
 
@@ -792,7 +792,7 @@ static void micro()
 				m_filt.r[i] = 0;
 
 			//			SET_SBY(1)
-			fprintf(stderr, "HLATED!\n");
+			//			fprintf(stderr, "HLATED!\n");
 			return;
 		}
 
@@ -808,7 +808,7 @@ static void micro()
 		/* ---------------------------------------------------------------- */
 		/*  Handle the special cases for specific opcodes.                  */
 		/* ---------------------------------------------------------------- */
-		fprintf(stderr,"OPCODE %d\n",opcode);
+		//		fprintf(stderr,"OPCODE %d\n",opcode);
 
 
 		switch (opcode)
@@ -857,7 +857,7 @@ static void micro()
 			/*  to the FIFO's address.                                      */
 			/* ------------------------------------------------------------ */
 		  			m_fifo_sel = m_pc == FIFO_ADDR;
-		  		  fprintf(stderr,"FIFOI!\n");
+					//		  		  fprintf(stderr,"FIFOI!\n");
 
 			/* ------------------------------------------------------------ */
 			/*  Control transfers to the FIFO cause it to discard the       */
@@ -896,7 +896,7 @@ static void micro()
 		{
 			int16_t len, shf, delta, field, prm, clra, clr5;
 			INT8 value;
-			fprintf(stderr,"IDX %d %d %d\n",idx0, idx1, i);
+			//			fprintf(stderr,"IDX %d %d %d\n",idx0, idx1, i);
 
 			/* ------------------------------------------------------------ */
 			/*  Get the control word and pull out some important fields.    */

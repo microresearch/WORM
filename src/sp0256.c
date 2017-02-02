@@ -223,6 +223,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		if (f->per_orig)
 		{
 		  int16_t val = (_selz*142.0f);
+		  //		  int16_t val=70;
 		  MAXED(val,140)
 		    val=140-val;
 		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
@@ -822,6 +823,9 @@ UINT32 getb( int len )
 /*                  instructions either until the repeat count != 0 or      */
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
+
+ const float repeatre_map[32]={0.1f, 0.119587327404f, 0.143011288757f, 0.171023378111f, 0.20452228712f, 0.244582737113f, 0.292489958607f, 0.349780924424f, 0.418293659289f, 0.500226207846f, 0.598207152939f, 0.715379946542f, 0.855503758857f, 1.02307408106f, 1.22346695091f, 1.46311142827f, 1.74969585401f, 2.09241450952f, 2.50226259016f, 2.99238895621f, 3.57851797828f, 4.27945401091f, 5.11768467915f, 6.12010233278f, 7.31886681418f, 8.75243721937f, 10.4668057534f, 12.5169732651f, 14.9687137997f, 17.9006847798f, 21.4069505153f, 25.6f};
+
 void micro()
 {
 	UINT8  immed4;
@@ -991,10 +995,16 @@ void micro()
 			{			  
 			  repeat = immed4 | (m_mode & 0x30);
 			  if (TTS==0) {
-			    val = (_sely*24.0f); // only if we are not in TTS mode
+			    /*   val = (_sely*24.0f); // only if we are not in TTS mode
 			    MAXED(val,24);
 			    val=24-val;
-			    repeat += 18-val; // seems to have dead zone at start for minus so shift TEST!
+			    repeat += 18-val; // seems to have dead zone at start 
+			    */
+			    //			    repeat=((float)(repeat)*2.0f*_sely); // or some kind of exponential/log mapped to say 32 values of sely - log_gen.py
+			    val = (_sely*32.0f); // only if we are not in TTS mode
+			    MAXED(val,31);
+			    repeat=((float)(repeat)*repeatre_map[val]);
+
 			  }
 			  if (repeat<1) repeat=1;
 			  break;
@@ -1271,7 +1281,7 @@ int16_t sp0256_get_sample(void){
 // for text to speech we need out array, length and index...
 
 extern char TTSinarray[65];
-static u8 TTSoutarray[255];
+static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
 
@@ -1344,7 +1354,7 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*152.0f; // split vocab into banks - on this one we need 0-150 values 
+     whichone=_selx*153.0f; // split vocab into banks - on this one we need 0-150 values 
      MAXED(whichone,150);
      whichone=150-whichone;
    }   
@@ -1365,7 +1375,7 @@ void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selx*168.0f;
+     whichone=_selx*169.0f;
      MAXED(whichone,166);
      whichone=166-whichone;
 
