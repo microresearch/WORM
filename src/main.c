@@ -90,8 +90,8 @@ void main(void)
   // all generator inits
   sp0256_init();
   sp0256_initbend();
-  sp0256_raw_init();
-    
+  votrax_init();
+  
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 

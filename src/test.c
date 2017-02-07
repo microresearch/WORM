@@ -270,6 +270,13 @@ void main(){
   int16_t sample_buffer[32];
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
 
+  //(0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1) // 7f=127
+
+  int16_t m_inflection=64;
+  int16_t m_filt_f1=16;
+  int16_t pitch=(0x7f ^ (m_inflection) ^ m_filt_f1) + 1; // TTS uses inflection // nothing else - what are m_filt_f1 values?
+  printf("PPPP: %d\n",pitch); 
+  
   //  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
 
   //(256-(exy[2 + 2*j]*512.0));

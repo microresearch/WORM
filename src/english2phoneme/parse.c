@@ -238,9 +238,9 @@ unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *inpu
   input[input_len] = EOF;
 
   xlate_file();
-  if (output_count>255) output_count=255;
+  if (output_count>=255) output_count=254;
 
-  char countme=0;
+  unsigned char countme=0;
   //      printf("Output: %d\n", output_count);
   for (unsigned char i=0;i<output_count;i++){
     //  printf("LEN: %d\n", ourvot[output_array[i]].length);
@@ -248,6 +248,7 @@ unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *inpu
     output[countme]=ourvot[output_array[i]].mmm[ii];
     //    printf("%s ", NRL_list[output_array[i]]);
     countme++;
+    if (countme>254) countme=254;
 	}
   }
   return countme; 

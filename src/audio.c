@@ -122,7 +122,7 @@ static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) =
 
 char TTSinarray[65];
 
-/// start with SP0256 sets
+///[[[[[[[[[[[[[[[[[[[[[[[[SP0256
 
 void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
   TTS=0;
@@ -234,7 +234,6 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	 //	  sp0256_newsayTTS(); // selector is in newsay
 	 sp0256_retriggerTTS();
 	 triggered=1;
 	   }
@@ -251,7 +250,6 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 //	 sp0256_newsayTTS(); // selector is in newsay
 	 sp0256_retriggerTTS();
 	 triggered=1;
 	   }
@@ -354,59 +352,6 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
    }
 };
 
-void sp0256raw(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  TTS=0;
-  // write into m_rome
-    u16 xaxis=_selx*257.0f;
-  MAXED(xaxis,255);
-  xaxis=255-xaxis;
-  u16 val=(_sely*257.0f);
-  MAXED(val,255);
-  val=255-val;
-  m_rome[xaxis]=val; 
-    
-  if (trigger==1) sp0256_newsayraw(); // selector is in newsay
-  static u8 triggered=0;
-  u8 xx=0,readpos;
-  float remainder;
-  samplespeed/=8.0;
-   if (samplespeed<=1){ 
-     while (xx<size){
-       if (samplepos>=1.0f) {
-	 lastval=samplel;
-	 samplel=sp0256_get_sampleraw();
-	 samplepos-=1.0f;
-       }
-       remainder=samplepos; 
-       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
-       if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayraw(); // selector is in newsay
-	 triggered=1;
-	   }
-       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
-       xx++;
-       samplepos+=samplespeed;
-     }
-   }
-   else { 
-     while (xx<size){
-              samplel=sp0256_get_sampleraw();
-
-       if (samplepos>=samplespeed) {       
-	 outgoing[xx]=samplel;
-       if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayraw(); // selector is in newsay
-	 triggered=1;
-	   }
-       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-	 xx++;
-	 samplepos-=samplespeed;
-       }
-       samplepos+=1.0f;
-     }
-   }
-};
 
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
@@ -458,6 +403,190 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
+///[[[[[[[[[[[[[[[[[[[[[[[[VOTRAX
+
+void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  if (trigger==1) votrax_newsay(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_sample();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_sample();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=1;
+  if (trigger==1) votrax_retriggerTTS(); // selector is in newsay
+    
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_sampleTTS();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_retriggerTTS();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_sampleTTS();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_retriggerTTS();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  if (trigger==1) votrax_newsaygorf(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_samplegorf();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaygorf();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_samplegorf();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaygorf();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  if (trigger==1) votrax_newsaywow(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_samplewow();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaywow();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_samplewow();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaywow();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 u8 toggled=1;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
@@ -499,7 +628,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256raw, sp0256bend}; // 0-6 modes
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

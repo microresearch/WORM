@@ -78,7 +78,7 @@ other excitations = 9+
 
 [- start on audio.c modes/abstraction if we like - but not all fits the same model]
 
-*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger - but we use trigger so..*
 
 *RAW/bend present LPC/usual but do pitch etc....*
 
@@ -539,11 +539,11 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 - retrigger also of TTS to test - DONE
 
-- sp0256: test RAW and bend, ADC extentsDONE-adjusting for each mode - test with extra hardware
-
-* - decide if we keep RAW*
-
 - check again how ADC works with CV in... - with reversal works as it should -> ZERO is far left and has MOST CV influence!DONE
+
+- *remove RAW mode*
+
+- sp0256: test RAW and bend, ADC extentsDONE-adjusting for each mode - test with extra hardware
 
 - re-test all sp0256 modes, triggers and extents DONE-all good so far - stress test TTS!
 
@@ -553,7 +553,35 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 - announce 20 march release and do soundclouds next week
 
+** 6/2+
+
 - TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+
+- - where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where to go after sp0256? ->
+
+// TODO: 
+
+VOTRAX modes and tweaks:
+
+- TTS votrax port and test - DONE, STRESS TEST TO DO but seems ok - one question is general length of TTSinarray which could be 32 instead!TODO
+
+- raw votrax-raw code, parameter code, bending of vocabs, vocab votrax modesDONE_TEST, also Y(not on TTS) and Z on votrax 
+
+-- pitch bending has glitches at certain frequencies? z should be for length
+
+somehow votrax is not quite THERE!
+
+///
+
+- start on TMS modes
+
+-- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+-- TMS vocabs and chipsets worked out
 
 * TTS 
 

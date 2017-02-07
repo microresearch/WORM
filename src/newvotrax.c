@@ -35,6 +35,8 @@ tp1 = phi clock (tied to f2q rom access)
 #include <memory.h>
 #include <linux/types.h>
 #define M_PI 3.141592f
+float _selx, _sely, _selz;
+u8 TTS=1;
 FILE* fo;
 #else
 #include "audio.h"
@@ -43,11 +45,12 @@ FILE* fo;
 #include <ctype.h>
 #include "votrax.h"
 extern float _selx, _sely, _selz;
+extern u8 TTS;
 #endif
 #include "vocab_votrax.h"
 
 extern char TTSinarray[65];
-static u8 TTSoutarray[128];
+static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
 
@@ -151,8 +154,10 @@ void generate_votrax_samples(int samples)
 #ifdef LAP	      
 //				printf("%c",analog_calc()>>8);
 		//		printf("%d\n",analog_calc());
-		unsigned int s16 = analog_calc();
-
+		int s16 = analog_calc();
+		//		printf("%d\n",s16);
+		
+		
 		unsigned char c = (unsigned)s16 & 255;
 		fwrite(&c, 1, 1, fo);
 		c = ((unsigned)s16 / 256) & 255;
@@ -164,7 +169,6 @@ void generate_votrax_samples(int samples)
 #ifndef LAP
 uint16_t lenny;
 
-// TODO: newsay for basic phonemesDONE-re-test, TTS and vocabulary
 
 void votrax_newsay(){
   u8 sel=_selx*65.0f; // is it 64 TODO!
@@ -175,30 +179,128 @@ void votrax_newsay(){
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
 }
 
-int16_t votrax_get_sample(){ 
+int16_t sample_count=0;
+
+int16_t votrax_get_sample(){ // TODO: trying new model
+  uint16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_sely*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay();
+  }
+  return sample;
+}
+
+// TODO: newsay for basic phonemesDONE-re-test, TTS and vocabulary-> vocablist_wow[79] and vocablist_gorf[115]
+
+void votrax_newsaygorf(){
+     static u8 vocabindex=0, whichone=0;
+     u8 it=*(vocablist_gorf[whichone]+vocabindex);
+   vocabindex++;
+   if (it==255){
+     vocabindex=0;
+     whichone=_selx*117.0f; 
+     MAXED(whichone,114);
+     whichone=114-whichone;
+   }   
+
+   writer(it); 
+  phone_commit();
+  inflection_w(it>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  }
+
+void votrax_newsaywow(){
+     static u8 vocabindex=0, whichone=0;
+     u8 it=*(vocablist_wow[whichone]+vocabindex);
+   vocabindex++;
+   if (it==255){
+     vocabindex=0;
+     whichone=_selx*81.0f; 
+     MAXED(whichone,78);
+     whichone=78-whichone;
+   }   
+   writer(it); 
+  phone_commit();
+  inflection_w(it>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+}
+
+int16_t votrax_get_samplegorf(){ 
+  int16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_sely*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsaygorf();
+  }
+  return sample;
+}
+
+int16_t votrax_get_samplewow(){ 
+  int16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_sely*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsaywow();
+  }
+  return sample;
+}
+
+
+
+void votrax_newsayTTS(){
+
+  writer(TTSoutarray[TTSindex]); 
+  phone_commit();
+  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  TTSindex++;
+   if (TTSindex>=TTSlength) {
+     TTSindex=0;
+     TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+   }
+}
+
+int16_t votrax_get_sampleTTS(){ 
   int16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
-  if (m_sample_count>lenny){
-    m_sample_count=0;
-    votrax_newsay();
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsayTTS();
   }
   return sample;
 }
 
-/* for TTS from main:
-
-  for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
-    writer(TTStest[x]);
-        phone_commit();
-  inflection_w(TTStest[x]>>6); // how many bits?
-    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
-  generate_votrax_samples(lenny);
- */
-
+void votrax_retriggerTTS(){
+  TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+  if (TTSindex>=TTSlength)     TTSindex=0;
+  writer(TTSoutarray[TTSindex]); 
+  phone_commit();
+  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+}
 
 #endif
 
@@ -293,9 +395,9 @@ void phone_commit()
 	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
 	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
 	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
-	    printf("I:%d\n",i);
+	    //	    printf("I:%d\n",i);
 			m_rom_f1  = BITSWAP4(val,  0,  7, 14, 21);
-	        printf("%d\n",m_rom_f1); // this works
+			printf("ROMF1%d\n",m_rom_f1); // this works
 			m_rom_va  = BITSWAP4(val,  1,  8, 15, 22);
 			m_rom_f2  = BITSWAP4(val,  2,  9, 16, 23);
 			m_rom_fc  = BITSWAP4(val,  3, 10, 17, 24);
@@ -311,7 +413,7 @@ void phone_commit()
 			m_rom_vd  = BITSWAP4(val, 35, 33, 31, 29);
 
 			m_rom_closure  = BITSWAP1(val, 36);
-			printf("closure: %d\n",m_rom_closure); // this works
+			//			printf("closure: %d\n",m_rom_closure); // this works
 			m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
 
 			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
@@ -409,8 +511,14 @@ void chip_update()
 	// it miss by manipulating the inflection inputs, but it'll wrap.
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1)
-		m_pitch = 0;
+	//		if(m_pitch >= (0x7f ^ (int)(_sely*128.0f) ^ m_filt_f1) + 1)
+	if (TTS==0){
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)(_sely*64.0f)-8)) + 1)) m_pitch = 0;
+	//	if (m_pitch>=(_sely*111.0f)+16) // wierd peaks
+	}
+	else 
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)(_selz*64.0f)-8)) + 1)) m_pitch = 0;
+	
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
