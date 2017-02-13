@@ -699,7 +699,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=7; 
+  _intmode=6; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 

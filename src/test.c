@@ -277,6 +277,12 @@ void main(){
   int16_t pitch=(0x7f ^ (m_inflection) ^ m_filt_f1) + 1; // TTS uses inflection // nothing else - what are m_filt_f1 values?
   printf("PPPP: %d\n",pitch); 
   
+  int m_mainclock = 720000; // TODO as we need m_mainclock - 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
+
+  float m_sclock = m_mainclock / 18.0f;
+  printf("cllll: %f\n",m_sclock); 
+
+
   //  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
 
   //(256-(exy[2 + 2*j]*512.0));

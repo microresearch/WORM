@@ -167,7 +167,7 @@ void generate_votrax_samples(int samples)
 }
 
 #ifndef LAP
-uint16_t lenny;
+static uint16_t lenny;
 
 
 void votrax_newsay(){
@@ -177,17 +177,25 @@ void votrax_newsay(){
   phone_commit();
   //  inflection_w(p1[x]>>6); // TODO as bend!
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
+  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
 }
 
-int16_t sample_count=0;
+static int16_t sample_count=0;
+
+static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f};
 
 int16_t votrax_get_sample(){ // TODO: trying new model
   uint16_t sample; u8 x;
+  //  u32 m_mainclockm=m_mainclock*_selz*4.0f;
+  //  m_sclock = m_mainclock / (18.0f*(_selz+0.5f));
+  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals
+  //  m_sclock=1.0f;
+  //    m_cclock=1.0f;
 
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  //  m_cur_f1=(_sely*126.0f)+1;
+  //  m_cur_f1=(_selz*126.0f)+1;
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
   if (sample_count++>=lenny){
@@ -397,7 +405,9 @@ void phone_commit()
 	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
 	    //	    printf("I:%d\n",i);
 			m_rom_f1  = BITSWAP4(val,  0,  7, 14, 21);
+#ifdef LAP
 			printf("ROMF1%d\n",m_rom_f1); // this works
+#endif
 			m_rom_va  = BITSWAP4(val,  1,  8, 15, 22);
 			m_rom_f2  = BITSWAP4(val,  2,  9, 16, 23);
 			m_rom_fc  = BITSWAP4(val,  3, 10, 17, 24);
@@ -513,11 +523,12 @@ void chip_update()
 	m_pitch = (m_pitch + 1) & 0x7f;
 	//		if(m_pitch >= (0x7f ^ (int)(_sely*128.0f) ^ m_filt_f1) + 1)
 	if (TTS==0){
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)(_sely*64.0f)-8)) + 1)) m_pitch = 0;
+	  //	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_sely)*64.0f)-8)) + 1)) m_pitch = 0;
+	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0;
 	//	if (m_pitch>=(_sely*111.0f)+16) // wierd peaks
 	}
 	else 
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)(_selz*64.0f)-8)) + 1)) m_pitch = 0;
+	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selz)*64.0f)-8)) + 1)) m_pitch = 0;
 	
 
 	// Filters are updated in index 1 of the pitch wave, which does
@@ -905,6 +916,12 @@ void build_standard_filter(float *a, float *b,
 	b[1] = 3.0f+m1-m2;
 	b[2] = 3.0f-m1-m2;
 	b[3] = 1.0f-m1+m2;
+
+#ifdef LAP
+	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
+#endif
+
+
 }
 
 /*

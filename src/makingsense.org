@@ -575,7 +575,9 @@ somehow votrax is not quite THERE!
 
 ** 13/2
 
-- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS)!!!
+- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS - could have z as TTS length there in alt TTS version - also for all TTS)!!!
+
+- selz for other votrax: 
 
 - raw votrax-raw code, parameter code, bending of vocabs, vocab votrax modesDONE_TEST
 
