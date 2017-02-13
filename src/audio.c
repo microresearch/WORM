@@ -586,6 +586,87 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
 };
 
+////////////////////[[[[[[[[[[ TESTING LPC residual as excitation for sp0256
+
+// this works but quite high volume
+
+void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
+//(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
+//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
+//  dowormwavetable(carrierbuffer, &wavtable, adc_buffer[SELX], size);
+  int_to_floot(incoming,voicebuffer,size);
+  //  LPC_cross(voicebuffer,carrierbuffer, lastbuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  //  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+    floot_to_int(outgoing,lastbuffer,size);
+};
+
+
+// next step is buffer sent into say sp0256 - how do we handle speed?
+
+void sp0256_within_basic(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float voicebuffer[32],lastbuffer[32];
+  int16_t outgo[32];
+  int_to_floot(incoming,voicebuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  floot_to_int(outgo,lastbuffer,size);
+
+  // then ignore speed for time being and just pass samples
+  u8 x;
+  for (x=0;x<size;x++){
+    outgoing[x]=sp0256_get_sample_withLPC(outgo[x]);
+  }
+}
+
+void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
+  // REMOVED TRIGGERED ON IN!!!
+  // how do we keep voice speed consistent
+
+  TTS=0;
+  // added trigger
+  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
+
+  float voicebuffer[32],lastbuffer[32];
+  int16_t outgo[32];
+  int_to_floot(incoming,voicebuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  floot_to_int(outgo,lastbuffer,size);
+  for (u8 x=0;x<size;x++) outgo[x]=(outgo[x])>>4; // say 11 bits
+
+    u8 xx=0,x=0,readpos;
+  float remainder;
+    samplespeed/=8.0;
+  //  samplespeed=1.0f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	 //	 samplel=outgo[(x++)%size];
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       samplel=sp0256_get_sample_withLPC(outgo[xx]);
+       //	 samplel=outgo[(x++)%size];
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+     }
+};
+
 
 u8 toggled=1;
 
@@ -618,7 +699,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=6; // check extents
+  _intmode=7; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -628,7 +709,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow}; // sp0256: 0-5 modes, votrax=6
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, lpc_error, sp0256_within}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

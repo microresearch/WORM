@@ -329,7 +329,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	f->cnt = 0;
 	f->per_orig = f->r[1];
-	//	fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
+		fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */

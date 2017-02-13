@@ -91,6 +91,7 @@ void main(void)
   sp0256_init();
   sp0256_initbend();
   votrax_init();
+  LPCAnalyzer_init4();
   
  ////////
   ADC1_Init((uint16_t *)adc_buffer);

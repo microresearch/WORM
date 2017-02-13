@@ -555,7 +555,7 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 ** 6/2+
 
-- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing! IN PROGRESS but GLITCHY!
 
 - - where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
 
@@ -573,9 +573,14 @@ VOTRAX modes and tweaks:
 
 somehow votrax is not quite THERE!
 
-///
+** 13/2
 
-- start on TMS modes
+- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS)!!!
+
+- raw votrax-raw code, parameter code, bending of vocabs, vocab votrax modesDONE_TEST
+
+
+- start on TMS modes:
 
 -- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -

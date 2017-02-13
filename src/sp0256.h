@@ -30,3 +30,5 @@ void sp0256_newsay1219(void);
 
 int16_t sp0256_get_sampleraw(void);
 void sp0256_newsayraw(void);
+
+int16_t sp0256_get_sample_withLPC(int16_t samp);
