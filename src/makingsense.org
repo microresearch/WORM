@@ -575,11 +575,13 @@ somehow votrax is not quite THERE!
 
 ** 13/2+
 
-- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS - could have z as TTS length there in alt TTS version - also for all TTS!!!
+- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax - not
+  TTS - could have z as TTS length there in alt TTS version - also for
+  all TTS!!!
 
 - selz for other votrax - clock ratioFINISHandTEST, or length of phoneme?
 
-- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO
+- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO-part_way - inc into audio.c
 
 /////
 
@@ -598,6 +600,10 @@ somehow votrax is not quite THERE!
   but may not be so in TMS5220 code RE_TEST!
 
 -- TMS vocabs and chipsets worked out
+
+/// 
+
+mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam)
 
 * TTS 
 

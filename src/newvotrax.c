@@ -271,6 +271,58 @@ void phone_commit()
 	}
 }
 
+void phone_commit_bend()
+{
+	// Only these two counters are reset on phone change, the rest is
+	// free-running.
+	m_phonetick = 0;
+	m_ticks = 0;
+
+	// In the real chip, the rom is re-read all the time.  Since it's
+	// internal and immutable, no point in not caching it though.
+	for(int i=0; i<512; i+=8) {// added +8 
+	  //	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
+	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
+	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
+	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
+	    //	    printf("I:%d\n",i);
+			m_rom_f1_orig  = BITSWAP4(val,  0,  7, 14, 21);
+			m_rom_va_orig  = BITSWAP4(val,  1,  8, 15, 22);
+			m_rom_f2_orig  = BITSWAP4(val,  2,  9, 16, 23);
+			m_rom_fc_orig  = BITSWAP4(val,  3, 10, 17, 24);
+			m_rom_f2q_orig = BITSWAP4(val,  4, 11, 18, 25);
+			m_rom_f3_orig  = BITSWAP4(val,  5, 12, 19, 26);
+			m_rom_fa_orig  = BITSWAP4(val,  6, 13, 20, 27);
+			// These two values have their bit orders inverted
+			// compared to everything else due to a bug in the
+			// prototype (miswiring of the comparator with the ticks
+			// count) they compensated in the rom.
+
+			m_rom_cld_orig = BITSWAP4(val, 34, 32, 30, 28);
+			m_rom_vd_orig  = BITSWAP4(val, 35, 33, 31, 29);
+
+			m_rom_closure  = BITSWAP1(val, 36);
+			//			printf("closure: %d\n",m_rom_closure); // this works
+			m_rom_duration_orig = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
+
+			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
+			// Hard-wired on the die, not an actual part of the rom.
+			m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
+
+			//			if(0)
+			//	logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
+
+			// That does not happen in the sc01(a) rom, but let's
+			// cover our behind.
+			if(m_rom_cld == 0)
+				m_cur_closure = m_rom_closure;
+
+			return;
+		}
+	}
+}
+
+
 void phone_commit_pbend() // parameter bend
 {
 	// Only these two counters are reset on phone change, the rest is
@@ -966,7 +1018,8 @@ static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f,
 
 void votrax_newsay(){
   u8 sel=_selx*65.0f; // is it 64 TODO!
-  //  sel=16;
+  MAXED(sel,64);
+  sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
   //  inflection_w(p1[x]>>6); // TODO as bend!
@@ -1012,7 +1065,60 @@ int16_t votrax_get_sample_rawparam(){ // TODO: trying new model
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
-    votrax_newsay();
+    votrax_newsay_rawparam();
+  }
+  return sample;
+}
+
+/////
+
+void votrax_newsay_bend(){
+  u8 sel=_selz*65.0f; // is it 64 TODO!
+  MAXED(sel,64);
+  sel=64-sel;
+  writer(sel); // what are we writing - is ROM index
+  phone_commit_bend();
+  //  inflection_w(p1[x]>>6); // TODO as bend!
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
+  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
+}
+
+int16_t votrax_get_sample_bend(){ // TODO: trying new model
+  uint16_t sample; u8 x;
+  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
+  
+  // TODO: all those orig BENT below = 10 values - and if ==0
+  m_rom_duration=m_rom_duration_orig+(64-(int)(exy[0]*128.0f));
+  m_rom_vd_orig=m_rom_vd+(8-(int)(exy[1]*16.0f));
+  m_rom_cld_orig=m_rom_cld+(8-(int)(exy[2]*16.0f));
+  m_rom_fa_orig=m_rom_fa+(8-(int)(exy[3]*16.0f));
+  m_rom_fc_orig=m_rom_fc+(8-(int)(exy[4]*16.0f));
+  m_rom_va_orig=m_rom_va+(8-(int)(exy[5]*16.0f));
+  m_rom_f1_orig=m_rom_f1+(8-(int)(exy[6]*16.0f));
+  m_rom_f2_orig=m_rom_f2+(8-(int)(exy[7]*16.0f));
+  m_rom_f2q_orig=m_rom_f2q+(8-(int)(exy[8]*16.0f));
+  m_rom_f3_orig=m_rom_f3+(8-(int)(exy[9]*16.0f));
+
+  if (m_rom_duration==0) m_rom_duration=1;
+  if (m_rom_vd==0) m_rom_vd=1;
+  if (m_rom_cld==0) m_rom_cld=1;
+  if (m_rom_fa==0) m_rom_fa=1;
+  if (m_rom_fc==0) m_rom_fc=1;
+  if (m_rom_va==0) m_rom_va=1;
+  if (m_rom_f1==0) m_rom_f1=1;
+  if (m_rom_f2==0) m_rom_f2=1;
+  if (m_rom_f2q==0) m_rom_f2q=1;
+  if (m_rom_f3==0) m_rom_f3=1;
+  
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_selz*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay_bend();
   }
   return sample;
 }

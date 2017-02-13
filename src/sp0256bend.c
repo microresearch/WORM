@@ -227,10 +227,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		do_int = 0;
 		samp   = 0;
 		// invert the values here - but do in exy in audio.c
-		f->amp=f->amporig+(320-exy[1]*640.0f); // amp values? 1280 - so
+		f->amp=f->amporig+(320-(int)(exy[1]*640.0f)); // amp values? 1280 - so
 		if (f->perorig)
 		{
-		  f->per=f->perorig+(90 - exy[0]*180.0f);
+		  f->per=f->perorig+(90 - (int)(exy[0]*180.0f));
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -318,8 +318,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		for (j = 0; j < 6; j++)
 		{
 		  // intersperse
-		  f->b_coef[j]=f->b_coeforig[j]+ (256-(exy[2 + 2*j]*512.0));
-		  f->f_coef[j]=f->f_coeforig[j]+ (256-(exy[3 + 2*j]*512.0));
+		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
+		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
 		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 

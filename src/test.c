@@ -282,9 +282,11 @@ void main(){
   float m_sclock = m_mainclock / 18.0f;
   printf("cllll: %f\n",m_sclock); 
   float exy=0.4f;
+  int xzy=320;
+  //
   
   int m_rom_closure  = exy+0.5f; // does this give us 1 or 0?
-  printf("is it: %d\n",m_rom_closure); 
+  printf("is it: %d\n",xzy-(exy*640.0f)); 
 
 
   

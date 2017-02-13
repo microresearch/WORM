@@ -82,11 +82,15 @@ we have either 4 bits or 1 or 7 so...
 	bool m_ar_state;                                // Current ar state
 
 	// "Unpacked" current rom values
-	u8 m_rom_duration;                              // Duration in 5KHz units (main/144) of one tick, 16 ticks per phone, 7 bits
-	u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+u8 m_rom_duration, m_rom_duration_orig;                              // Duration in 5KHz units (main/144) of one tick, 16 ticks per phone, 7 bits
+u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
 	u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
 	u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits each
-	bool m_rom_closure;                             // Closure bit, true = silence at cld
+u8 m_rom_vd_orig, m_rom_cld_orig;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+	u8 m_rom_fa_orig, m_rom_fc_orig, m_rom_va_orig;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+	u8 m_rom_f1_orig, m_rom_f2_orig, m_rom_f2q_orig, m_rom_f3_orig;     // Analog parameters, formant frequencies and Q, 4 bits each
+
+bool m_rom_closure;                             // Closure bit, true = silence at cld
 	bool m_rom_pause;                               // Pause bit
 
 	// Current interpolated values (8 bits each)
