@@ -355,7 +355,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
-  u8 xaxis=_selx*14.0f; //0-16 for r, but now 14 params
+  u8 xaxis=_selx*14.0f; //0-16 for r, but now 14 params 0-13
   MAXED(xaxis,13);
   xaxis=13-xaxis;
   exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
@@ -586,6 +586,57 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
 };
 
+void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  u8 xaxis=_selx*12.0f; // 12 params 0-11
+  MAXED(xaxis,11);
+  xaxis=11-xaxis;
+  exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+
+  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_sample_rawparam();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay_rawparam();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_sample_rawparam();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsay_rawparam();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 ////////////////////[[[[[[[[[[ TESTING LPC residual as excitation for sp0256
 
 // this works but quite high volume
@@ -709,7 +760,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, lpc_error, sp0256_within}; // sp0256: 0-5 modes, votrax=6
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, lpc_error, sp0256_within}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

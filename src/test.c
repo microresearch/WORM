@@ -281,8 +281,13 @@ void main(){
 
   float m_sclock = m_mainclock / 18.0f;
   printf("cllll: %f\n",m_sclock); 
+  float exy=0.4f;
+  
+  int m_rom_closure  = exy+0.5f; // does this give us 1 or 0?
+  printf("is it: %d\n",m_rom_closure); 
 
 
+  
   //  for( int i = 11 - 1; i > 0; i-- ) printf("%d\n", i);
 
   //(256-(exy[2 + 2*j]*512.0));

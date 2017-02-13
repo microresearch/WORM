@@ -12,4 +12,7 @@ int16_t votrax_get_samplewow();
 void votrax_newsayTTS();
 int16_t votrax_get_sampleTTS();
 
+void votrax_newsay_rawparam();
+int16_t votrax_get_sample_rawparam();
+
 void votrax_retriggerTTS();

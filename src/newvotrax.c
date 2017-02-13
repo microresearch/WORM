@@ -44,6 +44,7 @@ FILE* fo;
 #include <stdio.h>
 #include <ctype.h>
 #include "votrax.h"
+extern float exy[64];
 extern float _selx, _sely, _selz;
 extern u8 TTS;
 #endif
@@ -138,179 +139,6 @@ void inflection_w(int data)
 	m_inflection = data;
 }
 
-
-//-------------------------------------------------
-//  sound_stream_update - handle update requests
-//  for our sound stream
-//-------------------------------------------------
-
-//void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-void generate_votrax_samples(int samples)
-{
-	for(int i=0; i<samples; i++) {
-		m_sample_count++;
-		if(m_sample_count & 1)
-			chip_update();
-#ifdef LAP	      
-//				printf("%c",analog_calc()>>8);
-		//		printf("%d\n",analog_calc());
-		int s16 = analog_calc();
-		//		printf("%d\n",s16);
-		
-		
-		unsigned char c = (unsigned)s16 & 255;
-		fwrite(&c, 1, 1, fo);
-		c = ((unsigned)s16 / 256) & 255;
-		fwrite(&c, 1, 1, fo);
-#endif
-	}
-}
-
-#ifndef LAP
-static uint16_t lenny;
-
-
-void votrax_newsay(){
-  u8 sel=_selx*65.0f; // is it 64 TODO!
-  //  sel=16;
-  writer(sel); // what are we writing - is ROM index
-  phone_commit();
-  //  inflection_w(p1[x]>>6); // TODO as bend!
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
-  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
-}
-
-static int16_t sample_count=0;
-
-static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f};
-
-int16_t votrax_get_sample(){ // TODO: trying new model
-  uint16_t sample; u8 x;
-  //  u32 m_mainclockm=m_mainclock*_selz*4.0f;
-  //  m_sclock = m_mainclock / (18.0f*(_selz+0.5f));
-  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals
-  //  m_sclock=1.0f;
-  //    m_cclock=1.0f;
-
-  m_sample_count++;
-  if(m_sample_count & 1)
-    chip_update();
-  //  m_cur_f1=(_selz*126.0f)+1;
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
-  if (sample_count++>=lenny){
-    sample_count=0;
-    votrax_newsay();
-  }
-  return sample;
-}
-
-// TODO: newsay for basic phonemesDONE-re-test, TTS and vocabulary-> vocablist_wow[79] and vocablist_gorf[115]
-
-void votrax_newsaygorf(){
-     static u8 vocabindex=0, whichone=0;
-     u8 it=*(vocablist_gorf[whichone]+vocabindex);
-   vocabindex++;
-   if (it==255){
-     vocabindex=0;
-     whichone=_selx*117.0f; 
-     MAXED(whichone,114);
-     whichone=114-whichone;
-   }   
-
-   writer(it); 
-  phone_commit();
-  inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
-  }
-
-void votrax_newsaywow(){
-     static u8 vocabindex=0, whichone=0;
-     u8 it=*(vocablist_wow[whichone]+vocabindex);
-   vocabindex++;
-   if (it==255){
-     vocabindex=0;
-     whichone=_selx*81.0f; 
-     MAXED(whichone,78);
-     whichone=78-whichone;
-   }   
-   writer(it); 
-  phone_commit();
-  inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
-}
-
-int16_t votrax_get_samplegorf(){ 
-  int16_t sample; u8 x;
-
-  m_sample_count++;
-  if(m_sample_count & 1)
-    chip_update();
-  //  m_cur_f1=(_sely*126.0f)+1;
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
-  if (sample_count++>=lenny){
-    sample_count=0;
-    votrax_newsaygorf();
-  }
-  return sample;
-}
-
-int16_t votrax_get_samplewow(){ 
-  int16_t sample; u8 x;
-
-  m_sample_count++;
-  if(m_sample_count & 1)
-    chip_update();
-  //  m_cur_f1=(_sely*126.0f)+1;
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
-  if (sample_count++>=lenny){
-    sample_count=0;
-    votrax_newsaywow();
-  }
-  return sample;
-}
-
-
-
-void votrax_newsayTTS(){
-
-  writer(TTSoutarray[TTSindex]); 
-  phone_commit();
-  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
-  TTSindex++;
-   if (TTSindex>=TTSlength) {
-     TTSindex=0;
-     TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
-   }
-}
-
-int16_t votrax_get_sampleTTS(){ 
-  int16_t sample; u8 x;
-  m_sample_count++;
-  if(m_sample_count & 1)
-    chip_update();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
-  if (sample_count++>=lenny){
-    sample_count=0;
-    votrax_newsayTTS();
-  }
-  return sample;
-}
-
-void votrax_retriggerTTS(){
-  TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
-  if (TTSindex>=TTSlength)     TTSindex=0;
-  writer(TTSoutarray[TTSindex]); 
-  phone_commit();
-  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
-}
-
-#endif
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -442,6 +270,32 @@ void phone_commit()
 		}
 	}
 }
+
+void phone_commit_pbend() // parameter bend
+{
+	// Only these two counters are reset on phone change, the rest is
+	// free-running.
+	m_phonetick = 0;
+	m_ticks = 0;
+	// using exy but these are floats
+	
+	m_rom_f1  = exy[0]*17.0f;
+	m_rom_va  = exy[1]*17.0f;
+	m_rom_f2  = exy[2]*17.0f;
+	m_rom_fc  = exy[3]*17.0f;
+	m_rom_f2q = exy[4]*17.0f;
+	m_rom_f3  = exy[5]*17.0f;
+	m_rom_fa  = exy[6]*17.0f;
+	m_rom_cld = exy[7]*17.0f;
+	m_rom_vd  = exy[8]*17.0f;
+	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
+	m_rom_duration = exy[10]*130.0f;
+	m_rom_pause = exy[11]+0.5f;
+	// we have 12 of exy
+	if(m_rom_cld == 0)
+	  m_cur_closure = m_rom_closure;
+}
+
 
 u8 interpolate(u8 reg, u8 target) // does nothing as it was
 {
@@ -1076,24 +930,197 @@ void build_injection_filter(float *a, float *b,
 	b[1] = 0.0f;
 }
 
-const int PhonemeLengths[65] =
-{
-59, 71, 121, 47, 47, 71, 103, 90,
-71, 55, 80, 121, 103, 80, 71, 71,
-71, 121, 71, 146, 121, 146, 103, 185,
-103, 80, 47, 71, 71, 103, 55, 90,
-185, 65, 80, 47, 250, 103, 185, 185,
-185, 103, 71, 90, 185, 80, 185, 103,
-90, 71, 103, 185, 80, 121, 59, 90,
-80, 71, 146, 185, 121, 250, 185, 47,
-0
-};
-
-
 void votrax_init(){
   device_start();
   device_reset();
 }
+
+void generate_votrax_samples(int samples)
+{
+	for(int i=0; i<samples; i++) {
+		m_sample_count++;
+		if(m_sample_count & 1)
+			chip_update();
+#ifdef LAP	      
+//				printf("%c",analog_calc()>>8);
+		//		printf("%d\n",analog_calc());
+		int s16 = analog_calc();
+		//		printf("%d\n",s16);
+		
+		
+		unsigned char c = (unsigned)s16 & 255;
+		fwrite(&c, 1, 1, fo);
+		c = ((unsigned)s16 / 256) & 255;
+		fwrite(&c, 1, 1, fo);
+#endif
+	}
+}
+
+#ifndef LAP
+static uint16_t lenny;
+
+////[[[[[[[[[[[[[[[[[[[ audio functions:
+
+static int16_t sample_count=0;
+static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
+
+void votrax_newsay(){
+  u8 sel=_selx*65.0f; // is it 64 TODO!
+  //  sel=16;
+  writer(sel); // what are we writing - is ROM index
+  phone_commit();
+  //  inflection_w(p1[x]>>6); // TODO as bend!
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
+  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
+}
+
+int16_t votrax_get_sample(){ // TODO: trying new model
+  uint16_t sample; u8 x;
+  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_selz*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay();
+  }
+  return sample;
+}
+
+/////
+
+void votrax_newsay_rawparam(){
+  phone_commit_pbend();
+  //  inflection_w(p1[x]>>6); // TODO as bend!
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
+  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
+}
+
+int16_t votrax_get_sample_rawparam(){ // TODO: trying new model
+  uint16_t sample; u8 x;
+  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_selz*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay();
+  }
+  return sample;
+}
+
+/////
+
+void votrax_newsaygorf(){
+     static u8 vocabindex=0, whichone=0;
+     u8 it=*(vocablist_gorf[whichone]+vocabindex);
+   vocabindex++;
+   if (it==255){
+     vocabindex=0;
+     whichone=_selx*117.0f; 
+     MAXED(whichone,114);
+     whichone=114-whichone;
+   }   
+
+   writer(it); 
+  phone_commit();
+  inflection_w(it>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  }
+
+void votrax_newsaywow(){
+     static u8 vocabindex=0, whichone=0;
+     u8 it=*(vocablist_wow[whichone]+vocabindex);
+   vocabindex++;
+   if (it==255){
+     vocabindex=0;
+     whichone=_selx*81.0f; 
+     MAXED(whichone,78);
+     whichone=78-whichone;
+   }   
+   writer(it); 
+  phone_commit();
+  inflection_w(it>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+}
+
+int16_t votrax_get_samplegorf(){ 
+  int16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_sely*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsaygorf();
+  }
+  return sample;
+}
+
+int16_t votrax_get_samplewow(){ 
+  int16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_sely*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsaywow();
+  }
+  return sample;
+}
+
+void votrax_newsayTTS(){
+
+  writer(TTSoutarray[TTSindex]); 
+  phone_commit();
+  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  TTSindex++;
+   if (TTSindex>=TTSlength) {
+     TTSindex=0;
+     TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+   }
+}
+
+int16_t votrax_get_sampleTTS(){ 
+  int16_t sample; u8 x;
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsayTTS();
+  }
+  return sample;
+}
+
+void votrax_retriggerTTS(){
+  TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+  if (TTSindex>=TTSlength)     TTSindex=0;
+  writer(TTSoutarray[TTSindex]); 
+  phone_commit();
+  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+}
+
+#endif
 
 #ifdef LAP
 void main(void){

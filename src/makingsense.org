@@ -36,9 +36,9 @@
 - *worm control - MOVED OUT TO NEW MODULE alongside RAVEN! = except for wavetable maybe*
 
 * TODO  UPDATED:1/2
-** sp0256 as first model mode for others!
+** sp0256 as first model mode for others!-check what has been done
 
-- sp0256 AL2 - how to map allophones as all pauses are at one end?
+- sp0256 AL2 - how to map allophones as all pauses are at one end?DONE?
 
 /////
 
@@ -573,14 +573,23 @@ VOTRAX modes and tweaks:
 
 somehow votrax is not quite THERE!
 
-** 13/2
+** 13/2+
 
-- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS - could have z as TTS length there in alt TTS version - also for all TTS)!!!
+- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax (not TTS - could have z as TTS length there in alt TTS version - also for all TTS!!!
 
-- selz for other votrax: 
+- selz for other votrax - clock ratioFINISHandTEST, or length of phoneme?
 
-- raw votrax-raw code, parameter code, bending of vocabs, vocab votrax modesDONE_TEST
+- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO
 
+/////
+
+- clean up this with what has been done - TODO also from README.org ->
+  sp0256-mostly_done, VOTRAX // TMS, digitalker, Klatt and variants, SAM etc.
+
++ also double TTS modes as to length, utility modes such as inverse
+  filter (also test inverse filter as freeze - how as we have no TRIGGER?)
+
+////
 
 - start on TMS modes:
 
