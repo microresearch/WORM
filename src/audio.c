@@ -86,7 +86,7 @@ int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUF
 
 float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
 static adc_transform transform[5] = {
-  {MODE, 0, 0.1f, 33.0f}, // only multiplier we use except speed!
+  {MODE, 0, 0.1f, 33.0f}, // only multiplier we use except speed! was 0.1 for all!
   {SELX, 0, 0.1f, 32.0f},
   {SELY, 0, 0.1f, 32.0f},
   {SELZ, 0, 0.1f, 32.0f},
@@ -115,6 +115,10 @@ int16_t lastval;//=genstruct->prevsample;
 
 #define THRESH 16000
 #define THRESHLOW 10000
+
+Wavetable wavtable;
+wormy myworm;
+
 
 // for TTS
 
@@ -588,10 +592,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
-  u8 xaxis=_selx*12.0f; // 12 params 0-11
-  MAXED(xaxis,11);
-  xaxis=11-xaxis;
-  exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+
 
   if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
   static u8 triggered=0;
@@ -608,7 +609,13 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsay_rawparam();
+
+	 // attempt toggle this
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 //	 votrax_newsay_rawparam();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -624,7 +631,12 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsay_rawparam();
+	 // attempt toggle this
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 //	 votrax_newsay_rawparam();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -718,6 +730,19 @@ void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
      }
 };
 
+///[[[[[ good for testing ADC/CV ins
+
+void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
+  float lastbuffer[32];
+  //  dowavetable(lastbuffer, &wavtable, 2, size);
+  //  dowavetable(lastbuffer, &wavtable, 2+(1024-(adc_buffer[SELZ]>>2)), size);
+
+  //  if (_selx<0.9f) _selx=0.0f;
+
+  dowavetable(lastbuffer, &wavtable, 2.0f + (1024.0f*(1.0f-_sely)), size);
+  floot_to_int(outgoing,lastbuffer,size);
+}  
+
 
 u8 toggled=1;
 
@@ -733,7 +758,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   if (transform[x].flip) {
       value = 1.0f - value;
     }
-  smoothed_adc_value[x] += transform[x].filter_coeff * (value - smoothed_adc_value[x]);
+     smoothed_adc_value[x] += transform[x].filter_coeff * (value - smoothed_adc_value[x]);
+  //  smoothed_adc_value[x] = value;
   }
 
   _speed=smoothed_adc_value[SPEED_];
@@ -750,7 +776,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=6; 
+  _intmode=10; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -760,7 +786,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, lpc_error, sp0256_within}; // sp0256: 0-5 modes, votrax=6
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
@@ -776,7 +802,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // remapping for TTS modes - TODO!
   if (TTS){
     u8 selx=_selx*65.0f; // TODO!
-    u8 sely=_sely*65.0f;
+    u8 sely=_sely*65.0f; 
     MAXED(selx,63);
     MAXED(sely,63);
     selx=63-selx;

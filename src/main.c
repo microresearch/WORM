@@ -84,6 +84,10 @@ float exy[64]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
+extern Wavetable wavtable;
+extern wormy myworm;
+
+
 void main(void)
 {
   int16_t x;
@@ -93,6 +97,9 @@ void main(void)
   votrax_init();
   LPCAnalyzer_init4();
   
+  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 
+
+
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 

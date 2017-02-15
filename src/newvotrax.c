@@ -36,6 +36,7 @@ tp1 = phi clock (tied to f2q rom access)
 #include <linux/types.h>
 #define M_PI 3.141592f
 float _selx, _sely, _selz;
+float exy[64];
 u8 TTS=1;
 FILE* fo;
 #else
@@ -260,6 +261,12 @@ void phone_commit()
 
 			//			if(0)
 			//	logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
+#ifdef LAP
+			//			printf("ROMF1%d\n",m_rom_f1); // this works
+	printf("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
+#endif
+
+
 
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
@@ -331,18 +338,20 @@ void phone_commit_pbend() // parameter bend
 	m_ticks = 0;
 	// using exy but these are floats
 	
-	m_rom_f1  = exy[0]*17.0f;
-	m_rom_va  = exy[1]*17.0f;
-	m_rom_f2  = exy[2]*17.0f;
-	m_rom_fc  = exy[3]*17.0f;
-	m_rom_f2q = exy[4]*17.0f;
-	m_rom_f3  = exy[5]*17.0f;
-	m_rom_fa  = exy[6]*17.0f;
-	m_rom_cld = exy[7]*17.0f;
-	m_rom_vd  = exy[8]*17.0f;
-	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
-	m_rom_duration = exy[10]*130.0f;
-	m_rom_pause = exy[11]+0.5f;
+	m_rom_f1  = exy[0]*16.0f;
+	m_rom_va  = exy[1]*16.0f;
+	m_rom_f2  = exy[2]*16.0f;
+	m_rom_fc  = exy[3]*16.0f;
+	m_rom_f2q = exy[4]*16.0f;
+	m_rom_f3  = exy[5]*16.0f;
+	m_rom_fa  = exy[6]*16.0f;
+	m_rom_cld = exy[7]*16.0f;
+	m_rom_vd  = exy[8]*16.0f;
+	//	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
+	//	m_rom_duration = exy[10]*130.0f;
+	//m_rom_pause = exy[10]+0.5f;
+	m_rom_closure=0;
+	m_rom_pause=0;
 	// we have 12 of exy
 	if(m_rom_cld == 0)
 	  m_cur_closure = m_rom_closure;
@@ -824,7 +833,7 @@ void build_standard_filter(float *a, float *b,
 	b[3] = 1.0f-m1+m2;
 
 #ifdef LAP
-	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
+	//	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
 #endif
 
 
@@ -1048,21 +1057,20 @@ int16_t votrax_get_sample(){ // TODO: trying new model
 
 void votrax_newsay_rawparam(){
   phone_commit_pbend();
-  //  inflection_w(p1[x]>>6); // TODO as bend!
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
-  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
 }
 
-int16_t votrax_get_sample_rawparam(){ // TODO: trying new model
+int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is kind of noisy
   uint16_t sample; u8 x;
   //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
-
+    lenny=(1.0f-_selz)*6000.0f;
+    //        lenny=96;
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
   //  m_cur_f1=(_selz*126.0f)+1;
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
+
   if (sample_count++>=lenny){
     sample_count=0;
     votrax_newsay_rawparam();
@@ -1139,7 +1147,7 @@ void votrax_newsaygorf(){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
   }
 
 void votrax_newsaywow(){
@@ -1155,7 +1163,7 @@ void votrax_newsaywow(){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
 }
 
 int16_t votrax_get_samplegorf(){ 
@@ -1195,7 +1203,7 @@ void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
   TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
@@ -1223,7 +1231,7 @@ void votrax_retriggerTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
 }
 
 #endif
@@ -1254,7 +1262,7 @@ void main(void){
 
     ///    int lenny=PhonemeLengths[welcome[x]]*100;
     //    int lenny=m_rom_duration*144;
-    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/720000.0 * 24000.0); // what of sample-rate?
+    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
 // this is not precise - say 1200 above = 16*41*4*9+2=24000 odd
     // sample rate? say 24000 as about right?
   generate_votrax_samples(lenny);

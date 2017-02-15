@@ -605,6 +605,14 @@ somehow votrax is not quite THERE!
 
 mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam)
 
+** 15/2
+
+- suspected hardware issue but was board fault (to FIX)
+
+- all X/y/exy param things need freeze and toggle on trigger (how works with other sense of trigger?)
+
+- still working on votrax rawparam as is quite noisy
+
 * TTS 
 
 : gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
