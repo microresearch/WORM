@@ -15,4 +15,8 @@ int16_t votrax_get_sampleTTS();
 void votrax_newsay_rawparam();
 int16_t votrax_get_sample_rawparam();
 
+void votrax_newsay_bend();
+int16_t votrax_get_sample_bend();
+
+
 void votrax_retriggerTTS();

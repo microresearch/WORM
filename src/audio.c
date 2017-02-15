@@ -592,8 +592,6 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
-
-
   if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -627,6 +625,63 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    else { 
      while (xx<size){
               samplel=votrax_get_sample_rawparam();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 // attempt toggle this
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 //	 votrax_newsay_rawparam();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
+void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  if (trigger==1) votrax_newsay_bend(); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_sample_bend();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+
+	 // attempt toggle this
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 //	 votrax_newsay_rawparam();
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_sample_bend();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;

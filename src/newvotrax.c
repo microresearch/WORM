@@ -1081,7 +1081,7 @@ int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is k
 /////
 
 void votrax_newsay_bend(){
-  u8 sel=_selz*65.0f; // is it 64 TODO!
+  u8 sel=_selz*65.0f; // is it 64 TODO! // SELZ is select and x/y
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
@@ -1096,16 +1096,16 @@ int16_t votrax_get_sample_bend(){ // TODO: trying new model
   //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
   
   // TODO: all those orig BENT below = 10 values - and if ==0
-  m_rom_duration=m_rom_duration_orig+(64-(int)(exy[0]*128.0f));
-  m_rom_vd_orig=m_rom_vd+(8-(int)(exy[1]*16.0f));
-  m_rom_cld_orig=m_rom_cld+(8-(int)(exy[2]*16.0f));
-  m_rom_fa_orig=m_rom_fa+(8-(int)(exy[3]*16.0f));
-  m_rom_fc_orig=m_rom_fc+(8-(int)(exy[4]*16.0f));
-  m_rom_va_orig=m_rom_va+(8-(int)(exy[5]*16.0f));
-  m_rom_f1_orig=m_rom_f1+(8-(int)(exy[6]*16.0f));
-  m_rom_f2_orig=m_rom_f2+(8-(int)(exy[7]*16.0f));
-  m_rom_f2q_orig=m_rom_f2q+(8-(int)(exy[8]*16.0f));
-  m_rom_f3_orig=m_rom_f3+(8-(int)(exy[9]*16.0f));
+  //  m_rom_duration=m_rom_duration_orig+(64-(int)(exy[0]*128.0f)); // keep duration
+  m_rom_vd_orig=m_rom_vd+(8-(int)(exy[0]*16.0f));
+  m_rom_cld_orig=m_rom_cld+(8-(int)(exy[1]*16.0f));
+  m_rom_fa_orig=m_rom_fa+(8-(int)(exy[2]*16.0f));
+  m_rom_fc_orig=m_rom_fc+(8-(int)(exy[3]*16.0f));
+  m_rom_va_orig=m_rom_va+(8-(int)(exy[4]*16.0f));
+  m_rom_f1_orig=m_rom_f1+(8-(int)(exy[5]*16.0f));
+  m_rom_f2_orig=m_rom_f2+(8-(int)(exy[6]*16.0f));
+  m_rom_f2q_orig=m_rom_f2q+(8-(int)(exy[7]*16.0f));
+  m_rom_f3_orig=m_rom_f3+(8-(int)(exy[8]*16.0f));
 
   if (m_rom_duration==0) m_rom_duration=1;
   if (m_rom_vd==0) m_rom_vd=1;

@@ -581,7 +581,7 @@ somehow votrax is not quite THERE!
 
 - selz for other votrax - clock ratioFINISHandTEST, or length of phoneme?
 
-- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO-part_way - inc into audio.c
+- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO-part_way - incorp. into audio.cDONE-TEST!
 
 /////
 
@@ -611,7 +611,13 @@ mode list +: utility and strange modes, compost modes (start/end/triggerforlastm
 
 - all X/y/exy param things need freeze and toggle on trigger (how works with other sense of trigger?)
 
+best way of dealing with this: trigger stores value or toggle freeze /unfreeze
+
 - still working on votrax rawparam as is quite noisy
+
+** 16/2+
+
+- check that we hit extents - policy on this
 
 * TTS 
 
