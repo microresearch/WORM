@@ -785,8 +785,11 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 1. TMS -> vocab,TTS?, phonemes, raw, other excitations for all
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
-3. digitalker ???
 4. votrax -> TTS, phonemes, vocab is roms, raw?
+
+// above close to done-TMS to finish
+
+3. digitalker ???
 5. SAM -> TTS, vocab(ported already), raw
 6. klatt/nvp variations RE_ACQUAINT
 
