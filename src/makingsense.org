@@ -607,7 +607,7 @@ mode list +: utility and strange modes, compost modes (start/end/triggerforlastm
 
 ** 15/2
 
-- suspected hardware issue but was board fault (to FIX)
+- suspected hardware issue but was board fault (to FIX on rest of boards)
 
 - all X/y/exy param things need freeze and toggle on trigger (how works with other sense of trigger?)
 

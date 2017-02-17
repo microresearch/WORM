@@ -310,7 +310,7 @@ void phone_commit_bend()
 
 			m_rom_closure  = BITSWAP1(val, 36);
 			//			printf("closure: %d\n",m_rom_closure); // this works
-			m_rom_duration_orig = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
+			m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
 
 			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
 			// Hard-wired on the die, not an actual part of the rom.
@@ -336,22 +336,28 @@ void phone_commit_pbend() // parameter bend
 	// free-running.
 	m_phonetick = 0;
 	m_ticks = 0;
-	// using exy but these are floats
-	
-	m_rom_f1  = exy[0]*16.0f;
-	m_rom_va  = exy[1]*16.0f;
+
+  /*
+    u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+    u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+    u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits eac
+   */
+	// order which makes most sense
+
+	m_rom_va  = exy[0]*4.0f;
+	m_rom_f1  = exy[1]*16.0f;
 	m_rom_f2  = exy[2]*16.0f;
-	m_rom_fc  = exy[3]*16.0f;
-	m_rom_f2q = exy[4]*16.0f;
-	m_rom_f3  = exy[5]*16.0f;
-	m_rom_fa  = exy[6]*16.0f;
-	m_rom_cld = exy[7]*16.0f;
-	m_rom_vd  = exy[8]*16.0f;
+	m_rom_f3  = exy[3]*16.0f;
+	m_rom_f2q = exy[4]*4.0f;
+	m_rom_fc  = exy[5]*16.0f;
+	m_rom_fa  = exy[6]*4.0f;
+	m_rom_cld = exy[7]*12.0f;
+	m_rom_vd  = exy[8]*8.0f;
 	//	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
 	//	m_rom_duration = exy[10]*130.0f;
 	//m_rom_pause = exy[10]+0.5f;
 	m_rom_closure=0;
-	m_rom_pause=0;
+	m_rom_pause=0; // pause can be zero or one
 	// we have 12 of exy
 	if(m_rom_cld == 0)
 	  m_cur_closure = m_rom_closure;
@@ -1097,26 +1103,44 @@ int16_t votrax_get_sample_bend(){ // TODO: trying new model
   
   // TODO: all those orig BENT below = 10 values - and if ==0
   //  m_rom_duration=m_rom_duration_orig+(64-(int)(exy[0]*128.0f)); // keep duration
-  m_rom_vd_orig=m_rom_vd+(8-(int)(exy[0]*16.0f));
-  m_rom_cld_orig=m_rom_cld+(8-(int)(exy[1]*16.0f));
-  m_rom_fa_orig=m_rom_fa+(8-(int)(exy[2]*16.0f));
-  m_rom_fc_orig=m_rom_fc+(8-(int)(exy[3]*16.0f));
-  m_rom_va_orig=m_rom_va+(8-(int)(exy[4]*16.0f));
-  m_rom_f1_orig=m_rom_f1+(8-(int)(exy[5]*16.0f));
-  m_rom_f2_orig=m_rom_f2+(8-(int)(exy[6]*16.0f));
-  m_rom_f2q_orig=m_rom_f2q+(8-(int)(exy[7]*16.0f));
-  m_rom_f3_orig=m_rom_f3+(8-(int)(exy[8]*16.0f));
 
-  if (m_rom_duration==0) m_rom_duration=1;
-  if (m_rom_vd==0) m_rom_vd=1;
-  if (m_rom_cld==0) m_rom_cld=1;
-  if (m_rom_fa==0) m_rom_fa=1;
-  if (m_rom_fc==0) m_rom_fc=1;
-  if (m_rom_va==0) m_rom_va=1;
-  if (m_rom_f1==0) m_rom_f1=1;
-  if (m_rom_f2==0) m_rom_f2=1;
-  if (m_rom_f2q==0) m_rom_f2q=1;
-  if (m_rom_f3==0) m_rom_f3=1;
+  /*
+    u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+    u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+    u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits eac
+   */
+
+  // TODO change this order to match other bends and also what makes most sense
+  // TODO stop wrapping so only goes down to 0 - these are u8
+  signed char tmp;
+
+  tmp=m_rom_va_orig+(8-(int)(exy[0]*16.0f));
+  if (tmp>=0) m_rom_va=tmp;
+  else m_rom_va=0;
+  m_rom_f1=m_rom_f1_orig+(8-(int)(exy[1]*16.0f));
+  if (tmp>=0) m_rom_f1=tmp;
+  else m_rom_f1=0;
+  m_rom_f2=m_rom_f2_orig+(8-(int)(exy[2]*16.0f));
+  if (tmp>=0) m_rom_f2=tmp;
+  else m_rom_f2=0;
+  m_rom_f3=m_rom_f3_orig+(8-(int)(exy[3]*16.0f));
+  if (tmp>=0) m_rom_f3=tmp;
+  else m_rom_f3=0;
+  m_rom_f2q=m_rom_f2q_orig+(4-(int)(exy[4]*8.0f));
+  if (tmp>=0) m_rom_f2q=tmp;
+  else m_rom_f2q=0;
+  m_rom_fc=m_rom_fc_orig+(8-(int)(exy[5]*16.0f));
+  if (tmp>=0) m_rom_fc=tmp;
+  else m_rom_fc=0;
+  m_rom_fa=m_rom_fa_orig+(2-(int)(exy[6]*4.0f));
+  if (tmp>=0) m_rom_fa=tmp;
+  else m_rom_fa=0;
+  m_rom_cld=m_rom_cld_orig+(8-(int)(exy[7]*16.0f));
+  if (tmp>=0) m_rom_cld_orig=tmp;
+  else m_rom_cld_orig=0;
+  m_rom_vd=m_rom_vd_orig+(8-(int)(exy[8]*16.0f));
+  if (tmp>=0) m_rom_vd_orig=tmp;
+  else m_rom_vd_orig=0;
   
   m_sample_count++;
   if(m_sample_count & 1)
