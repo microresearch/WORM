@@ -798,6 +798,23 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
+//////////////[[[ crow/raven/LPC
+
+void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples);
+
+void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float voicebuffer[32],otherbuffer[32];
+
+  //  LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
+    //  convert in to float
+    //  exciter=indriver to float
+       int_to_floot(incoming,voicebuffer,size);
+       LPCAnalyzer_next(NULL, voicebuffer, otherbuffer, 10, size); //poles=10 - CROW TEST!
+	//    out from float to int
+   floot_to_int(mono_buffer,otherbuffer,size);
+};
+
+
 
 u8 toggled=1;
 
@@ -831,7 +848,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=11; 
+  _intmode=15;  // for raven LPC
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -841,7 +858,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

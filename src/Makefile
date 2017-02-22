@@ -24,7 +24,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			wvocoder.o wfilterbank.o digitalker.o nvp.o  braidworm.o voicform.o scformant.o \
 			ntube.o worming.o lpc4.o wavetable.o newvotrax.o sp0256bend.o\
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
-#			lpcanalysis.o
+			lpcanalysis.o
 #			ownvocoder.o
 
 OBJECTS += \

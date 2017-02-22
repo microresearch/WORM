@@ -541,17 +541,17 @@ mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine,
 
 - check again how ADC works with CV in... - with reversal works as it should -> ZERO is far left and has MOST CV influence!DONE
 
-- *remove RAW mode*
+- *removed RAW mode*
 
 - sp0256: test RAW and bend, ADC extentsDONE-adjusting for each mode - test with extra hardware
 
-- re-test all sp0256 modes, triggers and extents DONE-all good so far - stress test TTS!
+- re-test all sp0256 modes, triggers and extents DONE-all good so far - stress test TTS!DONE
 
 - new hardware tests for ADC extents - extra board TODO
 
 ////
 
-- announce 20 march release and do soundclouds next week
+- announce 20 march equinox release and do soundclouds
 
 ** 6/2+
 
@@ -601,10 +601,6 @@ somehow votrax is not quite THERE!
 
 -- TMS vocabs and chipsets worked out
 
-/// 
-
-mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam)
-
 ** 15/2
 
 - suspected hardware issue but was board fault (to FIX on rest of boards)
@@ -617,7 +613,10 @@ best way of dealing with this: trigger stores value or toggle freeze /unfreeze
 
 ** 16/2+
 
-- check that we hit extents - policy on this
+- check that we hit extents - policy on this for each set eg. >x 
+
+- mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam)
+
 
 * TTS 
 
