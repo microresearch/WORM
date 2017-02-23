@@ -7,7 +7,8 @@
 
 *new hardware is not so bad but we should fix with over-multiply but ALWAYS constrain if it is IMPORTANT!*
 
-- try different filter coeffs... (0.01f)
+- try different filter coeffs... (0.01f is maybe too low=too
+  smooth/filtered = 0.05 or 0.01 in clouds for our dual CV/pots - same design!)
 
 - refine and test triggers in all sp0256 modes - changing trigger thresholds
 
@@ -27,7 +28,7 @@
 
 ///////
 
-- LPC inverse filter as excitation to TEST!
+- LPC inverse filter as excitation to TEST - tested and is quite rough!
 
 - vocoder and experimental modes
 
@@ -81,8 +82,6 @@ other excitations = 9+
 *- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger - but we use trigger so..*
 
 *RAW/bend present LPC/usual but do pitch etc....*
-
-- raw votrax
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
@@ -615,8 +614,7 @@ best way of dealing with this: trigger stores value or toggle freeze /unfreeze
 
 - check that we hit extents - policy on this for each set eg. >x 
 
-- mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam)
-
+- mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam?/backwards?)
 
 * TTS 
 
@@ -754,9 +752,7 @@ but we need to group/cross off phonemes
 
 - but maybe use other method as we don't know where to put other phonemes not in book list
 - flaw is that TTS method doesn't use all of each phoneme
-- awky and -DLAP version of TTS
-
-
+- awky and -DLAP version of TTS ?
 
 * TMS ROMS
 
@@ -810,7 +806,7 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
 
 8. vocoder
 
-- vocoder also with compost or with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
+- vocoder also with compost AND with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
 
 9. vosim/fof etc.
 10. tube and ntube/glottal/wavetable

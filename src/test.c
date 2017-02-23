@@ -234,7 +234,7 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
   float b12 = unit->m_b12;
   float ain;
 
-  for (u8 i=0;i<inNumSamples;i++){
+  /*  for (u8 i=0;i<inNumSamples;i++){
   ain = inbuffer[i];
   y00 = ain + b01 * y01 + b02 * y02;
   y10 = ain + b11 * y11 + b12 * y12;
@@ -247,7 +247,7 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
   y12 = y11;
   y11 = y10;
   }
-
+  */
   unit->m_y01 = y01;
   unit->m_y02 = y02;
   unit->m_y11 = y11;
@@ -269,9 +269,16 @@ void main(){
   int16_t mono_buffer[32];
   int16_t sample_buffer[32];
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
-
+  float value,   smoothed_adc_value=0, filter_coeff=0.05f;
   //(0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1) // 7f=127
 
+  // test coeff for ADC:
+  for (y=0;y<128;y++){
+  value=(rand()%255)/255.0f;
+  smoothed_adc_value += filter_coeff * (value - smoothed_adc_value);
+  printf(" %f smoothed: %f\n",value, smoothed_adc_value);
+  }
+  
   int16_t m_inflection=64;
   int16_t m_filt_f1=16;
   int16_t pitch=(0x7f ^ (m_inflection) ^ m_filt_f1) + 1; // TTS uses inflection // nothing else - what are m_filt_f1 values?
