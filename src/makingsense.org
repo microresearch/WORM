@@ -16,7 +16,7 @@
 
 - basics eg. ROMS, filenamings, compost
 
-- XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferable
+- XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferableDONE
 
 -  control models: eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
 
@@ -24,7 +24,7 @@
 
 - basic modes templated: XYZ, speed, triggering, compost
 
-- each source/filter mode has regular in (eg. TMS, external in, other glottal sources) X,Y,Z and speed...
+- each source/filter mode has regular in (eg. TMS, external in, other glottal sources) X,Y,Z and speed...??
 
 ///////
 
@@ -39,7 +39,7 @@
 * TODO  UPDATED:1/2
 ** sp0256 as first model mode for others!-check what has been done
 
-- sp0256 AL2 - how to map allophones as all pauses are at one end?DONE?
+- sp0256 AL2 - how to map allophones as all pauses are at one end?DONE
 
 /////
 
@@ -618,17 +618,33 @@ best way of dealing with this: trigger stores value or toggle freeze /unfreeze
 
 ** 27/2+
 
-- inverse filtering levels and noise
-- x/y program resolved
-- policy for extents (how far we go beyond and does it wrap or something in any cases?)
-- look at spo256bend
+// fixed bug in votrax_bend, fixed bug in votrax gorf/wow resetsTEST,
+fixed same bug in 256 vocab resetsTEST, changed x/y trigger thing and
+is better, some tweaks in votrax and speed of all votrax in audio.c,
+still not happy with bending of votrax so maybe ditch or...
 
-// fixed bug in votrax_bend, changed x/y trigger thing and is better,
-some tweaks in votrax and speed of all votrax in audio.c, still not
-happy with bending of votrax so maybe ditch or...
+votrax bend questions: that parameters are very tight (4 bits) and
+cannot exceed these values, bend makes more sense for
+ROM/vocab->GORF/TEST
 
 /////- where we are at?
 
+- bends for votrax to resolve
+- sely and selz on votrax (TTS uses XandY)
+- inverse filtering levels and noise
+- x/y program resolved for all
+- policy for extents (how far we go beyond and does it wrap or something in any cases?)
+- re-look at sp0256bend and finalise all first modes
+
+- start on TMS and bends of//TMS TTS->
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code
+- klatt notes
+- other modes
 
 * TTS 
 
@@ -802,13 +818,15 @@ wavetable as in raven, generators eg. pulse, square, and original
 5. SAM -> TTS, vocab(ported already), raw
 6. klatt/nvp variations RE_ACQUAINT
 
+say 6x7=42+
+
 7. LPC vocoder -> where is code for this? lpcanalysis?
 
 see in README: 8.1 LPC vocoder/source - crossover with different sources and pitch following/off on ...
 
 :lpc4.c now!????
 
-wavetable and other insources and live LPC filter from IN! also window size variable?
+wavetable and other insources and live LPC filter from IN (to vocode with WHAT?)! also window size variable?
 
 potential also for live TMS/LPC recodings with pitch or add manual pitch:=
 
@@ -820,7 +838,7 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
 
 8. vocoder
 
-- vocoder also with compost AND with live generation of selected algos as VOICE and with INPUt as INSTRUMENT//EXCITATION
+- vocoder also with compost AND with live generation of selected algos as VOICE and with INPUT as INSTRUMENT//EXCITATION
 
 9. vosim/fof etc.
 10. tube and ntube/glottal/wavetable
@@ -831,6 +849,8 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
     oldX.Y for example
 
 13. what own brutal worm synth could be!
+
+14. extra modes for proposes RAVEN - excitations/wavetables
 
 * chipsets/emulation/roms
 

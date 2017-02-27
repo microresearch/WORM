@@ -3,10 +3,10 @@ void votrax_init();
 void votrax_newsay();
 int16_t votrax_get_sample();
 
-void votrax_newsaygorf();
+void votrax_newsaygorf(u8 reset);
 int16_t votrax_get_samplegorf();
 
-void votrax_newsaywow();
+void votrax_newsaywow(u8 reset);
 int16_t votrax_get_samplewow();
 
 void votrax_newsayTTS();

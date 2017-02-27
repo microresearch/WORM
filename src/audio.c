@@ -268,7 +268,7 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
-  if (trigger==1) sp0256_newsayvocabbankone(); // selector is in newsay
+  if (trigger==1) sp0256_newsayvocabbankone(1); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -283,7 +283,7 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayvocabbankone(); // selector is in newsay
+	  sp0256_newsayvocabbankone(1); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -299,7 +299,7 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayvocabbankone(); // selector is in newsay
+	 sp0256_newsayvocabbankone(1); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -313,7 +313,7 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 
 void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
-  if (trigger==1) sp0256_newsayvocabbanktwo(); // selector is in newsay
+  if (trigger==1) sp0256_newsayvocabbanktwo(1); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -328,7 +328,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
-	  sp0256_newsayvocabbanktwo(); // selector is in newsay
+	  sp0256_newsayvocabbanktwo(1); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -344,7 +344,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 sp0256_newsayvocabbanktwo(); // selector is in newsay
+	 sp0256_newsayvocabbanktwo(1); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -508,7 +508,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   samplespeed*=0.5f;
 
   TTS=0;
-  if (trigger==1) votrax_newsaygorf(); // selector is in newsay
+  if (trigger==1) votrax_newsaygorf(1); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -523,7 +523,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsaygorf();
+	 votrax_newsaygorf(1);
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -539,7 +539,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsaygorf();
+	 votrax_newsaygorf(1);
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -555,7 +555,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   samplespeed*=0.5f;
 
   TTS=0;
-  if (trigger==1) votrax_newsaywow(); // selector is in newsay
+  if (trigger==1) votrax_newsaywow(1); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -570,7 +570,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsaywow();
+	 votrax_newsaywow(1);
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -586,7 +586,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 votrax_newsaywow();
+	 votrax_newsaywow(1);
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -675,7 +675,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 };
 
 
-void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){// TODO - as now we don;t bend with selx
   samplespeed*=0.5f;
 
   TTS=0;
@@ -902,7 +902,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6 - was with LPCanalyzer
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6 - 
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

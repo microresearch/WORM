@@ -20,10 +20,10 @@ int16_t sp0256_get_sampleTTS(void);
 void sp0256_newsayTTS(void);
 
 int16_t sp0256_get_samplevocabbankone(void);
-void sp0256_newsayvocabbankone(void);
+void sp0256_newsayvocabbankone(u8 reset);
 
 int16_t sp0256_get_samplevocabbanktwo(void);
-void sp0256_newsayvocabbanktwo(void);
+void sp0256_newsayvocabbanktwo(u8 reset);
 
 int16_t sp0256_get_sample1219(void);
 void sp0256_newsay1219(void);

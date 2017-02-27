@@ -1393,7 +1393,7 @@ int16_t sp0256_get_sample_withLPC(INT16 samp){
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayvocabbankone();
+          sp0256_newsayvocabbankone(0);
    }
 
    micro();
@@ -1408,7 +1408,7 @@ int16_t sp0256_get_sample_withLPC(INT16 samp){
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-          sp0256_newsayvocabbanktwo();
+          sp0256_newsayvocabbanktwo(0);
    }
 
    micro();
@@ -1483,7 +1483,7 @@ void sp0256_retriggerTTS(void){// called on a trigger
  }
 
 
-void sp0256_newsayvocabbankone(void){// called at end of phoneme
+void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme
    u8 dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    static u8 vocabindex=0, whichone=0;
@@ -1493,18 +1493,19 @@ void sp0256_newsayvocabbankone(void){// called at end of phoneme
    m_romm=m_romAL2;   
    dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    vocabindex++;
-   if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255){
+   if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
      whichone=_selx*153.0f; // split vocab into banks - on this one we need 0-150 values 
      MAXED(whichone,150);
      whichone=150-whichone;
+     dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    }   
    m_ald = ((dada&63) << 4); 		
    m_lrq = 0; //from 8 bit write
  }
 
 
-void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
+void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
    u8 dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    static u8 vocabindex=0, whichone=0;
@@ -1514,12 +1515,12 @@ void sp0256_newsayvocabbanktwo(void){// called at end of phoneme
    m_romm=m_romAL2;   
    dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
    vocabindex++;
-   if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
+   if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
      whichone=_selx*169.0f;
      MAXED(whichone,166);
      whichone=166-whichone;
-
+     dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    }
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write

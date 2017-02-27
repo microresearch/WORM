@@ -1093,21 +1093,40 @@ int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is k
 
 void votrax_newsay_bend(){
   signed char tmp;
+  u8 it;
+  /*
   u8 sel=_selz*65.0f; // is it 64 TODO! // SELZ is select and x/y
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
+  */
+  // do bend now for GORF:
+  static u8 vocabindex=0, whichone=0;
+  it=*(vocablist_gorf[whichone]+vocabindex);
+  vocabindex++;
+  if (it==255){
+    vocabindex=0;
+    whichone=_selx*117.0f; 
+    MAXED(whichone,114);
+    whichone=114-whichone;
+    it=*(vocablist_gorf[whichone]+vocabindex);
+  }   
+
+  writer(it); 
   phone_commit();
   //  inflection_w(p1[x]>>6); // TODO as bend!
  
   // TODO: maybe try just f1 and f2 on selx and sely
-  /*  tmp=m_rom_f1+(8-(_selx*16.0f));
-  if (tmp>=0) m_rom_f1=tmp;
-  else m_rom_f1=0;
+    tmp=m_rom_f1+(8-(_selx*16.0f));
+    if (tmp>=0) tmp=0;
+    if (tmp>15) tmp=15;
+    m_rom_f1=tmp;
 
-  tmp=m_rom_f2+(8-(_sely*16.0f));
-  if (tmp>=0) m_rom_f2=tmp;
-  */
+    tmp=m_rom_f2+(8-(_sely*16.0f));
+    if (tmp>=0) tmp=0;
+    if (tmp>15) tmp=15;
+    m_rom_f2=tmp;
+ 
   /*
   tmp=m_rom_f1_orig+(8-(int)(exy[0]*16.0f));
   if (tmp>=0) m_rom_f1=tmp;
@@ -1171,15 +1190,17 @@ int16_t votrax_get_sample_bend(){ // TODO: trying new model
 
 /////
 
-void votrax_newsaygorf(){
+void votrax_newsaygorf(u8 reset){
      static u8 vocabindex=0, whichone=0;
-     u8 it=*(vocablist_gorf[whichone]+vocabindex);
+     u8 it;
+     it=*(vocablist_gorf[whichone]+vocabindex);
    vocabindex++;
-   if (it==255){
+   if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*117.0f; 
+     whichone=_selx*116.0f; 
      MAXED(whichone,114);
      whichone=114-whichone;
+     it=*(vocablist_gorf[whichone]+vocabindex);
    }   
 
    writer(it); 
@@ -1187,16 +1208,18 @@ void votrax_newsaygorf(){
   inflection_w(it>>6); // how many bits?
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
   }
-
-void votrax_newsaywow(){
+  
+void votrax_newsaywow(u8 reset){
      static u8 vocabindex=0, whichone=0;
-     u8 it=*(vocablist_wow[whichone]+vocabindex);
+     u8 it;
+     it=*(vocablist_wow[whichone]+vocabindex);
    vocabindex++;
-   if (it==255){
+   if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*81.0f; 
+     whichone=_selx*80.0f; 
      MAXED(whichone,78);
      whichone=78-whichone;
+     it=*(vocablist_wow[whichone]+vocabindex);
    }   
    writer(it); 
   phone_commit();
@@ -1215,7 +1238,7 @@ int16_t votrax_get_samplegorf(){
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
-    votrax_newsaygorf();
+    votrax_newsaygorf(0);
   }
   return sample;
 }
@@ -1231,7 +1254,7 @@ int16_t votrax_get_samplewow(){
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
-    votrax_newsaywow();
+    votrax_newsaywow(0);
   }
   return sample;
 }
