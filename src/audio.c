@@ -359,6 +359,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
+  // or should thus be in sample loop? TODO!
   u8 xaxis=_selx*14.0f; //0-16 for r, but now 14 params 0-13
   MAXED(xaxis,13);
   xaxis=13-xaxis;
@@ -410,6 +411,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 ///[[[[[[[[[[[[[[[[[[[[[[[[VOTRAX
 
 void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed*=0.5f;
   TTS=0;
   if (trigger==1) votrax_newsay(); // selector is in newsay
   static u8 triggered=0;
@@ -455,6 +457,8 @@ void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 };
 
 void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed*=0.5f;
+
   TTS=1;
   if (trigger==1) votrax_retriggerTTS(); // selector is in newsay
     
@@ -501,6 +505,8 @@ void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 };
 
 void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed*=0.5f;
+
   TTS=0;
   if (trigger==1) votrax_newsaygorf(); // selector is in newsay
   static u8 triggered=0;
@@ -546,6 +552,8 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 };
 
 void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed*=0.5f;
+
   TTS=0;
   if (trigger==1) votrax_newsaywow(); // selector is in newsay
   static u8 triggered=0;
@@ -591,14 +599,23 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 };
 
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NOTES - needs trigger but is this best way?
+  samplespeed*=0.5f;
+
   TTS=0;
   if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
-  static u8 triggered=0;
+  static u8 triggered=0, parammode=0;
   u8 xx=0,readpos;
   float remainder;
 
    if (samplespeed<=1){ 
      while (xx<size){
+       if (parammode==0){
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+       }
+
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sample_rawparam();
@@ -608,34 +625,45 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
 
+	 /*
 	 // attempt toggle this
 	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,8); // how can we test the extent for the CV in
 	 xaxis=8-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-	 //	 votrax_newsay_rawparam();
+	 */
 	 triggered=1;
+	 parammode^=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=samplespeed;
      }
    }
    else { 
      while (xx<size){
+
+       if (parammode==0){
+	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+       }
+
               samplel=votrax_get_sample_rawparam();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
+	 /*
 	 // attempt toggle this
 	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,8); // how can we test the extent for the CV in
 	 xaxis=8-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-	 //	 votrax_newsay_rawparam();
+	 */
 	 triggered=1;
+	 parammode^=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 	 xx++;
@@ -648,14 +676,22 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
 
 void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed*=0.5f;
+
   TTS=0;
   if (trigger==1) votrax_newsay_bend(); // selector is in newsay
-  static u8 triggered=0;
+  static u8 triggered=0, parammode=0;
   u8 xx=0,readpos;
   float remainder;
 
    if (samplespeed<=1){ 
      while (xx<size){
+       if (parammode==0){
+	 u8 xaxis=_selx*8.0f; // 8 params 0-7 - as int rounds down
+	 MAXED(xaxis,7); // how can we test the extent for the CV in
+	 xaxis=7-xaxis;
+	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
+       }
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sample_bend();
@@ -666,12 +702,15 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
        if (incoming[xx]>THRESH && !triggered) {
 
 	 // attempt toggle this
+	 /*
 	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,8); // how can we test the extent for the CV in
 	 xaxis=8-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 //	 votrax_newsay_rawparam();
+	 */
 	 triggered=1;
+	 parammode^=1;
+
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 
@@ -681,18 +720,26 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
+       if (parammode==0){
+	 u8 xaxis=_selx*8.0f; //
+	 MAXED(xaxis,7); // how can we test the extent for the CV in
+	 xaxis=7-xaxis;
+	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
+       }
               samplel=votrax_get_sample_bend();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
 	 // attempt toggle this
+	 /*
 	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,8); // how can we test the extent for the CV in
 	 xaxis=8-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 //	 votrax_newsay_rawparam();
+	 */
 	 triggered=1;
+	 parammode^=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 	 xx++;
@@ -800,21 +847,16 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 //////////////[[[ crow/raven/LPC
 
+/*
 void LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int inNumSamples);
 
 void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float voicebuffer[32],otherbuffer[32];
-
-  //  LPCAnalyzer_next(float *inoriginal, float *indriver, float *out, int p, int testE, float delta, int inNumSamples) {
-    //  convert in to float
-    //  exciter=indriver to float
        int_to_floot(incoming,voicebuffer,size);
        LPCAnalyzer_next(NULL, voicebuffer, otherbuffer, 10, size); //poles=10 - CROW TEST!
-	//    out from float to int
    floot_to_int(mono_buffer,otherbuffer,size);
 };
-
-
+*/
 
 u8 toggled=1;
 
@@ -848,7 +890,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=15;  // for raven LPC
+  _intmode=11; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -858,7 +900,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6
+  //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6 - was with LPCanalyzer
+
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

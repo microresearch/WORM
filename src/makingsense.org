@@ -614,7 +614,21 @@ best way of dealing with this: trigger stores value or toggle freeze /unfreeze
 
 - check that we hit extents - policy on this for each set eg. >x 
 
-- mode list +: utility and strange modes, compost modes (start/end/triggerforlastmodeparam?/backwards?)
+- mode list +: utility and strange/experimental modes, compost modes (start/end/triggerforlastmodeparam?/backwards?)
+
+** 27/2+
+
+- inverse filtering levels and noise
+- x/y program resolved
+- policy for extents (how far we go beyond and does it wrap or something in any cases?)
+- look at spo256bend
+
+// fixed bug in votrax_bend, changed x/y trigger thing and is better,
+some tweaks in votrax and speed of all votrax in audio.c, still not
+happy with bending of votrax so maybe ditch or...
+
+/////- where we are at?
+
 
 * TTS 
 

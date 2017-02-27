@@ -96,7 +96,7 @@ void main(void)
   sp0256_initbend();
   votrax_init();
   LPCAnalyzer_init4();
-  LPCAnalyzer_init(); // for raven voice
+  //  LPCAnalyzer_init(); // for raven voice
   wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 
 
 

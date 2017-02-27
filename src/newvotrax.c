@@ -293,28 +293,28 @@ void phone_commit_bend()
 	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
 	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
 	    //	    printf("I:%d\n",i);
-			m_rom_f1_orig  = BITSWAP4(val,  0,  7, 14, 21);
-			m_rom_va_orig  = BITSWAP4(val,  1,  8, 15, 22);
-			m_rom_f2_orig  = BITSWAP4(val,  2,  9, 16, 23);
-			m_rom_fc_orig  = BITSWAP4(val,  3, 10, 17, 24);
-			m_rom_f2q_orig = BITSWAP4(val,  4, 11, 18, 25);
-			m_rom_f3_orig  = BITSWAP4(val,  5, 12, 19, 26);
-			m_rom_fa_orig  = BITSWAP4(val,  6, 13, 20, 27);
+	    m_rom_f1_orig  = BITSWAP4(val,  0,  7, 14, 21);
+	    m_rom_va  = BITSWAP4(val,  1,  8, 15, 22);
+	    m_rom_f2_orig  = BITSWAP4(val,  2,  9, 16, 23);
+	    m_rom_fc_orig  = BITSWAP4(val,  3, 10, 17, 24);
+	    m_rom_f2q_orig = BITSWAP4(val,  4, 11, 18, 25);
+	    m_rom_f3_orig  = BITSWAP4(val,  5, 12, 19, 26);
+	    m_rom_fa_orig  = BITSWAP4(val,  6, 13, 20, 27);
 			// These two values have their bit orders inverted
 			// compared to everything else due to a bug in the
 			// prototype (miswiring of the comparator with the ticks
 			// count) they compensated in the rom.
 
-			m_rom_cld_orig = BITSWAP4(val, 34, 32, 30, 28);
-			m_rom_vd_orig  = BITSWAP4(val, 35, 33, 31, 29);
+	    m_rom_cld_orig = BITSWAP4(val, 34, 32, 30, 28);
+	    m_rom_vd_orig  = BITSWAP4(val, 35, 33, 31, 29);
 
-			m_rom_closure  = BITSWAP1(val, 36);
+	    m_rom_closure  = BITSWAP1(val, 36);
 			//			printf("closure: %d\n",m_rom_closure); // this works
-			m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
+	    m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
 
 			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
 			// Hard-wired on the die, not an actual part of the rom.
-			m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
+	    m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
 
 			//			if(0)
 			//	logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
@@ -997,10 +997,6 @@ void build_injection_filter(float *a, float *b,
 	b[1] = 0.0f;
 }
 
-void votrax_init(){
-  device_start();
-  device_reset();
-}
 
 void generate_votrax_samples(int samples)
 {
@@ -1023,9 +1019,16 @@ void generate_votrax_samples(int samples)
 	}
 }
 
-#ifndef LAP
-static uint16_t lenny;
+static int lenny;
 
+void votrax_init(){
+  device_start();
+  device_reset();
+  lenny=1000;
+}
+
+
+#ifndef LAP
 ////[[[[[[[[[[[[[[[[[[[ audio functions:
 
 static int16_t sample_count=0;
@@ -1063,12 +1066,14 @@ int16_t votrax_get_sample(){ // TODO: trying new model
 
 void votrax_newsay_rawparam(){
   phone_commit_pbend();
+  lenny=(int)((1.0f-_selz)*12000.0f)+600; // 600 is lowest we can have lenny
+  //  int durry=(int)((1.0f-_selz)*32.0f);
+  // lenny=((16*(durry*4+1)*4*9+2)/30);
 }
 
 int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is kind of noisy
   uint16_t sample; u8 x;
   //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
-    lenny=(1.0f-_selz)*6000.0f;
     //        lenny=96;
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1087,12 +1092,48 @@ int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is k
 /////
 
 void votrax_newsay_bend(){
+  signed char tmp;
   u8 sel=_selz*65.0f; // is it 64 TODO! // SELZ is select and x/y
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
-  phone_commit_bend();
+  phone_commit();
   //  inflection_w(p1[x]>>6); // TODO as bend!
+ 
+  // TODO: maybe try just f1 and f2 on selx and sely
+  /*  tmp=m_rom_f1+(8-(_selx*16.0f));
+  if (tmp>=0) m_rom_f1=tmp;
+  else m_rom_f1=0;
+
+  tmp=m_rom_f2+(8-(_sely*16.0f));
+  if (tmp>=0) m_rom_f2=tmp;
+  */
+  /*
+  tmp=m_rom_f1_orig+(8-(int)(exy[0]*16.0f));
+  if (tmp>=0) m_rom_f1=tmp;
+  else m_rom_f1=0;
+  tmp=m_rom_f2_orig+(8-(int)(exy[1]*16.0f));
+  if (tmp>=0) m_rom_f2=tmp;
+  else m_rom_f2=0;
+  tmp=m_rom_f3_orig+(8-(int)(exy[2]*16.0f));
+  if (tmp>=0) m_rom_f3=tmp;
+  else m_rom_f3=0;
+  tmp=m_rom_f2q_orig+(2-(int)(exy[3]*4.0f));
+  if (tmp>=0) m_rom_f2q=tmp;
+  else m_rom_f2q=0;
+  tmp=m_rom_fc_orig+(8-(int)(exy[4]*16.0f));
+  if (tmp>=0) m_rom_fc=tmp;
+  else m_rom_fc=0;
+  tmp=m_rom_fa_orig+(2-(int)(exy[5]*4.0f));
+  if (tmp>=0) m_rom_fa=tmp;
+  else m_rom_fa=0;
+  tmp=m_rom_cld_orig+(6-(int)(exy[6]*12.0f));
+  if (tmp>=0) m_rom_cld_orig=tmp;
+  else m_rom_cld_orig=0;
+  tmp=m_rom_vd_orig+(4-(int)(exy[7]*8.0f));
+  if (tmp>=0) m_rom_vd_orig=tmp;
+  else m_rom_vd_orig=0;
+  */
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
   //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
 }
@@ -1112,35 +1153,8 @@ int16_t votrax_get_sample_bend(){ // TODO: trying new model
 
   // TODO change this order to match other bends and also what makes most sense
   // TODO stop wrapping so only goes down to 0 - these are u8
-  signed char tmp;
 
-  tmp=m_rom_va_orig+(8-(int)(exy[0]*16.0f));
-  if (tmp>=0) m_rom_va=tmp;
-  else m_rom_va=0;
-  m_rom_f1=m_rom_f1_orig+(8-(int)(exy[1]*16.0f));
-  if (tmp>=0) m_rom_f1=tmp;
-  else m_rom_f1=0;
-  m_rom_f2=m_rom_f2_orig+(8-(int)(exy[2]*16.0f));
-  if (tmp>=0) m_rom_f2=tmp;
-  else m_rom_f2=0;
-  m_rom_f3=m_rom_f3_orig+(8-(int)(exy[3]*16.0f));
-  if (tmp>=0) m_rom_f3=tmp;
-  else m_rom_f3=0;
-  m_rom_f2q=m_rom_f2q_orig+(4-(int)(exy[4]*8.0f));
-  if (tmp>=0) m_rom_f2q=tmp;
-  else m_rom_f2q=0;
-  m_rom_fc=m_rom_fc_orig+(8-(int)(exy[5]*16.0f));
-  if (tmp>=0) m_rom_fc=tmp;
-  else m_rom_fc=0;
-  m_rom_fa=m_rom_fa_orig+(2-(int)(exy[6]*4.0f));
-  if (tmp>=0) m_rom_fa=tmp;
-  else m_rom_fa=0;
-  m_rom_cld=m_rom_cld_orig+(8-(int)(exy[7]*16.0f));
-  if (tmp>=0) m_rom_cld_orig=tmp;
-  else m_rom_cld_orig=0;
-  m_rom_vd=m_rom_vd_orig+(8-(int)(exy[8]*16.0f));
-  if (tmp>=0) m_rom_vd_orig=tmp;
-  else m_rom_vd_orig=0;
+  // we have closure and pause already
   
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1275,12 +1289,13 @@ void main(void){
   const unsigned char TTStest[]  = {24, 27, 0, 24, 38, 40, 62, 57, 0, 43, 62, 27, 36, 61, 38, 40, 62, 36, 43, 62, 41, 40, 40, 0, 62};
   
   // try and say
-  for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
+  //  for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
     //    writer(welcome[x]);
-    writer(TTStest[x]);
-        phone_commit();
+  //    writer(TTStest[x]);
+  writer(1);
+  phone_commit();
 //	m_votrax->inflection_w(space, 0, data >> 6);
-  inflection_w(TTStest[x]>>6);
+//  inflection_w(TTStest[x]>>6);
     // how to get duration:
   //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
 
@@ -1290,7 +1305,10 @@ void main(void){
 // this is not precise - say 1200 above = 16*41*4*9+2=24000 odd
     // sample rate? say 24000 as about right?
   generate_votrax_samples(lenny);
-  }
+  writer(1);
+  phone_commit();
+  generate_votrax_samples(lenny);
+  //  }
   //  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d\n",m_rom_duration);
 
 }
