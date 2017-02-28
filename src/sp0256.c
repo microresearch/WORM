@@ -1475,7 +1475,8 @@ void sp0256_retriggerTTS(void){// called on a trigger
    
    //     TTSindex=0;
      TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
-     if (TTSindex>=TTSlength)     TTSindex=0;
+     //     if (TTSindex>=TTSlength)     TTSindex=0;
+     TTSindex=0;
      dada=TTSoutarray[TTSindex]; 
 
      m_ald = ((dada&63) << 4); 

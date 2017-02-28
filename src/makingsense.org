@@ -920,12 +920,14 @@ MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are exte
 ** data sources/wavetables to generate
 * mode notes for manual
 
-- template
+*** template
 
 X-
 Y-
 Z-
 TRIGGER-
+
+** SP0256
 
 ** VOTRAX
 
