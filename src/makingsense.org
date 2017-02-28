@@ -667,9 +667,13 @@ question of wrap on all? TEST!
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code RE_TEST!
 
-- TMS: test coeff switching struct, grouping of TMS vocabs and clear chipsets marked for arm mame code:
+- TMS: test coeff switching struct-in progress, grouping of TMS vocabs and clear chipsets marked for arm mame code:
 
+//tms_newssay_
+//tms_reset_ called on mode change trigger ->   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
+//tms_get_sample
 
+for each vocab - generalise for each vocab -> pointer or?
 
 - klatt notes
 - other modes and start manual for each mode

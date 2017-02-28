@@ -826,11 +826,13 @@ void tms5200_init()
     m_new_frame_k_idx[i] = 0;
   for (i = 4; i < 7; i++)
     m_new_frame_k_idx[i] = 0xF;
-  for (i = 7; i < m_coeff->num_k; i++)
-    m_new_frame_k_idx[i] = 0x7;
+  for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
   m_talk_status = 1;
 };
 
+//tms_newssay_
+//tms_reset_ called on mode change trigger ->   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
+//tms_get_sample
 
 void tms5200_newsay(){
   INT16 i;
