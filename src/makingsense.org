@@ -661,11 +661,13 @@ question of wrap on all? TEST!
 
 - finalise all first modes 256/votrax so far
 
-- start on TMS and bends of//TMS TTS->
+///
+
+- start on TMS and bends of//TMS TTS TODO ->
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
-  but may not be so in TMS5220 code RE_TEST!
+  but may not be so in TMS5220 code TEST!
 
 - TMS: test coeff switching struct-in progress, grouping of TMS vocabs and clear chipsets marked for arm mame code:
 
