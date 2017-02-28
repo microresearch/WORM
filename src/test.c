@@ -271,12 +271,16 @@ void main(){
   float carrierbuffer[32], voicebuffer[32],otherbuffer[32];
   float value,   smoothed_adc_value=0, filter_coeff=0.05f;
   //(0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1) // 7f=127
+  unsigned char m_rom_f2=8;
+  float _sely=0.9;
+   unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
+   printf("TMPPPP:     %d\n", tmp);
 
   // test coeff for ADC:
   for (y=0;y<128;y++){
   value=(rand()%255)/255.0f;
   smoothed_adc_value += filter_coeff * (value - smoothed_adc_value);
-  printf(" %f smoothed: %f\n",value, smoothed_adc_value);
+  //  printf(" %f smoothed: %f\n",value, smoothed_adc_value);
   }
   
   int16_t m_inflection=64;

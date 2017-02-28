@@ -1,3 +1,63 @@
+int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is kind of noisy
+  uint16_t sample; u8 x;
+  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
+    //        lenny=96;
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  //  m_cur_f1=(_selz*126.0f)+1;
+  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  // hit end and then newsay
+
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay_rawparam();
+  }
+  return sample;
+}
+
+void votrax_newsay_rawparam(){
+  phone_commit_pbend();
+  lenny=(int)((1.0f-_selz)*12000.0f)+600; // 600 is lowest we can have lenny
+  //  int durry=(int)((1.0f-_selz)*32.0f);
+  // lenny=((16*(durry*4+1)*4*9+2)/30);
+}
+
+void phone_commit_pbend() // parameter bend
+{
+	// Only these two counters are reset on phone change, the rest is
+	// free-running.
+	m_phonetick = 0;
+	m_ticks = 0;
+
+  /*
+    u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
+    u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
+    u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits eac
+   */
+	// order which makes most sense
+
+	m_rom_va  = exy[0]*4.0f;
+	m_rom_f1  = exy[1]*16.0f;
+	m_rom_f2  = exy[2]*16.0f;
+	m_rom_f3  = exy[3]*16.0f;
+	m_rom_f2q = exy[4]*4.0f;
+	m_rom_fc  = exy[5]*16.0f;
+	m_rom_fa  = exy[6]*4.0f;
+	m_rom_cld = exy[7]*12.0f;
+	m_rom_vd  = exy[8]*8.0f;
+	//	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
+	//	m_rom_duration = exy[10]*130.0f;
+	//m_rom_pause = exy[10]+0.5f;
+	m_rom_closure=0;
+	m_rom_pause=0; // pause can be zero or one
+	// we have 12 of exy
+	if(m_rom_cld == 0)
+	  m_cur_closure = m_rom_closure;
+}
+
+
+
 // to one side from 1/2 +
 
 /// - from main.c

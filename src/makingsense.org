@@ -629,8 +629,11 @@ ROM/vocab->GORF/TEST
 
 /////- where we are at?
 
-- bends for votrax to resolve
-- sely and selz on votrax (TTS uses XandY)
+- bends for votrax to resolveDONE
+- sely and selz on votrax (TTS uses XandY)DONE
+
+////
+
 - inverse filtering levels and noise
 - x/y program resolved for all
 - policy for extents (how far we go beyond and does it wrap or something in any cases?)
@@ -644,7 +647,25 @@ ROM/vocab->GORF/TEST
 
 - grouping of TMS vocabs and clear chipsets marked for arm mame code
 - klatt notes
-- other modes
+- other modes and start manual for each mode
+
+** 28/2
+
+- fixing votrax bend - might need some tweaks, change param and deal with X/Y:
+
+xy can be pitch + length of phoneme DONE - test with allDONE
+
+question of wrap on all? TEST!
+
+- pitch is seperate in votrax as extra paramDONE, keep as == on pitch checkDONE, pitch bend is more or less in right place
+
+*test each modeXX and clean up votrax codeDONE, clean up audio.c for first modes*
+
+///
+
+- policy for selx so don't have to repeat eg. real extent etc - struct for each exy mode or?
+
+*TODO- maybe put all selects on Z so leaves x/y*
 
 * TTS 
 
@@ -897,3 +918,43 @@ MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are exte
 ** vocoding
 
 ** data sources/wavetables to generate
+* mode notes for manual
+
+- template
+
+X-
+Y-
+Z-
+TRIGGER-
+
+** VOTRAX
+
+*** straight mode
+
+phonemes
+
+X- select phoneme
+Y- pitch bend
+Z- length of phoneme
+TRIGGER-reset to start of phoneme
+
+*** rawparam mode
+
+X- param xaxis
+Y- param value
+Z- pitch
+TRIGGER-freeze/unfreeze setting of parameters
+
+*** bend mode
+
+X- param xaxis
+Y- param value
+Z- select phrase to bend
+TRIGGER-reset to start of phrase
+
+*** TTS mode
+
+X- text xaxis
+Y- select ascii character for TTS
+Z-bend pitch
+TRIGGER-reset to start

@@ -602,7 +602,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
   samplespeed*=0.5f;
 
   TTS=0;
-  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
+  //  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
   static u8 triggered=0, parammode=0;
   u8 xx=0,readpos;
   float remainder;
@@ -610,9 +610,9 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    if (samplespeed<=1){ 
      while (xx<size){
        if (parammode==0){
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
+	 u8 xaxis=_selx*7.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,6); // how can we test the extent for the CV in
+	 xaxis=6-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
        }
 
@@ -644,9 +644,9 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
      while (xx<size){
 
        if (parammode==0){
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
+	 u8 xaxis=_selx*7.0f; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,6); // how can we test the extent for the CV in
+	 xaxis=6-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
        }
 
@@ -675,23 +675,23 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 };
 
 
-void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){// TODO - as now we don;t bend with selx
+void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   samplespeed*=0.5f;
 
   TTS=0;
-  if (trigger==1) votrax_newsay_bend(); // selector is in newsay
+  if (trigger==1) votrax_newsay_bend(1); // selector is in newsay
   static u8 triggered=0, parammode=0;
   u8 xx=0,readpos;
   float remainder;
 
    if (samplespeed<=1){ 
      while (xx<size){
-       if (parammode==0){
-	 u8 xaxis=_selx*8.0f; // 8 params 0-7 - as int rounds down
-	 MAXED(xaxis,7); // how can we test the extent for the CV in
-	 xaxis=7-xaxis;
+       //       if (parammode==0){
+	 u8 xaxis=_selx*9.0f; // 8 params 
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-       }
+	 //       }
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sample_bend();
@@ -709,8 +709,8 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
 	 */
 	 triggered=1;
-	 parammode^=1;
-
+	 //	 parammode^=1;
+	 votrax_newsay_bend(1); // selector is in newsay
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 
@@ -720,12 +720,12 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
-       if (parammode==0){
-	 u8 xaxis=_selx*8.0f; //
-	 MAXED(xaxis,7); // how can we test the extent for the CV in
-	 xaxis=7-xaxis;
+       //       if (parammode==0){
+	 u8 xaxis=_selx*9.0f; //
+	 MAXED(xaxis,8); // how can we test the extent for the CV in
+	 xaxis=8-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-       }
+	 //       }
               samplel=votrax_get_sample_bend();
 
        if (samplepos>=samplespeed) {       
@@ -739,7 +739,8 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
 	 */
 	 triggered=1;
-	 parammode^=1;
+	 //	 parammode^=1;
+	 votrax_newsay_bend(1); // selector is in newsay
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
 	 xx++;

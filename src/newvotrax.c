@@ -186,8 +186,8 @@ void device_reset()
 	phone_commit();
 
 	// Clear the interpolation sram
-	m_cur_fa = m_cur_fc = m_cur_va = 0;
-	m_cur_f1 = m_cur_f2 = m_cur_f2q = m_cur_f3 = 0;
+	m_cur_fa = m_cur_fc = m_cur_va = m_cur_fa_orig = m_cur_fc_orig = m_cur_va_orig = 0;
+	m_cur_f1 = m_cur_f2 = m_cur_f2q = m_cur_f3 = m_cur_f1_orig = m_cur_f2_orig = m_cur_f2q_orig = m_cur_f3_orig = 0;
 
 	// Initialize the m_filt* values and the filter coefficients
 	filters_commit(true);
@@ -231,8 +231,6 @@ void phone_commit()
 	  //	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
 	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
 	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
-	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
-	    //	    printf("I:%d\n",i);
 			m_rom_f1  = BITSWAP4(val,  0,  7, 14, 21);
 #ifdef LAP
 			printf("ROMF1%d\n",m_rom_f1); // this works
@@ -252,22 +250,14 @@ void phone_commit()
 			m_rom_vd  = BITSWAP4(val, 35, 33, 31, 29);
 
 			m_rom_closure  = BITSWAP1(val, 36);
-			//			printf("closure: %d\n",m_rom_closure); // this works
 			m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
 
-			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
 			// Hard-wired on the die, not an actual part of the rom.
 			m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
-
-			//			if(0)
-			//	logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
 #ifdef LAP
 			//			printf("ROMF1%d\n",m_rom_f1); // this works
 	printf("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
 #endif
-
-
-
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
 			if(m_rom_cld == 0)
@@ -276,91 +266,6 @@ void phone_commit()
 			return;
 		}
 	}
-}
-
-void phone_commit_bend()
-{
-	// Only these two counters are reset on phone change, the rest is
-	// free-running.
-	m_phonetick = 0;
-	m_ticks = 0;
-
-	// In the real chip, the rom is re-read all the time.  Since it's
-	// internal and immutable, no point in not caching it though.
-	for(int i=0; i<512; i+=8) {// added +8 
-	  //	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
-	  u64 val = *(u64 *)(m_rom+i);// was reinterpet_cast
-	  if(m_phone == ((val >> 56) & 0x3f)) {// matches but????
-	    //	  printf("xxxxxxxxxxxxx %d\n",((val >> 56) & 0x3f));
-	    //	    printf("I:%d\n",i);
-	    m_rom_f1_orig  = BITSWAP4(val,  0,  7, 14, 21);
-	    m_rom_va  = BITSWAP4(val,  1,  8, 15, 22);
-	    m_rom_f2_orig  = BITSWAP4(val,  2,  9, 16, 23);
-	    m_rom_fc_orig  = BITSWAP4(val,  3, 10, 17, 24);
-	    m_rom_f2q_orig = BITSWAP4(val,  4, 11, 18, 25);
-	    m_rom_f3_orig  = BITSWAP4(val,  5, 12, 19, 26);
-	    m_rom_fa_orig  = BITSWAP4(val,  6, 13, 20, 27);
-			// These two values have their bit orders inverted
-			// compared to everything else due to a bug in the
-			// prototype (miswiring of the comparator with the ticks
-			// count) they compensated in the rom.
-
-	    m_rom_cld_orig = BITSWAP4(val, 34, 32, 30, 28);
-	    m_rom_vd_orig  = BITSWAP4(val, 35, 33, 31, 29);
-
-	    m_rom_closure  = BITSWAP1(val, 36);
-			//			printf("closure: %d\n",m_rom_closure); // this works
-	    m_rom_duration = BITSWAP7(~val, 37, 38, 39, 40, 41, 42, 43);
-
-			//			printf("rom_durxxxxxxxxxx %d\n",m_rom_duration);
-			// Hard-wired on the die, not an actual part of the rom.
-	    m_rom_pause = (m_phone == 0x03) || (m_phone == 0x3e);
-
-			//			if(0)
-			//	logerror("commit fa=%x va=%x fc=%x f1=%x f2=%x f2q=%x f3=%x dur=%02x cld=%x vd=%d cl=%d pause=%d\n", m_rom_fa, m_rom_va, m_rom_fc, m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3, m_rom_duration, m_rom_cld, m_rom_vd, m_rom_closure, m_rom_pause);
-
-			// That does not happen in the sc01(a) rom, but let's
-			// cover our behind.
-			if(m_rom_cld == 0)
-				m_cur_closure = m_rom_closure;
-
-			return;
-		}
-	}
-}
-
-
-void phone_commit_pbend() // parameter bend
-{
-	// Only these two counters are reset on phone change, the rest is
-	// free-running.
-	m_phonetick = 0;
-	m_ticks = 0;
-
-  /*
-    u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
-    u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
-    u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits eac
-   */
-	// order which makes most sense
-
-	m_rom_va  = exy[0]*4.0f;
-	m_rom_f1  = exy[1]*16.0f;
-	m_rom_f2  = exy[2]*16.0f;
-	m_rom_f3  = exy[3]*16.0f;
-	m_rom_f2q = exy[4]*4.0f;
-	m_rom_fc  = exy[5]*16.0f;
-	m_rom_fa  = exy[6]*4.0f;
-	m_rom_cld = exy[7]*12.0f;
-	m_rom_vd  = exy[8]*8.0f;
-	//	m_rom_closure  = exy[9]+0.5f; // does this give us 1 or 0? YES!
-	//	m_rom_duration = exy[10]*130.0f;
-	//m_rom_pause = exy[10]+0.5f;
-	m_rom_closure=0;
-	m_rom_pause=0; // pause can be zero or one
-	// we have 12 of exy
-	if(m_rom_cld == 0)
-	  m_cur_closure = m_rom_closure;
 }
 
 
@@ -371,6 +276,124 @@ u8 interpolate(u8 reg, u8 target) // does nothing as it was
 	reg = reg - (reg >> 3) + (target << 1);
 	return reg;
 }
+
+void chip_update_bend()
+{
+	// Phone tick counter update.  Stopped when ticks reach 16.
+	// Technically the counter keeps updating, but the comparator is
+	// disabled.
+	if(m_ticks != 0x10) {
+	  //	  printf("MTICKS: %d %d %d\n",m_ticks, m_phonetick, m_rom_cld);
+
+	  m_phonetick++;
+		// Comparator is with duration << 2, but there's a one-tick
+		// delay in the path.
+	  if(m_phonetick == ((m_rom_duration << 2) | 1)) {
+			m_phonetick = 0;
+			m_ticks++;
+			if(m_ticks == m_rom_cld)
+				m_cur_closure = m_rom_closure;
+				}
+		}
+
+	// The two update timing counters.  One divides by 16, the other
+	// by 48, and they're phased so that the 208Hz counter ticks
+	// exactly between two 625Hz ticks.
+	m_update_counter++;
+	if(m_update_counter == 0x30)
+		m_update_counter = 0;
+
+	bool tick_625 = !(m_update_counter & 0xf);
+	bool tick_208 = m_update_counter == 0x28;
+
+	// Formant update.  Die bug there: fc should be updated, not va.
+	// The formants are frozen on a pause phone unless both voice and
+	// noise volumes are zero.
+	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
+		//      interpolate(m_cur_va,  m_rom_va);
+	  // what ranges these should be?
+	  // and which should be inverted (no inversion in audio.c)
+	  m_cur_fc_orig=interpolate(m_cur_fc_orig,  m_rom_fc);
+	  m_cur_f1_orig=interpolate(m_cur_f1_orig,  m_rom_f1);
+	  m_cur_f2_orig=interpolate(m_cur_f2_orig,  m_rom_f2);
+	  m_cur_f2q_orig=interpolate(m_cur_f2q_orig, m_rom_f2q);
+	  m_cur_f3_orig=interpolate(m_cur_f3_orig,  m_rom_f3);
+	  m_cur_f1=m_cur_f1_orig+(128-(exy[2]*256.0f)); // TESTING!
+	  m_cur_f2=m_cur_f2_orig+(64-(exy[3]*128.0f)); // TESTING!
+	  m_cur_f3=m_cur_f3_orig+(64-(exy[4]*128.0f)); // TESTING!
+	  m_cur_f2q=m_cur_f2q_orig+(64-(exy[5]*128.0f)); // TESTING!
+	  m_cur_fc=m_cur_fc_orig+(64-(exy[6]*128.0f)); // TESTING!
+	}
+
+	// Non-formant update. Same bug there, va should be updated, not fc.
+	if(tick_625) {
+	  if(m_ticks >= m_rom_vd){
+		  m_cur_fa_orig=interpolate(m_cur_fa_orig, m_rom_fa);
+		  m_cur_fa=m_cur_fa_orig+(64-(exy[7]*128.0f)); // TESTING!
+	  }
+		if(m_ticks >= m_rom_cld){
+			//          interpolate(m_cur_fc, m_rom_fc);
+				  
+		  m_cur_va_orig=interpolate(m_cur_va_orig, m_rom_va);
+		  m_cur_va=m_cur_va_orig+(64-(exy[1]*128.0f)); // TESTING!
+
+		}
+	}
+
+	// Closure counter, reset every other tick in theory when not
+	// active (on the extra rom cycle).
+	//
+	// The closure level is immediatly used in the analog path,
+	// there's no pitch synchronization.
+
+	if(!m_cur_closure && (m_filt_fa || m_filt_va))
+		m_closure = 0;
+	else if(m_closure != 7 << 2)
+		m_closure ++;
+
+	// Pitch counter.  Equality comparison, so it's possible to make
+	// it miss by manipulating the inflection inputs, but it'll wrap.
+	// There's a delay, hence the +1.
+	m_pitch = (m_pitch + 1) & 0x7f;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-exy[0])*64.0f)-8)) + 1)) m_pitch = 0;
+
+	// Filters are updated in index 1 of the pitch wave, which does
+	// indeed mean four times in a row.
+	if((m_pitch >> 2) == 1){
+		filters_commit(false);
+	}
+	// Noise shift register.  15 bits, with a nxor on the last two
+	// bits for the loop.
+	bool inp = (1||m_filt_fa) && m_cur_noise && (m_noise != 0x7fff);
+	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
+	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
+}
+
+void chip_update_raw()
+{
+  m_cur_f1=exy[1]*255.0f;
+  m_cur_f2=exy[2]*255.0f;
+  m_cur_f3=exy[3]*255.0f;
+  m_cur_f2q=exy[4]*255.0f;
+  m_cur_fc=exy[5]*255.0f;
+  m_cur_fa=exy[6]*255.0f;
+  m_cur_va=exy[0]*255.0f;
+
+  m_pitch = (m_pitch + 1) & 0x7f;
+  if (m_pitch == (0x7f ^  ((int)((1.0f-_selz)*64.0f)) + 1)) m_pitch = 0;
+	
+	// Filters are updated in index 1 of the pitch wave, which does
+	// indeed mean four times in a row.
+	if((m_pitch >> 2) == 1){
+		filters_commit(false);
+	}
+	// Noise shift register.  15 bits, with a nxor on the last two
+	// bits for the loop.
+	bool inp = (1||m_filt_fa) && m_cur_noise && (m_noise != 0x7fff);
+	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
+	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
+}
+
 
 void chip_update()
 {
@@ -406,12 +429,11 @@ void chip_update()
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		//      interpolate(m_cur_va,  m_rom_va);
-		m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
-		m_cur_f1=interpolate(m_cur_f1,  m_rom_f1);
-		m_cur_f2=interpolate(m_cur_f2,  m_rom_f2);
-		m_cur_f2q=interpolate(m_cur_f2q, m_rom_f2q);
-		m_cur_f3=interpolate(m_cur_f3,  m_rom_f3);
-		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+	  m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
+	  m_cur_f1=interpolate(m_cur_f1,  m_rom_f1);
+	  m_cur_f2=interpolate(m_cur_f2,  m_rom_f2);
+	  m_cur_f2q=interpolate(m_cur_f2q, m_rom_f2q);
+	  m_cur_f3=interpolate(m_cur_f3,  m_rom_f3);
 	}
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
@@ -422,9 +444,7 @@ void chip_update()
 			//          interpolate(m_cur_fc, m_rom_fc);
 				  
 		  m_cur_va=interpolate(m_cur_va, m_rom_va);
-		  //		  printf("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx %d %d\n",m_cur_va, m_rom_va); // NEVER!
 		}
-		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
 	}
 
 	// Closure counter, reset every other tick in theory when not
@@ -442,15 +462,9 @@ void chip_update()
 	// it miss by manipulating the inflection inputs, but it'll wrap.
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
-	//		if(m_pitch >= (0x7f ^ (int)(_sely*128.0f) ^ m_filt_f1) + 1)
-	if (TTS==0){
-	  //	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_sely)*64.0f)-8)) + 1)) m_pitch = 0;
-	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0;
-	//	if (m_pitch>=(_sely*111.0f)+16) // wierd peaks
-	}
-	else 
-	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selz)*64.0f)-8)) + 1)) m_pitch = 0;
-	
+
+	// tuning this DONE
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_sely)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -464,8 +478,90 @@ void chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//  logerror("tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 2, m_pitch & 3, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
+
+void chip_updateTTS()
+{
+	// Phone tick counter update.  Stopped when ticks reach 16.
+	// Technically the counter keeps updating, but the comparator is
+	// disabled.
+	if(m_ticks != 0x10) {
+	  //	  printf("MTICKS: %d %d %d\n",m_ticks, m_phonetick, m_rom_cld);
+
+	  m_phonetick++;
+		// Comparator is with duration << 2, but there's a one-tick
+		// delay in the path.
+	  if(m_phonetick == ((m_rom_duration << 2) | 1)) {
+			m_phonetick = 0;
+			m_ticks++;
+			if(m_ticks == m_rom_cld)
+				m_cur_closure = m_rom_closure;
+				}
+		}
+
+	// The two update timing counters.  One divides by 16, the other
+	// by 48, and they're phased so that the 208Hz counter ticks
+	// exactly between two 625Hz ticks.
+	m_update_counter++;
+	if(m_update_counter == 0x30)
+		m_update_counter = 0;
+
+	bool tick_625 = !(m_update_counter & 0xf);
+	bool tick_208 = m_update_counter == 0x28;
+
+	// Formant update.  Die bug there: fc should be updated, not va.
+	// The formants are frozen on a pause phone unless both voice and
+	// noise volumes are zero.
+	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
+		//      interpolate(m_cur_va,  m_rom_va);
+	  m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
+	  m_cur_f1=interpolate(m_cur_f1,  m_rom_f1);
+	  m_cur_f2=interpolate(m_cur_f2,  m_rom_f2);
+	  m_cur_f2q=interpolate(m_cur_f2q, m_rom_f2q);
+	  m_cur_f3=interpolate(m_cur_f3,  m_rom_f3);
+	}
+
+	// Non-formant update. Same bug there, va should be updated, not fc.
+	if(tick_625) {
+		if(m_ticks >= m_rom_vd)
+			m_cur_fa=interpolate(m_cur_fa, m_rom_fa);
+		if(m_ticks >= m_rom_cld){
+			//          interpolate(m_cur_fc, m_rom_fc);
+				  
+		  m_cur_va=interpolate(m_cur_va, m_rom_va);
+		}
+	}
+
+	// Closure counter, reset every other tick in theory when not
+	// active (on the extra rom cycle).
+	//
+	// The closure level is immediatly used in the analog path,
+	// there's no pitch synchronization.
+
+	if(!m_cur_closure && (m_filt_fa || m_filt_va))
+		m_closure = 0;
+	else if(m_closure != 7 << 2)
+		m_closure ++;
+
+	// Pitch counter.  Equality comparison, so it's possible to make
+	// it miss by manipulating the inflection inputs, but it'll wrap.
+	// There's a delay, hence the +1.
+	m_pitch = (m_pitch + 1) & 0x7f;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selz)*64.0f)-8)) + 1)) m_pitch = 0;
+	
+
+	// Filters are updated in index 1 of the pitch wave, which does
+	// indeed mean four times in a row.
+	if((m_pitch >> 2) == 1){
+		filters_commit(false);
+	}
+	// Noise shift register.  15 bits, with a nxor on the last two
+	// bits for the loop.
+	bool inp = (1||m_filt_fa) && m_cur_noise && (m_noise != 0x7fff);
+	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
+	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
+}
+
 
 void filters_commit(bool force)
 {
@@ -541,26 +637,18 @@ void filters_commit(bool force)
 								  9523,
 								  14083);
 	}
-
-	//	if(0)
-	//	if(m_filt_fa || m_filt_va || m_filt_fc || m_filt_f1 || m_filt_f2 || m_filt_f2q || m_filt_f3)
-	//		logerror("filter fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%x f3=%x\n",
-	//				 m_filt_fa, m_filt_va, m_filt_fc, m_filt_f1, m_filt_f2, m_filt_f2q, m_filt_f3);
 }
 
 u32 analog_calc()
 {
 	// Voice-only path.
 	// 1. Pick up the pitch wave
-  //  printf("rom_durcalcxxxxxxxxxx %d\n",m_rom_duration);
 
 	float v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
-	//	printf("vvvvvv%f\n",v);
 
 	// 2. Multiply by the initial amplifier.  It's linear on the die,
 	// even if it's not in the patent.
 	v = v * m_filt_va / 15.0f;
-	//	printf("vvvvvv%f %f\n",v, m_filt_va);
 	shift_hist(v, m_voice_1, 4);
 
 	// 3. Apply the f1 filter
@@ -1019,7 +1107,7 @@ void generate_votrax_samples(int samples)
 	}
 }
 
-static int lenny;
+static unsigned int lenny;
 
 void votrax_init(){
   device_start();
@@ -1040,21 +1128,15 @@ void votrax_newsay(){
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  //  inflection_w(p1[x]>>6); // TODO as bend!
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
-  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
+  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
 }
 
 int16_t votrax_get_sample(){ // TODO: trying new model
   uint16_t sample; u8 x;
-  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
-
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  //  m_cur_f1=(_selz*126.0f)+1;
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
     votrax_newsay();
@@ -1062,51 +1144,27 @@ int16_t votrax_get_sample(){ // TODO: trying new model
   return sample;
 }
 
-/////
-
-void votrax_newsay_rawparam(){
-  phone_commit_pbend();
-  lenny=(int)((1.0f-_selz)*12000.0f)+600; // 600 is lowest we can have lenny
-  //  int durry=(int)((1.0f-_selz)*32.0f);
-  // lenny=((16*(durry*4+1)*4*9+2)/30);
-}
-
 int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is kind of noisy
   uint16_t sample; u8 x;
-  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
-    //        lenny=96;
   m_sample_count++;
   if(m_sample_count & 1)
-    chip_update();
-  //  m_cur_f1=(_selz*126.0f)+1;
+    chip_update_raw();
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
-  // hit end and then newsay
-
-  if (sample_count++>=lenny){
-    sample_count=0;
-    votrax_newsay_rawparam();
-  }
   return sample;
 }
 
 /////
 
-void votrax_newsay_bend(){
+void votrax_newsay_bend(u8 reset){
   signed char tmp;
   u8 it;
-  /*
-  u8 sel=_selz*65.0f; // is it 64 TODO! // SELZ is select and x/y
-  MAXED(sel,64);
-  sel=64-sel;
-  writer(sel); // what are we writing - is ROM index
-  */
   // do bend now for GORF:
   static u8 vocabindex=0, whichone=0;
   it=*(vocablist_gorf[whichone]+vocabindex);
   vocabindex++;
-  if (it==255){
+  if (it==255  || reset==1){
     vocabindex=0;
-    whichone=_selx*117.0f; 
+    whichone=_selz*117.0f; 
     MAXED(whichone,114);
     whichone=114-whichone;
     it=*(vocablist_gorf[whichone]+vocabindex);
@@ -1114,76 +1172,22 @@ void votrax_newsay_bend(){
 
   writer(it); 
   phone_commit();
-  //  inflection_w(p1[x]>>6); // TODO as bend!
- 
-  // TODO: maybe try just f1 and f2 on selx and sely
-    tmp=m_rom_f1+(8-(_selx*16.0f));
-    if (tmp>=0) tmp=0;
-    if (tmp>15) tmp=15;
-    m_rom_f1=tmp;
-
-    tmp=m_rom_f2+(8-(_sely*16.0f));
-    if (tmp>=0) tmp=0;
-    if (tmp>15) tmp=15;
-    m_rom_f2=tmp;
- 
-  /*
-  tmp=m_rom_f1_orig+(8-(int)(exy[0]*16.0f));
-  if (tmp>=0) m_rom_f1=tmp;
-  else m_rom_f1=0;
-  tmp=m_rom_f2_orig+(8-(int)(exy[1]*16.0f));
-  if (tmp>=0) m_rom_f2=tmp;
-  else m_rom_f2=0;
-  tmp=m_rom_f3_orig+(8-(int)(exy[2]*16.0f));
-  if (tmp>=0) m_rom_f3=tmp;
-  else m_rom_f3=0;
-  tmp=m_rom_f2q_orig+(2-(int)(exy[3]*4.0f));
-  if (tmp>=0) m_rom_f2q=tmp;
-  else m_rom_f2q=0;
-  tmp=m_rom_fc_orig+(8-(int)(exy[4]*16.0f));
-  if (tmp>=0) m_rom_fc=tmp;
-  else m_rom_fc=0;
-  tmp=m_rom_fa_orig+(2-(int)(exy[5]*4.0f));
-  if (tmp>=0) m_rom_fa=tmp;
-  else m_rom_fa=0;
-  tmp=m_rom_cld_orig+(6-(int)(exy[6]*12.0f));
-  if (tmp>=0) m_rom_cld_orig=tmp;
-  else m_rom_cld_orig=0;
-  tmp=m_rom_vd_orig+(4-(int)(exy[7]*8.0f));
-  if (tmp>=0) m_rom_vd_orig=tmp;
-  else m_rom_vd_orig=0;
-  */
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
-  //  lenny=((float)(16.0f * (m_rom_duration*_selz *4.0f + 1.0f))*4*9+2)/30; // what of sample-rate?  - check this length when we come to vocab
+  lenny=((16*(m_rom_duration*(1.2f-exy[8])*16+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
 }
 
 int16_t votrax_get_sample_bend(){ // TODO: trying new model
   uint16_t sample; u8 x;
-  //  m_cclock = m_mainclock / intervals[(int)(_selz*8.0f)]; // TESTING - might need to be array of intervals ABOVE
-  
-  // TODO: all those orig BENT below = 10 values - and if ==0
-  //  m_rom_duration=m_rom_duration_orig+(64-(int)(exy[0]*128.0f)); // keep duration
-
-  /*
-    u8 m_rom_vd, m_rom_cld;                         // Duration in ticks of the "voice" and "closure" delays, 4 bits
-    u8 m_rom_fa, m_rom_fc, m_rom_va;                // Analog parameters, noise volume, noise freq cutoff and voice volume, 4 bits each
-    u8 m_rom_f1, m_rom_f2, m_rom_f2q, m_rom_f3;     // Analog parameters, formant frequencies and Q, 4 bits eac
-   */
-
-  // TODO change this order to match other bends and also what makes most sense
-  // TODO stop wrapping so only goes down to 0 - these are u8
-
-  // we have closure and pause already
   
   m_sample_count++;
-  if(m_sample_count & 1)
-    chip_update();
-  //  m_cur_f1=(_selz*126.0f)+1;
+  if(m_sample_count & 1){
+    chip_update_bend();        
+  }
+
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
-    votrax_newsay_bend();
+    votrax_newsay_bend(0);
   }
   return sample;
 }
@@ -1206,7 +1210,7 @@ void votrax_newsaygorf(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
   }
   
 void votrax_newsaywow(u8 reset){
@@ -1224,7 +1228,7 @@ void votrax_newsaywow(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
 }
 
 int16_t votrax_get_samplegorf(){ 
@@ -1233,7 +1237,6 @@ int16_t votrax_get_samplegorf(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  //  m_cur_f1=(_sely*126.0f)+1;
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
   if (sample_count++>=lenny){
@@ -1249,7 +1252,6 @@ int16_t votrax_get_samplewow(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  //  m_cur_f1=(_sely*126.0f)+1;
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
   if (sample_count++>=lenny){
@@ -1264,7 +1266,7 @@ void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+    lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
   TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
@@ -1276,7 +1278,7 @@ int16_t votrax_get_sampleTTS(){
   int16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
-    chip_update();
+    chip_updateTTS();
   sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
   // hit end and then newsay
   if (sample_count++>=lenny){
@@ -1288,11 +1290,13 @@ int16_t votrax_get_sampleTTS(){
 
 void votrax_retriggerTTS(){
   TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
-  if (TTSindex>=TTSlength)     TTSindex=0;
+  //  if (TTSindex>=TTSlength)     TTSindex=0;
+  TTSindex=0;
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+  TTSindex++;
 }
 
 #endif
@@ -1307,8 +1311,7 @@ void main(void){
   // set up
   device_start();
   device_reset();
-
-  //  const unsigned char TTStest[]  = {24,44, 10, 32, 17, 22, 0, 54, 10, 29, 0, 44, 15, 16, 17, 22, 0, 14, 29, 0, 4, 20, 22, 22, 0}; // first as length};
+;
   const unsigned char TTStest[]  = {24, 27, 0, 24, 38, 40, 62, 57, 0, 43, 62, 27, 36, 61, 38, 40, 62, 36, 43, 62, 41, 40, 40, 0, 62};
   
   // try and say
