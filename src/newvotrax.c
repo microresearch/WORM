@@ -1120,15 +1120,15 @@ void votrax_init(){
 ////[[[[[[[[[[[[[[[[[[[ audio functions:
 
 static int16_t sample_count=0;
-static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
+//static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
 
 void votrax_newsay(){
-  u8 sel=_selx*65.0f; // is it 64 TODO!
+  u8 sel=_selz*65.0f; // is it 64 TODO!
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
+  lenny=((16*(m_rom_duration*(1.05f-_selx)*32+1)*4*9+2)/30); 
 }
 
 int16_t votrax_get_sample(){ // TODO: trying new model

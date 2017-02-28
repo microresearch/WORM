@@ -3,6 +3,9 @@
 #include "stdlib.h"
 #include "forlap.h"
 
+#include "LPC/roms/vocab_2303.h"
+
+
 typedef struct {
   float samplepos;
   u8 phonem, trigger;
@@ -276,6 +279,17 @@ void main(){
    unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
    printf("TMPPPP:     %d\n", tmp);
 
+typedef struct TMS_vocab__ {
+  // pointer to const
+  const uint8_t **wordlist;
+  uint16_t extent;
+  float extentplus;
+} TMS_vocab;
+
+ TMS_vocab vocab_2303={wordlist_spell2303, 102, 104.0f};
+
+ printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
+   
   // test coeff for ADC:
   for (y=0;y<128;y++){
   value=(rand()%255)/255.0f;

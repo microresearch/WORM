@@ -625,31 +625,12 @@ still not happy with bending of votrax so maybe ditch or...
 
 votrax bend questions: that parameters are very tight (4 bits) and
 cannot exceed these values, bend makes more sense for
-ROM/vocab->GORF/TEST
-
-/////- where we are at?
+ROM/vocab->GORF/TEST -DONE
 
 - bends for votrax to resolveDONE
 - sely and selz on votrax (TTS uses XandY)DONE
 
-////
-
-- inverse filtering levels and noise
-- x/y program resolved for all
-- policy for extents (how far we go beyond and does it wrap or something in any cases?)
-- re-look at sp0256bend and finalise all first modes
-
-- start on TMS and bends of//TMS TTS->
-
-- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
-  choppy???// also signal end of with 255->DONE - testing in lpc_say -
-  but may not be so in TMS5220 code RE_TEST!
-
-- grouping of TMS vocabs and clear chipsets marked for arm mame code
-- klatt notes
-- other modes and start manual for each mode
-
-** 28/2
+** 28/2 +
 
 - fixing votrax bend - might need some tweaks, change param and deal with X/Y:
 
@@ -659,13 +640,39 @@ question of wrap on all? TEST!
 
 - pitch is seperate in votrax as extra paramDONE, keep as == on pitch checkDONE, pitch bend is more or less in right place
 
-*test each modeXX and clean up votrax codeDONE, clean up audio.c for first modes*
+*test each modeXX and clean up votrax codeDONE, clean up audio.c for first modesDONE*
 
 ///
 
-- policy for selx so don't have to repeat eg. real extent etc - struct for each exy mode or?
+- policy for selx so don't have to repeat eg. real extent etc - struct for each exy mode or?DONE - in audio.c/h
 
-*TODO- maybe put all selects on Z so leaves x/y*
+*TODO- put all selects on Z so leaves x/y* - DONE for votrax, TODO for sp0256DONE-TEST
+
+////
+
+- inverse filtering levels and noise
+- check speed of inverse_filter -> sp0256
+- x/y program resolved for all
+- policy for extents (how far we go beyond and does it wrap or something in any cases?)
+
+- re-look at sp0256bend - moved changes into sample loop. toggle is still new phrase
+
+*also for trigger for LPC in we can do freeze of coeffs - for later modes as in raven*
+
+- finalise all first modes 256/votrax so far
+
+- start on TMS and bends of//TMS TTS->
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+- TMS: test coeff switching struct, grouping of TMS vocabs and clear chipsets marked for arm mame code:
+
+
+
+- klatt notes
+- other modes and start manual for each mode
 
 * TTS 
 
@@ -807,12 +814,10 @@ but we need to group/cross off phonemes
 
 * TMS ROMS
 
-classify each ROM in tms dir
+classify each ROM in LPC/roms directory
 
 ** 5100-speak and spell
-
 ** 5200- early echo II, disks of TRON????, TI99/4 
-
 ** 5220- later echo II, BBC MICRO
 
 * notes from README.org
@@ -860,6 +865,8 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
 8. vocoder
 
 - vocoder also with compost AND with live generation of selected algos as VOICE and with INPUT as INSTRUMENT//EXCITATION
+
+vocoder - channelv?, testvoc? svf? wvocoder - check all notes
 
 9. vosim/fof etc.
 10. tube and ntube/glottal/wavetable
@@ -920,7 +927,7 @@ MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are exte
 ** data sources/wavetables to generate
 * mode notes for manual
 
-*** template
+** template
 
 X-
 Y-
@@ -929,15 +936,64 @@ TRIGGER-
 
 ** SP0256
 
+*** phonemes
+
+X- period/pitch
+Y- repeat/length?
+Z- select phoneme
+TRIGGER- phoneme start
+
+*** TTS
+
+X- text xaxis
+Y- select ascii character for TTS
+Z- period/pitch
+TRIGGER- rephrase TTS
+
+*** sp0256vocabone
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256vocabtwo 
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256_1219
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256bend
+
+X- param xaxis
+Y- param value
+Z- select phrase to bend - rom12+19
+TRIGGER- new phrase
+
+*** withLPC ??
+
+X- period/pitch
+Y- repeat/length
+Z- select phrase
+TRIGGER- new phrase
+
 ** VOTRAX
 
 *** straight mode
 
 phonemes
 
-X- select phoneme
+X- length of phoneme
 Y- pitch bend
-Z- length of phoneme
+Z- select phoneme
 TRIGGER-reset to start of phoneme
 
 *** rawparam mode
@@ -959,4 +1015,4 @@ TRIGGER-reset to start of phrase
 X- text xaxis
 Y- select ascii character for TTS
 Z-bend pitch
-TRIGGER-reset to start
+TRIGGER-reset to start/redo TTS

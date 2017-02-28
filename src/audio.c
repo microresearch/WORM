@@ -1,8 +1,3 @@
-/*
- * audio.c - justttt the callback 
-
-*/
-
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
@@ -93,7 +88,8 @@ static adc_transform transform[5] = {
   {SPEED, 1, 0.1f, 8.0f} // what was former speed range?
 };
 
-extern unsigned char m_rome[256];
+
+
 extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
 u8 _intspeed, _intmode=0, trigger=0;
@@ -358,12 +354,8 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 
 
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  extent sp0256bendextent={13,14.0f};
   TTS=0;
-  // or should thus be in sample loop? TODO!
-  u8 xaxis=_selx*14.0f; //0-16 for r, but now 14 params 0-13
-  MAXED(xaxis,13);
-  xaxis=13-xaxis;
-  exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
     
   if (trigger==1) sp0256_newsaybend(); // selector is in newsay
   static u8 triggered=0;
@@ -372,6 +364,10 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   samplespeed/=8.0;
    if (samplespeed<=1){ 
      while (xx<size){
+       u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,sp0256bendextent.max);
+       xaxis=sp0256bendextent.max-xaxis;
+       exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=sp0256_get_samplebend();
@@ -391,7 +387,12 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
-              samplel=sp0256_get_samplebend();
+         u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,sp0256bendextent.max);
+	 xaxis=sp0256bendextent.max-xaxis;
+	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+
+	 samplel=sp0256_get_samplebend();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -599,8 +600,8 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 };
 
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NOTES - needs trigger but is this best way?
+  extent votraxparamextent={6,7.0f};
   samplespeed*=0.5f;
-
   TTS=0;
   //  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
   static u8 triggered=0, parammode=0;
@@ -610,9 +611,9 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    if (samplespeed<=1){ 
      while (xx<size){
        if (parammode==0){
-	 u8 xaxis=_selx*7.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,6); // how can we test the extent for the CV in
-	 xaxis=6-xaxis;
+	 u8 xaxis=_selx*votraxparamextent.maxplus; // 9 params 0-8 - as int rounds down
+	 MAXED(xaxis,votraxparamextent.max); // how can we test the extent for the CV in
+	 xaxis=votraxparamextent.max-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
        }
 
@@ -624,14 +625,6 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-
-	 /*
-	 // attempt toggle this
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-	 */
 	 triggered=1;
 	 parammode^=1;
 	   }
@@ -644,9 +637,9 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
      while (xx<size){
 
        if (parammode==0){
-	 u8 xaxis=_selx*7.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,6); // how can we test the extent for the CV in
-	 xaxis=6-xaxis;
+	 u8 xaxis=_selx*votraxparamextent.maxplus; 
+	 MAXED(xaxis,votraxparamextent.max); // how can we test the extent for the CV in
+	 xaxis=votraxparamextent.max-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
        }
 
@@ -655,13 +648,6 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 /*
-	 // attempt toggle this
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-	 */
 	 triggered=1;
 	 parammode^=1;
 	   }
@@ -676,8 +662,8 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
 
 void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  extent votraxbendextent={8,9.0f};
   samplespeed*=0.5f;
-
   TTS=0;
   if (trigger==1) votrax_newsay_bend(1); // selector is in newsay
   static u8 triggered=0, parammode=0;
@@ -686,12 +672,10 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 
    if (samplespeed<=1){ 
      while (xx<size){
-       //       if (parammode==0){
-	 u8 xaxis=_selx*9.0f; // 8 params 
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
+	 u8 xaxis=_selx*votraxbendextent.maxplus; // 8 params 
+	 MAXED(xaxis,votraxbendextent.max); // how can we test the extent for the CV in
+	 xaxis=votraxbendextent.max-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 //       }
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sample_bend();
@@ -700,46 +684,26 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-
-	 // attempt toggle this
-	 /*
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
-	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 */
 	 triggered=1;
-	 //	 parammode^=1;
 	 votrax_newsay_bend(1); // selector is in newsay
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=samplespeed;
      }
    }
    else { 
      while (xx<size){
-       //       if (parammode==0){
-	 u8 xaxis=_selx*9.0f; //
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
+	 u8 xaxis=_selx*votraxbendextent.maxplus; //
+	 MAXED(xaxis,votraxbendextent.max); // how can we test the extent for the CV in
+	 xaxis=votraxbendextent.max-xaxis;
 	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 //       }
               samplel=votrax_get_sample_bend();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 // attempt toggle this
-	 /*
-	 u8 xaxis=_selx*9.0f; // 9 params 0-8 - as int rounds down
-	 MAXED(xaxis,8); // how can we test the extent for the CV in
-	 xaxis=8-xaxis;
-	 exy[xaxis]=_sely; // no multiplier and NOT inverted here
-	 */
 	 triggered=1;
-	 //	 parammode^=1;
 	 votrax_newsay_bend(1); // selector is in newsay
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -786,8 +750,6 @@ void sp0256_within_basic(int16_t* incoming,  int16_t* outgoing, float samplespee
 }
 
 void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
-  // REMOVED TRIGGERED ON IN!!!
-  // how do we keep voice speed consistent
 
   TTS=0;
   // added trigger
@@ -808,7 +770,7 @@ void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	 samplel=sp0256_get_sample_withLPC(outgo[xx]); // check this!
 	 //	 samplel=outgo[(x++)%size];
 	 samplepos-=1.0f;
        }
@@ -839,8 +801,6 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   float lastbuffer[32];
   //  dowavetable(lastbuffer, &wavtable, 2, size);
   //  dowavetable(lastbuffer, &wavtable, 2+(1024-(adc_buffer[SELZ]>>2)), size);
-
-  //  if (_selx<0.9f) _selx=0.0f;
 
   dowavetable(lastbuffer, &wavtable, 2.0f + (1024.0f*(1.0f-_sely)), size);
   floot_to_int(outgoing,lastbuffer,size);

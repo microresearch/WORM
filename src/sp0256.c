@@ -225,7 +225,7 @@ static inline u8 lpc12_update_withsample(struct lpc12_t *f, INT16 samp, INT16* o
 		//		samp   = 0;
 		if (f->per_orig)
 		{
-		  int16_t val = (_selz*142.0f);
+		  int16_t val = (_selx*142.0f);
 		  //		  int16_t val=70;
 		  MAXED(val,140)
 		    val=140-val;
@@ -333,7 +333,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 	u8 j;
 	INT16 samp;
 	u8 do_int;
-
+	int16_t val;
 	/* -------------------------------------------------------------------- */
 	/*  Iterate up to the desired number of samples.  We actually may       */
 	/*  break out early if our repeat count expires.                        */
@@ -345,7 +345,9 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  int16_t val = (_selz*142.0f);
+		  if (TTS==0)		    val = (_selx*142.0f);
+		  else
+		    val = (_selz*142.0f);
 		  //		  int16_t val=70;
 		  MAXED(val,140)
 		    val=140-val;
@@ -1118,12 +1120,6 @@ void micro()
 			{			  
 			  repeat = immed4 | (m_mode & 0x30);
 			  if (TTS==0) {
-			    /*   val = (_sely*24.0f); // only if we are not in TTS mode
-			    MAXED(val,24);
-			    val=24-val;
-			    repeat += 18-val; // seems to have dead zone at start 
-			    */
-			    //			    repeat=((float)(repeat)*2.0f*_sely); // or some kind of exponential/log mapped to say 32 values of sely - log_gen.py
 			    val = (_sely*32.0f); // only if we are not in TTS mode
 			    MAXED(val,31);
 			    repeat=((float)(repeat)*repeatre_map[val]);
@@ -1316,7 +1312,7 @@ void sp0256_newsay1219(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selx*86.0f; // total is 36+49=85
+  u8 selector=_selz*86.0f; // total is 36+49=85
   MAXED(selector, 84); //0-84
   selector=84-selector;
   
@@ -1436,7 +1432,7 @@ void sp0256_newsay(void){
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
-   dada=_selx*65.0f; 
+   dada=_selz*65.0f; 
    MAXED(dada,63);
    dada=63-dada;
    m_ald = ((dada&63) << 4);  		
@@ -1478,7 +1474,7 @@ void sp0256_retriggerTTS(void){// called on a trigger
      //     if (TTSindex>=TTSlength)     TTSindex=0;
      TTSindex=0;
      dada=TTSoutarray[TTSindex]; 
-
+     TTSindex=1;
      m_ald = ((dada&63) << 4); 
      m_lrq = 0; //from 8 bit write
  }
@@ -1496,7 +1492,7 @@ void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*153.0f; // split vocab into banks - on this one we need 0-150 values 
+     whichone=_selz*153.0f; // split vocab into banks - on this one we need 0-150 values 
      MAXED(whichone,150);
      whichone=150-whichone;
      dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
@@ -1518,7 +1514,7 @@ void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
    vocabindex++;
    if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*169.0f;
+     whichone=_selz*169.0f;
      MAXED(whichone,166);
      whichone=166-whichone;
      dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  

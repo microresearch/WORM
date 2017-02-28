@@ -59,7 +59,11 @@ typedef struct xyer_ {
   u8 length;
 } xyer; // we don;t use this as each changes...
 
-
+typedef struct extent_ {
+  uint16_t max;
+  float maxplus;
+} extent;
+  
 typedef unsigned char UINT8;
 typedef signed char INT8;
 typedef u16 UINT16;
