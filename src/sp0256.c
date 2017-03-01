@@ -348,7 +348,6 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		  if (TTS==0)		    val = (_selx*142.0f);
 		  else
 		    val = (_selz*142.0f);
-		  //		  int16_t val=70;
 		  MAXED(val,140)
 		    val=140-val;
 		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
@@ -472,7 +471,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	for (i = 0; i < 6; i++)
 	{
-		#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
+#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);

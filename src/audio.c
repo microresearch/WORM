@@ -122,6 +122,54 @@ static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) =
 
 char TTSinarray[65];
 
+///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle
+
+void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
+  TTS=0;
+  // added trigger
+  if (trigger==1) tms_newsay(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=tms_get_sample();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 ///[[[[[[[[[[[[[[[[[[[[[[[[SP0256
 
 void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
@@ -732,24 +780,54 @@ void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
     floot_to_int(outgoing,lastbuffer,size);
 };
 
+void sp0256_within_noLPC(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
-// next step is buffer sent into say sp0256 - how do we handle speed?
+  TTS=0;
+  // added trigger
+  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
 
-void sp0256_within_basic(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   float voicebuffer[32],lastbuffer[32];
   int16_t outgo[32];
-  int_to_floot(incoming,voicebuffer,size);
-  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
-  floot_to_int(outgo,lastbuffer,size);
+  //  int_to_floot(incoming,voicebuffer,size);
+  //  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  //  floot_to_int(outgo,voicebuffer,size);
+  for (u8 x=0;x<size;x++) outgo[x]=(incoming[x])>>4; // say 11 bits
 
-  // then ignore speed for time being and just pass samples
-  u8 x;
-  for (x=0;x<size;x++){
-    outgoing[x]=sp0256_get_sample_withLPC(outgo[x]);
-  }
-}
+    u8 xx=0,x=0,readpos;
+  float remainder;
+    samplespeed/=8.0;
+  //  samplespeed=1.0f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_sample_withLPC(outgo[xx]); // check this!
+	 //	 	 samplel=outgo[xx];
+	 samplepos-=1.0f;
+	        }
+       remainder=samplepos; 
+       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       outgoing[xx]=samplel;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	      //	 samplel=outgo[xx];
 
-void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+     }
+};
+
+void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
 
   TTS=0;
   // added trigger
@@ -770,20 +848,21 @@ void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=sp0256_get_sample_withLPC(outgo[xx]); // check this!
-	 //	 samplel=outgo[(x++)%size];
+	 samplel=sp0256_get_sample_withLPC(outgo[x++]); // check this!
+	 //	 	 samplel=outgo[xx];
 	 samplepos-=1.0f;
-       }
+	        }
        remainder=samplepos; 
-       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       outgoing[xx]=samplel;
        xx++;
        samplepos+=samplespeed;
      }
    }
    else { 
      while (xx<size){
-       samplel=sp0256_get_sample_withLPC(outgo[xx]);
-       //	 samplel=outgo[(x++)%size];
+              samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	      //	 samplel=outgo[xx];
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -794,6 +873,7 @@ void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
      }
      }
 };
+
 
 ///[[[[[ good for testing ADC/CV ins
 
@@ -851,7 +931,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0;
-  _intmode=1; 
+  _intmode=16; 
   if (oldmode!=_intmode) trigger=1; 
   samplespeed=_speed*transform[SPEED_].multiplier;
 
@@ -866,7 +946,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // above is for raven
   // test_wave is just for testing purposes
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave}; // sp0256: 0-5 modes, votrax=6 - 
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within_noLPC, sp0256_within, test_wave, tms}; // sp0256: 0-5 modes, votrax=6 - 
+  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12lpc_error, 13sp0256_within_noLPC, 14sp0256_within, 15test_wave, 16tms
+
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

@@ -98,7 +98,8 @@ void main(void)
   LPCAnalyzer_init4();
   //  LPCAnalyzer_init(); // for raven voice
   wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 
-
+  //  sample_rate_init();
+  tms_init();
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
