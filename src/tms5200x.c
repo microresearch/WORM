@@ -46,11 +46,11 @@ typedef struct TMS_vocab__ {
 
 // maybe list roms here and then we assign coeff etc to them - or as array
 // test change over if we need to reset
-TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f}; // tested for wordlist access on lap!
-TMS_vocab vocab_spellone={wordlist_spell1, &T0280B_0281A_coeff, 150, 154.0f}; // tested for wordlist access on lap!
-TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f}; // tested for wordlist access on lap!
+const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f}; // tested for wordlist access on lap!
+const TMS_vocab vocab_spellone={wordlist_spell1, &T0280B_0281A_coeff, 150, 154.0f}; // tested for wordlist access on lap!
+const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f}; // tested for wordlist access on lap!
 
-TMS_vocab *allTMSvocabs[]={&vocab_2303, vocab_spellone, vocab_D000};
+const TMS_vocab *allTMSvocabs[]={&vocab_2303, &vocab_spellone, &vocab_D000};
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 extern uint8_t byte_rev[256];
