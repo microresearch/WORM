@@ -21,16 +21,61 @@ typedef int32_t INT32;
 #include "tms5110r.inc"
 
 // include all ROMS re-grouped TODO
-
-#include "LPC/roms/vocab_2303.h" // ???TODO
-#include "roms/vocab_spkspellone.h" // 5100 - wordlist_spell1[154] 0use -> 153today
-#include "roms/vocab_D000.h" // 5200 - wordlist_ffD000[199]
-
-// list of which_coeff:
-
 //** 5100-speak and spell
 //** 5200- early echo II, disks of TRON????, TI99/4 
 //** 5220- later echo II, BBC MICRO
+
+// group first 5100:
+
+#include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102]
+#include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
+#include "LPC/roms/vocab_2321.h" // sp_spk2321nn0[377]
+#include "LPC/roms/vocab_2322.h" // wordlist_spell2322[127]
+#include "LPC/roms/vocab_2350.h" // wordlist_spell2350
+#include "LPC/roms/vocab_2352.h" // wordlist_spell2352[144]
+#include "LPC/roms/vocab_spkspellone.h" // wordlist_spell1[154] 0use -> 153today
+#include "LPC/roms/vocab_spkspelltwo.h" // wordlist_spell2[124]
+
+// then 5200
+
+#include "LPC/roms/vocab_D000.h" // wordlist_ffD000[199]
+#include "LPC/roms/vocab_D001.h" // wordlist_ffD001[194]
+#include "LPC/roms/vocab_D002.h" // wordlist_ffD002[198]
+#include "LPC/roms/vocab_D003.h" // wordlist_ffD003[96]
+#include "LPC/roms/vocab_D004.h" // wordlist_ffD004[199]
+#include "LPC/roms/vocab_D005.h" // wordlist_ffD005[199]
+#include "LPC/roms/vocab_D006.h" // wordlist_ffD006[142]
+#include "LPC/roms/vocab_D007.h" // wordlist_ffD007[178]
+#include "LPC/roms/vocab_D008.h" // wordlist_ffD008[112]
+#include "LPC/roms/vocab_D009.h" // wordlist_ffD009[180]
+#include "LPC/roms/vocab_D010.h" // wordlist_ffD010[174]
+#include "LPC/roms/vocab_D011.h" // wordlist_ffD011[91]
+#include "LPC/roms/vocab_D012.h" // wordlist_ffD012[183]
+#include "LPC/roms/vocab_D013.h" // wordlist_ffD013[63]
+#include "LPC/roms/vocab_D014.h" // wordlist_ffD014[83]
+#include "LPC/roms/vocab_D015.h" // wordlist_ffD015[161]
+#include "LPC/roms/vocab_D016.h" // wordlist_ffD016[39]
+#include "LPC/roms/vocab_D017.h" // wordlist_ffD018[65]
+#include "LPC/roms/vocab_D018.h" // wordlist_ffD018[65]
+#include "LPC/roms/vocab_D019.h" // wordlist_ffD019[70]
+#include "LPC/roms/vocab_D020-21.h" // wordlist_ffD021[70] 
+#include "LPC/roms/vocab_D022.h" // wordlist_ffD022[47]
+#include "LPC/roms/vocab_D023.h" // wordlist_ffD023[56]
+#include "LPC/roms/vocab_D024-25.h" // wordlist_ffD025[76]
+#include "LPC/roms/vocab_D026.h" // wordlist_ffD026[39]
+#include "LPC/roms/vocab_D027-34.h" // wordlist_ffD027to34[61]
+#include "LPC/roms/vocab_echofemale.h" // wordlist_testroms[200]
+#include "LPC/roms/vocab_mpf.h" // wordlist_mpf[32]
+#include "LPC/roms/vocab_talko_notelsewhere.h" // wordlist_talko[31] TODO- also can add misc and own vocabs here
+#include "LPC/roms/vocab_testroms.h" // wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
+#include "LPC/roms/vocab_ti99.h" // wordlist_ti99_one[180] // and // wordlist_ti99_two[180]
+
+// then 5220 - all BBC micro
+#include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
+#include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
+#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
+
+// list of which_coeff:
 
 // 5100: &T0280B_0281A_coeff
 // 5200: &T0285_2501E_coeff
@@ -53,7 +98,7 @@ const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f}; /
 const TMS_vocab *allTMSvocabs[]={&vocab_2303, &vocab_spellone, &vocab_D000};
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
-extern uint8_t byte_rev[256];
+uint8_t byte_rev[256];
 
 #define PERFECT_INTERPOLATION_HACK 0
 

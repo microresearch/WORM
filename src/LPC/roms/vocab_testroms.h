@@ -607,21 +607,27 @@ const uint8_t sp_tron15[] __attribute__ ((section (".flash"))) = {0xC, 0x88, 0x2
 
 const uint8_t *wordlist_alphons[127]={sp_alphon1,sp_alphon2,sp_alphon3,sp_alphon4,sp_alphon5,sp_alphon6,sp_alphon7,sp_alphon8,sp_alphon9,sp_alphon10,sp_alphon11,sp_alphon12,sp_alphon13,sp_alphon14,sp_alphon15,sp_alphon16,sp_alphon17,sp_alphon18,sp_alphon19,sp_alphon20,sp_alphon21,sp_alphon22,sp_alphon23,sp_alphon24,sp_alphon25,sp_alphon26,sp_alphon27,sp_alphon28,sp_alphon29,sp_alphon30,sp_alphon31,sp_alphon32,sp_alphon33,sp_alphon34,sp_alphon35,sp_alphon36,sp_alphon37,sp_alphon38,sp_alphon39,sp_alphon40,sp_alphon41,sp_alphon42,sp_alphon43,sp_alphon44,sp_alphon45,sp_alphon46,sp_alphon47,sp_alphon48,sp_alphon49,sp_alphon50,sp_alphon51,sp_alphon52,sp_alphon53,sp_alphon54,sp_alphon55,sp_alphon56,sp_alphon57,sp_alphon58,sp_alphon59,sp_alphon60,sp_alphon61,sp_alphon62,sp_alphon63,sp_alphon64,sp_alphon65,sp_alphon66,sp_alphon67,sp_alphon68,sp_alphon69,sp_alphon70,sp_alphon71,sp_alphon72,sp_alphon73,sp_alphon74,sp_alphon75,sp_alphon76,sp_alphon77,sp_alphon78,sp_alphon79,sp_alphon80,sp_alphon81,sp_alphon82,sp_alphon83,sp_alphon84,sp_alphon85,sp_alphon86,sp_alphon87,sp_alphon88,sp_alphon89,sp_alphon90,sp_alphon91,sp_alphon92,sp_alphon93,sp_alphon94,sp_alphon95,sp_alphon96,sp_alphon97,sp_alphon98,sp_alphon99,sp_alphon100,sp_alphon101,sp_alphon102,sp_alphon103,sp_alphon104,sp_alphon105,sp_alphon106,sp_alphon107,sp_alphon108,sp_alphon109,sp_alphon110,sp_alphon111,sp_alphon112,sp_alphon113,sp_alphon114,sp_alphon115,sp_alphon116,sp_alphon117,sp_alphon118,sp_alphon119,sp_alphon120,sp_alphon121,sp_alphon122,sp_alphon123,sp_alphon124,sp_alphon125, sp_alphon126, sp_alphon127};
 
-const uint8_t *wordlist_moonmine[17]  ={sp_000mm,sp_001mm,sp_002mm,sp_003mm,sp_004mm,sp_005mm,sp_006mm,sp_007mm,sp_008mm,sp_009mm,sp_010mm,sp_011mm,sp_012mm,sp_013mm,sp_015mm,sp_016mm,sp_017mm};
+//const uint8_t *wordlist_moonmine[17]  ={sp_000mm,sp_001mm,sp_002mm,sp_003mm,sp_004mm,sp_005mm,sp_006mm,sp_007mm,sp_008mm,sp_009mm,sp_010mm,sp_011mm,sp_012mm,sp_013mm,sp_015mm,sp_016mm,sp_017mm};
 
-const uint8_t *wordlist_alpiner[16]  ={sp_013a,sp_024a,sp_0022a,sp_003a,sp_000a,sp_001a,sp_0021a,sp_005a,sp_006a,sp_007a,sp_008a,sp_010a,sp_011a,sp_012a,sp_0141a,sp_021a};
+//const uint8_t *wordlist_alpiner[16]  ={sp_013a,sp_024a,sp_0022a,sp_003a,sp_000a,sp_001a,sp_0021a,sp_005a,sp_006a,sp_007a,sp_008a,sp_010a,sp_011a,sp_012a,sp_0141a,sp_021a};
 
-const uint8_t *wordlist_mash[16]     ={sp_008m,sp_014m,sp_016m,sp_020m,sp_021m,sp_004m,sp_005m,sp_007m,sp_077m, sp_078m, sp_012m,sp_015m, sp_017m,sp_018m,sp_019m,sp_0055m};
+//const uint8_t *wordlist_mash[16]     ={sp_008m,sp_014m,sp_016m,sp_020m,sp_021m,sp_004m,sp_005m,sp_007m,sp_077m, sp_078m, sp_012m,sp_015m, sp_017m,sp_018m,sp_019m,sp_0055m};
 
-const uint8_t *wordlist_startrek[16]  ={sp_0033s, sp_000s,sp_002s,sp_003s,sp_005s,sp_006s,sp_011s,sp_007s,sp_008s,sp_009s,sp_0099s,sp_00999s,sp_010s,sp_012s,sp_013s,sp_015s};
+//const uint8_t *wordlist_startrek[16]  ={sp_0033s, sp_000s,sp_002s,sp_003s,sp_005s,sp_006s,sp_011s,sp_007s,sp_008s,sp_009s,sp_0099s,sp_00999s,sp_010s,sp_012s,sp_013s,sp_015s};
 
-const uint8_t *wordlist_buck[9]       ={sp_b019, sp_b018, sp_b016, sp_b012, sp_b011, sp_b010, sp_b009, sp_013b, sp_017b};
+//const uint8_t *wordlist_buck[9]       ={sp_b019, sp_b018, sp_b016, sp_b012, sp_b011, sp_b010, sp_b009, sp_013b, sp_017b};
 
-const uint8_t *wordlist_parsec[22]={sp_parNICE2, sp_parCONGRAT, sp_parALERT2, sp_parALERT1, sp_parFIRE, sp_parSHOT, sp_parCOUNT, sp_parFIVE, sp_parFOUR, sp_parTHREE, sp_parTWO, sp_parONE, sp_parADVANCE, sp_parNICE, sp_parGREAT, sp_parENEMY, sp_parTARGET, sp_parREFUEL, sp_parLASER, sp_parFUEL, sp_parEXTRA, sp_parASTEROID};
+//
 
-const uint8_t *wordlist_misc[29]={sp_misc0, sp_misc1, sp_misc2, sp_misc3, sp_misc4, sp_misc5, sp_misc6, sp_misc7, sp_misc8, sp_misc9, sp_misc10, sp_misc11, sp_misc12, sp_misc13, sp_misc14, sp_misc15, sp_misc16, sp_misc17, sp_misc18, sp_misc19, sp_misc20, sp_misc21, sp_misc22, sp_misc23, sp_misc24, sp_misc25, sp_misc26, sp_misc27, sp_misc28};
+const uint8_t *wordlist_arcade_one[74]       ={sp_000mm,sp_001mm,sp_002mm,sp_003mm,sp_004mm,sp_005mm,sp_006mm,sp_007mm,sp_008mm,sp_009mm,sp_010mm,sp_011mm,sp_012mm,sp_013mm,sp_015mm,sp_016mm,sp_017mm, sp_013a,sp_024a,sp_0022a,sp_003a,sp_000a,sp_001a,sp_0021a,sp_005a,sp_006a,sp_007a,sp_008a,sp_010a,sp_011a,sp_012a,sp_0141a,sp_021a, sp_008m,sp_014m,sp_016m,sp_020m,sp_021m,sp_004m,sp_005m,sp_007m,sp_077m, sp_078m, sp_012m,sp_015m, sp_017m,sp_018m,sp_019m,sp_0055m, sp_0033s, sp_000s,sp_002s,sp_003s,sp_005s,sp_006s,sp_011s,sp_007s,sp_008s,sp_009s,sp_0099s,sp_00999s,sp_010s,sp_012s,sp_013s,sp_015s, sp_b019, sp_b018, sp_b016, sp_b012, sp_b011, sp_b010, sp_b009, sp_013b, sp_017b};
 
-const uint8_t *wordlist_tron[16]={sp_tron0, sp_tron1, sp_tron2, sp_tron3, sp_tron4, sp_tron5, sp_tron6, sp_tron7, sp_tron8, sp_tron9, sp_tron10, sp_tron11, sp_tron12, sp_tron13, sp_tron14, sp_tron15};
+//const uint8_t *wordlist_parsec[22]={sp_parNICE2, sp_parCONGRAT, sp_parALERT2, sp_parALERT1, sp_parFIRE, sp_parSHOT, sp_parCOUNT, sp_parFIVE, sp_parFOUR, sp_parTHREE, sp_parTWO, sp_parONE, sp_parADVANCE, sp_parNICE, sp_parGREAT, sp_parENEMY, sp_parTARGET, sp_parREFUEL, sp_parLASER, sp_parFUEL, sp_parEXTRA, sp_parASTEROID};
+
+//const uint8_t *wordlist_misc[29]={sp_misc0, sp_misc1, sp_misc2, sp_misc3, sp_misc4, sp_misc5, sp_misc6, sp_misc7, sp_misc8, sp_misc9, sp_misc10, sp_misc11, sp_misc12, sp_misc13, sp_misc14, sp_misc15, sp_misc16, sp_misc17, sp_misc18, sp_misc19, sp_misc20, sp_misc21, sp_misc22, sp_misc23, sp_misc24, sp_misc25, sp_misc26, sp_misc27, sp_misc28};
+
+//const uint8_t *wordlist_tron[16]={sp_tron0, sp_tron1, sp_tron2, sp_tron3, sp_tron4, sp_tron5, sp_tron6, sp_tron7, sp_tron8, sp_tron9, sp_tron10, sp_tron11, sp_tron12, sp_tron13, sp_tron14, sp_tron15};
+
+const uint8_t *wordlist_arcade_two[67]={sp_parNICE2, sp_parCONGRAT, sp_parALERT2, sp_parALERT1, sp_parFIRE, sp_parSHOT, sp_parCOUNT, sp_parFIVE, sp_parFOUR, sp_parTHREE, sp_parTWO, sp_parONE, sp_parADVANCE, sp_parNICE, sp_parGREAT, sp_parENEMY, sp_parTARGET, sp_parREFUEL, sp_parLASER, sp_parFUEL, sp_parEXTRA, sp_parASTEROID, sp_misc0, sp_misc1, sp_misc2, sp_misc3, sp_misc4, sp_misc5, sp_misc6, sp_misc7, sp_misc8, sp_misc9, sp_misc10, sp_misc11, sp_misc12, sp_misc13, sp_misc14, sp_misc15, sp_misc16, sp_misc17, sp_misc18, sp_misc19, sp_misc20, sp_misc21, sp_misc22, sp_misc23, sp_misc24, sp_misc25, sp_misc26, sp_misc27, sp_misc28, sp_tron0, sp_tron1, sp_tron2, sp_tron3, sp_tron4, sp_tron5, sp_tron6, sp_tron7, sp_tron8, sp_tron9, sp_tron10, sp_tron11, sp_tron12, sp_tron13, sp_tron14, sp_tron15};
 
 // TOTAl above is 65  + 31 = 95 + 29 +16 = 141
 

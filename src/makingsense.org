@@ -661,9 +661,8 @@ question of wrap on all? TEST!
 - sp0256 - also bends to say qtbl - would this make senseTEST-NO!, *what other bends to imagine*
 ////
 
-- policy for extents (how far we go beyond and does it wrap or something in any cases?)
-
-// some kind of extent test code = clear vocab as best - for ssay 150 we need to +4 - test on other hardware
+- policy for extents (how far we go beyond)DONE
+*// some kind of extent test code = clear vocab as best - for say 150 we need to +4* - test on other hardwareDONE
 
 also code for ROM grouping: in lpc_say.c start to catalogue
 
@@ -671,12 +670,18 @@ also code for ROM grouping: in lpc_say.c start to catalogue
 
 ///
 
-*- TMS: test coeff switching - do we need to reset?*
+*- TMS: test coeff switching - do we need to reset anything - TEST?*
 
 - re-start on TMS and bends of_line593commented pitch bend//TMS TTS TODO ->
 
 bends: energy, pitch, bends to tables, length of thing, using the
 wrong coeff set (only across 5200 and 5100 variants itself)
+
+- also do we do phrase/bank Z/Y or have list of modes for each bank (and so with extra bend)
+
+phrase and bank with different bends and some chosen vocabs for multi-bends and other extras
+
+what does TALKO bend?
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
