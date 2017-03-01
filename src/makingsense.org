@@ -3,24 +3,22 @@
 * general TODO/notes
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but
-  would *need to test across other HW versions - tested so far on one*
+  would *need to test across other HW versions - tested so far on one* DONE
 
 *new hardware is not so bad but we should fix with over-multiply but ALWAYS constrain if it is IMPORTANT!*
 
 - try different filter coeffs... (0.01f is maybe too low=too
   smooth/filtered = 0.05 or 0.01 in clouds for our dual CV/pots - same design!)
 
-- refine and test triggers in all sp0256 modes - changing trigger thresholds
-
 ////
 
-- basics eg. ROMS, filenamings, compost
+- compost
 
 - XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferableDONE
 
--  control models: eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of control
+-  control models: eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of controlDONE
 
-- split/catalogue of glottal sources
+- split/catalogue of glottal sources - if used?
 
 - basic modes templated: XYZ, speed, triggering, compost
 
@@ -33,6 +31,8 @@
 - vocoder and experimental modes
 
 - clean ups, documentation, tests and release
+
+- all licensing in place and acknowledgments
 
 - *worm control - MOVED OUT TO NEW MODULE alongside RAVEN! = except for wavetable maybe*
 
@@ -650,51 +650,45 @@ question of wrap on all? TEST!
 
 *also for trigger for LPC in we can do freeze of coeffs - for later modes as in raven*
 
-
 ** 1/3+ 
 
-//- extents/first modes/start on TMS
-////
+*** sp0256
+
 - re-look at sp0256bend - moved changes into sample loop. toggle is still new phraseDONE
 - check speed of inverse_filter -> sp0256 DONE
 *- inverse filtering levels and noise - we need some way of gating - silence detection but leave for now*
 - sp0256 - also bends to say qtbl - would this make senseTEST-NO!, *what other bends to imagine*
-////
 
-- policy for extents (how far we go beyond)DONE
-*// some kind of extent test code = clear vocab as best - for say 150 we need to +4* - test on other hardwareDONE
+- policy for extents (how far we go beyond)DONE - *some kind of extent
+  test code = clear vocab as best - for say 150 we need to +4* - test
+  on other hardwareDONE
 
-also code for ROM grouping: in lpc_say.c start to catalogue
+*** TMS
 
-- finalise all first modes 256/votrax so far
+- cleaning up vocabs, removed talko code - lpc.c from MakefileDONE
 
-///
+*- TMS: test coeff switching - no reset just reassign*
 
-*- TMS: test coeff switching - do we need to reset anything - TEST?*
+-  selx is bend, sely is bank, selz is phrase - trigger re_inits this TEST
 
-- re-start on TMS and bends of_line593commented pitch bend//TMS TTS TODO ->
+- for multiple bends (eg x/y bends) we need stock vocab rather than all banks
 
-bends: energy, pitch, bends to tables, length of thing, using the
+- bends so far is pitch bend - TEST!
+
+bends: energy, pitch and m_current_pitch, bends to tables, k_coeffs, length of thing, using the
 wrong coeff set (only across 5200 and 5100 variants itself)
 
-- also do we do phrase/bank Z/Y or have list of modes for each bank (and so with extra bend)
+see//m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9])
 
-phrase and bank with different bends and some chosen vocabs for multi-bends and other extras
+also more general (for sp0256, votrax also) is if bends are applied continuously or to new phoneme?
 
-what does TALKO bend?
+TMS TTS with allphons:
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code TEST!
 
-
-grouping of TMS vocabs and clear chipsets marked for arm mame code:
-
-//tms_newssay_
-//tms_reset_ called on mode change trigger ->   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
-//tms_get_sample
-
-for each vocab - generalise for each vocab -> pointer or?
+*** ////
 
 - klatt notes
 - other modes and start manual for each mode

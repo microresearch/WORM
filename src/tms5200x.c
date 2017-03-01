@@ -29,9 +29,9 @@ typedef int32_t INT32;
 
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
-#include "LPC/roms/vocab_2321.h" // sp_spk2321nn0[377]
+#include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
 #include "LPC/roms/vocab_2322.h" // wordlist_spell2322[127]
-#include "LPC/roms/vocab_2350.h" // wordlist_spell2350
+#include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2352.h" // wordlist_spell2352[144]
 #include "LPC/roms/vocab_spkspellone.h" // wordlist_spell1[154] 0use -> 153today
 #include "LPC/roms/vocab_spkspelltwo.h" // wordlist_spell2[124]
@@ -55,7 +55,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_D014.h" // wordlist_ffD014[83]
 #include "LPC/roms/vocab_D015.h" // wordlist_ffD015[161]
 #include "LPC/roms/vocab_D016.h" // wordlist_ffD016[39]
-#include "LPC/roms/vocab_D017.h" // wordlist_ffD018[65]
+#include "LPC/roms/vocab_D017.h" // wordlist_ffD017[51]
 #include "LPC/roms/vocab_D018.h" // wordlist_ffD018[65]
 #include "LPC/roms/vocab_D019.h" // wordlist_ffD019[70]
 #include "LPC/roms/vocab_D020-21.h" // wordlist_ffD021[70] 
@@ -91,11 +91,61 @@ typedef struct TMS_vocab__ {
 
 // maybe list roms here and then we assign coeff etc to them - or as array
 // test change over if we need to reset
-const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f}; // tested for wordlist access on lap!
-const TMS_vocab vocab_spellone={wordlist_spell1, &T0280B_0281A_coeff, 150, 154.0f}; // tested for wordlist access on lap!
-const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f}; // tested for wordlist access on lap!
+const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f};
+const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f};
+const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 100.0f};
+const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 129.0f};
+const TMS_vocab vocab_2350={wordlist_spell2350, &T0280B_0281A_coeff, 151, 155.0f}; 
+const TMS_vocab vocab_2352={wordlist_spell2352, &T0280B_0281A_coeff, 143, 147.0f};
+const TMS_vocab vocab_spkspellone={wordlist_spell1, &T0280B_0281A_coeff, 153, 157.0f};
+const TMS_vocab vocab_spkspelltwo={wordlist_spell2, &T0280B_0281A_coeff, 123, 126.0f};
 
-const TMS_vocab *allTMSvocabs[]={&vocab_2303, &vocab_spellone, &vocab_D000};
+// 5200
+
+const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f};
+const TMS_vocab vocab_D001={wordlist_ffD001, &T0285_2501E_coeff, 193, 198.0f};
+const TMS_vocab vocab_D002={wordlist_ffD002, &T0285_2501E_coeff, 197, 104.0f};
+const TMS_vocab vocab_D003={wordlist_ffD003, &T0285_2501E_coeff, 95, 97.0f};
+const TMS_vocab vocab_D004={wordlist_ffD004, &T0285_2501E_coeff, 198, 203.0f};
+const TMS_vocab vocab_D005={wordlist_ffD005, &T0285_2501E_coeff, 198, 203.0f};
+const TMS_vocab vocab_D006={wordlist_ffD006, &T0285_2501E_coeff, 141, 145.0f};
+const TMS_vocab vocab_D007={wordlist_ffD007, &T0285_2501E_coeff, 178, 183.0f};
+const TMS_vocab vocab_D008={wordlist_ffD008, &T0285_2501E_coeff, 111, 115.0f};
+const TMS_vocab vocab_D009={wordlist_ffD009, &T0285_2501E_coeff, 179, 184.0f};
+const TMS_vocab vocab_D010={wordlist_ffD010, &T0285_2501E_coeff, 173, 177.0f};
+const TMS_vocab vocab_D011={wordlist_ffD011, &T0285_2501E_coeff, 90, 94.0f};
+const TMS_vocab vocab_D012={wordlist_ffD012, &T0285_2501E_coeff, 182, 187.0f};
+const TMS_vocab vocab_D013={wordlist_ffD013, &T0285_2501E_coeff, 62, 65.0f};
+const TMS_vocab vocab_D014={wordlist_ffD014, &T0285_2501E_coeff, 82, 85.0f};
+const TMS_vocab vocab_D015={wordlist_ffD015, &T0285_2501E_coeff, 160, 165.0f};
+const TMS_vocab vocab_D016={wordlist_ffD016, &T0285_2501E_coeff, 38, 40.0f};
+const TMS_vocab vocab_D017={wordlist_ffD017, &T0285_2501E_coeff, 50, 53.0f};
+const TMS_vocab vocab_D018={wordlist_ffD018, &T0285_2501E_coeff, 64, 67.0f};
+const TMS_vocab vocab_D019={wordlist_ffD019, &T0285_2501E_coeff, 69, 73.0f};
+const TMS_vocab vocab_D020_21={wordlist_ffD021, &T0285_2501E_coeff, 69, 73.0f};
+const TMS_vocab vocab_D022={wordlist_ffD022, &T0285_2501E_coeff, 46, 49.0f};
+const TMS_vocab vocab_D023={wordlist_ffD023, &T0285_2501E_coeff, 55, 57.0f};
+const TMS_vocab vocab_D024_25={wordlist_ffD025, &T0285_2501E_coeff, 75, 78.0f};
+const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 40.0f};
+const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 63.0f};
+const TMS_vocab vocab_echofemale={wordlist_testroms, &T0285_2501E_coeff, 199, 204.0f};
+const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 33.0f};
+const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 32.0f}; // if this should be 5220 TEST!
+const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 129.0f};
+const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 76.0f};
+const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 69.0f};
+const TMS_vocab vocab_ti99_one={wordlist_ti99_one, &T0285_2501E_coeff, 179, 183.0f};
+const TMS_vocab vocab_ti99_two={wordlist_ti99_two, &T0285_2501E_coeff, 179, 183.0f};
+
+// 5220
+
+const TMS_vocab vocab_acorn={wordlist_acorn, &tms5220_coeff, 164, 168.0f};
+const TMS_vocab vocab_large_male_one={wordlist_largemale_one, &tms5220_coeff, 197, 202.0f};
+const TMS_vocab vocab_large_male_two={wordlist_largemale_two, &tms5220_coeff, 197, 202.0f};
+const TMS_vocab vocab_male={wordlist_ffD026, &tms5220_coeff, 205, 210.0f};
+
+// how many are there = 46 - check each TODO
+const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350, &vocab_2352, &vocab_spkspellone, &vocab_spkspelltwo, &vocab_D000, &vocab_D001, &vocab_D002, &vocab_D003, &vocab_D004, &vocab_D005, &vocab_D006, &vocab_D007, &vocab_D008, &vocab_D009, &vocab_D010, &vocab_D011, &vocab_D012, &vocab_D013, &vocab_D014, &vocab_D015, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale, &vocab_mpf, &vocab_talko_not, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one, &vocab_ti99_two, &vocab_acorn, &vocab_large_male_one, &vocab_large_male_two, &vocab_male};
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 uint8_t byte_rev[256];
@@ -636,7 +686,7 @@ int16_t process(u8 *ending)
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];//+(_sely*255.0f); // TODO: very rough but makes very croaky!
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]+(64-(_selx*128.0f)); // TODO: very rough but makes very croaky!
 			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			for (i = 0; i < 4; i++)
 				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
@@ -811,7 +861,7 @@ int16_t process(u8 *ending)
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0;
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // 
 		m_pitch_count &= 0x1FF;
 		//		buf_count++;
 		//		size--;
@@ -858,7 +908,7 @@ void tms_init()
 
   // testing
 
-  m_coeff=vocab_spellone.m_coeff; // TODO - elsewhere!
+  m_coeff=vocab_spkspellone.m_coeff; // init for first bank which is 5100
   
   // what needs to be set to start speaking?
 
@@ -872,12 +922,16 @@ void tms_init()
   m_talk_status = 1;
 };
 
-//tms_newssay_
-//tms_reset_ called on mode change trigger ->   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
-//tms_get_sample
-
 void tms_newsay(){
   INT16 i;
+  u8 whichbank;
+  
+  // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
+  whichbank=_sely*47.0f; 
+  MAXED(whichbank, 45);
+  whichbank=45-whichbank; // inversion
+  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+  
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   for (i = 0; i < 4; i++)
@@ -890,25 +944,20 @@ void tms_newsay(){
 
   // we need to address vocab - array of vocabs to point to
 
-  INT16 sel=_selz*vocab_spellone.extentplus; 
-  MAXED(sel, vocab_spellone.extent);
-  sel=vocab_spellone.extent-sel; // inversion
-  ptrAddr=vocab_spellone.wordlist[sel]; // TESTING but we should point to vocab or each one is a newsay?
+  INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
+  MAXED(sel, allTMSvocabs[whichbank]->extent);
+  sel=allTMSvocabs[whichbank]->extent-sel; // inversion
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
   ptrBit = 0;
 };
-
-// tms_reset_ called on mode change trigger ->   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7; 
-// assign m_coeff
 
 int16_t tms_get_sample(){
   int16_t sample; u8 ending;
     sample=  process(&ending);
-    //    printf("%c",(sample+32768)>>8);
     if (ending==1){
       ending=0; tms_newsay();
     }
     return sample;
-
 }
 
 /*
