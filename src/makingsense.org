@@ -671,7 +671,7 @@ question of wrap on all? TEST!
 
 -  selx is bend, sely is bank, selz is phrase - trigger re_inits this TEST
 
-- for multiple bends (eg x/y bends) we need stock vocab rather than all banks
+- for multiple bends (eg x/y bends) we need stock vocab *which?* rather than all banks
 
 - bends so far is pitch bend - TEST!
 
@@ -680,7 +680,7 @@ wrong coeff set (only across 5200 and 5100 variants itself)
 
 see//m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9])
 
-also more general (for sp0256, votrax also) is if bends are applied continuously or to new phoneme?
+also more general (for sp0256, votrax also) is if bends are applied continuously or to new phoneme or both?
 
 TMS TTS with allphons:
 
@@ -688,10 +688,10 @@ TMS TTS with allphons:
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
   but may not be so in TMS5220 code TEST!
 
-*** ////
+** 2/3
 
-- klatt notes
-- other modes and start manual for each mode
+- test new TMS banks code, bends for TMS, TTS for TMS
+- how bends are applied for sp0256 and votrax (constant, per phonetic element)
 
 * TTS 
 
@@ -859,11 +859,25 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 // above close to done-TMS to finish
 
-3. digitalker ???
-5. SAM -> TTS, vocab(ported already), raw
+//////////////////
+
+3. digitalker
+5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
 6. klatt/nvp variations RE_ACQUAINT
 
-say 6x7=42+
+9. vosim/fof etc.
+10. tube and ntube/glottal/wavetable
+11. voicform?
+
+12. compost - startX, endY in compost buffer and Z? Z as last mode
+    still writing or NOT-but no poti changes HOW? - 2 stages with
+    oldX.Y for example
+
+13. what own brutal worm synth could be!
+
+say 6x7=42+ // 7 or 8 main speech engines
+
+// or we leave from below and any LPC work for RAVEN which could have 2 inputs?
 
 7. LPC vocoder -> where is code for this? lpcanalysis?
 
@@ -887,17 +901,9 @@ pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs i
 
 vocoder - channelv?, testvoc? svf? wvocoder - check all notes
 
-9. vosim/fof etc.
-10. tube and ntube/glottal/wavetable
-11. voicform?
+14. extra/experimental modes for proposed raw RAVEN (without filtering) - excitations/wavetables
 
-12. compost - startX, endY in compost buffer and Z? Z as last mode
-    still writing or NOT-but no poti changes HOW? - 2 stages with
-    oldX.Y for example
-
-13. what own brutal worm synth could be!
-
-14. extra modes for proposes RAVEN - excitations/wavetables
+15. utility modes such as raw LPC error out
 
 * chipsets/emulation/roms
 
@@ -952,6 +958,15 @@ X-
 Y-
 Z-
 TRIGGER-
+
+** TMS
+
+*** basic TMS synth
+
+X- pitch bend
+Y- bank
+Z- select phrase
+TRIGGER- phrase start
 
 ** SP0256
 
