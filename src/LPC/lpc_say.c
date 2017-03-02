@@ -26,13 +26,13 @@ typedef signed int int32_t;
 
 // START cataloguing
 
-#include "roms/vocab_spkspellone.h" // 5100 - wordlist_spell1[151] 0use -> 150beauty - some end glitches
-#include "roms/vocab_spkspelltwo.h" // 5100 - 
-#include "roms/vocab_mpf.h"
+//#include "roms/vocab_spkspellone.h" // 5100 - wordlist_spell1[151] 0use -> 150beauty - some end glitches
+//#include "roms/vocab_spkspelltwo.h" // 5100 - 
+//#include "roms/vocab_mpf.h"
 #include "roms/vocab_testroms.h"
-#include "roms/vocab_2304.h"
+//#include "roms/vocab_2304.h"
 #include "roms/vocab_2303.h"
-#include "roms/vocab_2321.h"
+/*#include "roms/vocab_2321.h"
 #include "roms/vocab_2322.h"
 #include "roms/vocab_2352.h"
 #include "roms/vocab_2350.h"
@@ -57,15 +57,14 @@ typedef signed int int32_t;
 #include "roms/vocab_D017.h"
 #include "roms/vocab_D018.h"
 #include "roms/vocab_D019.h"
-#include "roms/vocab_D020.h"
-#include "roms/vocab_D021.h"
+#include "roms/vocab_D020-21.h"
 #include "roms/vocab_D022.h"
 #include "roms/vocab_D023.h"
-#include "roms/vocab_D024.h"
-#include "roms/vocab_D025.h"
+//#include "roms/vocab_D024.h"
+#include "roms/vocab_D024-25.h"
 #include "roms/vocab_D026.h"
 #include "roms/vocab_D027-34.h"
-
+*/
 uint16_t lpc_get_sample(void);
 
 #define INTERP_PERIOD 25  // samples per subframe
@@ -130,7 +129,7 @@ pitch 6 bits=0b =25
  * TMS5xxx LPC coefficient tables
  */
 
-#define PERIOD_BITS 5 /// 5 for 5100, 6 for 5200
+#define PERIOD_BITS 6 /// 5 for 5100, 6 for 5200
 #define CHIRP_SIZE 52 // was 41 for older chirp
 
 /* 5100=
@@ -618,7 +617,7 @@ void lpc_update_coeffs(void)
 			if (didntjump){
 			  ptrBit =0;
 			  //			  printf("0x%X, ",*ptrAddr);
-	  ptrAddr++;
+			  ptrAddr++;
 			} 
 			//			didntjump=0;
 			starty=1;
@@ -626,17 +625,17 @@ void lpc_update_coeffs(void)
 	synth_subframe_ctr = 0;
 	synth_sample_ctr = 0;
 	//	printf("};\n{");
-		       
+
 
 		}
 		else
 		{
 			/* All other energy types */
-		  nextEnergy = tmsEnergy5100[energy];
+		  nextEnergy = tmsEnergy5200[energy];
 			repeat = lpc_getBits(1);
 			int origpitch = lpc_getBits(PERIOD_BITS); // 5110 - place these in defines
 			//	nextPeriod = tmsPeriod[lpc_getBits(6)];
-			nextPeriod=tmsPeriod5100[origpitch];
+			nextPeriod=tmsPeriod5200[origpitch];
 			//		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", energy, repeat, origpitch);
 
 			/* A repeat frame uses the last coefficients */
@@ -689,7 +688,7 @@ void lpc_update_coeffs(void)
 		for(i=0;i<10;i++)
 			synthK[i] += (nextK[i]-synthK[i])>>EXPO_SHIFT;
 	}
-		//	       		fprintf(stderr,"ENERGY: %d REPEAT: %d PITCH: %d\n", nextEnergy, repeat, nextPeriod); // after lookup
+		fprintf(stderr,"ENDED %d ENERGY: %d REPEAT: %d PITCH: %d\n", synth_running, nextEnergy, repeat, nextPeriod); // after lookup
 
 }
 
@@ -701,11 +700,13 @@ uint16_t lpc_get_sample(void)
 	int8_t i;
 	
 	/* if not running just return mid-scale */
-	/*		if(synth_running == 0)
+			if(synth_running == 0)
 	{
-		return 512;
+	  fprintf(stderr,"XXXXXENERGY");
+
+		return 0;
 		}
-	*/
+	
 	
 	/* Time to update the coeffs? */
 	if(++synth_sample_ctr == INTERP_PERIOD)
@@ -728,7 +729,7 @@ uint16_t lpc_get_sample(void)
 			periodCounter = 0;
 		
 		if (periodCounter < CHIRP_SIZE)
-		  ulpc[10] = ((chirp5100[periodCounter]) * (uint32_t) synthEnergy) >> 8;
+		  ulpc[10] = ((chirp5200[periodCounter]) * (uint32_t) synthEnergy) >> 8;
 		else
 			ulpc[10] = 0;
 	}
@@ -798,14 +799,14 @@ void main(int argc, char *argv[]){
 
    
    //      lpc_say(test00);
-      lpc_say(wordlist_spell1[uffset]+uuffset);
+   //      lpc_say(wordlist_spell2303[uffset]+uuffset);
    //                   while(synth_running) lpc_running();
    
    //   lpc_say(wordlist_[uffset]+uuffset);
    //   for (x=0;x<18;x++){
    x=0;
-   //   while (test00[x]!=255){
-   //      lpc_say(wordlist_alphons[test00[x++]]);
+      while (test00[x]!=255){
+	lpc_say(wordlist_alphons[test00[x++]]);
 // lpc_say(sp_ffD008nn172);
 //	printf("NEXT\n");
 //		lpc_update_coeffs();
@@ -815,7 +816,7 @@ void main(int argc, char *argv[]){
 	lpc_running();
 
       }
-	
+      }
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   // stay with first one which could be THIR or THIRTEE according to

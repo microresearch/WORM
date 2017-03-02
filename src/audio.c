@@ -120,11 +120,11 @@ wormy myworm;
 
 static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
 
-char TTSinarray[65];
+char TTSinarray[17];
 
 ///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle
 
-void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
+void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   TTS=0;
   // added trigger
   if (trigger==1) tms_newsay(); // selector is in newsay
@@ -168,6 +168,97 @@ void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // 
      }
    }
 };
+
+void tmsphon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  TTS=0;
+  // added trigger
+  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_allphon();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_allphon(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=tms_get_sample_allphon();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_allphon(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tmsTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  TTS=1;
+  // added trigger
+  if (trigger==1) tms_retriggerTTS(); 
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed/=8.0;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_TTS();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_retriggerTTS(); 
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=tms_get_sample_TTS();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_retriggerTTS(); 
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
 
 
 ///[[[[[[[[[[[[[[[[[[[[[[[[SP0256
@@ -906,7 +997,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   float samplespeed;
   static u16 cc;
   u8 oldmode=255;
-  
+  static u8 firsttime=0;
   for (u8 x=0;x<5;x++){
   float value=(float)adc_buffer[transform[x].whichone]/65536.0f; 
 
@@ -930,9 +1021,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   oldmode=_intmode;
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
-  trigger=0;
-  _intmode=0; 
-  if (oldmode!=_intmode) trigger=1; 
+  trigger=0; 
+ _intmode=1; 
+ // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
+ if (firsttime==0){// TEST CODE - for fake trigger
+   trigger=1;
+   firsttime=1;
+ }
   samplespeed=_speed*transform[SPEED_].multiplier;
 
   // splitting input
@@ -946,8 +1041,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // above is for raven
   // test_wave is just for testing purposes
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within_noLPC, sp0256_within, test_wave, tms}; // sp0256: 0-5 modes, votrax=6 - 
-  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12lpc_error, 13sp0256_within_noLPC, 14sp0256_within, 15test_wave, 16tms
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within_noLPC, sp0256_within, test_wave, tms, tmsphon, tmsTTS}; // sp0256: 0-5 modes, votrax=6 - 
+  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12lpc_error, 13sp0256_within_noLPC, 14sp0256_within, 15test_wave, 16tms, 17tmsphone,18tmsTTS
 
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
@@ -963,14 +1058,14 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   // remapping for TTS modes - TODO!
   if (TTS){
-    u8 selx=_selx*65.0f; // TODO!
-    u8 sely=_sely*65.0f; 
-    MAXED(selx,63);
-    MAXED(sely,63);
-    selx=63-selx; // inverted
-    sely=63-sely;
-    TTSinarray[selx]=mapytoascii[sely];
-  }
+    u8 xax=_sely*18.0f; // TODO!
+    u8 selz=_selz*65.0f; 
+    MAXED(xax,16);
+    MAXED(selz,63);
+    xax=16-xax; // inverted
+    selz=63-selz;
+    TTSinarray[xax]=mapytoascii[selz];
+    }
 
 #ifdef TEST
   audio_comb_stereo(sz, dst, left_buffer, mono_buffer);

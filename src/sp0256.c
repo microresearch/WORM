@@ -345,9 +345,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  if (TTS==0)		    val = (_selx*142.0f);
-		  else
-		    val = (_selz*142.0f);
+		  val = (_selx*142.0f);
 		  MAXED(val,140)
 		    val=140-val;
 		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
@@ -1416,7 +1414,7 @@ int16_t sp0256_get_sample_withLPC(INT16 samp){
 
 // for text to speech we need out array, length and index...
 
-extern char TTSinarray[65];
+extern char TTSinarray[17];
 static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
@@ -1452,7 +1450,7 @@ void sp0256_newsayTTS(void){// called at end of phoneme
    TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
-     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
+     TTSlength= text2speechfor256(16,TTSinarray,TTSoutarray);
    }
 
    m_ald = ((dada&63) << 4); 
@@ -1469,7 +1467,7 @@ void sp0256_retriggerTTS(void){// called on a trigger
    m_romm=m_romAL2;
    
    //     TTSindex=0;
-     TTSlength= text2speechfor256(64,TTSinarray,TTSoutarray);
+     TTSlength= text2speechfor256(16,TTSinarray,TTSoutarray);
      //     if (TTSindex>=TTSlength)     TTSindex=0;
      TTSindex=0;
      dada=TTSoutarray[TTSindex]; 
@@ -1526,8 +1524,4 @@ void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
  void sp0256_init(void){
    sp0256_iinit();
    reset();
-     TTSindex=0;
-     TTSlength=64;
-     //     TTSlength= text2speechfor256(18,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
-     for (u8 x=0;x<64;x++) TTSinarray[x]=32;
  }

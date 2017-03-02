@@ -19,6 +19,7 @@ typedef uint32_t UINT32;
 typedef int32_t INT32;
 
 #include "tms5110r.inc"
+#include "english2phoneme/TTS.h"
 
 // include all ROMS re-grouped TODO
 //** 5100-speak and spell
@@ -27,7 +28,8 @@ typedef int32_t INT32;
 
 // group first 5100:
 
-#include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102]
+#include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
+/*
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
 #include "LPC/roms/vocab_2322.h" // wordlist_spell2322[127]
@@ -74,7 +76,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 #include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
-
+*/
 // list of which_coeff:
 
 // 5100: &T0280B_0281A_coeff
@@ -92,6 +94,7 @@ typedef struct TMS_vocab__ {
 // maybe list roms here and then we assign coeff etc to them - or as array
 // test change over if we need to reset
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f};
+/*
 const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f};
 const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 100.0f};
 const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 129.0f};
@@ -104,7 +107,7 @@ const TMS_vocab vocab_spkspelltwo={wordlist_spell2, &T0280B_0281A_coeff, 123, 12
 
 const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f};
 const TMS_vocab vocab_D001={wordlist_ffD001, &T0285_2501E_coeff, 193, 198.0f};
-const TMS_vocab vocab_D002={wordlist_ffD002, &T0285_2501E_coeff, 197, 104.0f};
+const TMS_vocab vocab_D002={wordlist_ffD002, &T0285_2501E_coeff, 197, 203.0f};
 const TMS_vocab vocab_D003={wordlist_ffD003, &T0285_2501E_coeff, 95, 97.0f};
 const TMS_vocab vocab_D004={wordlist_ffD004, &T0285_2501E_coeff, 198, 203.0f};
 const TMS_vocab vocab_D005={wordlist_ffD005, &T0285_2501E_coeff, 198, 203.0f};
@@ -142,13 +145,25 @@ const TMS_vocab vocab_ti99_two={wordlist_ti99_two, &T0285_2501E_coeff, 179, 183.
 const TMS_vocab vocab_acorn={wordlist_acorn, &tms5220_coeff, 164, 168.0f};
 const TMS_vocab vocab_large_male_one={wordlist_largemale_one, &tms5220_coeff, 197, 202.0f};
 const TMS_vocab vocab_large_male_two={wordlist_largemale_two, &tms5220_coeff, 197, 202.0f};
-const TMS_vocab vocab_male={wordlist_ffD026, &tms5220_coeff, 205, 210.0f};
+const TMS_vocab vocab_male={wordlist_male, &tms5220_coeff, 205, 210.0f};
+ 
 
 // how many are there = 46 - check each TODO
 const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350, &vocab_2352, &vocab_spkspellone, &vocab_spkspelltwo, &vocab_D000, &vocab_D001, &vocab_D002, &vocab_D003, &vocab_D004, &vocab_D005, &vocab_D006, &vocab_D007, &vocab_D008, &vocab_D009, &vocab_D010, &vocab_D011, &vocab_D012, &vocab_D013, &vocab_D014, &vocab_D015, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale, &vocab_mpf, &vocab_talko_not, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one, &vocab_ti99_two, &vocab_acorn, &vocab_large_male_one, &vocab_large_male_two, &vocab_male};
+*/
+
+const TMS_vocab *allTMSvocabs[46]={&vocab_2303};
+
+// TEST: commented out to speed up
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 uint8_t byte_rev[256];
+
+extern char TTSinarray[17];
+static u8 TTSoutarray[256];
+static u8 TTSindex=0;
+static u8 TTSlength=0;
+
 
 #define PERFECT_INTERPOLATION_HACK 0
 
@@ -176,7 +191,7 @@ static INT16 clip_analog(INT16 cliptemp);
 #define FORCE_DIGITAL 0
 
 /* must be defined; if 1, normal speech (one A cycle, one B cycle per interpolation step); if 0; speak as if SPKSLOW was used (two A cycles, one B cycle per interpolation step) */
-#define FORCE_SUBC_RELOAD 1
+#define FORCE_SUBC_RELOAD 1 // appears to be unused
 
 
 /* *****debugging defines***** */
@@ -297,7 +312,7 @@ UINT8 m_talk_status;      /* If 1, TS status bit is 1, i.e. speak or speak exter
 	UINT16 m_previous_energy; /* needed for lattice filter to match patent */
 
 	UINT8 m_subcycle;         /* contains the current subcycle for a given PC: 0 is A' (only used on SPKSLOW mode on 51xx), 1 is A, 2 is B */
-	UINT8 m_subc_reload;      /* contains 1 for normal speech, 0 when SPKSLOW is active */
+UINT8 m_subc_reload=1;      /* contains 1 for normal speech, 0 when SPKSLOW is active */ // wasn't set before
 	UINT8 m_PC;               /* current parameter counter (what param is being interpolated), ranges from 0 to 12 */
 	/* NOTE: the interpolation period counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1 */
 	UINT8 m_IP;               /* the current interpolation period */
@@ -463,6 +478,9 @@ INT32 lattice_filter()
 	    }
 	m_x[0] = ep; // feed the last section of the top of the lattice directly to the bottom of the lattice
 	*/
+
+  //  m_current_k[0]+=((_selx*255.0f)-128);
+  //  m_excitation_data+=((_selx*255.0f)-128);
 		m_u[10] = matrix_multiply(m_previous_energy, (m_excitation_data<<6));  //Y(11)
 		m_u[9] = m_u[10] - matrix_multiply(m_current_k[9], m_x[9]);
 		m_u[8] = m_u[9] - matrix_multiply(m_current_k[8], m_x[8]);
@@ -606,6 +624,7 @@ void parse_frame()
 
 int16_t process(u8 *ending)
 {
+  static u8 counter;
 	int i, bitout, zpar;
 	INT32 this_sample;
 	int16_t sample;
@@ -686,7 +705,7 @@ int16_t process(u8 *ending)
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]+(64-(_selx*128.0f)); // TODO: very rough but makes very croaky!
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];//+(64-(_selx*128.0f)); // TODO: very rough but makes very croaky!
 			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			for (i = 0; i < 4; i++)
 				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
@@ -803,6 +822,8 @@ int16_t process(u8 *ending)
 		m_RNG <<= 1;
 		m_RNG |= bitout;
 	}
+	/////////////////////////////
+
 		this_sample = lattice_filter(); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
 		//fprintf(stderr,"C:%01d; ",m_subcycle);
@@ -852,16 +873,23 @@ int16_t process(u8 *ending)
 			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_count = 0;
 			m_subcycle = m_subc_reload;
 			m_PC = 0;
+			//			if (counter++>(_selx*10.0f)){ // commented bend - a bit strange
 			m_IP++;
 			m_IP&=0x7;
+			//			counter=0;
+			//			}
 		}
 		else if (m_subcycle == 3)
 		{
 			m_subcycle = m_subc_reload;
+			//			if (counter++>(10-(_selx*10.0f))){ // TEST - bend of length but doesn't make faster
 			m_PC++;
+			//			counter=0;
+			//		  }
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // 
+		if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+		//		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
 		m_pitch_count &= 0x1FF;
 		//		buf_count++;
 		//		size--;
@@ -869,46 +897,295 @@ int16_t process(u8 *ending)
 	return sample;
 }
 
+int16_t process2bends(u8 *ending)
+{
+  static u8 counter;
+	int i, bitout, zpar;
+	INT32 this_sample;
+	int16_t sample;
+	/* loop until the buffer is full or we've stopped speaking */
+	//	if (m_speaking_now)
+	//	{
+		/* if it is the appropriate time to update the old energy/pitch idxes,
+		 * i.e. when IP=7, PC=12, T=17, subcycle=2, do so. Since IP=7 PC=12 T=17
+		 * is JUST BEFORE the transition to IP=0 PC=0 T=0 sybcycle=(0 or 1),
+		 * which happens 4 T-cycles later), we change on the latter.*/
+		if ((m_IP == 0) && (m_PC == 0) && (m_subcycle < 2))
+		{
+			m_OLDE = (m_new_frame_energy_idx == 0);
+			m_OLDP = (m_new_frame_pitch_idx == 0);
+		}
+
+		/* if we're ready for a new frame to be applied, i.e. when IP=0, PC=12, Sub=1
+		 * (In reality, the frame was really loaded incrementally during the entire IP=0
+		 * PC=x time period, but it doesn't affect anything until IP=0 PC=12 happens)
+		 */
+		if ((m_IP == 0) && (m_PC == 12) && (m_subcycle == 1))
+		{
+			// HACK for regression testing, be sure to comment out before release!
+			//m_RNG = 0x1234;
+			// end HACK
+
+			/* appropriately override the interp count if needed; this will be incremented after the frame parse! */
+			m_IP = reload_table[m_c_variant_rate&0x3];
+
+#ifdef PERFECT_INTERPOLATION_HACK
+			/* remember previous frame energy, pitch, and coefficients */
+			m_old_frame_energy_idx = m_new_frame_energy_idx;
+			m_old_frame_pitch_idx = m_new_frame_pitch_idx;
+			for (i = 0; i < m_coeff->num_k; i++)
+				m_old_frame_k_idx[i] = m_new_frame_k_idx[i];
+#endif
+
+			/* if the talk status was clear last frame, halt speech now. */
+			if (m_talk_status == 0)
+			{
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
+#endif
+				//				m_speaking_now = 1; // finally halt speech
+				*ending=1;
+				// keep speaking - RESET TOD!
+				//				goto empty;
+				return 0;
+			}
+
+
+			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
+			parse_frame(); //TODO!
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			fprintf(stderr,"\n");
+#endif
+
+			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
+			if (NEW_FRAME_STOP_FLAG == 1)
+				{
+					m_talk_status = m_speak_external = 0;
+					//					set_interrupt_state(1);
+					//					update_fifo_status_and_ints();
+				}
+
+			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
+			   Interpolation inhibit cases:
+			 * Old frame was voiced, new is unvoiced
+			 * Old frame was silence/zero energy, new has nonzero energy
+			 * Old frame was unvoiced, new is voiced (note this is the case on the patent but may not be correct on the real final chip)
+			 */
+			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) /* this line needs further investigation, starwars tie fighters may sound better without it */
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
+				m_inhibit = 1;
+			else // normal frame, normal interpolation
+				m_inhibit = 0;
+
+			/* load new frame targets from tables, using parsed indices */
+			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx];//+(64-(_selx*128.0f)); // TODO: very rough but makes very croaky!
+			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+			for (i = 0; i < 4; i++)
+				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
+			for (i = 4; i < m_coeff->num_k; i++)
+				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
+
+#ifdef DEBUG_GENERATION
+			/* Debug info for current parsed frame */
+			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
+			fprintf(stderr,"Processing frame: ");
+			if (m_inhibit == 0)
+				fprintf(stderr, "Normal Frame\n");
+			else
+				fprintf(stderr,"Interpolation Inhibited\n");
+			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
+			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
+#endif
+
+			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
+			if (m_talk_status == 0)
+			{
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
+#endif
+				m_target_energy = 0;
+			}
+		}
+		else // Not a new frame, just interpolate the existing frame.
+		{
+			int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
+#ifdef PERFECT_INTERPOLATION_HACK
+			int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
+			//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW
+			int current_sample = (m_subcycle - m_subc_reload)+(m_PC*(3-m_subc_reload))+((m_subc_reload?25:38)*((m_IP-1)&7));
+
+			zpar = OLD_FRAME_UNVOICED_FLAG;
+			//fprintf(stderr, "CS: %03d", current_sample);
+			// reset the current energy, pitch, etc to what it was at frame start
+			m_current_energy = m_coeff->energytable[m_old_frame_energy_idx];
+			m_current_pitch = m_coeff->pitchtable[m_old_frame_pitch_idx];
+			for (i = 0; i < 4; i++)
+				m_current_k[i] = m_coeff->ktable[i][m_old_frame_k_idx[i]];
+			for (i = 4; i < m_coeff->num_k; i++)
+				m_current_k[i] = (m_coeff->ktable[i][m_old_frame_k_idx[i]] * (1-zpar));
+			// now adjust each value to be exactly correct for each of the samples per frame
+			if (m_IP != 0) // if we're still interpolating...
+			{
+				m_current_energy += (((m_target_energy - m_current_energy)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				m_current_pitch += (((m_target_pitch - m_current_pitch)*(1-inhibit_state))*current_sample)/samples_per_frame;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_current_k[i] += (((m_target_k[i] - m_current_k[i])*(1-inhibit_state))*current_sample)/samples_per_frame;
+			}
+			else // we're done, play this frame for 1/8 frame.
+			{
+				m_current_energy = m_target_energy;
+				m_current_pitch = m_target_pitch;
+				for (i = 0; i < m_coeff->num_k; i++)
+					m_current_k[i] = m_target_k[i];
+			}
+#else
+			//Updates to parameters only happen on subcycle '2' (B cycle) of PCs.
+			if (m_subcycle == 2)
+			{
+				switch(m_PC)
+				{
+					case 0: /* PC = 0, B cycle, write updated energy */
+					m_current_energy += (((m_target_energy - m_current_energy)*(1-inhibit_state)) INTERP_SHIFT);
+					break;
+					case 1: /* PC = 1, B cycle, write updated pitch */
+					m_current_pitch += (((m_target_pitch - m_current_pitch)*(1-inhibit_state)) INTERP_SHIFT);
+					break;
+					case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10: case 11:
+					/* PC = 2 through 11, B cycle, write updated K1 through K10 */
+					m_current_k[m_PC-2] += (((m_target_k[m_PC-2] - m_current_k[m_PC-2])*(1-inhibit_state)) INTERP_SHIFT);
+					break;
+					case 12: /* PC = 12, do nothing */
+					break;
+				}
+			}
+#endif
+		}
+
+		// calculate the output
+		if (OLD_FRAME_UNVOICED_FLAG == 1)
+		{
+			// generate unvoiced samples here
+			if (m_RNG & 1)
+				m_excitation_data = ~0x3F; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)*/
+			else
+				m_excitation_data = 0x40;
+		}
+		else /* (OLD_FRAME_UNVOICED_FLAG == 0) */
+		{
+			// generate voiced samples here
+			/* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
+			 * function has a chirp/peak and then a long chain of zeroes.
+			 * The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
+			 * and if the address reaches that point the ADDRESS incrementer is
+			 * disabled, forcing all samples beyond 51d to be == 51d
+			 */
+			if (m_pitch_count >= 51)
+				m_excitation_data = (INT8)m_coeff->chirptable[51];
+			else /*m_pitch_count < 51*/
+				m_excitation_data = (INT8)m_coeff->chirptable[m_pitch_count];
+		}
+
+		// Update LFSR *20* times every sample (once per T cycle), like patent shows
+	for (i=0; i<20; i++)
+	{
+		bitout = ((m_RNG >> 12) & 1) ^
+				((m_RNG >>  3) & 1) ^
+				((m_RNG >>  2) & 1) ^
+				((m_RNG >>  0) & 1);
+		m_RNG <<= 1;
+		m_RNG |= bitout;
+	}
+	/////////////////////////////
+
+		this_sample = lattice_filter(); /* execute lattice filter */
+#ifdef DEBUG_GENERATION_VERBOSE
+		//fprintf(stderr,"C:%01d; ",m_subcycle);
+		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
+		for (i=0; i<10; i++)
+			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
+		fprintf(stderr,"Out:%06d", this_sample);
+		fprintf(stderr,"\n");
+#endif
+		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
+		while (this_sample > 16383) this_sample -= 32768;
+		while (this_sample < -16384) this_sample += 32768;
+		if (m_digital_select == 0) // analog SPK pin output is only 8 bits, with clipping
+		  //			buffer[buf_count] = clip_analog(this_sample);
+		  sample= clip_analog(this_sample);
+		else // digital I/O pin output is 12 bits
+		{
+#ifdef ALLOW_4_LSB
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
+			// N taps:                       ^                 = 0x2000;
+			// output: ssss ssss ssss ssss snnn nnnn nnnn nnnN
+		  //			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+		  sample=(this_sample<<1)|((this_sample&0x2000)>>13);
+#else
+			this_sample &= ~0xF;
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn 0000
+			// N taps:                       ^^ ^^^            = 0x3E00;
+			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
+			//			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+			sample=(this_sample<<1)|((this_sample&0x3E00)>>9);
+#endif
+		}
+		// Update all counts
+
+		m_subcycle++;
+		if ((m_subcycle == 2) && (m_PC == 12))
+		{
+			/* Circuit 412 in the patent acts a reset, resetting the pitch counter to 0
+			 * if INHIBIT was true during the most recent frame transition.
+			 * The exact time this occurs is betwen IP=7, PC=12 sub=0, T=t12
+			 * and m_IP = 0, PC=0 sub=0, T=t12, a period of exactly 20 cycles,
+			 * which overlaps the time OLDE and OLDP are updated at IP=7 PC=12 T17
+			 * (and hence INHIBIT itself 2 t-cycles later). We do it here because it is
+			 * convenient and should make no difference in output.
+			 */
+			if ((m_IP == 7)&&(m_inhibit==1)) m_pitch_count = 0;
+			m_subcycle = m_subc_reload;
+			m_PC = 0;
+			//			if (counter++>(_selx*10.0f)){ // commented bend - a bit strange
+			m_IP++;
+			m_IP&=0x7;
+			//			counter=0;
+			//			}
+		}
+		else if (m_subcycle == 3)
+		{
+			m_subcycle = m_subc_reload;
+			if (counter++>(10-(_sely*10.0f))){ // TEST - bend of length but doesn't make faster
+			m_PC++;
+			counter=0;
+			}
+		}
+		m_pitch_count++;
+		if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+		//		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
+		m_pitch_count &= 0x1FF;
+		//		buf_count++;
+		//		size--;
+		//	}
+	return sample;
+}
+
+
 void tms_init()
 {
 
   INT16 i,j;
-  // do we need to set each time we change coeffs TODO!
-  
-  /*
-		case TMS5110_IS_TMC0281:
-			m_coeff = &T0280B_0281A_coeff;
-			break;
-		case TMS5110_IS_TMC0281D:
-			m_coeff = &T0280D_0281D_coeff;
-			break;
-		case TMS5110_IS_CD2801:
-			m_coeff = &T0280F_2801A_coeff;
-			break;
-		case TMS5110_IS_M58817:
-			m_coeff = &M58817_coeff;
-			break;
-		case TMS5110_IS_CD2802:
-			m_coeff = &T0280F_2802_coeff;
-			break;
-		case TMS5110_IS_TMS5110A:
-			m_coeff = &tms5110a_coeff;
-   */
 
-  //  m_coeff=&T0285_2501E_coeff; // this is for 5200! //		m_coeff = &tms5220_coeff;
-  //   m_coeff = &T0280B_0281A_coeff; // this is for 5100! // TODO - sett/swap here
-	
-  //  m_coeff=tms5220_coeff;
   for(i=0;i<256;i++)
     {
       j = (i>>4) | (i<<4); // Swap in groups of 4
       j = ((j & 0xcc)>>2) | ((j & 0x33)<<2); // Swap in groups of 2
       byte_rev[i] = ((j & 0xaa)>>1) | ((j & 0x55)<<1); // Swap bit pairs
-    }
+      }
 
-  // testing
-
-  m_coeff=vocab_spkspellone.m_coeff; // init for first bank which is 5100
+  m_coeff=vocab_2303.m_coeff; // init for first bank which is 5100
   
   // what needs to be set to start speaking?
 
@@ -920,29 +1197,32 @@ void tms_init()
     m_new_frame_k_idx[i] = 0xF;
   for (i = 7; i < m_coeff->num_k; i++)    m_new_frame_k_idx[i] = 0x7;
   m_talk_status = 1;
+  
 };
 
+//////////////////{{{{ NEWSAY
+
 void tms_newsay(){
-  INT16 i;
   u8 whichbank;
   
   // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
   whichbank=_sely*47.0f; 
   MAXED(whichbank, 45);
   whichbank=45-whichbank; // inversion
+  //  whichbank=0; /// TEST for speedups
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
-  for (i = 0; i < 4; i++)
+  /* // this was causing glitch at start of phrase  
+for (i = 0; i < 4; i++)
     m_new_frame_k_idx[i] = 0;
   for (i = 4; i < 7; i++)
     m_new_frame_k_idx[i] = 0xF;
   for (i = 7; i < m_coeff->num_k; i++)
     m_new_frame_k_idx[i] = 0x7;
+  */
   m_talk_status = 1;
-
-  // we need to address vocab - array of vocabs to point to
 
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
@@ -951,14 +1231,93 @@ void tms_newsay(){
   ptrBit = 0;
 };
 
-int16_t tms_get_sample(){
-  int16_t sample; u8 ending;
-    sample=  process(&ending);
-    if (ending==1){
-      ending=0; tms_newsay();
-    }
-    return sample;
+void tms_newsay_allphon(){
+    // selx is pitch bend, sely is bank, selz is allphon
+  u8 whichbank=37; // to check
+  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+    m_new_frame_energy_idx = 0;
+  m_new_frame_pitch_idx = 0;
+  m_talk_status = 1;
+
+  INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
+  MAXED(sel, allTMSvocabs[whichbank]->extent);
+  sel=allTMSvocabs[whichbank]->extent-sel; // inversion
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
+  ptrBit = 0;
+};
+
+void tms_newsay_TTS(){
+  // x and y are for the TTSarray which leaves us with Z for the pitch bend
+  //   const uint8_t test00[]={116, 33, 72, 14, 125, 94, 33, 81, 125, 116, 29, 125, 2, 81, 125, 84, 71, 255};
+  //   static u8 index=0;
+  // this is our allphon code
+  u8 whichbank=37; // to check
+  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+  m_new_frame_energy_idx = 0;
+  m_new_frame_pitch_idx = 0;
+  m_talk_status = 1;
+
+    ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[TTSindex]]; // TESTING 
+  //  ptrAddr=allTMSvocabs[whichbank]->wordlist[test00[index]]; // TESTING 
+  ptrBit = 0;
+
+    TTSindex++;
+   if (TTSindex>=TTSlength) {
+     TTSindex=0;
+     TTSlength= text2speechforTMS(16,TTSinarray,TTSoutarray);
+     }
+  //  index++;
+  //  if (index>16) index=0;
+};
+
+void tms_retriggerTTS(){
+
+  u8 whichbank=37; // to check
+  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+  m_new_frame_energy_idx = 0;
+  m_new_frame_pitch_idx = 0;
+  m_talk_status = 1;
+
+  TTSlength= text2speechforTMS(16,TTSinarray,TTSoutarray);
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[0]]; // TESTING 
+  ptrBit = 0;
+  TTSindex=1;
 }
+
+
+
+///// get_samples
+
+int16_t tms_get_sample_allphon(){
+  static uint16_t delay=0;
+  int16_t sample; u8 ending=0;
+  sample=  process2bends(&ending);
+  if (ending==1){
+    tms_newsay_allphon();
+  }
+  return sample;
+}
+
+int16_t tms_get_sample(){
+  static uint16_t delay=0;
+  int16_t sample; u8 ending=0;
+  sample=  process(&ending);
+  if (ending==1){
+    tms_newsay();
+  }
+  return sample;
+}
+
+int16_t tms_get_sample_TTS(){
+  static uint16_t delay=0;
+  int16_t sample; u8 ending=0;
+  sample=  process(&ending);
+  if (ending==1){
+    tms_newsay_TTS();
+  }
+  return sample;
+}
+
 
 /*
 void main(){

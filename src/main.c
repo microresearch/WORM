@@ -86,11 +86,18 @@ float exy[64]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 
 extern Wavetable wavtable;
 extern wormy myworm;
-
+extern char TTSinarray[17];
 
 void main(void)
 {
   int16_t x;
+
+  for (x=0;x<16;x++){
+    TTSinarray[x]=97+x;
+  }
+
+
+
   // all generator inits
   sp0256_init();
   sp0256_initbend();
@@ -101,6 +108,7 @@ void main(void)
   //  sample_rate_init();
   tms_init();
 
+
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
@@ -108,81 +116,9 @@ void main(void)
   I2S_Block_PlayRec((uint32_t)&tx_buffer, (uint32_t)&rx_buffer, BUFF_LEN);
   //  Audio_Init(); not needed
 
+
   while(1)
     {
-    // testing changing test_elm
-      //      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
-      // change element, change length? leave stress as is 0
-      //      test_elm[axis*3]=phoneme_prob_remap[adc_buffer[SELY]>>6]; // how many phonemes?=64
-      //      test_elm[(axis*3)+1]=(adc_buffer[SELZ]>>7)+1; // length say max 32
-    
-
-      //      oldmode=mode;    
-      //      mode=adc_buffer[MODE]>>7; // 12 bits to say 32 modes (5 bits)
-      //           mode=10; // TESTING
-
-      //       if(lpc_busy() == 0) lpc_newsay(adc_buffer[SELX]>>6);   
-
-      //    if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
-
-
-  // if there is a change in mode do something?
-  //  if (oldmode!=mode){
-  //    maintrigger=1;
-  //  }
-
-	   /*  if (maintrigger==1) {writepos=0;trigger=1;} // STRIP_OUT
-
-  switch(mode){
-  case 0:// rsynth/klatt-single phoneme
-           if (trigger==1){
-	     trigger=0;
-	     u8 phonemm=phoneme_prob_remap[(adc_buffer[SELX]>>6)]; // 7bits=128 %69//6=64
-	     pair xx=klatt_phoneme(writepos,phonemm); 
-	     generated=xx.generated;
-	     writepos=xx.writepos;
-	   }
-	   break;
-  case 1: // rsynth/klatt-chain of phonemes
-    writepos=run_holmes(writepos); 
-    break;
-  case 2: // vosim free running
-    writepos=runVOSIM_SC(writepos);
-    break;
-  case 3: // VOSIMondemand
-    if (trigger==1){
-      trigger=0;
-      float freqwency = (float)((adc_buffer[SELX])+100);//1500.0f; 
-      float cycles = (float)((adc_buffer[SELY]>>4)+2);
-      float decay = ((float)(adc_buffer[SELZ])/4096.0f); // TODO as SELZ!
-      pair xx=demandVOSIM_SC(writepos,freqwency,cycles,decay); 
-      generated=xx.generated;
-      writepos=xx.writepos;
-    }
-    break;
-  case 9: // SAM full. no writepos though and just a simple proof here
-        if (trigger==0){
-    	SAMMain();
-	trigger=1;
-	     }     
-    break;
-  case 10:
-    if(lpc_busy() == 0) lpc_newsay(adc_buffer[SELX]>>6);   
-
-    if(lpc_busy() != 0)    lpc_running(); // so just writes once otherwise gets messy...
-    break;
-  case 19: // parwave/simpleklatt
-    dosimpleklatt();
-    break;
-
-  } // cases
-
-    // now readpos is back to one now that we have written something 
-  if (maintrigger==1) {
-      readpos=0;
-      maintrigger=0;
-  }
-	   */
     }
 }
 

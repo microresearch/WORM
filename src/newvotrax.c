@@ -51,7 +51,7 @@ extern u8 TTS;
 #endif
 #include "vocab_votrax.h"
 
-extern char TTSinarray[65];
+extern char TTSinarray[17];
 static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
@@ -464,7 +464,7 @@ void chip_update()
 	m_pitch = (m_pitch + 1) & 0x7f;
 
 	// tuning this DONE
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_sely)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -547,7 +547,7 @@ void chip_updateTTS()
 	// it miss by manipulating the inflection inputs, but it'll wrap.
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selz)*64.0f)-8)) + 1)) m_pitch = 0;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0;
 	
 
 	// Filters are updated in index 1 of the pitch wave, which does
@@ -1128,7 +1128,7 @@ void votrax_newsay(){
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  lenny=((16*(m_rom_duration*(1.05f-_selx)*32+1)*4*9+2)/30); 
+  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
 }
 
 int16_t votrax_get_sample(){ // TODO: trying new model
@@ -1270,7 +1270,7 @@ void votrax_newsayTTS(){
   TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
-     TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+     TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
    }
 }
 
@@ -1289,7 +1289,7 @@ int16_t votrax_get_sampleTTS(){
 }
 
 void votrax_retriggerTTS(){
-  TTSlength= text2speechforvotrax(64,TTSinarray,TTSoutarray);
+  TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
   //  if (TTSindex>=TTSlength)     TTSindex=0;
   TTSindex=0;
   writer(TTSoutarray[TTSindex]); 

@@ -1,6 +1,6 @@
 * for march 20 spring equinox release
 
-* general TODO/notes
+b* general TODO/notes
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but
   would *need to test across other HW versions - tested so far on one* DONE
@@ -690,8 +690,45 @@ TMS TTS with allphons:
 
 ** 2/3
 
-- test new TMS banks code, bends for TMS, TTS for TMS
+DONEtrimmed code to speed up development for now...
+
+DONEclicks on some vocabs is actually at beginning rather than at
+end? - how to fix - was in reset in new_say but test now that we can
+move across coeffsDONE
+
+- test new TMS banks codeDONE-but need to do individual tests
+
+- bends for TMS: pitchDONE, energyNO=volume, excitation_data=too subtle, coeffs, length as done
+
+coeffs: m_current_k is read from coeffs tables - we would need to bend
+all (up to how many differs for 5100, 5200) with x/y set up
+
+modes as follows:
+
+1- full tms with pitch bendDONE
+4- eg. allphon mode with both bends TESTED/DONE
+6- TTS for TMS TEST-DONE
+
+///
+
+2-  full tms with length bend TODO 
+3+- subsections of vocabs with both bends TODO
+4+- X/Y bends on subsection of vocab TODO
+5+- raw raw mode TODO
+
 - how bends are applied for sp0256 and votrax (constant, per phonetic element)
+
+*maybe change all TTS so phoneme select is on Z and x axis is Y so we can keep x as bend* - TODO for sp0256 and votraxDONE
+
+*** fixed
+
+- bug in TTS initialisation which was in sp0256 and reduced size to 16 for TTSinarray
+- also fake trigger start in audio.c for testing purposes
+- back to trimmed TMS
+
+** 3/3
+
+- test all modes so far
 
 * TTS 
 
@@ -863,7 +900,10 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 3. digitalker
 5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
+
 6. klatt/nvp variations RE_ACQUAINT
+
+/////////
 
 9. vosim/fof etc.
 10. tube and ntube/glottal/wavetable
@@ -876,6 +916,8 @@ wavetable as in raven, generators eg. pulse, square, and original
 13. what own brutal worm synth could be!
 
 say 6x7=42+ // 7 or 8 main speech engines
+
+////////////////////////////
 
 // or we leave from below and any LPC work for RAVEN which could have 2 inputs?
 
@@ -977,11 +1019,11 @@ Y- repeat/length?
 Z- select phoneme
 TRIGGER- phoneme start
 
-*** TTS
+*** TTS - changed
 
-X- text xaxis
-Y- select ascii character for TTS
-Z- period/pitch
+X- period/pitch
+Y- text xaxis
+Z-  select ascii character for TTS
 TRIGGER- rephrase TTS
 
 *** sp0256vocabone
@@ -1025,8 +1067,8 @@ TRIGGER- UNUSED as we have carrier input
 
 phonemes
 
-X- length of phoneme
-Y- pitch bend
+X- pitch bend
+Y- length of phoneme
 Z- select phoneme
 TRIGGER-reset to start of phoneme
 
@@ -1044,9 +1086,9 @@ Y- param value
 Z- select phrase to bend
 TRIGGER-reset to start of phrase
 
-*** TTS mode
+*** TTS mode - changed
 
-X- text xaxis
-Y- select ascii character for TTS
-Z-bend pitch
-TRIGGER-reset to start/redo TTS
+X- pitch bend
+Y- text xaxis
+Z-  select ascii character for TTS
+TRIGGER- rephrase TTS

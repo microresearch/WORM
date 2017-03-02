@@ -3,7 +3,7 @@
 #include <string.h>
 #include "stdlib.h"
 #include "TTS.h"
-#define MAX_LENGTH 1280
+#define MAX_LENGTH 1024
 
 //static FILE *In_file;
 //static FILE *Out_file;
@@ -210,22 +210,23 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
   return output_count;
 }
 
-unsigned char text2speechfor256(unsigned char  input_len, unsigned char *input, unsigned char *output){ // TODO: this is our model
+unsigned char text2speechfor256(unsigned char  input_len, signed char *input, signed char *output){ // TODO: this is our model
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
   input[input_len] = EOF;
-  xlate_file();
-  //      output_count=10;
+      xlate_file();
+  //        output_count=16;
    if (output_count>=255) output_count=254;
   for (unsigned char i=0;i<output_count;i++){
-        output[i]=remap256[output_array[i]];
+              output[i]=remap256[output_array[i]];
 	if (output_array[i]==12){
 	  output_array[++i]=12;
 	  output_count++;
 	  if (output_count>=255) output_count=254;
  	  }
-	//       output[i]=remap256[rand()%43];
+    //    output[i]=remap256[rand()%43];
+    //    output[i]=remap256[input[i]-97];
   }
   //  output[output_count-1]=255; 
   return output_count-1; //check TODO!
@@ -261,7 +262,7 @@ unsigned char text2speechforSAM(unsigned char  input_len, unsigned char *input, 
   input[input_len] = EOF;
 
   xlate_file();
-    if (output_count>255) output_count=255;
+    if (output_count>255) output_count=254;
 
   //      output_count=10;
   for (unsigned char i=0;i<output_count;i++){
@@ -277,16 +278,16 @@ unsigned char text2speechforTMS(unsigned char input_len, unsigned char *input, u
   input[input_len] = EOF;
 
   xlate_file();
-    if (output_count>255) output_count=255;
+  if (output_count>255) output_count=254;
 
   //      output_count=10;
-      printf("OC%d\n",output_count);
+    //      printf("OC%d\n",output_count);
 
   for (unsigned char i=0;i<output_count;i++){
         output[i]=remaptms[output_array[i]];
 	}
-  output[output_count-1]=255; 
-  return output_count;
+  //  output[output_count-1]=255; 
+  return output_count-1;
 }
 
 
