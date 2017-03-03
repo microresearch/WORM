@@ -621,12 +621,12 @@ void parse_frame()
 	return;
 }
 
-void parse_frame_raw()
+void parse_frame_raw() // TODO - for our 3 sets of coeffs
 {
 	int indx, i, rep_flag;
 
 	// attempt to extract the energy index
-	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits); // exy[0]
 
 	// if the energy index is 0 or 15, we're done
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
@@ -634,12 +634,12 @@ void parse_frame_raw()
 
 
 	// attempt to extract the pitch
-	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits); // exy[1] make sure it can be 0
 
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[2]-exy[5]
 	}
 
 	// if the pitch index was zero, we only need 4 K's...
@@ -652,7 +652,7 @@ void parse_frame_raw()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[6]-exy[11]
 	}
 
 }
@@ -1532,7 +1532,7 @@ void tms_newsay(){
   
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
-  /* // this was causing glitch at start of phrase but is in the mame code
+  /* // this was causing glitch at start of phrase
 for (i = 0; i < 4; i++)
     m_new_frame_k_idx[i] = 0;
   for (i = 4; i < 7; i++)

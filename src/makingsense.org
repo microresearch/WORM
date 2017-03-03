@@ -721,7 +721,8 @@ modes as follows:
 3+- subsections of vocabs with both bends TODO - which vocabs?
 4+- X/Y bends on subsection of vocab TODO - which vocabs?
 
-5+- raw raw mode TODO - starting on parse_frame_raw - and keep pitch bend on selx as these are just frame bends
+5+- raw raw mode TODO - starting on parse_frame_raw - and keep pitch
+bend on selx as these are just frame bends - *should be for 2 different coeff sets - 5100, 5200 and 5220*
 
 
 
@@ -922,7 +923,7 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 * main modes overview - otherwise see modes.org
 
-** basic modes to do with suggested extensions - say 64 modes
+** basic modes to do with suggested extensions - say 48 modes
 
 1. TMS -> vocab,TTS?, phonemes, raw, other excitations for all
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
@@ -934,13 +935,12 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 3. digitalker
 5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
-
 6. klatt/nvp variations RE_ACQUAINT
 
 /////////
 
-9. vosim/fof etc.
 10. tube and ntube/glottal/wavetable
+9. vosim/fof etc.
 11. voicform?
 
 12. compost - startX, endY in compost buffer and Z? Z as last mode
