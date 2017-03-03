@@ -770,7 +770,7 @@ uint16_t lpc_get_sample(void)
 
 
 void main(int argc, char *argv[]){
-  int x;
+  int x=0;
   lpc_init();
    int uffset=atoi(argv[1]);
    int uuffset=atoi(argv[2]);
@@ -804,19 +804,19 @@ void main(int argc, char *argv[]){
    
    //   lpc_say(wordlist_[uffset]+uuffset);
    //   for (x=0;x<18;x++){
-   x=0;
-      while (test00[x]!=255){
-	lpc_say(wordlist_alphons[test00[x++]]);
-// lpc_say(sp_ffD008nn172);
+   //   x=0;
+   while (test00[x]!=255){
+     lpc_say(wordlist_alphons[test00[x++]]);
+     //   }
+     // lpc_say(sp_ffD008nn172);
 //	printf("NEXT\n");
 //		lpc_update_coeffs();
 
 	// or we try c7 etc as length?
       while(synth_running) {
 	lpc_running();
-
       }
-      }
+            }
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   // stay with first one which could be THIR or THIRTEE according to

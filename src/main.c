@@ -88,12 +88,14 @@ extern Wavetable wavtable;
 extern wormy myworm;
 extern char TTSinarray[17];
 
+char TTStester[16]={'m','a','r','t','i','n', ' ', 'm','a','r','t','i','n', ' ', ' ', ' '};
+
 void main(void)
 {
   int16_t x;
 
   for (x=0;x<16;x++){
-    TTSinarray[x]=97+x;
+    TTSinarray[x]=TTStester[x];
   }
 
 

@@ -1290,13 +1290,11 @@ int16_t votrax_get_sampleTTS(){
 
 void votrax_retriggerTTS(){
   TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
-  //  if (TTSindex>=TTSlength)     TTSindex=0;
-  TTSindex=0;
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
-  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+  inflection_w(TTSoutarray[0]>>6); // how many bits?
   lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
-  TTSindex++;
+  TTSindex=1;
 }
 
 #endif
@@ -1312,13 +1310,15 @@ void main(void){
   device_start();
   device_reset();
 ;
-  const unsigned char TTStest[]  = {24, 27, 0, 24, 38, 40, 62, 57, 0, 43, 62, 27, 36, 61, 38, 40, 62, 36, 43, 62, 41, 40, 40, 0, 62};
-  
+//  const unsigned char TTStest[]  = {24, 27, 0, 24, 38, 40, 62, 57, 0, 43, 62, 27, 36, 61, 38, 40, 62, 36, 43, 62, 41, 40, 40, 0, 62};
+
+ const unsigned char TTStest[]  = {7, 12, 36, 43, 42, 39, 13, 62}; // MARTIN
+ 
   // try and say
-  //  for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
+  for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
     //    writer(welcome[x]);
-  //    writer(TTStest[x]);
-  writer(1);
+    writer(TTStest[x]);
+    //  writer(1);
   phone_commit();
 //	m_votrax->inflection_w(space, 0, data >> 6);
 //  inflection_w(TTStest[x]>>6);
@@ -1331,9 +1331,10 @@ void main(void){
 // this is not precise - say 1200 above = 16*41*4*9+2=24000 odd
     // sample rate? say 24000 as about right?
   generate_votrax_samples(lenny);
-  writer(1);
-  phone_commit();
-  generate_votrax_samples(lenny);
+  }
+  //  writer(1);
+  //  phone_commit();
+  //  generate_votrax_samples(lenny);
   //  }
   //  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d\n",m_rom_duration);
 

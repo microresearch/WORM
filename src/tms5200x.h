@@ -9,3 +9,8 @@ void tms_retriggerTTS();
 
 int16_t tms_get_sample_allphon();
 int16_t tms_newsay_allphon();
+
+int16_t tms_get_sample_bendlength();
+
+int16_t tms_get_sample_lowbit();
+int16_t tms_newsay_lowbit();

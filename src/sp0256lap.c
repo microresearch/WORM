@@ -57,8 +57,9 @@ const unsigned char HAPPIER[7]={0x2d,4,4,4};
 const unsigned char SILENT[7]={4,4,4,4,4,4,4};
 
                                      
-const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 255};
+//const unsigned char testfromTTS[68]={46, 15, 0, 3, 17, 31, 3, 29, 14, 19, 3, 40, 23, 14, 3, 40, 6, 35, 3, 55, 12, 42, 55, 3, 255};
 
+const unsigned char testfromTTS[6]={16, 24, 14, 17, 12, 11}; // MARTIN
 
 struct lpc12_t
 {
@@ -771,7 +772,7 @@ UINT32 getb( int len )
 
 	  data=1;
 	  if (idx0<0x1800 && idx0>=0x1000) {
-	    whichrom=m_rom12;
+	    whichrom=m_romAL2;
 	    minus=0x1000;
 	  }
 
@@ -1208,10 +1209,13 @@ void micro()
 void main(int argc, char *argv[]){
 
   //		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
-  u8 output;
+  u8 output,x;
    sp0256_init();
 
-  int dada=atoi(argv[1]);
+   //   for (x=0;x<6;x++){
+          int dada=atoi(argv[1]);
+   //     int dada=testfromTTS[x];
+			    
   //  fprintf(stderr,"NUM: %d 0x%x\n", dada, dada<<1);
     //  fprintf(stderr,"0x%0x\n", dada);
   //		m_speech->ald_w(space, 0, offset & 0x7f);
@@ -1247,9 +1251,9 @@ void main(int argc, char *argv[]){
      if (m_halted==1 && m_filt.rpt <= 0)     {
 	break;
             }
+   }
 
-
-	    }
+   //	    }
      //        }
 
  }

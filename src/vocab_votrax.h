@@ -7,172 +7,172 @@ enum Intonations {I_1 =0x40,   I_2 =0x80,   I_3 =0xC0};
 
 #define END 0xFF
 
-// vocabularies - [0] is length:
+// vocabularies - [0] is length: - get rid of that!
 
 // Wizard of Wor
 
-const unsigned char p1[]         __attribute__ ((section (".flash")))  = {30, I_2|PA0, K, I, I3, L, PA0, W, O, O1, R, L, UH, K, PA0, F, O1, R, D, UH, B, UH3, L, S, K, O, O1, R, PA1, I_2|PA0, END};
+const unsigned char p1[]         __attribute__ ((section (".flash")))  = {I_2|PA0, K, I, I3, L, PA0, W, O, O1, R, L, UH, K, PA0, F, O1, R, D, UH, B, UH3, L, S, K, O, O1, R, PA1, I_2|PA0, END}; //30,  
 
-const unsigned char p2[]         __attribute__ ((section (".flash")))  = {50, I, F, Y1, I3, IU, U, G, EH, EH3, T,
+const unsigned char p2[]         __attribute__ ((section (".flash")))  = {I, F, Y1, I3, IU, U, G, EH, EH3, T,
 		      T, U, U1, P, AH1, W, ER, F, UH1, L, 
 			PA1, I_2|PA0, AH1, EH3, I3, Y, L, T, A, K, 
 			K, EH, R, UH1, V, Y1, IU, U, PA0, M, 
-			AH1, I3, Y, S, EH, L, F, PA1, I_2|PA0, END};
+									  AH1, I3, Y, S, EH, L, F, PA1, I_2|PA0, END}; //50, 
 
-const unsigned char p3[]         __attribute__ ((section (".flash")))  = {11, I_2|PA0, Y1, IU, U, UH, R, I, N, PA1, I_2|PA0, END};
+const unsigned char p3[]         __attribute__ ((section (".flash")))  = {I_2|PA0, Y1, IU, U, UH, R, I, N, PA1, I_2|PA0, END}; //11, 
 
-const unsigned char p4[]         __attribute__ ((section (".flash")))  = {21, I_2|PA0, THV, UH, PA0, D, UH, N, J, EH1, N, 
-			Z, UH, V, W, O, O1, R, R, PA1, I_2|PA1, END};
-const unsigned char p5[]         __attribute__ ((section (".flash")))  = {9, AH1, UH3, I3, Y, AE1, EH3, M, PA1, END};
+const unsigned char p4[]         __attribute__ ((section (".flash")))  = {I_2|PA0, THV, UH, PA0, D, UH, N, J, EH1, N, 
+									  Z, UH, V, W, O, O1, R, R, PA1, I_2|PA1, END}; //21, 
+const unsigned char p5[]         __attribute__ ((section (".flash")))  = {AH1, UH3, I3, Y, AE1, EH3, M, PA1, END}; //9, 
 
-const unsigned char p6[]         __attribute__ ((section (".flash")))  = {18, PA1, THV, I_1|UH, W, I_1|I, Z, ER, D, I_1|UH, I_1|V, 
-			PA0, I_1|W, O, O1, R, R, PA1, END};
+const unsigned char p6[]         __attribute__ ((section (".flash")))  = {PA1, THV, I_1|UH, W, I_1|I, Z, ER, D, I_1|UH, I_1|V, 
+									  PA0, I_1|W, O, O1, R, R, PA1, END}; //18, 
 
-const unsigned char p7[]         __attribute__ ((section (".flash")))  = {44, W, UH, N, B, UH3, AH2, Y, T, F, R, UH, M, M, AH1, I3, Y1, P, R, I, T, Y, Y1, S, PA1, PA1, AE1, EH3, N, D, Y1, IU, U, L, EH, K, PA0, S, P, L, O, U1, D, PA1, END};
+const unsigned char p7[]         __attribute__ ((section (".flash")))  = {W, UH, N, B, UH3, AH2, Y, T, F, R, UH, M, M, AH1, I3, Y1, P, R, I, T, Y, Y1, S, PA1, PA1, AE1, EH3, N, D, Y1, IU, U, L, EH, K, PA0, S, P, L, O, U1, D, PA1, END}; //44, 
 
-const unsigned char p8[]         __attribute__ ((section (".flash")))  = {29,M, AH1, EH3, I3, Y, K, R, E1, T, CH, ER, S, AH, UH3, R, R, A2, D, Y, O1, U1, AE1, EH3, K, T, I1, V, PA1, END};
+const unsigned char p8[]         __attribute__ ((section (".flash")))  = {AH1, EH3, I3, Y, K, R, E1, T, CH, ER, S, AH, UH3, R, R, A2, D, Y, O1, U1, AE1, EH3, K, T, I1, V, PA1, END}; //29,M, 
 
-const unsigned char p9[]         __attribute__ ((section (".flash")))  = {32,W, O, R, L, UH, K, PA0, W, I, L, PA0, EH, S, PA0, K, A2, I3, Y1, P, PA0, THV, R, U, THV, UH, D, O, O1, R, PA1 , END};
+const unsigned char p9[]         __attribute__ ((section (".flash")))  = {O, R, L, UH, K, PA0, W, I, L, PA0, EH, S, PA0, K, A2, I3, Y1, P, PA0, THV, R, U, THV, UH, D, O, O1, R, PA1 , END}; //32,W, 
 
-const unsigned char p10[]         __attribute__ ((section (".flash")))  = {31,Y1, IU, U, W, O1, N, T, H, I_1|AE1, I2, V, PA0, A2, T, CH, I_1|AE, N, S, PA0, F, O2, R, Y, O1, R, D, I_1|AE, N, S, PA1, END};
+const unsigned char p10[]         __attribute__ ((section (".flash")))  = {IU, U, W, O1, N, T, H, I_1|AE1, I2, V, PA0, A2, T, CH, I_1|AE, N, S, PA0, F, O2, R, Y, O1, R, D, I_1|AE, N, S, PA1, END}; //31,Y1, 
 
-const unsigned char p11[]         __attribute__ ((section (".flash")))  = {32,I_2|PA0, R, E1, M, I_1|EH, M, B, ER, PA1, I_1|AH1, EH3, I3, Y, M, THV, UH, W, I, Z, ER, D, PA1, N, AH1, T, Y, IU, U1, U1, PA1, I_2|PA0, END};
+const unsigned char p11[]         __attribute__ ((section (".flash")))  = {R, E1, M, I_1|EH, M, B, ER, PA1, I_1|AH1, EH3, I3, Y, M, THV, UH, W, I, Z, ER, D, PA1, N, AH1, T, Y, IU, U1, U1, PA1, I_2|PA0, END}; //32,I_2|PA0, 
 
-const unsigned char p12[]         __attribute__ ((section (".flash")))  = {45,I_1|I1, I_1|F, Y, I3, U1, K, AE1, EH3, N, T, PA1, B, I_1|E1, T, THV, UH1, R, EH, S, T, PA1, I_2|THV, I_1|EH1, N, Y, IU, U1, L, N, EH1, V, ER, PA1, G, I_1|EH1, T, THV, UH1, B, EH, S, T, PA0, I_2|PA0, END};
+const unsigned char p12[]         __attribute__ ((section (".flash")))  = {I_1|F, Y, I3, U1, K, AE1, EH3, N, T, PA1, B, I_1|E1, T, THV, UH1, R, EH, S, T, PA1, I_2|THV, I_1|EH1, N, Y, IU, U1, L, N, EH1, V, ER, PA1, G, I_1|EH1, T, THV, UH1, B, EH, S, T, PA0, I_2|PA0, END}; //45,I_1|I1, 
 
-const unsigned char p13[]         __attribute__ ((section (".flash")))  = {50,I_2|PA0, I, F, Y, I3, U, D, E1, S, T, R, O1, UH3, I3, AY, M, AH2, AH2, EH3, I3, Y, B, I_1|A, B, Y, Y1, S, PA1, AH1, I3, Y1, L, P, I_1|AH1, P, Y, IU, U, I1, N, THV, AY, AY, UH, V, EH, N, PA1, I_2|PA0, END};
+const unsigned char p13[]         __attribute__ ((section (".flash")))  = {I, F, Y, I3, U, D, E1, S, T, R, O1, UH3, I3, AY, M, AH2, AH2, EH3, I3, Y, B, I_1|A, B, Y, Y1, S, PA1, AH1, I3, Y1, L, P, I_1|AH1, P, Y, IU, U, I1, N, THV, AY, AY, UH, V, EH, N, PA1, I_2|PA0, END}; //50,I_2|PA0, 
 
-const unsigned char p14[]         __attribute__ ((section (".flash")))  = {22,I_2|PA0, N, I_1|AH1, UH3, U1, AH1, EH3, I3, Y, M, G, EH, T, I, NG, M, AE, EH3, D, PA1, I_2|PA0, END};
+const unsigned char p14[]         __attribute__ ((section (".flash")))  = {N, I_1|AH1, UH3, U1, AH1, EH3, I3, Y, M, G, EH, T, I, NG, M, AE, EH3, D, PA1, I_2|PA0, END}; //22,I_2|PA0, 
 
-const unsigned char p15[]         __attribute__ ((section (".flash")))  = {28,I_2|PA0, Y1, IU, U, W, I, L, N, I_1|EH, V, ER, L, E1, E1, V, W, I_1|O, I_1|O1, R, UH1, L, I_1|AH1, EH3, Y, V, PA1, I_2|PA0, END};
+const unsigned char p15[]         __attribute__ ((section (".flash")))  = {Y1, IU, U, W, I, L, N, I_1|EH, V, ER, L, E1, E1, V, W, I_1|O, I_1|O1, R, UH1, L, I_1|AH1, EH3, Y, V, PA1, I_2|PA0, END}; //28,I_2|PA0, 
 
-const unsigned char p16[]         __attribute__ ((section (".flash")))  = {22,I_2|PA0, G, I_1|AH1, R, W, O1, R, PA1, G, O1, O1, I_1|AE1, EH3, F, T, ER, THV, EH, M, PA1, I_2|PA0, END};
+const unsigned char p16[]         __attribute__ ((section (".flash")))  = {G, I_1|AH1, R, W, O1, R, PA1, G, O1, O1, I_1|AE1, EH3, F, T, ER, THV, EH, M, PA1, I_2|PA0, END}; //22,I_2|PA0, 
 
-const unsigned char p17[]         __attribute__ ((section (".flash")))  = {15,I_2|PA0, W, AH1, T, CH, THV, UH, R, A, D, AH1, R, PA0, I_2|PA0, END};
+const unsigned char p17[]         __attribute__ ((section (".flash")))  = {W, AH1, T, CH, THV, UH, R, A, D, AH1, R, PA0, I_2|PA0, END}; //15,I_2|PA0, 
 
-const unsigned char p18[]         __attribute__ ((section (".flash")))  = {7,W, O, R, Y, ER, PA1, END};
+const unsigned char p18[]         __attribute__ ((section (".flash")))  = {O, R, Y, ER, PA1, END}; //7,W, 
 
-const unsigned char p19[]         __attribute__ ((section (".flash")))  = {30,I_2|PA0, N, AH1, I_1|UH3, I_1|U1, Y1, IU, U1, U1, G, EH, T, PA0, TH, UH1, PA0, I_1|H, I_1|EH1, I_1|I3, V, E1, W, I_1|A1, I3, Y1, T, S, PA1, I_2|PA0, END};
+const unsigned char p19[]         __attribute__ ((section (".flash")))  = {N, AH1, I_1|UH3, I_1|U1, Y1, IU, U1, U1, G, EH, T, PA0, TH, UH1, PA0, I_1|H, I_1|EH1, I_1|I3, V, E1, W, I_1|A1, I3, Y1, T, S, PA1, I_2|PA0, END}; //30,I_2|PA0, 
 
-const unsigned char p20[]         __attribute__ ((section (".flash")))  = {23,I_2|PA0, Y, O2, O2, R, I_1|AE1, EH3, I_1|S, I_1|K, I, NG, F, O, R, T, R, I_1|UH, I_1|B, UH3, L, PA1, I_2|PA0, END};
+const unsigned char p20[]         __attribute__ ((section (".flash")))  = {Y, O2, O2, R, I_1|AE1, EH3, I_1|S, I_1|K, I, NG, F, O, R, T, R, I_1|UH, I_1|B, UH3, L, PA1, I_2|PA0, END}; //23,I_2|PA0, 
 
-const unsigned char p21[]         __attribute__ ((section (".flash")))  = {43,I, F, Y, IU, U, T, R, AH1, EH3, I3, Y, I_1|AE1, N, Y, H, I_1|AH1, I_1|R, D, ER, PA1, I_2|PA0, Y1, IU, U, L, I_1|O1, N, L, Y, M, E, E1, T, W, I, TH, I_1|D, U, U, M, PA1, I_2|PA0, END};
+const unsigned char p21[]         __attribute__ ((section (".flash")))  = {F, Y, IU, U, T, R, AH1, EH3, I3, Y, I_1|AE1, N, Y, H, I_1|AH1, I_1|R, D, ER, PA1, I_2|PA0, Y1, IU, U, L, I_1|O1, N, L, Y, M, E, E1, T, W, I, TH, I_1|D, U, U, M, PA1, I_2|PA0, END}; //43,I, 
 
-const unsigned char p22[]         __attribute__ ((section (".flash")))  = {40,I_2|PA0, B, I_1|ER, I_1|R, W, O, R, PA1, G, I_1|AH1, I_1|R, W, O, R, PA1, AE1, EH3, N, D, TH, I_1|O, I_1|R, W, O, R, PA1, W, I, L, D, IU, I_1|U, Y1, IU, U, I, N, PA1, I_2|PA0, END};
+const unsigned char p22[]         __attribute__ ((section (".flash")))  = {B, I_1|ER, I_1|R, W, O, R, PA1, G, I_1|AH1, I_1|R, W, O, R, PA1, AE1, EH3, N, D, TH, I_1|O, I_1|R, W, O, R, PA1, W, I, L, D, IU, I_1|U, Y1, IU, U, I, N, PA1, I_2|PA0, END}; //40,I_2|PA0, 
 
-const unsigned char p23[]         __attribute__ ((section (".flash")))  = {35,I_2|PA0, M, AH1, EH3, I3, Y, W, I_1|O, I_1|R, L, I, NG, S, AH1, UH3, R, V, I_1|EH, I_1|EH3, R, Y, V, I_1|EH, I_1|EH3, R, Y, H, I_1|UH, N, G, R, Y, PA1, I_2|PA0, END};
+const unsigned char p23[]         __attribute__ ((section (".flash")))  = {M, AH1, EH3, I3, Y, W, I_1|O, I_1|R, L, I, NG, S, AH1, UH3, R, V, I_1|EH, I_1|EH3, R, Y, V, I_1|EH, I_1|EH3, R, Y, H, I_1|UH, N, G, R, Y, PA1, I_2|PA0, END}; //35,I_2|PA0, 
 
-const unsigned char p24[]         __attribute__ ((section (".flash")))  = {36,M, AH1, I_1|EH3, I_1|I3, I_1|Y, M, I_1|AE1, D, J, I1, K, I, Z, S, T, R, I_1|AW, N, G, R, THV, AE1, EH3, N, Y, O2, O2, R, W, I_1|EH, I_1|P, UH1, N, S, PA1, END};
+const unsigned char p24[]         __attribute__ ((section (".flash")))  = {AH1, I_1|EH3, I_1|I3, I_1|Y, M, I_1|AE1, D, J, I1, K, I, Z, S, T, R, I_1|AW, N, G, R, THV, AE1, EH3, N, Y, O2, O2, R, W, I_1|EH, I_1|P, UH1, N, S, PA1, END}; //36,M, 
 
-const unsigned char p25[]         __attribute__ ((section (".flash")))  = {39,I_2|PA0, Y, O2, O2, R, I_1|B, O, O2, I_1|N, S, W, I, L, PA0, L, AH1, EH3, Y, I, N, THV, UH, D, I_1|UH, N, J, EH1, N, S, UH, V, W, O, O1, R, R, PA1, I_2|PA0, END};
+const unsigned char p25[]         __attribute__ ((section (".flash")))  = {Y, O2, O2, R, I_1|B, O, O2, I_1|N, S, W, I, L, PA0, L, AH1, EH3, Y, I, N, THV, UH, D, I_1|UH, N, J, EH1, N, S, UH, V, W, O, O1, R, R, PA1, I_2|PA0, END}; //39,I_2|PA0, 
 
-const unsigned char p26[]         __attribute__ ((section (".flash")))  = {44,W, AH1, EH3, I3, L, Y1, I_1|IU, I_1|U, D, E1, V, EH1, L, UH3, P, T, S, AH1, I3, AY, EH, N, S, PA1, W, E1, Y, D, E1, V, EH1, L, UH3, P, T, M, AE1, EH3, D, J, I1, K, PA1, END};
+const unsigned char p26[]         __attribute__ ((section (".flash")))  = {AH1, EH3, I3, L, Y1, I_1|IU, I_1|U, D, E1, V, EH1, L, UH3, P, T, S, AH1, I3, AY, EH, N, S, PA1, W, E1, Y, D, E1, V, EH1, L, UH3, P, T, M, AE1, EH3, D, J, I1, K, PA1, END}; //44,W, 
 
-const unsigned char p27[]         __attribute__ ((section (".flash")))  = {20,H, I_1|A, I_1|I1, I_1|Y1, PA1, PA1, I, N, S, I_1|ER, I_1|T, PA1, I_1|K, I_1|O1, O2, I3, Y1, N, PA1, END};
+const unsigned char p27[]         __attribute__ ((section (".flash")))  = {I_1|A, I_1|I1, I_1|Y1, PA1, PA1, I, N, S, I_1|ER, I_1|T, PA1, I_1|K, I_1|O1, O2, I3, Y1, N, PA1, END}; //20,H, 
 
-const unsigned char p28[]         __attribute__ ((section (".flash")))  = {11,F, I_1|AH1, I_1|I3, I_1|Y, N, D, M, E, E1, PA1, END};
+const unsigned char p28[]         __attribute__ ((section (".flash")))  = {I_1|AH1, I_1|I3, I_1|Y, N, D, M, E, E1, PA1, END}; //11,F, 
 
-const unsigned char p29[]         __attribute__ ((section (".flash")))  = {19,AH1, I_1|I3, I_1|Y, M, PA0, AH2, O1, U1, D, AH1, PA0, S, P, AH2, I_1|I1, I_1|Y, T, PA1, END};
+const unsigned char p29[]         __attribute__ ((section (".flash")))  = {I_1|I3, I_1|Y, M, PA0, AH2, O1, U1, D, AH1, PA0, S, P, AH2, I_1|I1, I_1|Y, T, PA1, END}; //19,AH1, 
 
-const unsigned char p30[]         __attribute__ ((section (".flash")))  = {9,G, EH, T, R, EH, D, Y, PA1, END};
+const unsigned char p30[]         __attribute__ ((section (".flash")))  = {EH, T, R, EH, D, Y, PA1, END}; //9,G, 
 
-const unsigned char p31[]         __attribute__ ((section (".flash")))  = {33,Y1, IU, U, D, PA0, B, I_1|EH1, T, ER, PA0, H, O, P, Y1, I_1|IU, I_1|U, D, O, N, T, I_1|F, I_1|AH1, I3, Y1, N, D, I_1|M, E, E1, PA1, PA1, PA1, END};
+const unsigned char p31[]         __attribute__ ((section (".flash")))  = {IU, U, D, PA0, B, I_1|EH1, T, ER, PA0, H, O, P, Y1, I_1|IU, I_1|U, D, O, N, T, I_1|F, I_1|AH1, I3, Y1, N, D, I_1|M, E, E1, PA1, PA1, PA1, END}; //33,Y1, 
 
-const unsigned char p32[]         __attribute__ ((section (".flash")))  = {31,AH1, N, UH, TH, ER, PA0, K, O1, O2, I3, Y1, N, F, O, R, M, I_1|AH1, I_1|I3, I_1|Y1, T, R, EH1, ZH, ER, T, CH, EH, S, T, PA1, END};
+const unsigned char p32[]         __attribute__ ((section (".flash")))  = {N, UH, TH, ER, PA0, K, O1, O2, I3, Y1, N, F, O, R, M, I_1|AH1, I_1|I3, I_1|Y1, T, R, EH1, ZH, ER, T, CH, EH, S, T, PA1, END}; //31,AH1, 
 
-const unsigned char p33[]         __attribute__ ((section (".flash")))  = {11,PA1, H, I_1|AH1, H, I_1|AH1, H, AH1, H, AH1, PA1, END};
+const unsigned char p33[]         __attribute__ ((section (".flash")))  = {H, I_1|AH1, H, I_1|AH1, H, AH1, H, AH1, PA1, END}; //11,PA1, 
 
-const unsigned char p34[]         __attribute__ ((section (".flash")))  = {35,I_1|AH, AH2, PA0, I_1|G, I_1|IU, I_1|IU, IU, IU, D, PA1, M, AH1, I3, Y, P, I_1|EH, T, S, W, ER, R, G, EH, T, I, NG, H, I_1|UH, I_1|NG, G, R, Y, PA1, PA1, END};
+const unsigned char p34[]         __attribute__ ((section (".flash")))  = {AH2, PA0, I_1|G, I_1|IU, I_1|IU, IU, IU, D, PA1, M, AH1, I3, Y, P, I_1|EH, T, S, W, ER, R, G, EH, T, I, NG, H, I_1|UH, I_1|NG, G, R, Y, PA1, PA1, END}; //35,I_1|AH, 
 
-const unsigned char p35[]         __attribute__ ((section (".flash")))  = {21,I_2|PA0, Y1, IU, U, L, G, EH, T, PA1, PA1, THV, E, PA0, I_1|AH2, R, E, N, AH1, PA1, I_2|PA1, END};
+const unsigned char p35[]         __attribute__ ((section (".flash")))  = {Y1, IU, U, L, G, EH, T, PA1, PA1, THV, E, PA0, I_1|AH2, R, E, N, AH1, PA1, I_2|PA1, END}; //21,I_2|PA0, 
 
-const unsigned char p36[]         __attribute__ ((section (".flash")))  = {12,I_2|PA1, H, AH1, H, AH1, H, AH1, H, AH1, PA1, I_2|PA0, END};
+const unsigned char p36[]         __attribute__ ((section (".flash")))  = {H, AH1, H, AH1, H, AH1, H, AH1, PA1, I_2|PA0, END}; //12,I_2|PA1, 
 
-const unsigned char p37[]         __attribute__ ((section (".flash")))  = {36,AH1, N, UH1, THV, ER, PA0, W, O, R, Y, ER, F, O1, R, M, AH1, I3, Y1, B, A, Y, B, Y1, Y, S, T, U, D, E, V, AH1, O2, U1, R, PA1, END};
+const unsigned char p37[]         __attribute__ ((section (".flash")))  = {N, UH1, THV, ER, PA0, W, O, R, Y, ER, F, O1, R, M, AH1, I3, Y1, B, A, Y, B, Y1, Y, S, T, U, D, E, V, AH1, O2, U1, R, PA1, END}; //36,AH1, 
 
-const unsigned char p38[]         __attribute__ ((section (".flash")))  = {30,K, I_1|E, P, PA0, G, O, I1, Y1, NG, PA0, AE, N, D, Y, IU, U, W, I, L, F, I_1|AH1, I1, Y1, N, D, M, E, E1, PA1, END};
+const unsigned char p38[]         __attribute__ ((section (".flash")))  = {I_1|E, P, PA0, G, O, I1, Y1, NG, PA0, AE, N, D, Y, IU, U, W, I, L, F, I_1|AH1, I1, Y1, N, D, M, E, E1, PA1, END}; //30,K, 
 
-const unsigned char p39[]         __attribute__ ((section (".flash")))  = {30,AH1, F, E1, U, U, M, O, R, D, UH, N, J, EH1, N, S, PA1, AH1, N, D, Y, IU, I_1|U, I_1|L, B, E, E1, PA0, A, A2, END};
+const unsigned char p39[]         __attribute__ ((section (".flash")))  = {F, E1, U, U, M, O, R, D, UH, N, J, EH1, N, S, PA1, AH1, N, D, Y, IU, I_1|U, I_1|L, B, E, E1, PA0, A, A2, END}; //30,AH1, 
 
-const unsigned char p40[]         __attribute__ ((section (".flash")))  = {9,W, I_1|O, I_1|R, L, O, R, D, PA1, END};
+const unsigned char p40[]         __attribute__ ((section (".flash")))  = {I_1|O, I_1|R, L, O, R, D, PA1, END}; //9,W, 
 
-const unsigned char p41[]         __attribute__ ((section (".flash")))  = {11,I_2|PA0, W, I_1|O, I_1|R, L, O, R, D, PA1, I_2|PA0, END};
+const unsigned char p41[]         __attribute__ ((section (".flash")))  = {W, I_1|O, I_1|R, L, O, R, D, PA1, I_2|PA0, END}; //11,I_2|PA0, 
 
-const unsigned char p42[]         __attribute__ ((section (".flash")))  = {19,K, AH1, M, B, AE, K, F, O, R, M, O, O1, R, PA1, PA1, W, I, TH, END};
+const unsigned char p42[]         __attribute__ ((section (".flash")))  = {AH1, M, B, AE, K, F, O, R, M, O, O1, R, PA1, PA1, W, I, TH, END}; //19,K, 
 
-const unsigned char p43[]         __attribute__ ((section (".flash")))  = {40,I_2|PA0, THV, UH, D, I_1|UH, I_1|N, J, EH, N, S, PA0, UH, V, PA0, W, O, O1, R, R, AH1, W, I_1|A2, I_1|AY, Y, T, PA0, Y, O, O1, R, R, I3, E1, T, I_1|ER, R, N, PA1, I_2|PA0, END};
+const unsigned char p43[]         __attribute__ ((section (".flash")))  = {THV, UH, D, I_1|UH, I_1|N, J, EH, N, S, PA0, UH, V, PA0, W, O, O1, R, R, AH1, W, I_1|A2, I_1|AY, Y, T, PA0, Y, O, O1, R, R, I3, E1, T, I_1|ER, R, N, PA1, I_2|PA0, END}; //40,I_2|PA0, 
 
-const unsigned char p44[]         __attribute__ ((section (".flash")))  = {44,I_2|PA0, D, I_1|E, E1, P, I, N, THV, UH, PA0, K, AE, V, ER, N, S, PA0, UH, V, W, I_1|O, I_1|O1, R, R, PA1, PA1, Y1, IU, U, U1, W, I, L, M, I_1|E, I_1|E1, T, PA0, M, E, E1, PA0, I_2|PA0, END};
+const unsigned char p44[]         __attribute__ ((section (".flash")))  = {D, I_1|E, E1, P, I, N, THV, UH, PA0, K, AE, V, ER, N, S, PA0, UH, V, W, I_1|O, I_1|O1, R, R, PA1, PA1, Y1, IU, U, U1, W, I, L, M, I_1|E, I_1|E1, T, PA0, M, E, E1, PA0, I_2|PA0, END}; //44,I_2|PA0, 
 
-const unsigned char p45[]         __attribute__ ((section (".flash")))  = {15,PA1, TH, TH, AE1, EH3, NG, K, S, PA0, Y, IU, U, U1, PA1, END};
+const unsigned char p45[]         __attribute__ ((section (".flash")))  = {TH, TH, AE1, EH3, NG, K, S, PA0, Y, IU, U, U1, PA1, END}; //15,PA1, 
 
-const unsigned char p46[]         __attribute__ ((section (".flash")))  = {25,I_2|PA0, Y1, IU, U, N, I_1|O1, I_1|O1, O1, Y1, IU, U, K, AE1, EH3, N, D, IU, U, B, I_1|EH, T, ER, PA1, I_2|PA0, END};
+const unsigned char p46[]         __attribute__ ((section (".flash")))  = {Y1, IU, U, N, I_1|O1, I_1|O1, O1, Y1, IU, U, K, AE1, EH3, N, D, IU, U, B, I_1|EH, T, ER, PA1, I_2|PA0, END}; //25,I_2|PA0, 
 
-const unsigned char p47[]         __attribute__ ((section (".flash")))  = {39,H, I_1|ER, I_1|R, Y, B, AE1, EH3, K, PA1, PA1, AH1, EH3, I3, Y, K, AE1, EH3, N, T, W, I_1|A2, I_1|AY, Y, T, T, IU, U1, D, I_1|IU, U, I, T, UH1, G, I_1|A1, I_1|EH1, N, PA1, END};
+const unsigned char p47[]         __attribute__ ((section (".flash")))  = {I_1|ER, I_1|R, Y, B, AE1, EH3, K, PA1, PA1, AH1, EH3, I3, Y, K, AE1, EH3, N, T, W, I_1|A2, I_1|AY, Y, T, T, IU, U1, D, I_1|IU, U, I, T, UH1, G, I_1|A1, I_1|EH1, N, PA1, END}; //39,H, 
 
-const unsigned char p48[]         __attribute__ ((section (".flash")))  = {40,Y1, IU, U, K, AE1, EH3, N, S, T, I_1|AH1, R, T, AH1, N, I_1|IU, U1, W, PA1, I_2|PA1, B, UH, T, F, O1, R, N, AH1, I_1|UH3, I_1|U1, Y, O2, O2, R, TH, R, I_1|U1, U1, PA1, I_2|PA1, END};
+const unsigned char p48[]         __attribute__ ((section (".flash")))  = {IU, U, K, AE1, EH3, N, S, T, I_1|AH1, R, T, AH1, N, I_1|IU, U1, W, PA1, I_2|PA1, B, UH, T, F, O1, R, N, AH1, I_1|UH3, I_1|U1, Y, O2, O2, R, TH, R, I_1|U1, U1, PA1, I_2|PA1, END}; //40,Y1, 
 
-const unsigned char p49[]         __attribute__ ((section (".flash")))  = {35,H, I_1|E, H, I_1|E, H, I_1|E, H, O, H, O, H, O, H, AH1, H, AH1, H, AH1, H, AH1, PA1, THV, I_1|AE, EH3, T, PA0, PA0, W, UH, Z, F, UH, N, PA1, END};
+const unsigned char p49[]         __attribute__ ((section (".flash")))  = {I_1|E, H, I_1|E, H, I_1|E, H, O, H, O, H, O, H, AH1, H, AH1, H, AH1, H, AH1, PA1, THV, I_1|AE, EH3, T, PA0, PA0, W, UH, Z, F, UH, N, PA1, END}; //35,H, 
 
-const unsigned char p50[]         __attribute__ ((section (".flash")))  = {26,W, I_1|EH, L, K, UH, M, PA1, T, U1, M, AH1, I1, Y, W, O1, I_1|ER, I_1|L, D, UH, V, W, O, O1, R, PA1, END};
+const unsigned char p50[]         __attribute__ ((section (".flash")))  = {I_1|EH, L, K, UH, M, PA1, T, U1, M, AH1, I1, Y, W, O1, I_1|ER, I_1|L, D, UH, V, W, O, O1, R, PA1, END}; //26,W, 
 
-const unsigned char p51[]         __attribute__ ((section (".flash")))  = {34,S, I_1|O, Y, IU, U1, V, K, I_1|UH, I_1|M, T, U1, S, K, O, O1, R, PA1, I1, N, THV, UH1, W, O1, I_1|ER, L, D, UH, V, W, I_1|O, O1, R, PA1, END};
+const unsigned char p51[]         __attribute__ ((section (".flash")))  = {I_1|O, Y, IU, U1, V, K, I_1|UH, I_1|M, T, U1, S, K, O, O1, R, PA1, I1, N, THV, UH1, W, O1, I_1|ER, L, D, UH, V, W, I_1|O, O1, R, PA1, END}; //34,S, 
 
-const unsigned char p52[]         __attribute__ ((section (".flash")))  = {45,Y, O2, O2, R, AW, F, T, IU, U1, I_2|S, E1, Y, THV, UH, I_2|W, I, Z, ER, D, PA1, THV, UH, M, AE1, EH3, D, J, I1, K, UH1, L, I_2|W, I, Z, ER, D, I_2|UH, V, W, O1, O2, R, PA1, PA1, END};
+const unsigned char p52[]         __attribute__ ((section (".flash")))  = {O2, O2, R, AW, F, T, IU, U1, I_2|S, E1, Y, THV, UH, I_2|W, I, Z, ER, D, PA1, THV, UH, M, AE1, EH3, D, J, I1, K, UH1, L, I_2|W, I, Z, ER, D, I_2|UH, V, W, O1, O2, R, PA1, PA1, END}; //45,Y, 
 
-const unsigned char p53[]         __attribute__ ((section (".flash")))  = {33,I_2|PA0, B, ER, R, W, O, R, H, AE, S, N, T, E, T, EH1, N, EH, N, Y, W, UH, N, PA0, I1, N, M, UH, N, TH, S, PA1, I_2|PA0, END};
+const unsigned char p53[]         __attribute__ ((section (".flash")))  = {B, ER, R, W, O, R, H, AE, S, N, T, E, T, EH1, N, EH, N, Y, W, UH, N, PA0, I1, N, M, UH, N, TH, S, PA1, I_2|PA0, END}; //33,I_2|PA0, 
 
-const unsigned char p54[]         __attribute__ ((section (".flash")))  = {23,M, AH1, I3, Y, B, I_1|A, B, Y, Y1, S, PA0, B, R, E1, Y, TH, F, I_1|AH1, EH3, AY, R, PA1, END};
+const unsigned char p54[]         __attribute__ ((section (".flash")))  = {AH1, I3, Y, B, I_1|A, B, Y, Y1, S, PA0, B, R, E1, Y, TH, F, I_1|AH1, EH3, AY, R, PA1, END}; //23,M, 
 
-const unsigned char p55[]         __attribute__ ((section (".flash")))  = {39,I_2|PA0, AH1, EH3, I3, Y, L, F, R, AH1, I_1|EH3, I_1|EH3, I_1|Y, Y1, I3, U1, W, I1, TH, M, AH1, EH3, I3, Y, L, UH3, I_1|AH2, I_1|Y, T, N, I, NG, B, O, L, T, S, PA1, I_2|PA0, END};
+const unsigned char p55[]         __attribute__ ((section (".flash")))  = {AH1, EH3, I3, Y, L, F, R, AH1, I_1|EH3, I_1|EH3, I_1|Y, Y1, I3, U1, W, I1, TH, M, AH1, EH3, I3, Y, L, UH3, I_1|AH2, I_1|Y, T, N, I, NG, B, O, L, T, S, PA1, I_2|PA0, END}; //39,I_2|PA0, 
 
-const unsigned char p56[]         __attribute__ ((section (".flash")))  = {35,G, AH1, R, W, O, R, AE1, EH3, N, D, TH, O, R, W, O, R, PA1, B, Y, K, UH, M, PA1, I_2|PA1, I, N, V, I_1|I1, I_1|Z, I1, B, L, PA1, I_2|PA0, END};
+const unsigned char p56[]         __attribute__ ((section (".flash")))  = {AH1, R, W, O, R, AE1, EH3, N, D, TH, O, R, W, O, R, PA1, B, Y, K, UH, M, PA1, I_2|PA1, I, N, V, I_1|I1, I_1|Z, I1, B, L, PA1, I_2|PA0, END}; //35,G, 
 
-const unsigned char p57[]         __attribute__ ((section (".flash")))  = {45,I_2|PA0, TH, O, R, W, O, R, PA1, I, Z, R, EH, D, PA1, M, E1, AY, N, PA1, AE1, EH3, N, D, H, I_1|UH, I_1|NG, G, R, Y, F, O, R, S, P, A2, I3, Y, S, F, U1, U1, D, PA1, I_2|PA0, END};
+const unsigned char p57[]         __attribute__ ((section (".flash")))  = {TH, O, R, W, O, R, PA1, I, Z, R, EH, D, PA1, M, E1, AY, N, PA1, AE1, EH3, N, D, H, I_1|UH, I_1|NG, G, R, Y, F, O, R, S, P, A2, I3, Y, S, F, U1, U1, D, PA1, I_2|PA0, END}; //45,I_2|PA0, 
 
-const unsigned char p58[]         __attribute__ ((section (".flash")))  = {41,W, O, R, Y, ER, F, AY, I2, R, PA1, AH1, EH3, I3, Y, D, R, AW, N, AY, I2, R, PA1, E1, T, CH, T, AH1, I3, Y1, M, AH1, EH3, I3, Y, UH1, P, I_1|AY, I_1|I3, R, PA1, END};
+const unsigned char p58[]         __attribute__ ((section (".flash")))  = {O, R, Y, ER, F, AY, I2, R, PA1, AH1, EH3, I3, Y, D, R, AW, N, AY, I2, R, PA1, E1, T, CH, T, AH1, I3, Y1, M, AH1, EH3, I3, Y, UH1, P, I_1|AY, I_1|I3, R, PA1, END}; //41,W, 
 
-const unsigned char p59[]         __attribute__ ((section (".flash")))  = {8,I_2|W, O, R, Y, ER, PA1, I_2|PA0, END};
+const unsigned char p59[]         __attribute__ ((section (".flash")))  = {O, R, Y, ER, PA1, I_2|PA0, END}; //8,I_2|W, 
 
-const unsigned char p60[]         __attribute__ ((section (".flash")))  = {24,Y, IU, U1, V, PA0, J, UH, S, T, B, EH, N, F, R, AH1, I1, Y1, D, PA1, B, AH1, I2, Y1, END};
+const unsigned char p60[]         __attribute__ ((section (".flash")))  = {IU, U1, V, PA0, J, UH, S, T, B, EH, N, F, R, AH1, I1, Y1, D, PA1, B, AH1, I2, Y1, END}; //24,Y, 
 
-const unsigned char p61[]         __attribute__ ((section (".flash")))  = {16,I_2|PA0, B, UH3, AH1, Y, T, THV, UH, B, O1, O1, L, T, PA1, I_2|PA0, END};
+const unsigned char p61[]         __attribute__ ((section (".flash")))  = {B, UH3, AH1, Y, T, THV, UH, B, O1, O1, L, T, PA1, I_2|PA0, END}; //16,I_2|PA0, 
 
-const unsigned char p62[]         __attribute__ ((section (".flash")))  = {30,W, UH, S, N, T, THV, AE1, T, L, UH3, I_1|AH2, I_1|Y, T, N, I, NG, B, O, L, T, PA0, D, E, L, I1, SH, UH1, S, PA1, END};
+const unsigned char p62[]         __attribute__ ((section (".flash")))  = {UH, S, N, T, THV, AE1, T, L, UH3, I_1|AH2, I_1|Y, T, N, I, NG, B, O, L, T, PA0, D, E, L, I1, SH, UH1, S, PA1, END}; //30,W, 
 
-const unsigned char p63[]         __attribute__ ((section (".flash")))  = {43,I_2|PA0, AE, N, D, PA0, M, AH1, I1, Y1, T, EH1, L, EH1, P, O, R, T, I1, NG, S, P, EH, L, PA0, K, AE1, N, B, E, PA0, PA0, E1, V, EH, N, F, AE, S, T, ER, PA1, I_2|PA0, END};
+const unsigned char p63[]         __attribute__ ((section (".flash")))  = {AE, N, D, PA0, M, AH1, I1, Y1, T, EH1, L, EH1, P, O, R, T, I1, NG, S, P, EH, L, PA0, K, AE1, N, B, E, PA0, PA0, E1, V, EH, N, F, AE, S, T, ER, PA1, I_2|PA0, END}; //43,I_2|PA0, 
 
-const unsigned char p64[]         __attribute__ ((section (".flash")))  = {36,I_2|PA0, N, I_1|AH1, UH3, U1, Y, IU, U1, U1, N, O, O, THV, UH, T, A, A1, S, T, PA0, UH1, V, M, AH1, I2, Y1, M, AE1, EH3, D, J, I1, K, PA0, I_2|PA0, END};
+const unsigned char p64[]         __attribute__ ((section (".flash")))  = {N, I_1|AH1, UH3, U1, Y, IU, U1, U1, N, O, O, THV, UH, T, A, A1, S, T, PA0, UH1, V, M, AH1, I2, Y1, M, AE1, EH3, D, J, I1, K, PA0, I_2|PA0, END}; //36,I_2|PA0, 
 
-const unsigned char p65[]         __attribute__ ((section (".flash")))  = {23,M, A, Y, B, E, Y, IU, U1, L, S, E, E1, M, E1, E, PA0, UH, G, A2, EH2, N, PA1, END};
+const unsigned char p65[]         __attribute__ ((section (".flash")))  = {A, Y, B, E, Y, IU, U1, L, S, E, E1, M, E1, E, PA0, UH, G, A2, EH2, N, PA1, END}; //23,M, 
 
-const unsigned char p66[]         __attribute__ ((section (".flash")))  = {36,Y1, O2, O2, R, EH1, K, I_1|S, P, L, I_1|O, ZH, UH, N, PA0, W, UH1, S, M, I_1|Y1, I_1|U, S, I, K, T, U, M, AH1, I3, Y1, PA0, E1, ER, R, S, PA1, END};
+const unsigned char p66[]         __attribute__ ((section (".flash")))  = {O2, O2, R, EH1, K, I_1|S, P, L, I_1|O, ZH, UH, N, PA0, W, UH1, S, M, I_1|Y1, I_1|U, S, I, K, T, U, M, AH1, I3, Y1, PA0, E1, ER, R, S, PA1, END}; //36,Y1, 
 
-const unsigned char p67[]         __attribute__ ((section (".flash")))  = {17,AH1, EH3, I3, Y, L, S, A, Y1, I, T, UH, G, A2, EH2, N, PA1, END};
+const unsigned char p67[]         __attribute__ ((section (".flash")))  = {EH3, I3, Y, L, S, A, Y1, I, T, UH, G, A2, EH2, N, PA1, END}; //17,AH1, 
 
-const unsigned char p68[]         __attribute__ ((section (".flash")))  = {35,I_2|PA0, B, E1, E, F, O, R, W, O1, O, R, N, D, PA1, Y, IU, U, U1, PA1, UH1, P, R, O, O1, T, CH, PA1, THV, UH, P, I, T, PA1, I_2|PA0, END};
+const unsigned char p68[]         __attribute__ ((section (".flash")))  = {B, E1, E, F, O, R, W, O1, O, R, N, D, PA1, Y, IU, U, U1, PA1, UH1, P, R, O, O1, T, CH, PA1, THV, UH, P, I, T, PA1, I_2|PA0, END}; //35,I_2|PA0, 
 
-const unsigned char p69[]         __attribute__ ((section (".flash")))  = {35,I_2|PA0, Y, O2, O2, R, P, AE, TH, PA0, L, E, D, S, PA0, D, ER, EH1, K, T, L, Y1, PA0, T, U, U1, PA1, PA1, THV, UH, P, I, T, PA1, I_2|PA0, END};
+const unsigned char p69[]         __attribute__ ((section (".flash")))  = {Y, O2, O2, R, P, AE, TH, PA0, L, E, D, S, PA0, D, ER, EH1, K, T, L, Y1, PA0, T, U, U1, PA1, PA1, THV, UH, P, I, T, PA1, I_2|PA0, END}; //35,I_2|PA0, 
 
-const unsigned char p70[]         __attribute__ ((section (".flash")))  = {23,I_2|PA0, D, E1, E, P, ER, PA1, EH, V, ER, D, E1, E, P, ER, PA1, I, N, T, U, PA1, I_2|PA0, END};
+const unsigned char p70[]         __attribute__ ((section (".flash")))  = {D, E1, E, P, ER, PA1, EH, V, ER, D, E1, E, P, ER, PA1, I, N, T, U, PA1, I_2|PA0, END}; //23,I_2|PA0, 
 
-const unsigned char p71[]         __attribute__ ((section (".flash")))  = {34,I_2|PA0, B, Y, W, EH, R, PA1, Y, IU, U, AH1, R, I, N, THV, UH, W, O, R, L, O, R, D, PA0, D, UH, N, J, EH1, N, Z, PA1, I_2|PA0, END};
+const unsigned char p71[]         __attribute__ ((section (".flash")))  = {B, Y, W, EH, R, PA1, Y, IU, U, AH1, R, I, N, THV, UH, W, O, R, L, O, R, D, PA0, D, UH, N, J, EH1, N, Z, PA1, I_2|PA0, END}; //34,I_2|PA0, 
 
-const unsigned char p72[]         __attribute__ ((section (".flash")))  = {48,I_2|PA0, AH, AH1, PA1, Y, IU, U, TH, AW, T, Y, IU, U, K, OO, D, H, AH1, I2, Y1, D, PA1, B, UH, T, AH1, EH3, I3, Y, M, PA1, PA1, THV, UH, D, UH, N, J, EH1, N, M, AE, S, T, ER, PA1, I_2|PA0, END};
+const unsigned char p72[]         __attribute__ ((section (".flash")))  = {AH, AH1, PA1, Y, IU, U, TH, AW, T, Y, IU, U, K, OO, D, H, AH1, I2, Y1, D, PA1, B, UH, T, AH1, EH3, I3, Y, M, PA1, PA1, THV, UH, D, UH, N, J, EH1, N, M, AE, S, T, ER, PA1, I_2|PA0, END}; //48,I_2|PA0, 
 
-const unsigned char p73[]         __attribute__ ((section (".flash")))  = {28,I_2|PA0, TH, O, O1, R, PA0, B, ER, R, PA0, G, AH, R, PA1, D, I_1|I, I_1|N, ER, S, PA0, R, I_1|EH, I3, D, Y, PA1, I_2|PA0, END};
+const unsigned char p73[]         __attribute__ ((section (".flash")))  = {TH, O, O1, R, PA0, B, ER, R, PA0, G, AH, R, PA1, D, I_1|I, I_1|N, ER, S, PA0, R, I_1|EH, I3, D, Y, PA1, I_2|PA0, END}; //28,I_2|PA0, 
 
-const unsigned char p74[]         __attribute__ ((section (".flash")))  = {32,H, I_1|A, I_1|I1, I_1|Y1, PA1, PA1, Y, O2, O2, R, S, P, A2, AY, Y, S, PA0, B, U, U1, T, S, PA0, UH, N, T, AH1, I2, Y1, D, PA1, END};
+const unsigned char p74[]         __attribute__ ((section (".flash")))  = {I_1|A, I_1|I1, I_1|Y1, PA1, PA1, Y, O2, O2, R, S, P, A2, AY, Y, S, PA0, B, U, U1, T, S, PA0, UH, N, T, AH1, I2, Y1, D, PA1, END}; //32,H, 
 
-const unsigned char p75[]         __attribute__ ((section (".flash")))  = {45,I_2|PA0, M, AH1, EH3, I3, Y1, B, E, E1, S, T, S, PA0, R, UH, N, W, AH1, I2, Y1, L, D, PA1, I, N, THV, UH, W, O, R, L, O, R, D, PA1, D, UH, N, J, EH1, N, Z, PA1, I_2|PA0, END};
+const unsigned char p75[]         __attribute__ ((section (".flash")))  = {M, AH1, EH3, I3, Y1, B, E, E1, S, T, S, PA0, R, UH, N, W, AH1, I2, Y1, L, D, PA1, I, N, THV, UH, W, O, R, L, O, R, D, PA1, D, UH, N, J, EH1, N, Z, PA1, I_2|PA0, END}; //45,I_2|PA0, 
 
-const unsigned char p76[]         __attribute__ ((section (".flash")))  = {29,N, AH1, I_1|UH3, I_1|U1, Y, O2, O2, R, O, N, L, Y, T, CH, AE, N, S, I1, S, Y, O2, O2, R, D, AE, N, S, PA1, END};
+const unsigned char p76[]         __attribute__ ((section (".flash")))  = {AH1, I_1|UH3, I_1|U1, Y, O2, O2, R, O, N, L, Y, T, CH, AE, N, S, I1, S, Y, O2, O2, R, D, AE, N, S, PA1, END}; //29,N, 
 
-const unsigned char p77[]         __attribute__ ((section (".flash")))  = {37,I_2|PA0, AH, R, PA0, PA0, Y1, IU, U, PA0, I_2|PA0, F, I, T, PA0, PA0, T, U, PA0, I_2|PA0, S, ER, V, AH2, I2, Y1, V, PA0, PA0, THV, UH, PA0, I_2|PA0, P, I, T, PA1, END};
+const unsigned char p77[]         __attribute__ ((section (".flash")))  = {AH, R, PA0, PA0, Y1, IU, U, PA0, I_2|PA0, F, I, T, PA0, PA0, T, U, PA0, I_2|PA0, S, ER, V, AH2, I2, Y1, V, PA0, PA0, THV, UH, PA0, I_2|PA0, P, I, T, PA1, END}; //37,I_2|PA0, 
 
-const unsigned char p78[]         __attribute__ ((section (".flash")))  = {32,U, P, S, PA1, PA1, AH1, UH3, I3, Y, M, UH, S, T, H, AE1, V, F, O, R, G, AH1, T, EH1, N, THV, UH, W, AW, L, S, PA1, END};
+const unsigned char p78[]         __attribute__ ((section (".flash")))  = {P, S, PA1, PA1, AH1, UH3, I3, Y, M, UH, S, T, H, AE1, V, F, O, R, G, AH1, T, EH1, N, THV, UH, W, AW, L, S, PA1, END}; //32,U, 
 
-const unsigned char p79[]         __attribute__ ((section (".flash")))  = {28,I_2|PA0, W, AE1, ER, AH1, R, Y1, IU, U, G, O, I1, NG, T, U, H, AH1, I2, Y1, D, PA0, N, AH1, UH3, U, PA1, I_2|PA0, END};
+const unsigned char p79[]         __attribute__ ((section (".flash")))  = {W, AE1, ER, AH1, R, Y1, IU, U, G, O, I1, NG, T, U, H, AH1, I2, Y1, D, PA0, N, AH1, UH3, U, PA1, I_2|PA0, END}; //28,I_2|PA0, 
  
 const unsigned char gorf0[]         __attribute__ ((section (".flash")))  = {6, 33, 34, END };
 const unsigned char gorf1[]         __attribute__ ((section (".flash")))  = {6, 60, END };

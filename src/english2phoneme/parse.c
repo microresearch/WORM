@@ -3,7 +3,13 @@
 #include <string.h>
 #include "stdlib.h"
 #include "TTS.h"
+#ifdef LAP
+#define MAX_LENGTH 10240
+#else
 #define MAX_LENGTH 1024
+#endif
+
+//  gcc parse.c newenglish.c saynum.c spellwor.c phoneme.c -DLAP -std=c99 -o ttts
 
 //static FILE *In_file;
 //static FILE *Out_file;
@@ -19,6 +25,7 @@ typedef struct{
   unsigned char length;
   unsigned char mmm[5];
 } vottts;
+
 
 static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}, //IY 0 // start to convert to sc01
 				{1, {0x27}},//IH1
@@ -69,7 +76,7 @@ static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}
 static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
 
 
-//const char* NRL_list[54]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
+
 
 //KLATT: END 0",  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
 
@@ -77,7 +84,7 @@ static const unsigned char remap256[43]  __attribute__ ((section (".flash"))) ={
 
 static const unsigned char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13, 2, 3, 4, 6, 17, 8, 18, 10, 11, 5, 14, 16, 15, 39, 27, 40, 28, 41, 29, 37, 33, 38, 34, 35, 31, 36, 32, 43, 24, 25, 26, 20, 21, 23, 19, 42, 30, 22, 54, 54};
 
-// TMS
+// TMS -1
 
 //NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
 
@@ -118,6 +125,15 @@ void outnum(const char* ooo);
 void have_number();
 
 #ifdef LAP
+
+const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
+
+const char* SP_list[43]={
+
+const char* VOT_list[64]={"EH3", "EH2", "EH1", "PA0", "DT", "A2", "A1", "ZH", "AH2", "I3", "I2", "I1", "M", "N", "B", "V", "CH", "SH", "Z", "AW1", "NG", "AH1", "OO1", "OO", "L", "K", "J", "H", "G", "F", "D", "S", "A", "AY", "Y1", "UH3", "AH", "P", "O", "I", "U", "Y", "T", "R", "E", "W", "AE", "AE1", "AW2", "UH2", "UH1", "UH", "O2", "O1", "IU", "U1", "THV", "TH", "ER", "EH", "E1", "AW", "PA1", "STOP"};
+
+const char* TMS_list[127]={"AE1", "AE1N", "AH1", "AH1N", "AW1", "AW1N", "E1", "E1N", "EH1", "EH1N", "ER1N", "I1", "I1N", "OO1", "OW1N", "U1", "U1N", "UH1", "UH1M", "UH1N", "Y1", "Y1N", "ER1", "OW1", "Y1", "AE2", "AH2", "AI2", "AR2", "AV2", "AW2", "E2", "EER2", "EH2", "EHR2", "EI2", "ER2", "I2", "OI2", "OO2", "OOR2", "OR2", "OW2", "U2", "UH2", "UU2", "AE3", "AH3", "AI3", "AR3", "AU3", "AW3", "E3", "EELL", "EER3", "EH3", "EHR3", "EI3", "ER3", "I3", "ILL", "ING2", "OI3", "OO3", "OOR3", "OR3", "OW3", "U3", "UH3", "ULL", "UHL", "UU3", "L", "L-", "LL", "M", "MM", "N", "NN", "NG1", "NG2", "R", "W", "WH", "Y", "B", "BE", "D", "DD", "G1", "G2", "GG", "J", "JJ", "THV", "THV-", "V", "VV", "Z", "ZZ", "ZH", "ZH-", "K2", "KH", "KH-", "KH1", "KH2", "P", "PH", "PH-", "T", "TH", "TH-", "CH", "F", "FF", "HI", "HO", "HUH", "S", "SS", "SH", "SH-", "THF", "THF-", "PAUSE1", "PAUSE2"}; //127
+
 void main(argc, argv)
 	int argc;
 	char *argv[];
@@ -156,7 +172,7 @@ void main(argc, argv)
   static char TTSinarray[640], buffer[640];
     static unsigned char TTSoutarray[1280];
     char flag=1;
-    while(flag==1){
+    //    while(flag==1){
     int count=0;
     xxx=0;
     while (xxx!=' ' && xxx!='\n'){
@@ -177,20 +193,33 @@ void main(argc, argv)
 
 
   //  printf("INEDX %d in %c\n\n", index, input[4]);
-
+    //    }
   
   //transform text to integer code phonemes
       int output_count = text2speech(count,TTSinarray,TTSoutarray);
+  for(int i = 0; i < output_count; i++){
+    //    for(int j = 0; j < strlen(output[i]); j++){
+        printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
+    //    printf("%s ..", TMS_list[TTSoutarray[i]]);
+	     //      printf("\n");
+  }
+  printf("\n\n");
+
+  //  output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
+  output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
+      
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
       //      printf("%s outcount: %d\n",TTSinarray, output_count);
   for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
-             printf("%d, ", TTSoutarray[i]);
-	     //	      }
-	     //      printf("\n");
+    //    printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
+    //    printf("%d %s ..", TTSoutarray[i], TMS_list[TTSoutarray[i]]);
+        printf("%d, ", TTSoutarray[i]);
   }
+  printf("\n");
+  printf("COUNT: %d\n", output_count);
   //  return output_count;
-  }
+  //    }
 	}
 #endif
 
@@ -201,7 +230,7 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
-  input[input_len] = EOF;
+  input[input_len-1] = EOF;
   xlate_file();
   //  printf("xxxxx %d\n", output_count);
   for (unsigned char i=0;i<output_count;i++){
@@ -229,7 +258,7 @@ unsigned char text2speechfor256(unsigned char  input_len, signed char *input, si
     //    output[i]=remap256[input[i]-97];
   }
   //  output[output_count-1]=255; 
-  return output_count-1; //check TODO!
+  return output_count; //check TODO!
 }
 
 unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *input, unsigned char *output){
@@ -268,7 +297,7 @@ unsigned char text2speechforSAM(unsigned char  input_len, unsigned char *input, 
   for (unsigned char i=0;i<output_count;i++){
         output[i]=remapsam[output_array[i]];
 	}
-  return output_count-1;
+  return output_count;
 }
 
 unsigned char text2speechforTMS(unsigned char input_len, unsigned char *input, unsigned char  *output){
@@ -287,7 +316,7 @@ unsigned char text2speechforTMS(unsigned char input_len, unsigned char *input, u
         output[i]=remaptms[output_array[i]];
 	}
   //  output[output_count-1]=255; 
-  return output_count-1;
+  return output_count;
 }
 
 
