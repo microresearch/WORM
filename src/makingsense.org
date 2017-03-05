@@ -937,23 +937,23 @@ wavetable as in raven, generators eg. pulse, square, and original
 5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
 6. klatt/nvp variations RE_ACQUAINT
 
-/////////
-
 10. tube and ntube/glottal/wavetable
-9. vosim/fof etc.
-11. voicform?
 
 12. compost - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example
 
-13. what own brutal worm synth could be!
+13. worming of raw modes and worm wavetable
 
-say 6x7=42+ // 7 or 8 main speech engines
+*/////////// we leave from below and any LPC work for RAVEN which could have 2 inputs?*
+
+
+9. vosim/fof etc.
+11. voicform?
+
 
 ////////////////////////////
 
-// or we leave from below and any LPC work for RAVEN which could have 2 inputs?
 
 7. LPC vocoder -> where is code for this? lpcanalysis?
 
