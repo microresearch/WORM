@@ -764,6 +764,9 @@ try all output_count-1 in parse.c
 
 - in votrax wow vocab was all starting with length - removed now
 
+** 6/3
+
+- exponential pitch
 
 * TTS 
 
