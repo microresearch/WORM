@@ -820,16 +820,15 @@ still not happy with x/y selection in any case
 
  -  test and clean code for each mode following:
 
-
- - exponential pitch - where do we need this (I guess on any pitch bend) - lookup as we always have reduced scale..
-
-- are rawparams also exp for each but with different values?
+ - *exponential pitch and speed* - lookups // all pitch mods // any other mods (exy?) - look at mode by mode 
 
 sp0256: // period/pitch -70 to +70
 
 votrax: pitch bend is from -8 to +64
 
 TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+
+log scale:
 
  - still not happy with x/y selecting protocal
 

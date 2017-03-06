@@ -1,6 +1,7 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
+#include "resources.h"
 #include "audio.h"
 #include "effect.h"
 #include "klatt_phoneme.h"
@@ -32,32 +33,6 @@
 #include "vot.h"
 //#include "raven.h"
 
-/*
-static const float freq[5][5] __attribute__ ((section (".flash"))) = {
-      {600, 1040, 2250, 2450, 2750},
-      {400, 1620, 2400, 2800, 3100},
-      {250, 1750, 2600, 3050, 3340},
-      {400, 750, 2400, 2600, 2900},
-      {350, 600, 2400, 2675, 2950}
-  };
-
-static const float qqq[5][5] __attribute__ ((section (".flash"))) = {
-    {14.424072,21.432398,29.508234,29.453644,30.517193},
-    {14.424072,29.213112,34.623474,33.661621,37.268467},
-    {6.004305,28.050945,37.508934,36.667324,40.153900},
-    {14.424072,13.522194,34.623474,31.257082,34.863983},
-{12.620288,10.816360,34.623474,32.158768,35.465038}
-  };
-
-static const float mull[5][5] __attribute__ ((section (".flash"))) = {
-    {1, 0.44668359215096, 0.35481338923358, 0.35481338923358, 0.1},
-    {1, 0.25118864315096, 0.35481338923358, 0.25118864315096, 0.12589254117942},
-    {1, 0.031622776601684, 0.15848931924611, 0.079432823472428, 0.03981071705535},
-    {1, 0.28183829312645, 0.089125093813375, 0.1, 0.01},
-    { 1, 0.1, 0.025118864315096, 0.03981071705535, 0.015848931924611}
-  };
-
-*/
 
 inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *rsrc)
 {
@@ -88,8 +63,6 @@ static adc_transform transform[5] = {
   {SPEED, 1, 0.1f, 8.0f} // what was former speed range?
 };
 
-
-
 extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
 u8 _intspeed, _intmode=0, trigger=0;
@@ -114,11 +87,6 @@ int16_t lastval;//=genstruct->prevsample;
 
 Wavetable wavtable;
 wormy myworm;
-
-
-// for TTS
-
-static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
 
 char TTSinarray[17];
 
