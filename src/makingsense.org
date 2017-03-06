@@ -803,18 +803,17 @@ bend on selz as these are just frame bends - *should be for 3 different coeff se
 
 still not happy with x/y selection in any case
 
-** TODO
+** 7/3 TODO
 
 *** TMS
 
-- add 5220 bend mode (simply copy but when we are happy with X/Y)
+- add 5220 bend mode (simply copy but when we are happy with X/Y - changed to trigger as freeze/unfreeze)
 
 - extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
 
 - X/Y bends/add-subs on subsection of vocab TODO - which vocabs? - allphons and ...
 
-++ bends of tables on specific vocabs. tables are: energy, pitch, LPC and chirp
-
+++ bends of tables on specific vocabs. tables are: energy, pitch, LPC and chirp - bend all of just 1?
 
 *** GENERAL
 
@@ -822,7 +821,11 @@ still not happy with x/y selection in any case
 
  - *exponential pitch and speed* - lookups // all pitch mods // any other mods (exy?) - look at mode by mode 
 
-logspeed[1024] and logpitch[128] in resources.h
+logspeed[1024] and logpitch[128] in resources.c
+
+where we put the pitch stuff - in each mode// test speed change also...DONE_TO_TEST!
+
+update these with mult by logpitch:
 
 sp0256: // period/pitch -70 to +70
 
@@ -830,20 +833,18 @@ votrax: pitch bend is from -8 to +64
 
 TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
 
-log scale:
+/////
 
- - still not happy with x/y selecting protocal
+- still not happy with x/y selecting protocal
 
- - - look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
+- look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
 
- *- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
+*- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
 
   // with exy=0.0 idx=16// exy=0.95 idx=0
   exy=1.0f-_sely; // no multiplier and inverted here
   m_new_frame_energy_idx = exy*16.0f; /
  
-
-
 * TTS 
 
 : gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
@@ -1002,13 +1003,13 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 * main modes overview - otherwise see modes.org
 
-** basic modes to do with suggested extensions - say 48 modes
+** basic modes to do with suggested extensions - 64 modes
 
 1. TMS -> vocab,TTS?, phonemes, raw, other excitations for all
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
 4. votrax -> TTS, phonemes, vocab is roms, raw?
 
-//////////////////
+//////////////////say 30 so far
 
 3. digitalker
 5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
@@ -1148,7 +1149,6 @@ X- param xaxis
 Y- param value
 Z- bend pitch
 TRIGGER- new phrase err?
-
 
 ** SP0256
 

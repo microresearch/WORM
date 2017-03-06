@@ -60,7 +60,7 @@ static adc_transform transform[5] = {
   {SELX, 0, 0.1f, 32.0f},
   {SELY, 0, 0.1f, 32.0f},
   {SELZ, 0, 0.1f, 32.0f},
-  {SPEED, 1, 0.1f, 8.0f} // what was former speed range?
+  {SPEED, 1, 0.1f, 1024.0f} 
 };
 
 extern float exy[64];
@@ -317,51 +317,54 @@ void tmslowbit(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
 };
 
-void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  extent tmsraw5100extent={11,13.0f};
+
+void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  static u8 parammode=0;
+  extent tmsraw5200extent={10,12.0f};
   TTS=0;
-    
-  if (trigger==1) tms_newsay_raw5100(); // selector is in newsay
+
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
   samplespeed/=8.0;
    if (samplespeed<=1){ 
      while (xx<size){
-       u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
-       MAXED(xaxis,tmsraw5100extent.max);
-       xaxis=tmsraw5100extent.max-xaxis;
-       exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-       if (samplepos>=1.0f) {
+              if (parammode==0){
+		u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+		MAXED(xaxis,tmsraw5200extent.max);
+		xaxis=tmsraw5200extent.max-xaxis;
+		exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	      }
+	      if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=tms_get_sample_raw5100();
+	 samplel=tms_get_sample_raw5200();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	  tms_newsay_raw5100(); // selector is in newsay
+	 parammode^=1;
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=samplespeed;
      }
    }
    else { 
      while (xx<size){
-         u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
-	 MAXED(xaxis,tmsraw5100extent.max);
-	 xaxis=tmsraw5100extent.max-xaxis;
+              if (parammode==0){
+         u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,tmsraw5200extent.max);
+	 xaxis=tmsraw5200extent.max-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-
-	 samplel=tms_get_sample_raw5100();
+	      }
+	 samplel=tms_get_sample_raw5200();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay_raw5100(); // selector is in newsay
+	 parammode^=1;
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -373,52 +376,53 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
-
-void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  extent tmsraw5200extent={10,12.0f};
+void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  static u8 parammode=0;
+  extent tmsraw5100extent={10,12.0f};
   TTS=0;
-    
-  if (trigger==1) tms_newsay_raw5200(); // selector is in newsay
+
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
   samplespeed/=8.0;
    if (samplespeed<=1){ 
      while (xx<size){
-       u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
-       MAXED(xaxis,tmsraw5200extent.max);
-       xaxis=tmsraw5200extent.max-xaxis;
-       exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-       if (samplepos>=1.0f) {
+              if (parammode==0){
+		u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
+		MAXED(xaxis,tmsraw5100extent.max);
+		xaxis=tmsraw5100extent.max-xaxis;
+		exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	      }
+	      if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=tms_get_sample_raw5200();
+	 samplel=tms_get_sample_raw5100();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	  tms_newsay_raw5200(); // selector is in newsay
+	 parammode^=1;
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=samplespeed;
      }
    }
    else { 
      while (xx<size){
-         u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
-	 MAXED(xaxis,tmsraw5200extent.max);
-	 xaxis=tmsraw5200extent.max-xaxis;
+              if (parammode==0){
+         u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,tmsraw5100extent.max);
+	 xaxis=tmsraw5100extent.max-xaxis;
 	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
-
-	 samplel=tms_get_sample_raw5200();
+	      }
+	 samplel=tms_get_sample_raw5100();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay_raw5200(); // selector is in newsay
+	 parammode^=1;
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -1166,6 +1170,7 @@ u8 toggled=1;
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   float samplespeed;
+  u16 samplespeedref;
   static u16 cc;
   u8 oldmode=255;
   static u8 firsttime=0;
@@ -1199,8 +1204,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
    trigger=1;
    firsttime=1;
  }
-  samplespeed=_speed*transform[SPEED_].multiplier;
+  samplespeedref=_speed*transform[SPEED_].multiplier;
 
+  // TEST - speed exp
+  samplespeed=logspeed[samplespeedref];  
+  
   // splitting input
   for (u8 x=0;x<sz/2;x++){
     sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
