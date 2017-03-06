@@ -1,7 +1,6 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
-#include "resources.h"
 #include "audio.h"
 #include "effect.h"
 #include "klatt_phoneme.h"
@@ -31,6 +30,7 @@
 #include "wavetable.h"
 #include "worming.h"
 #include "vot.h"
+#include "resources.h"
 //#include "raven.h"
 
 

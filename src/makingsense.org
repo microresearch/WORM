@@ -822,6 +822,8 @@ still not happy with x/y selection in any case
 
  - *exponential pitch and speed* - lookups // all pitch mods // any other mods (exy?) - look at mode by mode 
 
+logspeed[1024] and logpitch[128] in resources.h
+
 sp0256: // period/pitch -70 to +70
 
 votrax: pitch bend is from -8 to +64
