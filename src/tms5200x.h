@@ -14,3 +14,9 @@ int16_t tms_get_sample_bendlength();
 
 int16_t tms_get_sample_lowbit();
 int16_t tms_newsay_lowbit();
+
+int16_t tms_get_sample_raw5100();
+int16_t tms_newsay_raw5100();
+
+int16_t tms_get_sample_raw5200();
+int16_t tms_newsay_raw5200();

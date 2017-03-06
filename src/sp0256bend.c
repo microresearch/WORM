@@ -196,8 +196,7 @@ static void reset()
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
 /* ======================================================================== */
-static inline INT16 limit(INT16 s)
-{
+static inline INT16 limit(INT16 s){
 #ifdef HIGH_QUALITY /* Higher quality than the original, but who cares? */
 	if (s >  8191) return  8191;
 	if (s < -8192) return -8192;

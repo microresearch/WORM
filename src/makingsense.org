@@ -686,7 +686,7 @@ TMS TTS with allphons:
 
 - TMS TTS code/mappings -> DONE testing in lpc_say but sounds
   choppy???// also signal end of with 255->DONE - testing in lpc_say -
-  but may not be so in TMS5220 code TEST!
+  but may not be so in TMS5220 code TEST!DONE
 
 ** 2/3
 
@@ -709,32 +709,12 @@ modes as follows:
 4- eg. allphon mode with both bends TESTED/DONE
 6- TTS for TMS TEST-DONE
 
-*** TODO 
-
-/// - TODO 3/3 draft these out to inc into audio.c and test
-
-2-  full tms with length bend - bend length on selx TEST
-+ 8 bit and high quality mode for full tms as mode 1 (as we have it is undefined - defined as 12 bits now) TEST
-
-+ also calculations for shorter lengths in interpol scheme - TEST just with define for now
-/////
-3+- subsections of vocabs with both bends TODO - which vocabs?
-4+- X/Y bends on subsection of vocab TODO - which vocabs?
-
-5+- raw raw mode TODO - starting on parse_frame_raw - and keep pitch
-bend on selx as these are just frame bends - *should be for 2 different coeff sets - 5100, 5200 and 5220*
-
-
-
-- how bends are applied for sp0256 and votrax (constant, per phonetic element)
-
-*maybe change all TTS so phoneme select is on Z and x axis is Y so we can keep x as bend* - TODO for sp0256 and votraxDONE
-
 *** fixed
 
 - bug in TTS initialisation which was in sp0256 and reduced size to 16 for TTSinarray
 - also fake trigger start in audio.c for testing purposes
 - back to trimmed TMS
+*maybe change all TTS so phoneme select is on Z and x axis is Y so we can keep x as bend* - TODO for sp0256 and votrax *DONE*
 
 ** 3/3 TODO
 
@@ -758,7 +738,7 @@ try all output_count-1 in parse.c
 
 - test if certain vocabs should be 5220
 - // TEST> do we need to zero coeffs here?
-- look at latest tms5220.cpp and m_zpar, old_zpar code? more for interpolation?
+- look at latest tms5220.cpp and m_zpar, old_zpar code? more for interpolation?DONE
 
 *** fixed
 
@@ -766,7 +746,102 @@ try all output_count-1 in parse.c
 
 ** 6/3
 
-- exponential pitch
+*** TODO: exponential pitch - where do we need this (I guess on any pitch bend) - lookup as we always have reduced scale..
+
+- are rawparams also exp for each but with different values?
+
+sp0256: // period/pitch -70 to +70
+
+votrax: pitch bend is from -8 to +64
+
+TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+
+// leave for now until we have these first 3 sets of modes...
+
+*** TTS
+
+- working on TMS, to test on votrax nowTESTED/DONE
+
+*** TODO
+
+- look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
+
+*- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
+
+  // with exy=0.0 idx=16// exy=0.95 idx=0
+  exy=1.0f-_sely; // no multiplier and inverted here
+  m_new_frame_energy_idx = exy*16.0f; /
+
+*** TMS TODO
+
+- leave as is (as all FIFO stuff etc. in tms5220.cpp is not needed for simple speechrom access)DONE
+
+- test if certain vocabs should be 5220 DONE and fixed length of echo_female vocabDONE
+
+- // TEST> do we need to zero coeffs here? *NO!*DONE
+
+
+/// - draft these out to inc into audio.c and test
+
+2-  full tms with length bend - bend length on selx TEST-DONE
+
++ 8 bit and high quality mode for full tms as mode 1 (as we have it is undefined - defined as 12 bits now) TEST-DONE
+
+////
+
++ also calculations for shorter lengths in interpol scheme - TEST just with define for now *NO!*
+
+/////
+3+- subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
+
+4+- X/Y bends on subsection of vocab TODO - which vocabs? - allphons and ...
+
+++ bends of tables on specific vocabs
+
+5+- raw raw mode DONE - starting on parse_frame_raw - and - pitch
+bend on selz as these are just frame bends - *should be for 3 different coeff sets - 5100, 5200 and 5220*
+
+still not happy with x/y selection in any case
+
+** TODO
+
+*** TMS
+
+- add 5220 bend mode (simply copy but when we are happy with X/Y)
+
+- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
+
+- X/Y bends/add-subs on subsection of vocab TODO - which vocabs? - allphons and ...
+
+++ bends of tables on specific vocabs. tables are: energy, pitch, LPC and chirp
+
+
+*** GENERAL
+
+ -  test and clean code for each mode following:
+
+
+ - exponential pitch - where do we need this (I guess on any pitch bend) - lookup as we always have reduced scale..
+
+- are rawparams also exp for each but with different values?
+
+sp0256: // period/pitch -70 to +70
+
+votrax: pitch bend is from -8 to +64
+
+TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+
+ - still not happy with x/y selecting protocal
+
+ - - look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
+
+ *- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
+
+  // with exy=0.0 idx=16// exy=0.95 idx=0
+  exy=1.0f-_sely; // no multiplier and inverted here
+  m_new_frame_energy_idx = exy*16.0f; /
+ 
+
 
 * TTS 
 
@@ -932,8 +1007,6 @@ wavetable as in raven, generators eg. pulse, square, and original
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
 4. votrax -> TTS, phonemes, vocab is roms, raw?
 
-// above close to done-TMS to finish
-
 //////////////////
 
 3. digitalker
@@ -1047,6 +1120,35 @@ Y- bank
 Z- select phrase
 TRIGGER- phrase start
 
+*** phonemes
+
+X- period/pitch
+Y- repeat/length?
+Z- select phoneme
+TRIGGER- phoneme start
+
+*** bend length
+
+X- length bend
+Y- bank
+Z- select phrase
+TRIGGER- phrase start
+
+*** TTS
+
+X- period/pitch
+Y- text xaxis
+Z-  select ascii character for TTS
+TRIGGER- rephrase TTS
+
+*** raw - 5100, 5200 and 5220
+
+X- param xaxis
+Y- param value
+Z- bend pitch
+TRIGGER- new phrase err?
+
+
 ** SP0256
 
 *** phonemes
@@ -1056,7 +1158,7 @@ Y- repeat/length?
 Z- select phoneme
 TRIGGER- phoneme start
 
-*** TTS - changed
+*** TTS
 
 X- period/pitch
 Y- text xaxis

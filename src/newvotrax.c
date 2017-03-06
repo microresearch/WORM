@@ -463,7 +463,7 @@ void chip_update()
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
 
-	// tuning this DONE
+	// tuning this DONE - TODO make exponential vot_pitch[]
 	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
 
 	// Filters are updated in index 1 of the pitch wave, which does

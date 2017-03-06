@@ -30,6 +30,7 @@ typedef signed int int32_t;
 //#include "roms/vocab_spkspelltwo.h" // 5100 - 
 //#include "roms/vocab_mpf.h"
 #include "roms/vocab_testroms.h"
+#include "roms/vocab_echofemale.h" // wordlist_testroms[200] // is this 5220?
 //#include "roms/vocab_2304.h"
 #include "roms/vocab_2303.h"
 /*#include "roms/vocab_2321.h"
@@ -799,14 +800,14 @@ void main(int argc, char *argv[]){
 
    
    //      lpc_say(test00);
-   //      lpc_say(wordlist_spell2303[uffset]+uuffset);
+   lpc_say(wordlist_testroms[uffset]+uuffset);
    //                   while(synth_running) lpc_running();
    
    //   lpc_say(wordlist_[uffset]+uuffset);
    //   for (x=0;x<18;x++){
    //   x=0;
-   while (test00[x]!=255){
-     lpc_say(wordlist_alphons[test00[x++]]);
+   //   while (test00[x]!=255){
+     //     lpc_say(wordlist_alphons[test00[x++]]);
      //   }
      // lpc_say(sp_ffD008nn172);
 //	printf("NEXT\n");
@@ -816,7 +817,7 @@ void main(int argc, char *argv[]){
       while(synth_running) {
 	lpc_running();
       }
-            }
+      //            }
 
    ////////////////////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   // stay with first one which could be THIR or THIRTEE according to

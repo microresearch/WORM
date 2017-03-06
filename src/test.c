@@ -275,9 +275,8 @@ void main(){
   float value,   smoothed_adc_value=0, filter_coeff=0.05f;
   //(0x7f ^ (m_inflection << 4) ^ m_filt_f1) + 1) // 7f=127
   unsigned char m_rom_f2=8;
-  float _sely=0.9;
-   unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
-   printf("TMPPPP:     %d\n", tmp);
+  //   unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
+  //   printf("TMPPPP:     %d\n", tmp);
 
 typedef struct TMS_vocab__ {
   // pointer to const
@@ -289,6 +288,13 @@ typedef struct TMS_vocab__ {
  TMS_vocab vocab_2303={wordlist_spell2303, 102, 104.0f};
 
  printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
+
+  // with exy=0.0// exy=0.99
+  float _sely=0.95f;
+  float exy=1.0f-_sely; // no multiplier and inverted here
+  int m_new_frame_energy_idx = exy*15.0f; //
+  printf("sely=0.9: result=%d\n",m_new_frame_energy_idx); 
+
    
   // test coeff for ADC:
   for (y=0;y<128;y++){
@@ -306,7 +312,7 @@ typedef struct TMS_vocab__ {
 
   float m_sclock = m_mainclock / 18.0f;
   printf("cllll: %f\n",m_sclock); 
-  float exy=0.4f;
+  //  float exy=0.4f;
   int xzy=320;
   //
   

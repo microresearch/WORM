@@ -128,7 +128,7 @@ void have_number();
 
 const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
 
-const char* SP_list[43]={
+const char* SP_list[43]={};
 
 const char* VOT_list[64]={"EH3", "EH2", "EH1", "PA0", "DT", "A2", "A1", "ZH", "AH2", "I3", "I2", "I1", "M", "N", "B", "V", "CH", "SH", "Z", "AW1", "NG", "AH1", "OO1", "OO", "L", "K", "J", "H", "G", "F", "D", "S", "A", "AY", "Y1", "UH3", "AH", "P", "O", "I", "U", "Y", "T", "R", "E", "W", "AE", "AE1", "AW2", "UH2", "UH1", "UH", "O2", "O1", "IU", "U1", "THV", "TH", "ER", "EH", "E1", "AW", "PA1", "STOP"};
 
@@ -205,8 +205,8 @@ void main(argc, argv)
   }
   printf("\n\n");
 
-  //  output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
-  output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
+    output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
+  //  output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
       
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
       //      printf("%s outcount: %d\n",TTSinarray, output_count);
