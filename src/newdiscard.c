@@ -1,3 +1,42 @@
+
+
+
+/* FOR TMS on lap
+void main(){
+  INT16 i, sample; u8 ending=0;
+  // buffer?
+  tms5200_init();
+  tms5200_newsay();
+  // ptraddr and speech data array
+  //  m_IP=0;
+
+  while(1){
+    sample=  process(&ending);
+    printf("%c",(sample+32768)>>8);
+    if (ending==1){
+      ending=0; tms5200_newsay();
+    }
+
+  //  for (i=0;i<32768;i++) printf("%c",(speechbuffer[i]+32768)>>8);
+  }
+}
+*/
+
+
+
+#define delay()						 do {	\
+    register unsigned int ix;					\
+    for (ix = 0; ix < 1000000; ++ix)				\
+      __asm__ __volatile__ ("nop\n\t":::"memory");		\
+  } while (0)
+
+#define delayxx()						 do {	\
+    register unsigned int ix;					\
+    for (ix = 0; ix < 1000; ++ix)				\
+      __asm__ __volatile__ ("nop\n\t":::"memory");		\
+  } while (0)
+
+
 ////////////////////[[[[[[[[[[ TESTING LPC residual as excitation for sp0256
 
 // this works but quite high volume

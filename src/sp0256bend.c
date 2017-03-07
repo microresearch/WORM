@@ -64,7 +64,6 @@ struct lpc12_t
   INT16   b_coef[6], b_coeforig[6];      /* B0 through B5.                               */
 	INT16   z_data[6][2];   /* Time-delay data for the filter stages.       */
 	UINT8   r[16];          /* The encoded register set.                    */
-  //  	UINT8   rorig[16];          /* The ORIGINAL encoded register set.                    */
 	INT16     interp;
 };
 
@@ -198,8 +197,6 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		// invert the values here if necessary
-		//		f->amp=f->amporig+(320-(int)((1.0f-exy[1])*640.0f)); // amp values? 1280 - so
 		val=exy[1]*1026.0f;
 		MAXED(val,1023);
 		f->amp=f->amporig*logspeed[1023-val];
@@ -209,13 +206,12 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		  MAXED(val,127);
 		  f->per=f->perorig*logpitch[val];
 
-		  //		  f->per=f->perorig+(90 - (int)(exy[0]*180.0f)); // exy should be exp/log
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
 				f->rpt--;
-				//				do_int  = f->interp;
+				//				do_int  = f->interp;//????
 
 				for (j = 0; j < 6; j++)
 					f->z_data[j][1] = f->z_data[j][0] = 0;

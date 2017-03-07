@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+
+// modified for WORM by Martin Howse
+
 /***************************************************************************
 
     votrax.c
@@ -7,11 +10,6 @@
     Votrax SC01A simulation
 
 ***************************************************************************/
-// TODO: re-work - how to deal with timers?, test, test without floatsDONE, RE_TEST on lapDONE, test on ARM
-
-// seems to work but question of timings, also vocabs for the phonemes from:
-
-// float ok - sqrtf etc... seems to work but make sure all floats for ARM
 
 // gcc newvotrax.c -lm -ovot -std=c99 -DLAP
 
@@ -102,17 +100,10 @@ const float s_glottal_wave[9] =
 
 void writer(int data)
 {
-	// flush out anything currently processing
-  //	m_stream->update();
-
 	u8 prev = m_phone;
 
 	// only 6 bits matter
 	m_phone = data & 0x3f;
-
-	//	if(m_phone != prev || m_phone != 0x3f)
-	//	logerror("phone %02x.%d %s\n", m_phone, m_inflection, s_phone_table[m_phone]);
-
 	m_ar_state = 0; // was CLEAR_LINE
 
 	// Schedule a commit/ar reset at roughly 0.1ms in the future (one
@@ -157,14 +148,7 @@ void device_start()
 
   m_sclock = m_mainclock / 18.0f;
   m_cclock = m_mainclock / 36.0f;
-	//	m_stream = stream_alloc(0, 1, m_sclock);
-	//	m_timer = timer_alloc();
-
-	// reset outputs
-	//	m_ar_cb.resolve_safe();
-  //	m_ar_state = 1; // ASSERT_LINE
 }
-
 
 //-------------------------------------------------
 //  device_reset - handle device reset
@@ -1133,7 +1117,7 @@ static int16_t sample_count=0;
 //static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
 
 void votrax_newsay(){
-  u8 sel=_selz*65.0f; // is it 64 TODO!
+  u8 sel=_selz*65.0f; 
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
@@ -1141,12 +1125,12 @@ void votrax_newsay(){
   lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
 }
 
-int16_t votrax_get_sample(){ // TODO: trying new model
+int16_t votrax_get_sample(){ 
   uint16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   if (sample_count++>=lenny){
     sample_count=0;
     votrax_newsay();
@@ -1154,12 +1138,12 @@ int16_t votrax_get_sample(){ // TODO: trying new model
   return sample;
 }
 
-int16_t votrax_get_sample_rawparam(){ // TODO: trying new model - but still is kind of noisy
+int16_t votrax_get_sample_rawparam(){ 
   uint16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update_raw();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   return sample;
 }
 
@@ -1182,10 +1166,10 @@ void votrax_newsay_bend(u8 reset){
 
   writer(it); 
   phone_commit();
-  lenny=((16*(m_rom_duration*(1.2f-exy[8])*16+1)*4*9+2)/30); // what of sample-rate?  - check this length when we come to vocab
+  lenny=((16*(m_rom_duration*(1.2f-exy[8])*16+1)*4*9+2)/30); 
 }
 
-int16_t votrax_get_sample_bend(){ // TODO: trying new model
+int16_t votrax_get_sample_bend(){ 
   uint16_t sample; u8 x;
   
   m_sample_count++;
@@ -1193,7 +1177,7 @@ int16_t votrax_get_sample_bend(){ // TODO: trying new model
     chip_update_bend();        
   }
 
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
@@ -1219,7 +1203,7 @@ void votrax_newsaygorf(u8 reset){
 
    writer(it); 
   phone_commit();
-  inflection_w(it>>6); // how many bits?
+  inflection_w(it>>6); 
   lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
   }
   
@@ -1247,7 +1231,7 @@ int16_t votrax_get_samplegorf(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
@@ -1262,7 +1246,7 @@ int16_t votrax_get_samplewow(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
@@ -1289,7 +1273,7 @@ int16_t votrax_get_sampleTTS(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_updateTTS();
-  sample=analog_calc();//TODO: check extent of analog_calc value - seems OK
+  sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
     sample_count=0;
@@ -1326,9 +1310,7 @@ void main(void){
  
   // try and say
   for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
-    //    writer(welcome[x]);
     writer(TTStest[x]);
-    //  writer(1);
   phone_commit();
 //	m_votrax->inflection_w(space, 0, data >> 6);
 //  inflection_w(TTStest[x]>>6);

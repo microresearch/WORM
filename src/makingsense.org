@@ -844,19 +844,18 @@ bend chirptable - TEST - DONE but may need some tweaking
 
 TODO: 5200 variants of these which work/...
 
-*** TODO 
-
-- clean all mode code and audio.c we have so far
+** 8/3 TODO 
 
 - tweak speeds for each mode?
 
-TMS  
-- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
-- X/Y bends on subsection of vocab TODO - which vocabs? - allphonsDONE
-- 5200 variants of table bends which work = pitchtable and ktable and watch newsay for these when add rest of vocabs
-- bend pitchtable AND ktable
+lis of new TMS modes - any easier way to template these?
 
-*so all bends with fixed vocabs*
+- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
+- X/Y bends on subsection of vocab TODO also 5100 - which vocabs? - allphonsDONE (5200)
+- 5200 variants of table bends which work = pitchtable and ktable and watch newsay for these when add rest of vocabs
+- bend pitchtable AND ktable at same time
+
+- *so all bends with fixed vocabs*
 
 * TTS 
 

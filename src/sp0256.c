@@ -1,21 +1,7 @@
-// port towards ARM now
-
-#include "sp0256.h"
-#include "audio.h"
-#include "english2phoneme/TTS.h"
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-
-#include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
-#include "sp0256vocab.h"
-#include "resources.h"
-extern float _selx, _sely, _selz, _mode, _speed;
-extern u8 TTS;
-const unsigned char *m_romm;
-
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
+// modified for WORM by Martin Howse
+
 /**********************************************************************
 
     SP0256 Narrator Speech Processor emulation
@@ -46,6 +32,22 @@ const unsigned char *m_romm;
 
 */
 
+
+#include "sp0256.h"
+#include "audio.h"
+#include "english2phoneme/TTS.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+#include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
+#include "sp0256vocab.h"
+#include "resources.h"
+extern float _selx, _sely, _selz, _mode, _speed;
+extern u8 TTS;
+const unsigned char *m_romm;
+
+
 typedef unsigned char UINT8;
 typedef signed char INT8;
 typedef u16 UINT16;
@@ -53,18 +55,7 @@ typedef int16_t INT16;
 typedef uint32_t UINT32;
 typedef int32_t INT32;
 
-// al2.bin dumped here// now we use one from sauro.zip
-
-// needs to start at 0x1000  and rom is till 0x10000 but only 2k...
-
-// length is 2048 which is 2k or 0x1000
-
 void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
-
-
-// this one is stock allophone al2 rom
-
-
 
 struct lpc12_t
 {
@@ -1268,10 +1259,6 @@ int16_t sp0256_get_sample(void){
    }
    return output;
  }
-
-
-
-// for text to speech we need out array, length and index...
 
 extern char TTSinarray[17];
 static u8 TTSoutarray[256];

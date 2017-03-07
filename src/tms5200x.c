@@ -1,8 +1,8 @@
-/// stripped out of mame: LICENSE! [for testing so far... use parse frame from other=?]
+// license:BSD-3-Clause
+// copyright-holders:Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf
 
-// 
+// modified for WORM by Martin Howse
 
-// TABLES and defines
 
 #include "audio.h"
 #include "stdio.h"
@@ -13,7 +13,6 @@ extern float _selx, _sely, _selz;
 extern float exy[64];
 
 typedef u8 UINT8;
-//typedef char INT8;
 typedef uint16_t UINT16;
 typedef int16_t INT16;
 typedef uint32_t UINT32;
@@ -87,15 +86,12 @@ typedef int32_t INT32;
 // 5220: &tms5220_coeff
 
 typedef struct TMS_vocab__ {
-  // pointer to const
   const uint8_t **wordlist;
   const struct tms5100_coeffs *m_coeff;
   uint16_t extent;
   float extentplus;
 } TMS_vocab;
 
-// maybe list roms here and then we assign coeff etc to them - or as array
-// test change over if we need to reset
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f};
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 129.0f};
 /*
@@ -156,7 +152,7 @@ const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab
 
 const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
-// TEST: commented out to speed up
+// TEST: above commented out to speed up
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 uint8_t byte_rev[256];
@@ -244,15 +240,6 @@ static INT16 clip_analog(INT16 cliptemp);
 
 
 static const UINT8 reload_table[4] = { 0, 2, 4, 6 }; //sample count reload for 5220c and cd2501ecd only; 5200 and 5220 always reload with 0; keep in mind this is loaded on IP=0 PC=12 subcycle=1 so it immediately will increment after one sample, effectively being 1,3,5,7 as in the comments above.
-
-// vars
-
-	// internal state
-
-	/* coefficient tables */
-//int m_variant=TMS5220_IS_5200;                /* Variant of the 5xxx - see tms5110r.h */
-
-/// for 5100= ????
 
 	int m_variant=0;
 
@@ -359,30 +346,21 @@ int extract_bits(int count) // extract from rom image/array
   INT8 num_bits=count;
 
   	data = byte_rev[*ptrAddr]<<8;
-	//	data = (*ptrAddr)<<8;
 	if (ptrBit+num_bits > 8)
 	{
 	    data |= byte_rev[*(ptrAddr+1)];
-	    //  	  data |= *(ptrAddr+1);
 	}
 	data <<= ptrBit;
 	value = data >> (16-num_bits);
 	ptrBit += num_bits;
-	//	didntjump=1;
 	if (ptrBit >= 8)
 	{
-	  //	  fprintf(stderr,"%x, ",*ptrAddr);
 		ptrBit -= 8;
 		ptrAddr++;
-		//		didntjump=2;
 		if (ptrBit==0) {
-		  //		  didntjump=0;
 		}
 	}
-//	tobits(value,num_bits);
 	return value;
-
-
 }
 
 
@@ -402,9 +380,6 @@ static INT16 clip_analog(INT16 cliptemp)
 	 * 00 0bcd efgh xxxx -> 0b0bcdefgh
 	 * 0x xxxx xxxx xxxx -> 0b01111111
 	 */
-#ifdef DEBUG_CLIP
-	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
-#endif
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
 	/* at this point the analog output is tapped */
@@ -442,10 +417,6 @@ static INT32 matrix_multiply(INT32 a, INT32 b)
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
 	result = ((a*b)>>9)|1;//&(~1);
-#ifdef VERBOSE
-	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
-	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
-#endif
 	return result;
 }
 
@@ -503,16 +474,6 @@ INT32 lattice_filter()
 		m_x[1] = m_x[0] + matrix_multiply(m_current_k[0], m_u[0]);
 		m_x[0] = m_u[0];
 		m_previous_energy = m_current_energy;
-#ifdef DEBUG_LATTICE
-		int i;
-		fprintf(stderr,"V:%04d ", m_u[10]);
-		for (i = 9; i >= 0; i--)
-		{
-			fprintf(stderr,"Y%d:%04d ", i+1, m_u[i]);
-			fprintf(stderr,"b%d:%04d ", i+1, m_x[i]);
-			if ((i % 5) == 0) fprintf(stderr,"\n");
-		}
-#endif
 		return m_u[0];
 }
 
@@ -530,10 +491,6 @@ void parse_frame()
 	if ((TMS5220_HAS_RATE_CONTROL) && (m_c_variant_rate & 0x04))
 	{
 		indx = extract_bits(2);
-#ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(indx,2);
-		fprintf(stderr," ");
-#endif
 		m_IP = reload_table[indx];
 	}
 	else // non-5220C and 5220C in fixed rate mode
@@ -541,10 +498,6 @@ void parse_frame()
 
 	// attempt to extract the energy index
 	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
-#ifdef DEBUG_PARSE_FRAME_DUMP
-	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
-	fprintf(stderr," ");
-#endif
 	// if the energy index is 0 or 15, we're done
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
 		return;
@@ -552,17 +505,9 @@ void parse_frame()
 
 	// attempt to extract the repeat flag
 	rep_flag = extract_bits(1);
-#ifdef DEBUG_PARSE_FRAME_DUMP
-	printbits(rep_flag, 1);
-	fprintf(stderr," ");
-#endif
 
 	// attempt to extract the pitch
 	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
-#ifdef DEBUG_PARSE_FRAME_DUMP
-	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
-	fprintf(stderr," ");
-#endif
 	// if this is a repeat frame, just do nothing, it will reuse the old coefficients
 	if (rep_flag)
 		return;
@@ -571,18 +516,12 @@ void parse_frame()
 	for (i = 0; i < 4; i++)
 	{
 		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
-#ifdef DEBUG_PARSE_FRAME_DUMP
-		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
-		fprintf(stderr," ");
-#endif
+
 	}
 
 	// if the pitch index was zero, we only need 4 K's...
 	if (m_new_frame_pitch_idx == 0)
 	{
-		/* and the rest of the coefficients are zeroed, but that's done in the generator code ??? */
-	  // TEST> do we need to zero coeffs here?
-	  
 		return;
 	}
 
@@ -761,11 +700,6 @@ void parse_frame_raw_5200() // TODO - for our 3 sets of coeffs - exy is 0-11
 	//	MAXED(m_new_frame_pitch_idx, 63);
 
 	// extract first 4 K coefficients
-	/*	for (i = 0; i < 4; i++)
-	{
-	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[2]-exy[5]
-	}
-	*/
 	m_new_frame_k_idx[0] =   exy[1]*31.0f;
 	m_new_frame_k_idx[1] =   exy[2]*31.0f;
 	m_new_frame_k_idx[2] =   exy[3]*15.0f;
@@ -774,16 +708,9 @@ void parse_frame_raw_5200() // TODO - for our 3 sets of coeffs - exy is 0-11
 	// if the pitch index was zero, we only need 4 K's...
 	if (m_new_frame_pitch_idx == 0)
 	{
-		/* and the rest of the coefficients are zeroed, but that's done in the generator code */
 		return;
 	}
-
-	// If we got here, we need the remaining 6 K's
-	/*	for (i = 4; i < m_coeff->num_k; i++)
-	{
-	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[6]-exy[11]
-	  }*/
-
+	
 	m_new_frame_k_idx[4] =   exy[5]*15.0f;
 	m_new_frame_k_idx[5] =   exy[6]*15.0f;
 	m_new_frame_k_idx[6] =   exy[7]*15.0f;
@@ -791,10 +718,6 @@ void parse_frame_raw_5200() // TODO - for our 3 sets of coeffs - exy is 0-11
 	m_new_frame_k_idx[8] =   exy[9]*7.0f;
 	m_new_frame_k_idx[9] =   exy[10]*7.0f;
 }
-
-
-
-// main process loop
 
 int16_t process(u8 *ending)
 {
@@ -822,23 +745,14 @@ int16_t process(u8 *ending)
 			/* if the talk status was clear last frame, halt speech now. */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
 				//				m_speaking_now = 1; // finally halt speech
 				*ending=1;
-				// keep speaking - RESET TOD!
-				//				goto empty;
 				return 0;
 			}
 
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(); //TODO!
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
-
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
@@ -869,24 +783,9 @@ int16_t process(u8 *ending)
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
-
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -984,15 +883,6 @@ int16_t process(u8 *ending)
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -1369,9 +1259,6 @@ int16_t processbend5200(u8 *ending)
 			/* if the talk status was clear last frame, halt speech now. */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
 				//				m_speaking_now = 1; // finally halt speech
 				*ending=1;
 				// keep speaking - RESET TOD!
@@ -1382,10 +1269,6 @@ int16_t processbend5200(u8 *ending)
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame_bend5200();
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
-
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
@@ -1416,24 +1299,9 @@ int16_t processbend5200(u8 *ending)
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
-
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -1531,15 +1399,6 @@ int16_t processbend5200(u8 *ending)
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -1637,9 +1496,6 @@ int16_t process5100raw(u8 *ending)
 			/* if the talk status was clear last frame, halt speech now. */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
 				//				m_speaking_now = 1; // finally halt speech
 				*ending=1;
 				// keep speaking - RESET TOD!
@@ -1650,9 +1506,6 @@ int16_t process5100raw(u8 *ending)
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame_raw_5100(); //TODO!
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
 
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 
@@ -1686,24 +1539,9 @@ int16_t process5100raw(u8 *ending)
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
-
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -1801,15 +1639,6 @@ int16_t process5100raw(u8 *ending)
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -1911,10 +1740,6 @@ int16_t process5200raw()
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame_raw_5200(); //TODO!
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
-
 
 			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
 			   Interpolation inhibit cases:
@@ -1938,24 +1763,10 @@ int16_t process5200raw()
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -2053,15 +1864,6 @@ int16_t process5200raw()
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -2160,9 +1962,6 @@ int16_t processbendlength(u8 *ending)
 			/* if the talk status was clear last frame, halt speech now. */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
 				//				m_speaking_now = 1; // finally halt speech
 				*ending=1;
 				// keep speaking - RESET TOD!
@@ -2173,10 +1972,6 @@ int16_t processbendlength(u8 *ending)
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(); //TODO!
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
-
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
@@ -2207,24 +2002,9 @@ int16_t processbendlength(u8 *ending)
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
-
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -2320,15 +2100,6 @@ int16_t processbendlength(u8 *ending)
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -2431,9 +2202,6 @@ int16_t process2bends(u8 *ending)
 			/* if the talk status was clear last frame, halt speech now. */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
-#endif
 				//				m_speaking_now = 1; // finally halt speech
 				*ending=1;
 				// keep speaking - RESET TOD!
@@ -2444,9 +2212,6 @@ int16_t process2bends(u8 *ending)
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(); //TODO!
-#ifdef DEBUG_PARSE_FRAME_DUMP
-			fprintf(stderr,"\n");
-#endif
 
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
@@ -2478,24 +2243,10 @@ int16_t process2bends(u8 *ending)
 			for (i = 4; i < m_coeff->num_k; i++)
 				m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar));
 
-#ifdef DEBUG_GENERATION
-			/* Debug info for current parsed frame */
-			fprintf(stderr, "OLDE: %d; OLDP: %d; ", m_OLDE, m_OLDP);
-			fprintf(stderr,"Processing frame: ");
-			if (m_inhibit == 0)
-				fprintf(stderr, "Normal Frame\n");
-			else
-				fprintf(stderr,"Interpolation Inhibited\n");
-			fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9]);
-			fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",m_target_energy, m_new_frame_energy_idx, m_target_pitch, m_target_k[0], m_target_k[1], m_target_k[2], m_target_k[3], m_target_k[4], m_target_k[5], m_target_k[6], m_target_k[7], m_target_k[8], m_target_k[9]);
-#endif
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if (m_talk_status == 0)
 			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
-#endif
 				m_target_energy = 0;
 			}
 		}
@@ -2591,15 +2342,6 @@ int16_t process2bends(u8 *ending)
 	/////////////////////////////
 
 		this_sample = lattice_filter(); /* execute lattice filter */
-#ifdef DEBUG_GENERATION_VERBOSE
-		//fprintf(stderr,"C:%01d; ",m_subcycle);
-		fprintf(stderr,"IP:%01d PC:%02d X:%04d E:%03d P:%03d Pc:%03d ",m_IP, m_PC, m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		//fprintf(stderr,"X:%04d E:%03d P:%03d Pc:%03d ", m_excitation_data, m_current_energy, m_current_pitch, m_pitch_count);
-		for (i=0; i<10; i++)
-			fprintf(stderr,"K%d:%04d ", i+1, m_current_k[i]);
-		fprintf(stderr,"Out:%06d", this_sample);
-		fprintf(stderr,"\n");
-#endif
 		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
 		while (this_sample > 16383) this_sample -= 32768;
 		while (this_sample < -16384) this_sample += 32768;
@@ -2809,7 +2551,6 @@ void tms_newsay_raw5220(){
   m_talk_status = 1;
 };
 
-
 ///// get_samples
 
 int16_t tms_get_sample_allphon(){
@@ -2881,7 +2622,13 @@ int16_t tms_get_sample_raw5220(){
   return sample;
 }
 
-int16_t tms_get_sample_bend5200(){ // for allphons
+//// bends and vocab selection
+
+
+int16_t tms_get_sample_bend5100(){// for a 5100 vocab such as...
+}
+
+int16_t tms_get_sample_bend5200(){ // for allphons - TODO - other fixed vocabs
   m_coeff=&T0285_2501E_coeff;
   static uint16_t delay=0;
   int16_t sample; u8 ending=0;
@@ -2897,40 +2644,29 @@ int16_t tms_get_sample_5100pitchtable(){
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
   if (ending==1){
-    tms_newsay(); // TODO: restrict this later to just one 5100 vocab
+    tms_newsay(); // TODO: restrict this later to just one or two 5100 vocab - which ones?
   }
   return sample;
 }
 
+int16_t tms_get_sample_5200ktable(){ // for allphons and also one more - is just a coeff change
+
+}
+
+int16_t tms_get_sample_5200pitchtable(){ // for allphons and also one more - we have more pitches so need new process!
+
+}
+
+int16_t tms_get_sample_5100kandpitchtable(){ //bend pitchtable AND ktable at same time - we need a new process
+
+}
+  
 int16_t tms_get_sample_5100ktable(){
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
   if (ending==1){
-    tms_newsay(); // TODO: restrict this later to just one 5100 vocab
+    tms_newsay(); // TODO: restrict this later to just one or two 5100 vocab - which ones?
   }
   return sample;
 }
-
-
-
-/*
-void main(){
-  INT16 i, sample; u8 ending=0;
-  // buffer?
-  tms5200_init();
-  tms5200_newsay();
-  // ptraddr and speech data array
-  //  m_IP=0;
-
-  while(1){
-    sample=  process(&ending);
-    printf("%c",(sample+32768)>>8);
-    if (ending==1){
-      ending=0; tms5200_newsay();
-    }
-
-  //  for (i=0;i<32768;i++) printf("%c",(speechbuffer[i]+32768)>>8);
-  }
-}
-*/
