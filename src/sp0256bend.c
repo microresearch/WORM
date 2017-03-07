@@ -1,41 +1,7 @@
-/*
-
-x/y in regdec x=16
-regs are all y=0-255 - add and round
-UINT8   r[16];       
-
-where do we make the regs - in regdec
-
-z is select dada for rom12-19 = base on this
-
-all of this is DONE - in audio.c is x/y upto 16
-
- */
-
-// port towards ARM now
-
-#include "sp0256.h"
-#include "audio.h"
-#include "english2phoneme/TTS.h"
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-
-//#include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
-//#include "sp0256vocab.h"
-
-extern const unsigned char m_rom12[] __attribute__ ((section (".flash")));
-extern const unsigned char m_rom19[] __attribute__ ((section (".flash")));
-extern const unsigned char m_rom003[] __attribute__ ((section (".flash")));
-extern const unsigned char m_rom004[] __attribute__ ((section (".flash")));
-
-extern float exy[64];
-extern float _selx, _sely, _selz;
-
-static const unsigned char *m_romm;
-
 // license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
+// modified for WORM by Martin Howse
+
 /**********************************************************************
 
     SP0256 Narrator Speech Processor emulation
@@ -66,19 +32,28 @@ static const unsigned char *m_romm;
 
 */
 
+#include "sp0256.h"
+#include "audio.h"
+#include "english2phoneme/TTS.h"
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include "resources.h"
+
+extern const unsigned char m_rom12[] __attribute__ ((section (".flash")));
+extern const unsigned char m_rom19[] __attribute__ ((section (".flash")));
+extern const unsigned char m_rom003[] __attribute__ ((section (".flash")));
+extern const unsigned char m_rom004[] __attribute__ ((section (".flash")));
+extern float exy[64];
+extern float _selx, _sely, _selz;
+
+static const unsigned char *m_romm;
 typedef unsigned char UINT8;
 typedef signed char INT8;
 typedef u16 UINT16;
 typedef int16_t INT16;
 typedef uint32_t UINT32;
 typedef int32_t INT32;
-
-// al2.bin dumped here// now we use one from sauro.zip
-
-// needs to start at 0x1000  and rom is till 0x10000 but only 2k...
-
-// length is 2048 which is 2k or 0x1000
-
 
 struct lpc12_t
 {
@@ -191,8 +166,6 @@ static void reset()
 	  m_lrq = 0;
 }
 
-
-
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
 /* ======================================================================== */
@@ -213,7 +186,7 @@ static inline INT16 limit(INT16 s){
 static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
-	INT16 samp;
+	INT16 samp, val;
 	u8 do_int;
 
 	/* -------------------------------------------------------------------- */
@@ -225,11 +198,18 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		// invert the values here - but do in exy in audio.c
-		f->amp=f->amporig+(320-(int)(exy[1]*640.0f)); // amp values? 1280 - so
+		// invert the values here if necessary
+		//		f->amp=f->amporig+(320-(int)((1.0f-exy[1])*640.0f)); // amp values? 1280 - so
+		val=exy[1]*1026.0f;
+		MAXED(val,1023);
+		f->amp=f->amporig*logspeed[1023-val];
 		if (f->perorig)
 		{
-		  f->per=f->perorig+(90 - (int)(exy[0]*180.0f));
+		  val=exy[0]*130.0f;
+		  MAXED(val,127);
+		  f->per=f->perorig*logpitch[val];
+
+		  //		  f->per=f->perorig+(90 - (int)(exy[0]*180.0f)); // exy should be exp/log
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -317,8 +297,13 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		for (j = 0; j < 6; j++)
 		{
 		  // intersperse
-		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
-		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
+		  //		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
+		  val=exy[2 + 2*j]*1026.0f;
+		  MAXED(val,1023);
+		  f->b_coef[j]=f->b_coeforig[j]*logspeed[1023-val];
+		  val=exy[3 + 2*j]*1026.0f;
+		  f->f_coef[j]=f->f_coeforig[j]*logspeed[1023-val];
+		  //		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
 		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
@@ -766,13 +751,6 @@ static UINT32 getb( int len )
 		/* ---------------------------------------------------------------- */
 	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
 	  int32_t idx1 = (m_pc + 8) >> 3, d1;
-		
-	  //	int firstadd=(idx0 & 0xffff);
-	  //	int secondadd=(idx1 & 0xffff);
-
-	  /*	  if (firstadd<0 || secondadd>0x800) data=0; // better check on this - NOT in case of m_rom19
-				else
-				{*/
 
 	  data=1; minus=0x1000; // default
 	  if (idx0>=0x1800 || idx0<0x1000) data=0;

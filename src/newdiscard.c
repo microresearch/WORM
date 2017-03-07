@@ -1,3 +1,261 @@
+////////////////////[[[[[[[[[[ TESTING LPC residual as excitation for sp0256
+
+// this works but quite high volume
+
+void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
+//(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
+//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
+//  dowormwavetable(carrierbuffer, &wavtable, adc_buffer[SELX], size);
+  int_to_floot(incoming,voicebuffer,size);
+  //  LPC_cross(voicebuffer,carrierbuffer, lastbuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  //  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+    floot_to_int(outgoing,lastbuffer,size);
+};
+
+
+
+void sp0256_within_noLPC(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+
+  TTS=0;
+  // added trigger
+  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
+
+  float voicebuffer[32],lastbuffer[32];
+  int16_t outgo[32];
+  //  int_to_floot(incoming,voicebuffer,size);
+  //  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  //  floot_to_int(outgo,voicebuffer,size);
+  for (u8 x=0;x<size;x++) outgo[x]=(incoming[x])>>4; // say 11 bits
+
+    u8 xx=0,x=0,readpos;
+  float remainder;
+    samplespeed/=8.0;
+  //  samplespeed=1.0f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_sample_withLPC(outgo[xx]); // check this!
+	 //	 	 samplel=outgo[xx];
+	 samplepos-=1.0f;
+	        }
+       remainder=samplepos; 
+       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       outgoing[xx]=samplel;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	      //	 samplel=outgo[xx];
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+     }
+};
+
+void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+
+  TTS=0;
+  // added trigger
+  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
+
+  float voicebuffer[32],lastbuffer[32];
+  int16_t outgo[32];
+  int_to_floot(incoming,voicebuffer,size);
+  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
+  floot_to_int(outgo,lastbuffer,size);
+  for (u8 x=0;x<size;x++) outgo[x]=(outgo[x])>>4; // say 11 bits
+
+    u8 xx=0,x=0,readpos;
+  float remainder;
+    samplespeed/=8.0;
+  //  samplespeed=1.0f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=sp0256_get_sample_withLPC(outgo[x++]); // check this!
+	 //	 	 samplel=outgo[xx];
+	 samplepos-=1.0f;
+	        }
+       remainder=samplepos; 
+       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       outgoing[xx]=samplel;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=sp0256_get_sample_withLPC(outgo[xx]);
+	      //	 samplel=outgo[xx];
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+     }
+};
+
+
+
+
+int16_t sp0256_get_sample_withLPC(INT16 samp){
+  static int16_t output; 
+   
+      u8 howmany=0;
+            while(howmany==0){ 
+   
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsay1219();
+   }
+
+      micro();
+      howmany=lpc12_update_withsample(&m_filt, samp, &output);
+          }
+   return output;
+ }
+
+
+
+
+
+// adding lpc12_update_withsample
+
+static inline u8 lpc12_update_withsample(struct lpc12_t *f, INT16 samp, INT16* out)
+{
+	u8 j;
+	//	INT16 samp;
+	u8 do_int;
+
+	/* -------------------------------------------------------------------- */
+	/*  Iterate up to the desired number of samples.  We actually may       */
+	/*  break out early if our repeat count expires.                        */
+	/* -------------------------------------------------------------------- */
+		/* ---------------------------------------------------------------- */
+		/*  Generate a series of periodic impulses, or random noise.        */
+		/* ---------------------------------------------------------------- */
+		do_int = 0;
+		//		samp   = 0;
+		if (f->per_orig)
+		{
+		  int16_t val = (_selx*142.0f);
+		  //		  int16_t val=70;
+		  MAXED(val,140)
+		    val=140-val;
+		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
+		  //		  f->per=f->per_orig;
+			if (f->cnt <= 0)
+			{
+				f->cnt += f->per;
+				//	samp    = f->amp;
+				f->rpt--;
+				do_int  = f->interp;
+
+				for (j = 0; j < 6; j++)
+					f->z_data[j][1] = f->z_data[j][0] = 0;
+
+			} else
+			{
+			  //  samp = 0; /// ??? keeps noise out?
+			  f->cnt--;
+			}
+
+		} else // do noise
+		{
+			u8 bit;
+
+			if (--f->cnt <= 0)
+			{
+				do_int = f->interp;
+				f->cnt = PER_NOISE;
+				f->rpt--;
+				for (j = 0; j < 6; j++)
+					f->z_data[j][0] = f->z_data[j][1] = 0;
+			}
+
+			bit = f->rng & 1;
+			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
+
+						if (bit) { samp =  f->amp; }
+						else     { samp = -f->amp; }
+		}
+
+		/* ---------------------------------------------------------------- */
+		/*  If we need to, process the interpolation registers.             */
+		/* ---------------------------------------------------------------- */
+		if (do_int)
+		{
+			f->r[0] += f->r[14];
+			f->r[1] += f->r[15];
+
+			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+			f->per_orig   = f->r[1];
+
+			do_int   = 0;
+		}
+
+		/* ---------------------------------------------------------------- */
+		/*  Stop if we expire our repeat counter and return the actual      */
+		/*  number of samples we did.                                       */
+		/* ---------------------------------------------------------------- */
+		if (f->rpt <= 0) return 0; 
+
+		/* ---------------------------------------------------------------- */
+		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
+		/*  gives the first form, the patent gives the second form.         */
+		/*  They're equivalent except for time delay.  I implement the      */
+		/*  first form.   (Note: 1/Z == 1 unit of time delay.)              */
+		/*                                                                  */
+		/*          ---->(+)-------->(+)----------+------->                 */
+		/*                ^           ^           |                         */
+		/*                |           |           |                         */
+		/*                |           |           |                         */
+		/*               [B]        [2*F]         |                         */
+		/*                ^           ^           |                         */
+		/*                |           |           |                         */
+		/*                |           |           |                         */
+		/*                +---[1/Z]<--+---[1/Z]<--+                         */
+		/*                                                                  */
+		/*                                                                  */
+		/*                +---[2*F]<---+                                    */
+		/*                |            |                                    */
+		/*                |            |                                    */
+		/*                v            |                                    */
+		/*          ---->(+)-->[1/Z]-->+-->[1/Z]---+------>                 */
+		/*                ^                        |                        */
+		/*                |                        |                        */
+		/*                |                        |                        */
+		/*                +-----------[B]<---------+                        */
+		/*                                                                  */
+		/* ---------------------------------------------------------------- */
+		//		samp=samp>>2;
+				for (j = 0; j < 6; j++)
+		{
+			samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+			samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+
+			f->z_data[j][1] = f->z_data[j][0];
+			f->z_data[j][0] = samp;
+			}
+		*out= limit(samp)<<2;
+		return 1;
+}
+
+
     // testing changing test_elm
       //      u8 axis=adc_buffer[SELX]>>8; // 16*3=48
       // change element, change length? leave stress as is 0

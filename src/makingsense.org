@@ -803,21 +803,13 @@ bend on selz as these are just frame bends - *should be for 3 different coeff se
 
 still not happy with x/y selection in any case
 
-** 7/3 TODO
+** 7/3 
 
-*** TMS
+*** GENERAL - DONE
 
-- add 5220 bend mode (simply copy but when we are happy with X/Y - changed to trigger as freeze/unfreeze)
+- how can we measure frequency and test 1v/oct? tested in test_wave with DC PSU and scope - WORKING!
 
-- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
-
-- X/Y bends/add-subs on subsection of vocab TODO - which vocabs? - allphons and ...
-
-++ bends of tables on specific vocabs. tables are: energy, pitch, LPC and chirp - bend all of just 1?
-
-*** GENERAL
-
- -  test and clean code for each mode following:
+- testing extents with DC power supply: SELXx, SELZx, Yx, MODEx, SPEEDx -DONE
 
  - *exponential pitch and speed* - lookups // all pitch mods // any other mods (exy?) - look at mode by mode 
 
@@ -827,24 +819,45 @@ where we put the pitch stuff - in each mode// test speed change also...DONE_TO_T
 
 update these with mult by logpitch:
 
-sp0256: // period/pitch -70 to +70
+sp0256: // period/pitch -70 to +70-DONE
 
 votrax: pitch bend is from -8 to +64
 
 TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
 
-/////
+- still not happy with x/y selecting protocol
 
-- still not happy with x/y selecting protocal
+- move inversion of exy out of audio.c DONE - so is no inversion/extent issue
 
-- look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
+*** TMS - DONE
 
-*- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
+- added 5220 bend mode (simply copy but when we are happy with X/Y - changed to trigger as freeze/unfreeze)
+*5220 bend is same but with diff coeff only*DONE
 
-  // with exy=0.0 idx=16// exy=0.95 idx=0
-  exy=1.0f-_sely; // no multiplier and inverted here
-  m_new_frame_energy_idx = exy*16.0f; /
- 
+/////++ bends of tables on specific vocabs. tables are: energyNO, pitch, LPC and chirp - bend all or just 1?
+
+as example for 5100 try: all in process()
+
+bend pitchtable - for 5100 table is 32 - DONE for 5100 and seems to work ok
+bend ktable - TEST - not very interesting so leave off
+bend chirptable - TEST - DONE but may need some tweaking
+
+TODO: 5200 variants of these which work/...
+
+*** TODO 
+
+- clean all mode code and audio.c we have so far
+
+- tweak speeds for each mode?
+
+TMS  
+- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
+- X/Y bends on subsection of vocab TODO - which vocabs? - allphonsDONE
+- 5200 variants of table bends which work = pitchtable and ktable and watch newsay for these when add rest of vocabs
+- bend pitchtable AND ktable
+
+*so all bends with fixed vocabs*
+
 * TTS 
 
 : gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
@@ -1005,11 +1018,11 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 ** basic modes to do with suggested extensions - 64 modes
 
-1. TMS -> vocab,TTS?, phonemes, raw, other excitations for all
-2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw?
-4. votrax -> TTS, phonemes, vocab is roms, raw?
+1. TMS -> vocab,TTS?, phonemes, raw
+2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw
+4. votrax -> TTS, phonemes, vocab is roms, raw
 
-//////////////////say 30 so far
+//////////////////say 27 so far - we have 23 with maybe 4 more to come
 
 3. digitalker
 5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
@@ -1194,23 +1207,14 @@ Y- param value
 Z- select phrase to bend - rom12+19
 TRIGGER- new phrase
 
-*** withLPC - two varieties of sp0256 within (one with residual, one without)
-
-X- period/pitch
-Y- repeat/length
-Z- select phrase - rom12+19
-TRIGGER- UNUSED as we have carrier input
-
 ** VOTRAX
 
-*** straight mode
-
-phonemes
+*** straight mode / wow / gorf
 
 X- pitch bend
-Y- length of phoneme
-Z- select phoneme
-TRIGGER-reset to start of phoneme
+Y- length of phoneme/phrase
+Z- select phoneme/phrase
+TRIGGER-reset to start of phoneme/phrase
 
 *** rawparam mode
 

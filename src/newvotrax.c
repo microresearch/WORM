@@ -45,6 +45,7 @@ FILE* fo;
 #include <stdio.h>
 #include <ctype.h>
 #include "votrax.h"
+#include "resources.h"
 extern float exy[64];
 extern float _selx, _sely, _selz;
 extern u8 TTS;
@@ -400,6 +401,7 @@ void chip_update()
 	// Phone tick counter update.  Stopped when ticks reach 16.
 	// Technically the counter keeps updating, but the comparator is
 	// disabled.
+  uint16_t val;
 	if(m_ticks != 0x10) {
 	  //	  printf("MTICKS: %d %d %d\n",m_ticks, m_phonetick, m_rom_cld);
 
@@ -464,8 +466,11 @@ void chip_update()
 	m_pitch = (m_pitch + 1) & 0x7f;
 
 	// tuning this DONE - TODO make exponential vot_pitch[]
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
-
+	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
+	val=_selx*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
 	if((m_pitch >> 2) == 1){
@@ -482,6 +487,7 @@ void chip_update()
 
 void chip_updateTTS()
 {
+  uint16_t val;
 	// Phone tick counter update.  Stopped when ticks reach 16.
 	// Technically the counter keeps updating, but the comparator is
 	// disabled.
@@ -547,8 +553,12 @@ void chip_updateTTS()
 	// it miss by manipulating the inflection inputs, but it'll wrap.
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0;
-	
+	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0;
+	val=_selx*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -1201,7 +1211,7 @@ void votrax_newsaygorf(u8 reset){
    vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*116.0f; 
+     whichone=_selz*116.0f; 
      MAXED(whichone,114);
      whichone=114-whichone;
      it=*(vocablist_gorf[whichone]+vocabindex);
@@ -1210,7 +1220,7 @@ void votrax_newsaygorf(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
+  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
   }
   
 void votrax_newsaywow(u8 reset){
@@ -1220,7 +1230,7 @@ void votrax_newsaywow(u8 reset){
    vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selx*80.0f; 
+     whichone=_selz*80.0f; 
      MAXED(whichone,78);
      whichone=78-whichone;
      it=*(vocablist_wow[whichone]+vocabindex);
@@ -1228,7 +1238,7 @@ void votrax_newsaywow(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*(1.05f-_selz)*32+1)*4*9+2)/30); 
+  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
 }
 
 int16_t votrax_get_samplegorf(){ 

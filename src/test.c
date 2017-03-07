@@ -289,11 +289,17 @@ typedef struct TMS_vocab__ {
 
  printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
+
+
   // with exy=0.0// exy=0.99
   float _sely=0.95f;
   float exy=1.0f-_sely; // no multiplier and inverted here
   int m_new_frame_energy_idx = exy*15.0f; //
   printf("sely=0.9: result=%d\n",m_new_frame_energy_idx); 
+  m_new_frame_energy_idx=16;
+  exy=0.45;
+  m_new_frame_energy_idx*=2*(1.0f-exy);
+  printf("DDDDDDDDDDDDDDDDDDDDDDDDDDDd: result=%d\n",m_new_frame_energy_idx); 
 
    
   // test coeff for ADC:

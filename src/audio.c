@@ -60,7 +60,7 @@ static adc_transform transform[5] = {
   {SELX, 0, 0.1f, 32.0f},
   {SELY, 0, 0.1f, 32.0f},
   {SELZ, 0, 0.1f, 32.0f},
-  {SPEED, 1, 0.1f, 1024.0f} 
+  {SPEED, 1, 0.1f, 1027.0f} 
 };
 
 extern float exy[64];
@@ -100,7 +100,7 @@ void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -145,7 +145,7 @@ void tmsphon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -190,7 +190,7 @@ void tmsTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -235,7 +235,7 @@ void tmsbendlength(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -280,7 +280,7 @@ void tmslowbit(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -322,18 +322,18 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   static u8 parammode=0;
   extent tmsraw5200extent={10,12.0f};
   TTS=0;
-
   static u8 triggered=0;
+  if (trigger==1) tms_newsay_raw5200(); // selector is in newsay
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
               if (parammode==0){
 		u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
 		MAXED(xaxis,tmsraw5200extent.max);
 		xaxis=tmsraw5200extent.max-xaxis;
-		exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+		exy[xaxis]=_sely;
 	      }
 	      if (samplepos>=1.0f) {
 	 lastval=samplel;
@@ -357,7 +357,7 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
          u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,tmsraw5200extent.max);
 	 xaxis=tmsraw5200extent.max-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 exy[xaxis]=_sely; 
 	      }
 	 samplel=tms_get_sample_raw5200();
 
@@ -376,22 +376,81 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
+void tmsraw5220(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  static u8 parammode=0;
+  extent tmsraw5220extent={10,12.0f};
+  TTS=0;
+  static u8 triggered=0;
+  if (trigger==1) tms_newsay_raw5220(); // selector is in newsay
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.5f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+              if (parammode==0){
+		u8 xaxis=_selx*tmsraw5220extent.maxplus; //0-16 for r, but now 14 params 0-13
+		MAXED(xaxis,tmsraw5220extent.max);
+		xaxis=tmsraw5220extent.max-xaxis;
+		exy[xaxis]=_sely;
+	      }
+	      if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=tms_get_sample_raw5220();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              if (parammode==0){
+         u8 xaxis=_selx*tmsraw5220extent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,tmsraw5220extent.max);
+	 xaxis=tmsraw5220extent.max-xaxis;
+	 exy[xaxis]=_sely; 
+	      }
+	 samplel=tms_get_sample_raw5220();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 parammode=0;
   extent tmsraw5100extent={10,12.0f};
   TTS=0;
-
   static u8 triggered=0;
+  if (trigger==1) tms_newsay_raw5100(); // selector is in newsay
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
               if (parammode==0){
 		u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
 		MAXED(xaxis,tmsraw5100extent.max);
 		xaxis=tmsraw5100extent.max-xaxis;
-		exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+		exy[xaxis]=_sely; // no multiplier and inverted here
 	      }
 	      if (samplepos>=1.0f) {
 	 lastval=samplel;
@@ -415,7 +474,7 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
          u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,tmsraw5100extent.max);
 	 xaxis=tmsraw5100extent.max-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 exy[xaxis]=_sely; // no multiplier and inverted here
 	      }
 	 samplel=tms_get_sample_raw5100();
 
@@ -434,6 +493,161 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
+void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  TTS=0;
+  extent tmsraw5200extent={11,13.0f};//11 here
+  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.5f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tmsraw5200extent.max);
+       xaxis=tmsraw5200extent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_bend5200();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_allphon(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tmsraw5200extent.max);
+       xaxis=tmsraw5200extent.max-xaxis;
+       samplel=tms_get_sample_bend5200();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_allphon(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  TTS=0;
+  extent tableextent={167,170.0f};//169 for LPC table here
+  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.5f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5100ktable();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5100ktable();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay; // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  TTS=0;
+  extent tableextent={31,33.0f};//11 here
+  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.5f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5100pitchtable();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5100pitchtable();
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay; // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
 
 
 ///[[[[[[[[[[[[[[[[[[[[[[[[SP0256
@@ -446,7 +660,7 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed/=8.0;
+  //  samplespeed/=8.0; // FIX THIS!
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -681,7 +895,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
        u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,sp0256bendextent.max);
        xaxis=sp0256bendextent.max-xaxis;
-       exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+       exy[xaxis]=_sely; // no multiplier and inverted here
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=sp0256_get_samplebend();
@@ -704,7 +918,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
          u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,sp0256bendextent.max);
 	 xaxis=sp0256bendextent.max-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 exy[xaxis]=_sely; // no multiplier and inverted here
 
 	 samplel=sp0256_get_samplebend();
 
@@ -726,7 +940,6 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 ///[[[[[[[[[[[[[[[[[[[[[[[[VOTRAX
 
 void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  samplespeed*=0.5f;
   TTS=0;
   if (trigger==1) votrax_newsay(); // selector is in newsay
   static u8 triggered=0;
@@ -772,7 +985,6 @@ void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 };
 
 void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  samplespeed*=0.5f;
 
   TTS=1;
   if (trigger==1) votrax_retriggerTTS(); // selector is in newsay
@@ -820,7 +1032,6 @@ void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 };
 
 void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  samplespeed*=0.5f;
 
   TTS=0;
   if (trigger==1) votrax_newsaygorf(1); // selector is in newsay
@@ -867,7 +1078,6 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 };
 
 void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  samplespeed*=0.5f;
 
   TTS=0;
   if (trigger==1) votrax_newsaywow(1); // selector is in newsay
@@ -915,7 +1125,6 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NOTES - needs trigger but is this best way?
   extent votraxparamextent={6,7.0f};
-  samplespeed*=0.5f;
   TTS=0;
   //  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
   static u8 triggered=0, parammode=0;
@@ -928,7 +1137,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 	 u8 xaxis=_selx*votraxparamextent.maxplus; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,votraxparamextent.max); // how can we test the extent for the CV in
 	 xaxis=votraxparamextent.max-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 exy[xaxis]=_sely; 
        }
 
        if (samplepos>=1.0f) {
@@ -954,7 +1163,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 	 u8 xaxis=_selx*votraxparamextent.maxplus; 
 	 MAXED(xaxis,votraxparamextent.max); // how can we test the extent for the CV in
 	 xaxis=votraxparamextent.max-xaxis;
-	 exy[xaxis]=1.0f-_sely; // no multiplier and inverted here
+	 exy[xaxis]=_sely; 
        }
 
               samplel=votrax_get_sample_rawparam();
@@ -977,7 +1186,6 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
 void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   extent votraxbendextent={8,9.0f};
-  samplespeed*=0.5f;
   TTS=0;
   if (trigger==1) votrax_newsay_bend(1); // selector is in newsay
   static u8 triggered=0, parammode=0;
@@ -1029,126 +1237,15 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
 };
 
-
-////////////////////[[[[[[[[[[ TESTING LPC residual as excitation for sp0256
-
-// this works but quite high volume
-
-void lpc_error(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  float carrierbuffer[32], voicebuffer[32],otherbuffer[32], lastbuffer[32];
-//(DelayN.ar(input,delaytime, delaytime)- LPCAnalyzer.ar(input,source,1024,MouseX.kr(1,256))).poll(10000)
-//  do_impulse(carrierbuffer, 32, adc_buffer[SELX]>>2);
-//  dowormwavetable(carrierbuffer, &wavtable, adc_buffer[SELX], size);
-  int_to_floot(incoming,voicebuffer,size);
-  //  LPC_cross(voicebuffer,carrierbuffer, lastbuffer,size);
-  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
-  //  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
-    floot_to_int(outgoing,lastbuffer,size);
-};
-
-void sp0256_within_noLPC(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-
-  TTS=0;
-  // added trigger
-  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
-
-  float voicebuffer[32],lastbuffer[32];
-  int16_t outgo[32];
-  //  int_to_floot(incoming,voicebuffer,size);
-  //  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
-  //  floot_to_int(outgo,voicebuffer,size);
-  for (u8 x=0;x<size;x++) outgo[x]=(incoming[x])>>4; // say 11 bits
-
-    u8 xx=0,x=0,readpos;
-  float remainder;
-    samplespeed/=8.0;
-  //  samplespeed=1.0f;
-   if (samplespeed<=1){ 
-     while (xx<size){
-       if (samplepos>=1.0f) {
-	 lastval=samplel;
-	 samplel=sp0256_get_sample_withLPC(outgo[xx]); // check this!
-	 //	 	 samplel=outgo[xx];
-	 samplepos-=1.0f;
-	        }
-       remainder=samplepos; 
-       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
-       outgoing[xx]=samplel;
-       xx++;
-       samplepos+=samplespeed;
-     }
-   }
-   else { 
-     while (xx<size){
-              samplel=sp0256_get_sample_withLPC(outgo[xx]);
-	      //	 samplel=outgo[xx];
-
-       if (samplepos>=samplespeed) {       
-	 outgoing[xx]=samplel;
-	 xx++;
-	 samplepos-=samplespeed;
-       }
-       samplepos+=1.0f;
-     }
-     }
-};
-
-void sp0256_within(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
-
-  TTS=0;
-  // added trigger
-  if (trigger==1) sp0256_newsay1219(); // selector is in newsay
-
-  float voicebuffer[32],lastbuffer[32];
-  int16_t outgo[32];
-  int_to_floot(incoming,voicebuffer,size);
-  LPC_residual(voicebuffer, lastbuffer,size); // WORKING!
-  floot_to_int(outgo,lastbuffer,size);
-  for (u8 x=0;x<size;x++) outgo[x]=(outgo[x])>>4; // say 11 bits
-
-    u8 xx=0,x=0,readpos;
-  float remainder;
-    samplespeed/=8.0;
-  //  samplespeed=1.0f;
-   if (samplespeed<=1){ 
-     while (xx<size){
-       if (samplepos>=1.0f) {
-	 lastval=samplel;
-	 samplel=sp0256_get_sample_withLPC(outgo[x++]); // check this!
-	 //	 	 samplel=outgo[xx];
-	 samplepos-=1.0f;
-	        }
-       remainder=samplepos; 
-       //       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
-       outgoing[xx]=samplel;
-       xx++;
-       samplepos+=samplespeed;
-     }
-   }
-   else { 
-     while (xx<size){
-              samplel=sp0256_get_sample_withLPC(outgo[xx]);
-	      //	 samplel=outgo[xx];
-
-       if (samplepos>=samplespeed) {       
-	 outgoing[xx]=samplel;
-	 xx++;
-	 samplepos-=samplespeed;
-       }
-       samplepos+=1.0f;
-     }
-     }
-};
-
-
 ///[[[[[ good for testing ADC/CV ins
 
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
-  //  dowavetable(lastbuffer, &wavtable, 2, size);
-  //  dowavetable(lastbuffer, &wavtable, 2+(1024-(adc_buffer[SELZ]>>2)), size);
-
-  dowavetable(lastbuffer, &wavtable, 2.0f + (1024.0f*(1.0f-_sely)), size);
+  uint16_t val;
+  val=_selz*1030.0f;
+  MAXED(val,1023);
+  val=1023-val;
+  dowavetable(lastbuffer, &wavtable, 2.0f+(logspeed[val]*440.0f), size); // for exp/1v/oct test
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
@@ -1181,7 +1278,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       value = 1.0f - value;
     }
      smoothed_adc_value[x] += transform[x].filter_coeff * (value - smoothed_adc_value[x]);
-  //  smoothed_adc_value[x] = value;
   }
 
   _speed=smoothed_adc_value[SPEED_];
@@ -1198,15 +1294,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0; 
- _intmode=16; 
+ _intmode=23; 
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;
    firsttime=1;
  }
+ 
   samplespeedref=_speed*transform[SPEED_].multiplier;
-
-  // TEST - speed exp
+  MAXED(samplespeedref, 1023);
   samplespeed=logspeed[samplespeedref];  
   
   // splitting input
@@ -1215,14 +1311,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6 - was with LPCanalyzer
+  //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6 - was with LPCanalyzer
 
   // above is for raven
-  // test_wave is just for testing purposes
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, sp0256_within_noLPC, sp0256_within, test_wave, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200}; // sp0256: 0-5 modes, votrax=6 - 
-  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12lpc_error, 13sp0256_within_noLPC, 14sp0256_within, 15test_wave, 16tms, 17tmsphone,18tmsTTS, 19tmsbendlength, 20tmslowbit, 21tmsraw5100, 22tmsraw5200
-
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, test_wave, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5200, tms5100pitchtablebend, tms5100ktablebend}; // sp0256: 0-5 modes, votrax=6 - 
+  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12test_wave, 13tms, 14tmsphone,15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5200, 22tms5100pitchtablebend, 23tms5100ktablebend
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
@@ -1235,9 +1329,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
   }
 
-  // remapping for TTS modes - TODO!
     if (TTS){
-    u8 xax=_sely*18.0f; // TODO!
+    u8 xax=_sely*18.0f; 
     u8 selz=_selz*65.0f; 
     MAXED(xax,16);
     MAXED(selz,63);

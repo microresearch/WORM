@@ -9,8 +9,8 @@
 
 #include "sp0romstest.h" // this has all roms as: m_rom12, m_rom19, m_romAL2 // latter is with vocabs and TTS
 #include "sp0256vocab.h"
-
-extern float _selx, _sely, _selz;
+#include "resources.h"
+extern float _selx, _sely, _selz, _mode, _speed;
 extern u8 TTS;
 const unsigned char *m_romm;
 
@@ -206,128 +206,6 @@ static inline INT16 limit(INT16 s)
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
 
-// adding lpc12_update_withsample
-
-static inline u8 lpc12_update_withsample(struct lpc12_t *f, INT16 samp, INT16* out)
-{
-	u8 j;
-	//	INT16 samp;
-	u8 do_int;
-
-	/* -------------------------------------------------------------------- */
-	/*  Iterate up to the desired number of samples.  We actually may       */
-	/*  break out early if our repeat count expires.                        */
-	/* -------------------------------------------------------------------- */
-		/* ---------------------------------------------------------------- */
-		/*  Generate a series of periodic impulses, or random noise.        */
-		/* ---------------------------------------------------------------- */
-		do_int = 0;
-		//		samp   = 0;
-		if (f->per_orig)
-		{
-		  int16_t val = (_selx*142.0f);
-		  //		  int16_t val=70;
-		  MAXED(val,140)
-		    val=140-val;
-		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
-		  //		  f->per=f->per_orig;
-			if (f->cnt <= 0)
-			{
-				f->cnt += f->per;
-				//	samp    = f->amp;
-				f->rpt--;
-				do_int  = f->interp;
-
-				for (j = 0; j < 6; j++)
-					f->z_data[j][1] = f->z_data[j][0] = 0;
-
-			} else
-			{
-			  //  samp = 0; /// ??? keeps noise out?
-			  f->cnt--;
-			}
-
-		} else // do noise
-		{
-			u8 bit;
-
-			if (--f->cnt <= 0)
-			{
-				do_int = f->interp;
-				f->cnt = PER_NOISE;
-				f->rpt--;
-				for (j = 0; j < 6; j++)
-					f->z_data[j][0] = f->z_data[j][1] = 0;
-			}
-
-			bit = f->rng & 1;
-			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
-
-						if (bit) { samp =  f->amp; }
-						else     { samp = -f->amp; }
-		}
-
-		/* ---------------------------------------------------------------- */
-		/*  If we need to, process the interpolation registers.             */
-		/* ---------------------------------------------------------------- */
-		if (do_int)
-		{
-			f->r[0] += f->r[14];
-			f->r[1] += f->r[15];
-
-			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-			f->per_orig   = f->r[1];
-
-			do_int   = 0;
-		}
-
-		/* ---------------------------------------------------------------- */
-		/*  Stop if we expire our repeat counter and return the actual      */
-		/*  number of samples we did.                                       */
-		/* ---------------------------------------------------------------- */
-		if (f->rpt <= 0) return 0; 
-
-		/* ---------------------------------------------------------------- */
-		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
-		/*  gives the first form, the patent gives the second form.         */
-		/*  They're equivalent except for time delay.  I implement the      */
-		/*  first form.   (Note: 1/Z == 1 unit of time delay.)              */
-		/*                                                                  */
-		/*          ---->(+)-------->(+)----------+------->                 */
-		/*                ^           ^           |                         */
-		/*                |           |           |                         */
-		/*                |           |           |                         */
-		/*               [B]        [2*F]         |                         */
-		/*                ^           ^           |                         */
-		/*                |           |           |                         */
-		/*                |           |           |                         */
-		/*                +---[1/Z]<--+---[1/Z]<--+                         */
-		/*                                                                  */
-		/*                                                                  */
-		/*                +---[2*F]<---+                                    */
-		/*                |            |                                    */
-		/*                |            |                                    */
-		/*                v            |                                    */
-		/*          ---->(+)-->[1/Z]-->+-->[1/Z]---+------>                 */
-		/*                ^                        |                        */
-		/*                |                        |                        */
-		/*                |                        |                        */
-		/*                +-----------[B]<---------+                        */
-		/*                                                                  */
-		/* ---------------------------------------------------------------- */
-		//		samp=samp>>2;
-				for (j = 0; j < 6; j++)
-		{
-			samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-			samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
-
-			f->z_data[j][1] = f->z_data[j][0];
-			f->z_data[j][0] = samp;
-			}
-		*out= limit(samp)<<2;
-		return 1;
-}
-
 static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
@@ -345,11 +223,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		samp   = 0;
 		if (f->per_orig)
 		{
-		  val = (_selx*142.0f);
-		  MAXED(val,140)
-		    val=140-val;
-		  f->per=f->per_orig+(70 - val);//+(adc_buffer[SELY]>>5);
-		  //		  f->per=f->per_orig;
+		  val=_selx*130.0f;
+		  MAXED(val,127);
+		  		  f->per=f->per_orig*logpitch[val];
+		  //	  f->per=f->per_orig;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -1346,24 +1223,6 @@ int16_t sp0256_get_sample(void){
    return output;
  }
 
-int16_t sp0256_get_sample_withLPC(INT16 samp){
-  static int16_t output; 
-   
-      u8 howmany=0;
-            while(howmany==0){ 
-   
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay1219();
-   }
-
-      micro();
-      howmany=lpc12_update_withsample(&m_filt, samp, &output);
-          }
-   return output;
- }
-
-
-
  int16_t sp0256_get_sampleTTS(void){
   static int16_t output; 
    u8 howmany=0;
@@ -1422,10 +1281,6 @@ static u8 TTSlength=0;
 void sp0256_newsay(void){
    u8 dada=0;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
-
-   //   m_halted=1;
-   //   dada=adc_buffer[SELX]>>6;
-   //   dada+=1;
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
@@ -1435,9 +1290,6 @@ void sp0256_newsay(void){
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
-
-//static const unsigned char mapytoascii[]  __attribute__ ((section (".flash"))) ={32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122}; // total 64 and starts with 2 spaces SELY=0-63
-
 
 void sp0256_newsayTTS(void){// called at end of phoneme
    u8 dada;
