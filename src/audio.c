@@ -539,10 +539,10 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
 };
 
-void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  // vocab=0
   TTS=0;
-  extent tableextent={167,170.0f};//169 for LPC table here
-  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+  extent tableextent={167,170.0f};//168 for LPC table here = 0-167
+  if (trigger==1) tms_newsay_specific(0); // selector is in newsay
 
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -562,7 +562,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay(); // selector is in newsay
+	 tms_newsay_specific(0); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -579,7 +579,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay; // selector is in newsay
+	 tms_newsay_specific(0); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -591,10 +591,10 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
    }
 };
 
-void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  // vocab=0
   TTS=0;
   extent tableextent={31,33.0f};//11 here
-  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
+  if (trigger==1) tms_newsay_specific(0); // selector is in newsay
 
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -614,7 +614,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay(); // selector is in newsay
+	 tms_newsay_specific(0); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -631,7 +631,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay; // selector is in newsay
+	 tms_newsay_specific(0); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;

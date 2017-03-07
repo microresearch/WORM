@@ -5,7 +5,7 @@
 	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
-// all isn m_rom above!
+// all is m_rom above!
 
 	ROM_REGION( 0x10000, "digitalker", 0) // 64k? for digitalker voice samples 
 	ROM_LOAD( "mblvsb2.2a",0x0000, 0x1000, NO_DUMP )

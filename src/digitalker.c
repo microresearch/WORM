@@ -1,22 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-//#include "emu.h"
-//#include "digitalk.h"
-
-// HEADER
 
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
-//#include "forlap.h"
 
 #include "audio.h"
 #include "digitalker.h"
 #include "digitalker_roms.h"
 
 extern __IO uint16_t adc_buffer[10];
-
 
 typedef unsigned char UINT8;
 typedef signed char INT8;
@@ -362,7 +356,7 @@ void digitalker_step_mode_0()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);
+	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6); // TODO - _selx pitch bend
 
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
@@ -415,7 +409,7 @@ void digitalker_step_mode_2()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);
+	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
 
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
@@ -477,7 +471,7 @@ void digitalker_step_mode_3()
 	UINT8 dac, apos, wpos;
 	int k, l;
 
-	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);
+	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
 		m_cur_dac = 0;
@@ -565,18 +559,10 @@ void digitalk_init(void){
 //static u8 alwayswhich;
 
 void digitalk_newsay(){
-  u8 which=(adc_buffer[SELX]>>6)+1; // 65
+  u8 which=(adc_buffer[SELX]>>6)+1; // 65 //  // TODO - _selz selection
   //     u8 which =1;
   digitalker_start_command(which);
   //  alwayswhich=which;
-}
-
-void digitalk_newsayarg(u8 which){
-  //  u8 which=adc_buffer[SELX]>>6; // 6 bits = 64
-  //  u8 which =1;
-  digitalker_start_command(which);
-  //  fprintf(stderr,"ALWAYS: %d\n",alwayswhich);
-  //  alwayswhich=which+1;
 }
 
 

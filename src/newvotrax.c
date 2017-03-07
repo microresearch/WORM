@@ -200,6 +200,9 @@ void device_reset()
 	memset(m_vn_3, 0, sizeof(m_vn_3));
 	memset(m_vn_4, 0, sizeof(m_vn_4));
 	memset(m_vn_5, 0, sizeof(m_vn_5));
+
+
+
 	memset(m_vn_6, 0, sizeof(m_vn_6));
 }
 

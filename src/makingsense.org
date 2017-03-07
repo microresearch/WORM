@@ -846,16 +846,16 @@ TODO: 5200 variants of these which work/...
 
 ** 8/3 TODO 
 
+- check clean extent for 64 modes - should be ok!
+
 - tweak speeds for each mode?
 
-lis of new TMS modes - any easier way to template these?
+- new bends/TMS modes in tms5200x.h to incorporate in audio.c, TEST and delect/add new vocabs
 
-- extra subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
-- X/Y bends on subsection of vocab TODO also 5100 - which vocabs? - allphonsDONE (5200)
-- 5200 variants of table bends which work = pitchtable and ktable and watch newsay for these when add rest of vocabs
-- bend pitchtable AND ktable at same time
+int16_t tms_newsay_specific(u8 whichbank); is new vocab selection make
+sure is matched in audio.c for each of new modes and add new modes for new vocabs for each of these bends
 
-- *so all bends with fixed vocabs*
+- check all TMS alphon code:     now tms_newsay_specific(1); // TODO this will change with full vocab to tms_newsay_specific(37)
 
 * TTS 
 
@@ -961,7 +961,7 @@ phons = {'AA': "0x0E", 'AE': "0x2E", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "
 
 
 
-* phonemes probabilty map high->low ABANDON
+* phonemes probability map high->low ABANDON
 
 ** TMS
 
@@ -1021,22 +1021,27 @@ wavetable as in raven, generators eg. pulse, square, and original
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw
 4. votrax -> TTS, phonemes, vocab is roms, raw
 
-//////////////////say 27 so far - we have 23 with maybe 4 more to come
+//////////////////say 30+ so far with vocab modes/TMS = 4 weeks
 
-3. digitalker
-5. SAM -> TTS, vocab(ported already), raw, filtered and unfiltered
-6. klatt/nvp variations RE_ACQUAINT
+3. digitalker ?? are there 2 roms? we have one large so stick with this, bends if any=pitch _and_ repeats/zero_count ???
 
-10. tube and ntube/glottal/wavetable
+5. SAM -> TTS, vocab(ported already), raw, low pass filtered and not filtered
 
-12. compost - startX, endY in compost buffer and Z? Z as last mode
+6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ, various glottal sources
+
+10. tube and ntube/glottal/wavetable and wormed tubes 
+
+12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example
 
-13. worming of raw modes and worm wavetable
+13. worming of all XY modes above
+
+*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*
 
 */////////// we leave from below and any LPC work for RAVEN which could have 2 inputs?*
 
+xx. wavetables and worm through wavetables
 
 9. vosim/fof etc.
 11. voicform?

@@ -24,8 +24,20 @@ int16_t tms_newsay_raw5200();
 int16_t tms_get_sample_raw5220();
 int16_t tms_newsay_raw5220();
 
-int16_t tms_get_sample_bend5200(); // for allphons - with     tms_newsay_allphon();
+int16_t tms_get_sample_bend5200(); // vocab=1 which will change for allphons ADD VOCABS
 
-int16_t tms_get_sample_5100pitchtable(); // with straight newsay just for tests and restrict to one vocab LATER TODO!
+int16_t tms_get_sample_5100pitchtable();  // vocab=0 ADD VOCABS
 
-int16_t tms_get_sample_5100ktable(); // with straight newsay just for tests and restrict to one vocab LATER TODO!
+int16_t tms_get_sample_5100ktable();  // vocab=0 ADD VOCABS
+
+int16_t tms_newsay_specific(u8 whichbank);
+
+/// new to TEST in audio.c and extra vocabs for each and above modes as independent functions
+
+int16_t tms_get_sample_bend5100(); // vocab=0 ADD VOCABS
+
+int16_t tms_get_sample_5200pitchtable(); // vocab=1 which will change for allphons + we have more pitches = 64 - reflect this in audio.c ADD VOCABS
+
+int16_t tms_get_sample_5100kandpitchtable(); // for 5100 we have 32+168 in exy= 200 5200 is 232 ADD VOCABS
+
+int16_t tms_get_sample_5200kandpitchtable(); // for 5100 we have 32+168 in exy= 200 5200 is 232 ADD VOCABS
