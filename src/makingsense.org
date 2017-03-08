@@ -846,11 +846,20 @@ TODO: 5200 variants of these which work/...
 
 ** 8/3 TODO 
 
-- check clean extent for 64 modes - should be ok!
+- check clean extent for 64 modes - should be ok as fine for greater...DONE
 
-- tweak speeds for each mode? - where normal speed should be for each mode?
+- tweak speeds for each mode? - where normal speed should be for each mode - sp0256DONE=10KHz, votraxDONE=20KHz, TMS-DONE=8KHz, digitalker=9000
 
-- new bends/TMS modes in tms5200x.h to incorporate in audio.c, TEST and delect/add new vocabs
+- changed length code to loggy in votraxDONE
+
+- check logarithmic for pitch bends - tms=byID so no logDONE, sp0256DONE, votraxDONETEST
+
+///////
+
+- TODO: note also with votrax clock change on cap filters - as extra bend
+
+
+- new bends/TMS modes in tms5200x.h to incorporate in audio.c, TEST and select/add new vocabs
 
 int16_t tms_newsay_specific(u8 whichbank); is new vocab selection make
 sure is matched in audio.c for each of new modes and add new modes for new vocabs for each of these bends

@@ -89,7 +89,7 @@ wormy myworm;
 
 char TTSinarray[17];
 
-///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle
+///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle - is it 8KHz = *0.25f - seems OK
 
 void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   TTS=0;
@@ -98,7 +98,7 @@ void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -644,7 +644,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
 };
 
 
-///[[[[[[[[[[[[[[[[[[[[[[[[SP0256
+///[[[[[[[[[[[[[[[[[[[[[[[[SP0256 10 KHz so -   samplespeed/=3.2;
 
 void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
   TTS=0;
@@ -692,6 +692,7 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
 void sp0256_1219(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   TTS=0;
   if (trigger==1) sp0256_newsay1219(); // selector is in newsay
+  samplespeed/=3.2;
 
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -921,7 +922,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
-///[[[[[[[[[[[[[[[[[[[[[[[[VOTRAX
+///[[[[[[[[[[[[[[[[[[[[[[[[VOTRAX 20KHz =
 
 void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
@@ -1020,6 +1021,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
+  samplespeed=samplespeed*2.0f;
 
    if (samplespeed<=1){ 
      while (xx<size){
@@ -1059,12 +1061,13 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
-void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // 40 KHZ = 
   TTS=0;
   if (trigger==1) votrax_newsaywow(1); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
+  samplespeed=samplespeed*1.25f;
 
    if (samplespeed<=1){ 
      while (xx<size){
@@ -1275,7 +1278,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0; 
- _intmode=23; 
+ _intmode=9; 
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;

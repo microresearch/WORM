@@ -146,8 +146,8 @@ void device_start()
 	// initialize internal state
   m_mainclock = 720000; // TODO as we need m_mainclock - 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 
-  m_sclock = m_mainclock / 18.0f;
-  m_cclock = m_mainclock / 36.0f;
+  m_sclock = m_mainclock / 18.0f; // so 40000
+  m_cclock = m_mainclock / 36.0f; // so 20000
 }
 
 //-------------------------------------------------
@@ -265,6 +265,7 @@ u8 interpolate(u8 reg, u8 target) // does nothing as it was
 	return reg;
 }
 
+#ifndef LAP
 void chip_update_bend()
 {
 	// Phone tick counter update.  Stopped when ticks reach 16.
@@ -343,7 +344,12 @@ void chip_update_bend()
 	// it miss by manipulating the inflection inputs, but it'll wrap.
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-exy[0])*64.0f)-8)) + 1)) m_pitch = 0;
+	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-exy[0])*64.0f)-8)) + 1)) m_pitch = 0;
+	u8 val=exy[0]*130.0f;
+	MAXED(val,127);
+	val=127-val;
+
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0;
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -368,8 +374,15 @@ void chip_update_raw()
   m_cur_va=exy[0]*255.0f;
 
   m_pitch = (m_pitch + 1) & 0x7f;
-  if (m_pitch == (0x7f ^  ((int)((1.0f-_selz)*64.0f)) + 1)) m_pitch = 0;
-	
+  //  if (m_pitch == (0x7f ^  ((int)((1.0f-_selz)*64.0f)) + 1)) m_pitch = 0;
+
+	u8 val=_selz*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+		
+
+
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
 	if((m_pitch >> 2) == 1){
@@ -381,14 +394,13 @@ void chip_update_raw()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 }
-
+#endif
 
 void chip_update()
 {
 	// Phone tick counter update.  Stopped when ticks reach 16.
 	// Technically the counter keeps updating, but the comparator is
 	// disabled.
-  uint16_t val;
 	if(m_ticks != 0x10) {
 	  //	  printf("MTICKS: %d %d %d\n",m_ticks, m_phonetick, m_rom_cld);
 
@@ -454,10 +466,15 @@ void chip_update()
 
 	// tuning this DONE - TODO make exponential vot_pitch[]
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
-	val=_selx*130.0f;
+#ifdef LAP
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
+#else
+	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+		if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
+#endif
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
 	if((m_pitch >> 2) == 1){
@@ -472,9 +489,9 @@ void chip_update()
 
 }
 
+#ifndef LAP
 void chip_updateTTS()
 {
-  uint16_t val;
 	// Phone tick counter update.  Stopped when ticks reach 16.
 	// Technically the counter keeps updating, but the comparator is
 	// disabled.
@@ -541,7 +558,7 @@ void chip_updateTTS()
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0;
-	val=_selx*130.0f;
+	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
 	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
@@ -558,6 +575,7 @@ void chip_updateTTS()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 }
+#endif
 
 
 void filters_commit(bool force)
@@ -572,6 +590,7 @@ void filters_commit(bool force)
 	m_filt_va = m_cur_va >> 4;
 
 	if(force || m_filt_f1 != m_cur_f1 >> 4) {
+	  //	  printf("filtercommit\n");
 		m_filt_f1 = m_cur_f1 >> 4;
 
 		build_standard_filter(m_f1_a, m_f1_b,
@@ -1125,7 +1144,10 @@ void votrax_newsay(){
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 }
 
 int16_t votrax_get_sample(){ 
@@ -1169,7 +1191,10 @@ void votrax_newsay_bend(u8 reset){
 
   writer(it); 
   phone_commit();
-  lenny=((16*(m_rom_duration*(1.2f-exy[8])*16+1)*4*9+2)/30); 
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 }
 
 int16_t votrax_get_sample_bend(){ 
@@ -1201,13 +1226,16 @@ void votrax_newsaygorf(u8 reset){
      whichone=_selz*116.0f; 
      MAXED(whichone,114);
      whichone=114-whichone;
-     it=*(vocablist_gorf[whichone]+vocabindex);
+     it=*(vocablist_gorf[whichone]);
    }   
 
    writer(it); 
   phone_commit();
   inflection_w(it>>6); 
-  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   }
   
 void votrax_newsaywow(u8 reset){
@@ -1220,12 +1248,21 @@ void votrax_newsaywow(u8 reset){
      whichone=_selz*80.0f; 
      MAXED(whichone,78);
      whichone=78-whichone;
-     it=*(vocablist_wow[whichone]+vocabindex);
+     it=*(vocablist_wow[whichone]);
    }   
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  lenny=((16*(m_rom_duration*(1.05f-_sely)*32+1)*4*9+2)/30); 
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; // TODO: where do we get this from? - make LOGGY
+
+  //  lenny=((16*(m_rom_duration*4+1)*4*9+2)/32); // what of sample-rate?
+    //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
+  //  m_sclock = m_mainclock / 18.0f * logpitch[val]; // so 40000 - doesn't do anything if we have both in sync - crashes filter
+  //  m_cclock = m_mainclock / 36.0f * logpitch[val]; // so 20000 
+
 }
 
 int16_t votrax_get_samplegorf(){ 
@@ -1263,7 +1300,11 @@ void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-    lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+
   TTSindex++;
    if (TTSindex>=TTSlength) {
      TTSindex=0;
@@ -1290,7 +1331,10 @@ void votrax_retriggerTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[0]>>6); // how many bits?
-  lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   TTSindex=1;
 }
 
