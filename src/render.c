@@ -59,7 +59,7 @@ static inline unsigned char Output(unsigned char index) // is one step behind wh
 	//	older=	(bufferpos/50)-(oldbufferpos/50);
 	//	oldbufferpos=bufferpos;
 	//	k=older;
-		k=5;
+	k=5; /// ?????
 	return k;
 }
 

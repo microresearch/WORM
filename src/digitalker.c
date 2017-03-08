@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
+// modified for WORM by Martin Howse
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -9,8 +11,9 @@
 #include "audio.h"
 #include "digitalker.h"
 #include "digitalker_roms.h"
+#include "resources.h"
 
-extern __IO uint16_t adc_buffer[10];
+extern float _selx, _sely, _selz;
 
 typedef unsigned char UINT8;
 typedef signed char INT8;
@@ -356,8 +359,12 @@ void digitalker_step_mode_0()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6); // TODO - _selx pitch bend
-
+	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6); 
+	u8 val=_selx*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	m_pitch = pitch_vals[pitch_id] * logpitch[val];
+	
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
 
@@ -409,8 +416,13 @@ void digitalker_step_mode_2()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+	u8 val=_selx*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	m_pitch = pitch_vals[pitch_id] * logpitch[val];
 
+	
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
@@ -471,7 +483,12 @@ void digitalker_step_mode_3()
 	UINT8 dac, apos, wpos;
 	int k, l;
 
-	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+	//	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+	u8 val=_selx*130.0f;
+	MAXED(val,127);
+	val=127-val;
+	m_pitch = pitch_vals[h & 0x1f] * logpitch[val];
+
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
 		m_cur_dac = 0;
@@ -559,7 +576,11 @@ void digitalk_init(void){
 //static u8 alwayswhich;
 
 void digitalk_newsay(){
-  u8 which=(adc_buffer[SELX]>>6)+1; // 65 //  // TODO - _selz selection
+  u8 val=_selz*67.0f;
+  MAXED(val,64);
+  val=64-val;
+
+  u8 which=val+1; // 65 - do we hit the end? TODO TEST
   //     u8 which =1;
   digitalker_start_command(which);
   //  alwayswhich=which;
@@ -612,7 +633,8 @@ int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMPLES!
 	//	else  new say????
 	else {
 	  digitalk_newsay();
-	  sample=digitalk_get_sample();
+	  //	  sample=digitalk_get_sample();
+	  sample=0;
 	}
 	return sample;
 	}

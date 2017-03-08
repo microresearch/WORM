@@ -854,8 +854,6 @@ TODO: 5200 variants of these which work/...
 
 - check logarithmic for pitch bends - tms=byID so no logDONE, sp0256DONE, votraxDONETEST
 
-///////
-
 - TODO: note also with votrax clock change on cap filters - *as extra  bend* DONE TEST
 - DONEcheck filter stuff on lap (clock doesn't change filter coeffs just
   ratio between m_sclock and m_cclock) - as bend instead of lengthTEST!
@@ -866,12 +864,68 @@ TODO: 5200 variants of these which work/...
 
 ADDED: tms5200ktablebend, tmsbend5100, tms5200pitchtablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend TEST all
 
+*TODO:*
+
 extra vocabs for these and... tmsbend5200, tms5100ktablebend, tms5100pitchtablebend = +8 say
 
 tms_newsay_specific(u8 whichbank); is new vocab selection make these in audio.c
 
 - when we need full vocab on TMS: allphon and tms_newsay_specific(1); // TODO this will change with full vocab to
   tms_newsay_specific(37)
+
+/////
+
+SAM:
+
+- get new code base
+- starting on SAM: vocablist_sam is 32 banks by 42 vocabs sely and selz
+- sort out SAM mess with repeats and singmode - singmode doesn't seem to do much
+- reciter.c is text to speech also
+- bends for SPEED     PITCH     THROAT    MOUTH see readme notes below
+
+- singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
+
+- short vocab - TESTING - how to divide up vocab as we use up SELX?Y?Z????
+
+/// possible 2 more modes 
+
+1= phonetic array (position in array (of 32), phonemes, stress)
+2= bent raw phonemeindex/length/stress going through but how to stop this malfunctioning and add breaths also?
+
+raw phoneme is a bit brittle and should maybe be abandoned - or somehow break to single functions and no parsing at all???
+
+.... details from: http://www.retrobits.net/atari/sam.shtml#ch1.1
+
+PITCH
+POKE PITCH,N
+N=
+00-20	impractical
+20-30	very high
+30-40	high
+40-50	high normal
+50-70	normal
+70-80	low normal
+80-90	low
+90-255	very low
+default = 64
+
+SPEED
+POKE SPEED,M
+M=
+0-20	impractical
+20-40	very fast
+40-60	fast
+60-70	fast conversational
+70-75	normal conversational
+75-90	narrative
+90-100	slow
+100-225	very slow
+default = 72
+
+
+DIGI:
+
+- digitalker changed so skips one sample at end of get_sample - needs clean up // and changed pitch and selz for vocab
 
 * TTS 
 
@@ -1039,9 +1093,11 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 //////////////////say 30+ so far with vocab modes/TMS = 4 weeks
 
+5. SAM -> TTS, vocab(ported already), raw?, low pass filtered and not filtered - bend on one as we will have y/z for bank and vocab
+
 3. digitalker ?? are there 2 roms? we have one large so stick with this, bends if any=pitch _and_ repeats/zero_count ???
 
-5. SAM -> TTS, vocab(ported already), raw, low pass filtered and not filtered
+////
 
 6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ, various glottal sources
 
@@ -1049,7 +1105,7 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
-    oldX.Y for example
+    oldX.Y for example. compost as wormed wavetable
 
 13. worming of all XY modes above
 

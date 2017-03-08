@@ -1284,7 +1284,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
   u8 val=_sely*130.0f;
   MAXED(val,127);
   val=127-val;
-
+p
   lenny=(16*(m_rom_duration*4+1)*4*9+2); 
   m_cclock = m_mainclock / 36.0f * logpitch[val]; 
 

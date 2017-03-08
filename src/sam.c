@@ -1,3 +1,5 @@
+// questionable copyright! modified for WORM by Martin Howse
+
 #include "sam.h"
 #include "samvocab.h"
 #include "render.h"
@@ -254,7 +256,11 @@ void sam_newsay(void){
 	}	
 }
 
-// sam_get_sample for individual samples
+// sam_get_sample for individual samples: TODO: redo so fits audio.c model without howmany
+
+//	 while (howmany==0) howmany=(sam_get_sample(&samplel)); 
+//	 howmany--;
+
 
 u8 sam_get_sample(int16_t* newsample){
   static int16_t lastsample;
@@ -267,7 +273,7 @@ u8 sam_get_sample(int16_t* newsample){
   if (ending) sam_newsay();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50);
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
   //  howmany=5;
   return howmany;
 }
