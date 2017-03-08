@@ -142,7 +142,7 @@ void tmsphon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -186,7 +186,7 @@ void tmsTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -230,7 +230,7 @@ void tmsbendlength(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -274,7 +274,7 @@ void tmslowbit(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -320,7 +320,7 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   if (trigger==1) tms_newsay_raw5200(); // selector is in newsay
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
               if (parammode==0){
@@ -378,7 +378,7 @@ void tmsraw5220(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   if (trigger==1) tms_newsay_raw5220(); // selector is in newsay
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
               if (parammode==0){
@@ -437,7 +437,7 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   if (trigger==1) tms_newsay_raw5100(); // selector is in newsay
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
               if (parammode==0){
@@ -487,15 +487,16 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
-void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+// TODO we can add vocabs from here on but they must match 5100/5200
+
+void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: copy/add vocabs!
   TTS=0;
   extent tmsraw5200extent={11,13.0f};//11 here
-  if (trigger==1) tms_newsay_allphon(); // selector is in newsay
-
+  if (trigger==1)     tms_newsay_specific(1); // TODO this will change with full vocab!
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
@@ -504,13 +505,13 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
        exy[xaxis]=_sely; // no multiplier and inverted here
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	  samplel=tms_get_sample_bend5200();
+	  samplel=tms_get_sample_bend5200(1);  // TODO this will change with full vocab!
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay_allphon(); // selector is in newsay
+	tms_newsay_specific(1); // TODO this will change with full vocab!
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -523,11 +524,11 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tmsraw5200extent.max);
        xaxis=tmsraw5200extent.max-xaxis;
-       samplel=tms_get_sample_bend5200();
+       samplel=tms_get_sample_bend5200(1);  // TODO this will change with full vocab!
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 tms_newsay_allphon(); // selector is in newsay
+	 tms_newsay_specific(1); // TODO this will change with full vocab!
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -539,7 +540,8 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
 };
 
-void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  // vocab=0
+void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  //  // TODO: copy/add vocabs!
+
   TTS=0;
   extent tableextent={167,170.0f};//168 for LPC table here = 0-167
   if (trigger==1) tms_newsay_specific(0); // selector is in newsay
@@ -547,7 +549,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
@@ -556,7 +558,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
        exy[xaxis]=_sely; // no multiplier and inverted here
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	  samplel=tms_get_sample_5100ktable();
+	  samplel=tms_get_sample_5100ktable(0);
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
@@ -575,7 +577,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
-       samplel=tms_get_sample_5100ktable();
+       samplel=tms_get_sample_5100ktable(0);
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
@@ -591,7 +593,61 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
    }
 };
 
-void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  // vocab=0
+void tms5200ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){  //  // TODO: copy/add vocabs!
+
+  TTS=0;
+  extent tableextent={167,170.0f};//168 for LPC table here = 0-167
+  if (trigger==1) tms_newsay_specific(1);  // TODO this will change with full vocab!
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.25f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5200ktable(0);
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1);// TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5200ktable(0);
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1);// TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
+void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){   // TODO: copy/add vocabs!
   TTS=0;
   extent tableextent={31,33.0f};//11 here
   if (trigger==1) tms_newsay_specific(0); // selector is in newsay
@@ -599,7 +655,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
@@ -608,7 +664,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
        exy[xaxis]=_sely; // no multiplier and inverted here
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	  samplel=tms_get_sample_5100pitchtable();
+	  samplel=tms_get_sample_5100pitchtable(0);
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
@@ -627,7 +683,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
-       samplel=tms_get_sample_5100pitchtable();
+       samplel=tms_get_sample_5100pitchtable(0);
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
@@ -643,12 +699,229 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
    }
 };
 
+/* // all with tms_newsay_specific - at moment 0 for 5100, 1 for 5200 to change and add*
+
+- Xtms_get_sample_bend5100(); // 0 tmsbend5100
+
+- Xtms_get_sample_5200pitchtable(); // vocab=1 which will change for allphons + exy = 64 - reflect this in audio.c ADD VOCABS tms5200pitchtablebend
+
+- tms_get_sample_5100kandpitchtable(); // 0 for 5100 we have 32+168 in exy= 200 tms5100kandpitchtablebend
+
+- tms_get_sample_5200kandpitchtable(); //  5200 is 232 tms5200kandpitchtablebend
+*/
+
+void tmsbend5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // TODO: copy/add vocabs!
+  TTS=0;
+  extent tmsraw5200extent={11,13.0f};//11 here
+  if (trigger==1)     tms_newsay_specific(0);
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.25f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tmsraw5200extent.max);
+       xaxis=tmsraw5200extent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_bend5100(0); 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	tms_newsay_specific(0); // TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tmsraw5200extent.max);
+       xaxis=tmsraw5200extent.max-xaxis;
+       samplel=tms_get_sample_bend5100(0);  // TODO this will change with full vocab!
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(0); // TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tms5200pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){   // TODO: copy/add vocabs!
+  TTS=0;
+  extent tableextent={63,65.0f};
+  if (trigger==1) tms_newsay_specific(1); // TODO this will change with full vocab!
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.25f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5200pitchtable(0);
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1); // TODO this will change with full vocab!	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5200pitchtable(0);
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1); // TODO this will change with full vocab!	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tms5100kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){   // TODO: copy/add vocabs!
+  TTS=0;
+  extent tableextent={199,202.0f};//11 here
+  if (trigger==1) tms_newsay_specific(0); // selector is in newsay
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.25f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5100kandpitchtable(0);
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(0); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5100kandpitchtable(0);
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(0); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+void tms5200kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){   // TODO: copy/add vocabs!
+  TTS=0;
+  extent tableextent={231,234.0f};//11 here
+  if (trigger==1) tms_newsay_specific(1);  // TODO this will change with full vocab!
+
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed*=0.25f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       exy[xaxis]=_sely; // no multiplier and inverted here
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	  samplel=tms_get_sample_5200kandpitchtable(0);
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1); // TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
+       MAXED(xaxis,tableextent.max);
+       xaxis=tableextent.max-xaxis;
+       samplel=tms_get_sample_5200kandpitchtable(0);
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 tms_newsay_specific(1); // TODO this will change with full vocab!
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 
 ///[[[[[[[[[[[[[[[[[[[[[[[[SP0256 10 KHz so -   samplespeed/=3.2;
 
 void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // NEW model - ALLOPHONES
   TTS=0;
   if (trigger==1) sp0256_newsay(); // selector is in newsay
+  samplespeed/=3.2;
 
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -736,6 +1009,7 @@ void sp0256_1219(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=1;
   if (trigger==1) sp0256_retriggerTTS(); // selector is in newsay
+  samplespeed/=3.2;
     
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -783,6 +1057,8 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
   TTS=0;
   if (trigger==1) sp0256_newsayvocabbankone(1); // selector is in newsay
   static u8 triggered=0;
+    samplespeed/=3.2;
+
   u8 xx=0,readpos;
   float remainder;
    if (samplespeed<=1){ 
@@ -826,6 +1102,8 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
   if (trigger==1) sp0256_newsayvocabbanktwo(1); // selector is in newsay
+  samplespeed/=3.2;
+
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
@@ -870,6 +1148,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
 void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   extent sp0256bendextent={13,14.0f};
   TTS=0;
+  samplespeed/=3.2;
     
   if (trigger==1) sp0256_newsaybend(); // selector is in newsay
   static u8 triggered=0;
@@ -926,6 +1205,8 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 
 void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
+  samplespeed=samplespeed*1.25f;
+
   if (trigger==1) votrax_newsay(); // selector is in newsay
   static u8 triggered=0;
   u8 xx=0,readpos;
@@ -970,6 +1251,7 @@ void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 };
 
 void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed=samplespeed*1.25f;
   TTS=1;
   if (trigger==1) votrax_retriggerTTS(); // selector is in newsay
     
@@ -1016,6 +1298,7 @@ void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 };
 
 void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed=samplespeed*1.25f;
   TTS=0;
   if (trigger==1) votrax_newsaygorf(1); // selector is in newsay
   static u8 triggered=0;
@@ -1062,6 +1345,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 };
 
 void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // 40 KHZ = 
+  samplespeed=samplespeed*1.25f;
   TTS=0;
   if (trigger==1) votrax_newsaywow(1); // selector is in newsay
   static u8 triggered=0;
@@ -1107,7 +1391,56 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
 };
 
+void votraxwowfilterbend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // 40 KHZ = 
+  samplespeed=samplespeed*1.25f;
+  TTS=0;
+  if (trigger==1) votrax_newsaywow_bendfilter(1); // selector is in newsay
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed=samplespeed*1.25f;
+
+   if (samplespeed<=1){ 
+     while (xx<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=votrax_get_samplewow();
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaywow_bendfilter(1);
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+              samplel=votrax_get_samplewow();
+
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 votrax_newsaywow_bendfilter(1);
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+
 void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
+  samplespeed=samplespeed*1.25f;
   extent votraxparamextent={6,7.0f};
   TTS=0;
   //  if (trigger==1) votrax_newsay_rawparam(); // selector is in newsay
@@ -1169,6 +1502,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
 
 void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  samplespeed=samplespeed*1.25f;
   extent votraxbendextent={8,9.0f};
   TTS=0;
   if (trigger==1) votrax_newsay_bend(1); // selector is in newsay
@@ -1299,8 +1633,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   // above is for raven
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, test_wave, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5200, tms5100pitchtablebend, tms5100ktablebend}; // sp0256: 0-5 modes, votrax=6 - 
-  //0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votrax_param, 11votrax_bend, 12test_wave, 13tms, 14tmsphone,15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5200, 22tms5100pitchtablebend, 23tms5100ktablebend
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend};
+  
+  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend // 28+say8=36
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

@@ -3230,83 +3230,83 @@ int16_t tms_get_sample_raw5220(){
 
 //// bends and vocab selection
 
-int16_t tms_get_sample_bend5100(){// for a 5100 vocab such as 0 to begin with
+int16_t tms_get_sample_bend5100(u8 fix){// for a 5100 vocab such as 0 to begin with
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample=processbend5100(&ending);
   if (ending==1){
-    tms_newsay_specific(0);
+    tms_newsay_specific(fix);
   }
   return sample;
 
 }
 
-int16_t tms_get_sample_bend5200(){ // for allphons - TODO - other fixed vocabs
+int16_t tms_get_sample_bend5200(u8 fix){ // for allphons - TODO - other fixed vocabs
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample=processbend5200(&ending);
   if (ending==1){
-    tms_newsay_specific(1); // TODO this will change with full vocab!
+    tms_newsay_specific(fix); // TODO this will change with full vocab!
   }
   return sample;
 }
 
-int16_t tms_get_sample_5100pitchtable(){  /// additional vocabs as extra functions - which ones?
+int16_t tms_get_sample_5100pitchtable(u8 fix){  /// additional vocabs as extra functions - which ones?
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(0); 
+    tms_newsay_specific(fix); 
   }
   return sample;
 }
 
-int16_t tms_get_sample_5200pitchtable(){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c
+int16_t tms_get_sample_5200pitchtable(u8 fix){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(1); // TODO this will change with full vocab! 
+    tms_newsay_specific(fix); // TODO this will change with full vocab! 
   }
   return sample;
 }
   
-int16_t tms_get_sample_5100ktable(){  /// additional vocabs as extra functions - which ones?
+int16_t tms_get_sample_5100ktable(u8 fix){  /// additional vocabs as extra functions - which ones?
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(0); 
+    tms_newsay_specific(fix); 
   }
   return sample;
 }
 
-int16_t tms_get_sample_5200ktable(){ // for allphons and also one more - is just a coeff change
+int16_t tms_get_sample_5200ktable(u8 fix){ // for allphons and also one more - is just a coeff change
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(1); // TODO this will change with full vocab!
+    tms_newsay_specific(fix); // TODO this will change with full vocab!
   }
   return sample;
 }
 
-int16_t tms_get_sample_5100kandpitchtable(){ //bend pitchtable AND ktable at same time
+int16_t tms_get_sample_5100kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(0); 
+    tms_newsay_specific(fix); 
   }
   return sample;
 }
 
-int16_t tms_get_sample_5200kandpitchtable(){ //bend pitchtable AND ktable at same time
+int16_t tms_get_sample_5200kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5200(&ending);
   if (ending==1){
-    tms_newsay_specific(1); // TODO this will change with full vocab!
+    tms_newsay_specific(fix); // TODO this will change with full vocab!
   }
   return sample;
 

@@ -933,6 +933,8 @@ void build_standard_filter(float *a, float *b,
 	float m1 = zc*k1;
 	float m2 = zc*zc*k2;
 
+
+	
 	a[0] = 1.0f+m0;
 	a[1] = 3.0f+m0;
 	a[2] = 3.0f-m0;
@@ -943,7 +945,7 @@ void build_standard_filter(float *a, float *b,
 	b[3] = 1.0f-m1+m2;
 
 #ifdef LAP
-	//	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
+	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
 #endif
 
 
@@ -1256,14 +1258,39 @@ void votrax_newsaywow(u8 reset){
   u8 val=_sely*130.0f;
   MAXED(val,127);
   val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; // TODO: where do we get this from? - make LOGGY
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 
-  //  lenny=((16*(m_rom_duration*4+1)*4*9+2)/32); // what of sample-rate?
-    //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
+  //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
   //  m_sclock = m_mainclock / 18.0f * logpitch[val]; // so 40000 - doesn't do anything if we have both in sync - crashes filter
   //  m_cclock = m_mainclock / 36.0f * logpitch[val]; // so 20000 
 
 }
+
+void votrax_newsaywow_bendfilter(u8 reset){
+     static u8 vocabindex=0, whichone=0;
+     u8 it;
+     it=*(vocablist_wow[whichone]+vocabindex);
+   vocabindex++;
+   if (it==255 || reset==1){
+     vocabindex=0;
+     whichone=_selz*80.0f; 
+     MAXED(whichone,78);
+     whichone=78-whichone;
+     it=*(vocablist_wow[whichone]);
+   }   
+   writer(it); 
+  phone_commit();
+  inflection_w(it>>6); // how many bits?
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  val=127-val;
+
+  lenny=(16*(m_rom_duration*4+1)*4*9+2); 
+  m_cclock = m_mainclock / 36.0f * logpitch[val]; 
+
+}
+
+
 
 int16_t votrax_get_samplegorf(){ 
   int16_t sample; u8 x;
