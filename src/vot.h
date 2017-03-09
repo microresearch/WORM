@@ -18,6 +18,6 @@ int16_t votrax_get_sample_rawparam();
 void votrax_newsay_bend(u8 reset);
 int16_t votrax_get_sample_bend();
 
-void votrax_newsaywow_bendfilter(u8 reset); // pair with votrax_newsaywow
-
+void votrax_newsaywow_bendfilter(u8 reset); 
+int16_t votrax_get_samplewow_bendfilter();
 void votrax_retriggerTTS();

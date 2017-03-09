@@ -854,19 +854,30 @@ TODO: 5200 variants of these which work/...
 
 - check logarithmic for pitch bends - tms=byID so no logDONE, sp0256DONE, votraxDONETEST
 
-- TODO: note also with votrax clock change on cap filters - *as extra  bend* DONE TEST
-- DONEcheck filter stuff on lap (clock doesn't change filter coeffs just
-  ratio between m_sclock and m_cclock) - as bend instead of lengthTEST!
+** 9/3
 
-- new bends/TMS modes in tms5200x.h to incorporate in audio.cDONE, TEST and select/add new vocabs - 
+- test votrax with pitch bend - fixes there and in other votrax cases...DONE
+
+- DONEcheck filter stuff on lap (clock doesn't change filter coeffs just
+  ratio between m_sclock and m_cclock) - as bend instead of lengthTEST!DONE
+
+///
+
+- new bends/TMS modes in tms5200x.h to incorporate in audio.cDONE,
+  TESTED and FIXED (bugs in array access for pitchtables) 
+
+*** TODO
+
+/// select/add new vocabs for these new TMS modes
 
 */// all with tms_newsay_specific - at moment 0 for 5100, 1 for 5200 to change and add*
 
-ADDED: tms5200ktablebend, tmsbend5100, tms5200pitchtablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend TEST all
-
 *TODO:*
 
-extra vocabs for these and... tmsbend5200, tms5100ktablebend, tms5100pitchtablebend = +8 say
+extra vocabs for tmsbend5200, tms5100ktablebend,
+tms5100pitchtablebend, tms5200ktablebend, tmsbend5100,
+tms5200pitchtablebend, tms5100kandpitchtablebend,
+tms5200kandpitchtablebend
 
 tms_newsay_specific(u8 whichbank); is new vocab selection make these in audio.c
 

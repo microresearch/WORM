@@ -12,6 +12,8 @@
 extern float _selx, _sely, _selz;
 extern float exy[64];
 
+const u8 koffset[10]={0, 32, 64, 80, 96, 112, 128, 144, 152, 160};
+
 typedef u8 UINT8;
 typedef uint16_t UINT16;
 typedef int16_t INT16;
@@ -1059,9 +1061,9 @@ int16_t process_k_tabled5100(u8 *ending)
 			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			// 168 in total
 			for (i = 0; i < 4; i++)
-				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*(exy[i*m_new_frame_k_idx[i]]+0.1f));
+				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*(exy[koffset[i]+m_new_frame_k_idx[i]]+0.1f));
 			for (i = 4; i < m_coeff->num_k; i++)
-			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*(exy[i*m_new_frame_k_idx[i]]+0.1f)));
+			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*(exy[koffset[i]+m_new_frame_k_idx[i]]+0.1f)));
 
 			if (m_talk_status == 0)
 			{
@@ -1158,6 +1160,7 @@ int16_t process_k_tabled5100(u8 *ending)
 	return sample;
 }
 
+
 int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy= 200 5200 is 232
 {
   static u8 counter;
@@ -1195,10 +1198,10 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never z			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			// 168 in total
-			for (i = 0; i < 4; i++)
-			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(i*m_new_frame_k_idx[i])]+0.1f);
+			for (i = 0; i < 4; i++) // this is more complex as each line of ktable has different length
+			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
 			for (i = 4; i < m_coeff->num_k; i++)
-			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[32+(i*m_new_frame_k_idx[i])]+0.1f));
+			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
 
 			if (m_talk_status == 0)
 			{
@@ -1333,9 +1336,9 @@ int16_t process_pitchk_tabled5200(u8 *ending) // for 5100 we have 32+168 in exy=
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never z			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			// 168 in total
 			for (i = 0; i < 4; i++)
-			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[64+(i*m_new_frame_k_idx[i])]+0.1f);
+			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[64+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
 			for (i = 4; i < m_coeff->num_k; i++)
-			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[64+(i*m_new_frame_k_idx[i])]+0.1f));
+			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[64+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
 
 			if (m_talk_status == 0)
 			{

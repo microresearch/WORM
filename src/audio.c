@@ -1404,7 +1404,7 @@ void votraxwowfilterbend(int16_t* incoming,  int16_t* outgoing, float samplespee
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 samplel=votrax_get_samplewow();
+	 samplel=votrax_get_samplewow_bendfilter();
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
@@ -1421,8 +1421,7 @@ void votraxwowfilterbend(int16_t* incoming,  int16_t* outgoing, float samplespee
    }
    else { 
      while (xx<size){
-              samplel=votrax_get_samplewow();
-
+              samplel=votrax_get_samplewow_bendfilter();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
@@ -1612,7 +1611,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0; 
- _intmode=9; 
+  _intmode=28;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;
@@ -1628,10 +1627,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
     src++;
   }
-
-  //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votrax_param, votrax_bend, lpc_error, test_wave, LPCanalyzer}; // sp0256: 0-5 modes, votrax=6 - was with LPCanalyzer
-
-  // above is for raven
 
   void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend};
   

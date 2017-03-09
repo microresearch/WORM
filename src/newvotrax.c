@@ -1193,10 +1193,7 @@ void votrax_newsay_bend(u8 reset){
 
   writer(it); 
   phone_commit();
-  u8 val=_sely*130.0f;
-  MAXED(val,127);
-  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
 }
 
 int16_t votrax_get_sample_bend(){ 
@@ -1284,13 +1281,10 @@ void votrax_newsaywow_bendfilter(u8 reset){
   u8 val=_sely*130.0f;
   MAXED(val,127);
   val=127-val;
-p
-  lenny=(16*(m_rom_duration*4+1)*4*9+2); 
+  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
   m_cclock = m_mainclock / 36.0f * logpitch[val]; 
 
 }
-
-
 
 int16_t votrax_get_samplegorf(){ 
   int16_t sample; u8 x;
@@ -1303,6 +1297,21 @@ int16_t votrax_get_samplegorf(){
   if (sample_count++>=lenny){
     sample_count=0;
     votrax_newsaygorf(0);
+  }
+  return sample;
+}
+
+int16_t votrax_get_samplewow_bendfilter(){ 
+  int16_t sample; u8 x;
+
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  sample=analog_calc();
+  // hit end and then newsay
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsaywow_bendfilter(0);
   }
   return sample;
 }
