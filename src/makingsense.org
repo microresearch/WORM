@@ -872,7 +872,7 @@ TODO: 5200 variants of these which work/...
 
 */// all with tms_newsay_specific - at moment 0 for 5100, 1 for 5200 to change and add*
 
-*TODO:*
+*TODO for TMS when we use full vocabs:*
 
 extra vocabs for tmsbend5200, tms5100ktablebend,
 tms5100pitchtablebend, tms5200ktablebend, tmsbend5100,
@@ -888,53 +888,37 @@ tms_newsay_specific(u8 whichbank); is new vocab selection make these in audio.c
 
 SAM:
 
-- get new code base
-- starting on SAM: vocablist_sam is 32 banks by 42 vocabs sely and selz
-- sort out SAM mess with repeats and singmode - singmode doesn't seem to do much
-- reciter.c is text to speech also
-- bends for SPEED     PITCH     THROAT    MOUTH see readme notes below
+- get new code baseDONE
+- starting on SAM: vocablist_sam is 32 banks by 42 vocabs sely and selzDONE
+
+- sort out SAM mess with repeats and singmode - singmode doesn't seem to do muchDONE - will use for pitch mode outlined in sam.c
+- reciter.c is text to speech alsoNON
+- bends for SPEED     PITCH     THROAT    MOUTH see readme notes belowDONE
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
-
-/// possible 2 more modes 
-
-1= phonetic array (position in array (of 32), phonemes, stress)
-2= bent raw phonemeindex/length/stress going through but how to stop this malfunctioning and add breaths also?
-
-raw phoneme is a bit brittle and should maybe be abandoned - or somehow break to single functions and no parsing at all???
-
-.... details from: http://www.retrobits.net/atari/sam.shtml#ch1.1
-
-PITCH
-POKE PITCH,N
-N=
-00-20	impractical
-20-30	very high
-30-40	high
-40-50	high normal
-50-70	normal
-70-80	low normal
-80-90	low
-90-255	very low
-default = 64
-
-SPEED
-POKE SPEED,M
-M=
-0-20	impractical
-20-40	very fast
-40-60	fast
-60-70	fast conversational
-70-75	normal conversational
-75-90	narrative
-90-100	slow
-100-225	very slow
-default = 72
-
 
 DIGI:
 
 - digitalker changed so skips one sample at end of get_sample - needs clean up // and changed pitch and selz for vocab
+
+** 13/3
+
+*** SAM
+
+- working on sam.c, render.c. List of modes to work on/seperate out in sam.c - FIRST DONE, TO TEST, then break out rest of modes
+
+- render.c -> 	//	k=5; /// ????? TODO - in our out?
+
+- for pitch we set at 64-middle and then we vary this// do modus and
+  log pitch in render.cDONE TO TEST - also note that pitch is anyways
+  >>4 so range is very limited and we could use a much smaller lookup
+  with no floats but anyways
+
+*** general
+
+- in general we need selx,y,z in each generator in audio.c or doesn't
+  make sense in some cases (esp. if we have selx, sely there for
+  exy) - BREAKING out - To test and then implement - now just in mode 0!
 
 * TTS 
 
@@ -1099,10 +1083,9 @@ wavetable as in raven, generators eg. pulse, square, and original
 1. TMS -> vocab,TTS?, phonemes, raw
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw
 4. votrax -> TTS, phonemes, vocab is roms, raw
+5. SAM -> TTS, vocab(ported already) - see sam.c for modes
 
-//////////////////say 30+ so far with vocab modes/TMS = 4 weeks for the rest
-
-5. SAM -> TTS, vocab(ported already), raw?, low pass filtered and not filtered - bend on one as we will have y/z for bank and vocab
+////test all above
 
 3. digitalker ?? are there 2 roms? we have one large so stick with this, bends if any=pitch _and_ repeats/zero_count ???
 

@@ -24,9 +24,8 @@ void EnableSingmode();
 void EnableDebug();
 
 void sam_init();
-void sam_newsay();
-int SAMMain();
-u8 sam_get_sample(int16_t *newsample);
+void sam_newsay_banks0();
+u8 sam_get_sample_banks0(int16_t *newsample);
 
 #endif
 

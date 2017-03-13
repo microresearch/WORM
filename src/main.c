@@ -23,23 +23,13 @@
 #include "nsynth.h"
 #include "elements.h"
 #include "holmes.h"
-#include "saml.h"
+#include "sam.h"
 #include "tube.h"
-#include "LPC/lpc.h"
-#include "parwave.h"
 #include "sp0256.h"
 #include "tms5200x.h"
-#include "channelv.h"
-#include "svf.h"
-#include "wvocoder.h"
 #include "digitalker.h"
 #include "nvp.h"
-#include "samplerate.h"
-#include "braidworm.h"
-#include "voicform.h"
-#include "scformant.h"
 #include "ntube.h"
-#include "lpcansc.h"
 #include "wavetable.h"
 #include "wavetables.h"
 #include "worming.h"
@@ -93,7 +83,7 @@ void main(void)
   tms_init();
   //  LPCAnalyzer_init(); // for raven voice
  sam_init(); 
- sam_newsay(); // TEST!
+ sam_newsay_banks0(); // TEST!
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);

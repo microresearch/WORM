@@ -13,7 +13,7 @@
 #include "lpcansc.h"
 #include "parwave.h"
 #include "lpc.h"
-#include "saml.h"
+#include "sam.h"
 #include "holmes.h"
 #include "sp0256.h"
 #include "biquad.h"
@@ -33,18 +33,6 @@
 #include "resources.h"
 //#include "raven.h"
 
-
-inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *rsrc)
-{
-	while(sz)
-	{
-		*dst++ = *lsrc++;
-		sz--;
-		*dst++ = (*rsrc++);
-		sz--;
-	}
-}
-
 arm_biquad_casd_df1_inst_f32 df[5][5] __attribute__ ((section (".ccmdata")));
 float coeffs[5][5][5] __attribute__ ((section (".ccmdata")));//{a0 a1 a2 -b1 -b2} b1 and b2 negate
 
@@ -54,13 +42,6 @@ int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
 float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
-static adc_transform transform[5] = {
-  {MODE, 0, 0.1f, 33.0f}, // only multiplier we use except speed! was 0.1 for all!
-  {SELX, 0, 0.1f, 32.0f},
-  {SELY, 0, 0.1f, 32.0f},
-  {SELZ, 0, 0.1f, 32.0f},
-  {SPEED, 1, 0.1f, 1027.0f} 
-};
 
 extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
@@ -88,6 +69,38 @@ Wavetable wavtable;
 wormy myworm;
 
 char TTSinarray[17];
+
+
+inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *rsrc)
+{
+	while(sz)
+	{
+		*dst++ = *lsrc++;
+		sz--;
+		*dst++ = (*rsrc++);
+		sz--;
+	}
+}
+
+inline void doadc(){
+  float value;
+  
+  value =(float)adc_buffer[SELX]/65536.0f; 
+  smoothed_adc_value[2] += 0.1f * (value - smoothed_adc_value[2]);
+  _selx=smoothed_adc_value[2];
+  CONSTRAIN(_selx,0.0f,1.0f);
+
+  value =(float)adc_buffer[SELY]/65536.0f; 
+  smoothed_adc_value[3] += 0.1f * (value - smoothed_adc_value[3]);
+  _sely=smoothed_adc_value[3];
+  CONSTRAIN(_sely,0.0f,1.0f);
+
+  value =(float)adc_buffer[SELZ]/65536.0f; 
+  smoothed_adc_value[4] += 0.1f * (value - smoothed_adc_value[4]);
+  _selz=smoothed_adc_value[4];
+  CONSTRAIN(_selz,0.0f,1.0f);
+}
+
 
 ///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle - is it 8KHz = *0.25f - seems OK
 
@@ -926,6 +939,9 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
+
+  doadc();
+  
    if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
@@ -1579,45 +1595,27 @@ void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 };
 */
 
+/////// [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ SAM 
 
-/////// sammy test code from discard
-
-void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sam_banks0(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=1;
   static u8 triggered=0;
   u8 x=0,readpos;
   static u8 howmany=0;
   float remainder;
-  //  float xx,xxx;
-  //  float tmpbuffer[32];
-
-     // test lowpass/biquad:
-     /*
-     int_to_floot(outgoing,tmpbuffer,32);
-    for (x=0;x<32;x++){
-    xxx=tmpbuffer[x];
-    xx=BiQuad(xxx,newB); 
-    tmpbuffer[x]=xx;
-      }
-    floot_to_int(outgoing,tmpbuffer,32);
-     */
-
  
    if (samplespeed<=1){ 
      while (x<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
-	 while (howmany==0) howmany=(sam_get_sample(&samplel)); 
+	 while (howmany==0) howmany=(sam_get_sample_banks0(&samplel)); 
 	 howmany--;
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
-       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
-       //       outgoing[x]=samplel;
-
-       // TEST trigger: 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[x]>THRESH && !triggered) {
-	 sam_newsay(); // selector is in newsay
+	 sam_newsay_banks0(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[x]<THRESHLOW && triggered) triggered=0;
@@ -1628,23 +1626,21 @@ void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { 
      while (x<size){
-       while (howmany==0)	 howmany=(sam_get_sample(&samplel)); 
+       while (howmany==0)	 howmany=(sam_get_sample_banks0(&samplel)); 
        howmany--;
        if (samplepos>=samplespeed) {       
 	 outgoing[x]=samplel;
-       // TEST trigger: 
        if (incoming[x]>THRESH && !triggered) {
-	 sam_newsay(); // selector is in newsay
+	 sam_newsay_banks0(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[x]<THRESHLOW && triggered) triggered=0;
-
 	 x++;
 	 samplepos-=samplespeed;
        }
        samplepos+=1.0f;
        }
-       }
+   }
 }
 
 
@@ -1653,31 +1649,23 @@ u8 toggled=1;
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
   float samplespeed;
+  float value;
   u16 samplespeedref;
   static u16 cc;
   u8 oldmode=255;
   static u8 firsttime=0;
-  for (u8 x=0;x<5;x++){
-  float value=(float)adc_buffer[transform[x].whichone]/65536.0f; 
-
-  if (transform[x].flip) {
-      value = 1.0f - value;
-    }
-     smoothed_adc_value[x] += transform[x].filter_coeff * (value - smoothed_adc_value[x]);
-  }
-
-  _speed=smoothed_adc_value[SPEED_];
+  value =(float)adc_buffer[SPEED]/65536.0f; 
+  smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
+  _speed=smoothed_adc_value[0];
   CONSTRAIN(_speed,0.0f,1.0f);
-  _selx=smoothed_adc_value[SELX_];
-  CONSTRAIN(_selx,0.0f,1.0f);
-  _sely=smoothed_adc_value[SELY_];
-  CONSTRAIN(_sely,0.0f,1.0f);
-  _selz=smoothed_adc_value[SELZ_];
-  CONSTRAIN(_selz,0.0f,1.0f);
-  _mode=smoothed_adc_value[MODE_];
+  _speed=1.0f-_speed;
+
+  value =(float)adc_buffer[MODE]/65536.0f; 
+  smoothed_adc_value[1] += 0.1f * (value - smoothed_adc_value[1]);
+  _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
   oldmode=_intmode;
-  _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
+  _intmode=_mode*32.0f;
   MAXED(_intmode, 31);
   trigger=0; 
   _intmode=29;
@@ -1687,7 +1675,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
    firsttime=1;
  }
  
-  samplespeedref=_speed*transform[SPEED_].multiplier;
+  samplespeedref=_speed*1027.0f;
   MAXED(samplespeedref, 1023);
   samplespeed=logspeed[samplespeedref];  
   
@@ -1697,9 +1685,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sammy};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0};
   
-  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend // 28+say8=36
+  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_bank0s // 28+say8=36
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
