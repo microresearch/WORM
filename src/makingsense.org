@@ -1,6 +1,6 @@
-* for march 20 spring equinox release
+* for april 1 release
 
-b* general TODO/notes
+* general TODO/notes
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but
   would *need to test across other HW versions - tested so far on one* DONE
@@ -901,7 +901,14 @@ DIGI:
 
 - digitalker changed so skips one sample at end of get_sample - needs clean up // and changed pitch and selz for vocab
 
+- watch speed 
+
 ** 13/3
+
+*** digi
+
+- code for LAP for ROM testing: gcc digitalker.c -DLAP -o digi
+- speed is /128 there but for 8k samplerate so /32
 
 *** SAM
 
@@ -1085,19 +1092,27 @@ wavetable as in raven, generators eg. pulse, square, and original
 4. votrax -> TTS, phonemes, vocab is roms, raw
 5. SAM -> TTS, vocab(ported already) - see sam.c for modes
 
-////test all above
+////test all above - say 35 modes
 
-3. digitalker ?? are there 2 roms? we have one large so stick with this, bends if any=pitch _and_ repeats/zero_count ???
+3. digitalker ?? are there 2 roms? we have one large so stick with
+   this, bends if any=pitch _and_ repeats/zero_count, also possible
+   bend of any tables
 
-////
+how large is vocab in that rom?
 
-6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ, various glottal sources
+what is that rom from? other roms? mazerbla
+
+/////
 
 10. tube and ntube/glottal/wavetable and wormed tubes 
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example. compost as wormed wavetable
+
+/////
+
+6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
 
 13. worming of all XY modes above
 

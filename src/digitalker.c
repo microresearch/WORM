@@ -7,20 +7,25 @@
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
-
-#include "audio.h"
 #include "digitalker.h"
 #include "digitalker_roms.h"
 #include "resources.h"
 
+#ifndef LAP
+#include "audio.h"
 extern float _selx, _sely, _selz;
+#else
+#include "forlap.h"
+#endif
 
-typedef unsigned char UINT8;
-typedef signed char INT8;
 typedef u16 UINT16;
 typedef int16_t INT16;
 typedef uint32_t UINT32;
 typedef int32_t INT32;
+
+typedef unsigned char UINT8;
+typedef signed char INT8;
+
 
 
 static UINT16 m_bpos;
@@ -360,10 +365,14 @@ void digitalker_step_mode_0()
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
 	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6); 
+#ifndef LAP
 	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
 	m_pitch = pitch_vals[pitch_id] * logpitch[val];
+#else
+	m_pitch = pitch_vals[pitch_id];
+#endif
 	
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
@@ -417,10 +426,14 @@ void digitalker_step_mode_2()
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
 	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+#ifndef LAP
 	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
 	m_pitch = pitch_vals[pitch_id] * logpitch[val];
+#else
+	m_pitch = pitch_vals[pitch_id];
+#endif
 
 	
 	for(k=1; k != 9; k++) {
@@ -484,10 +497,15 @@ void digitalker_step_mode_3()
 	int k, l;
 
 	//	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
+
+#ifndef LAP
 	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
 	m_pitch = pitch_vals[h & 0x1f] * logpitch[val];
+#else
+	m_pitch = pitch_vals[h & 0x1f];
+#endif
 
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
@@ -576,22 +594,26 @@ void digitalk_init(void){
 //static u8 alwayswhich;
 
 void digitalk_newsay(){
-  u8 val=_selz*67.0f;
+#ifndef LAP
+  u8 val=_selz*67.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
   MAXED(val,64);
   val=64-val;
-
   u8 which=val+1; // 65 - do we hit the end? TODO TEST
-  //     u8 which =1;
+#else
+       u8 which =1;
+#endif
   digitalker_start_command(which);
   //  alwayswhich=which;
 }
 
+#ifdef LAP
+void digitalk_newsayarg(int which){
+  digitalker_start_command(which);
+  //  alwayswhich=which;
+}
 
-//void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-// does it repeat
-int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMPLES!
+int16_t digitalk_get_sample_arg(int val){ // BREAK DOWN TO SINGLE SAMpLES - is done?
 
-  //	stream_sample_t *sout = outputs[0];
   int16_t sample; static int pp;//=m_pitch_pos;
   
   //	static int cpos = 0;
@@ -616,121 +638,66 @@ int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMPLES!
 	      pp++;
 	      return sample;
 	    }
-	    //	    m_pitch_pos=pp;
-
-	    /*		while(cpos != samples && pp != m_pitch) {
-					sout[cpos++] = v;
-					pp++;
-				}
-				if(pp == m_pitch) {
-					pp = 0;
-					m_dac_index++;
-				}
-				m_pitch_pos = pp;*/
-
+	}
+	else {
+	  digitalk_newsayarg(val);
+	  sample=0;
+	  //	  sample=digitalk_get_sample_arg(val);
 
 	}
-	//	else  new say????
+	return sample;
+	}
+
+
+#endif
+
+// does it repeat?
+int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMpLES - is done?
+
+  int16_t sample; static int pp;//=m_pitch_pos;
+  
+  //	static int cpos = 0;
+
+	if(m_zero_count == 0 && m_dac_index == 128)
+	  digitalker_step();
+
+	if(m_zero_count) {
+	  sample = 0;
+	  m_zero_count -= 1;
+	}
+	else if(m_dac_index != 128) {// the rest here
+	    short v = m_dac[m_dac_index];
+	    //	    int pp = m_pitch_pos;
+	    if (pp==m_pitch)
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
+	      sample=v;
+	      pp++;
+	      return sample;
+	    }
+	}
 	else {
 	  digitalk_newsay();
-	  //	  sample=digitalk_get_sample();
 	  sample=0;
 	}
 	return sample;
 	}
 
-/*void digitalker_cs_w(int line)
-{
-	UINT8 cs = line == ASSERT_LINE ? 1 : 0;
-	if(cs == m_cs)
-		return;
-	m_cs = cs;
-	if(cs)
-		return;
-	if(!m_wr) {
-		if(m_cms)
-			digitalker_set_intr(1);
-		else
-			digitalker_start_command(m_data);
-	}
-}
-
-void digitalker_cms_w(int line)
-{
-	m_cms = line == ASSERT_LINE ? 1 : 0;
-}
-
-void digitalker_wr_w(int line)
-{
-	UINT8 wr = line == ASSERT_LINE ? 1 : 0;
-	if(wr == m_wr)
-		return;
-	m_wr = wr;
-	if(wr || m_cs)
-		return;
-	if(m_cms)
-		digitalker_set_intr(1);
-	else
-		digitalker_start_command(m_data);
-}
-
-int digitalker_intr_r()
-{
-	return m_intr ? ASSERT_LINE : CLEAR_LINE;
-}
-*/
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-/*void device_start()
-{
-  //	m_rom = m_region->base();
-	//	m_stream = stream_alloc(0, 1, clock()/4);
-	m_dac_index = 128;
-	m_data = 0xff;
-	m_cs = m_cms = m_wr = 1;
-	m_bpos = 0xffff;
-	//	digitalker_set_intr(1);
-
-	//	digitalker_register_for_save();
-	}*/
-
-/*void digitalker_0_cs_w(int line)
-{
-	digitalker_cs_w(line);
-}
-
-void digitalker_0_cms_w(int line)
-{
-	digitalker_cms_w(line);
-}
-
-void digitalker_0_wr_w(int line)
-{
-	digitalker_wr_w(line);
-}
-
-int digitalker_0_intr_r()
-{
-	return digitalker_intr_r();
-}
-
-WRITE8_MEMBER( digitalker_data_w )
-{
-	m_data = data;
-}
-*/
-
-/*
+#ifdef LAP
  void main(int argc, char *argv[]){
    u8 x; int xx;
    digitalk_init();
    digitalk_newsayarg(atoi(argv[1]));
    while(1){
-          for (x=0;x<128;x++)      xx=digitalk_get_sample();
-          printf("%c",xx>>8);
+     for (x=0;x<128;x++) {
+       xx=digitalk_get_sample_arg(atoi(argv[1]));
+       //       printf("%d ",x);
+     }
+         printf("%c",(xx+2048)>>5);
+    //	  printf("%d\n",xx+2048);
    }
    }
-*/
+#endif
