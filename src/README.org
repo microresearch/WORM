@@ -2550,7 +2550,7 @@ TODO:
 
 - probability list for allophones=>how did we generate the klatt one? phoneme_prob_remap - was using rsynth/klatt itself?
 
-The pitch is how high or low the voice sounds and can be a number from
+TI singing desc: The pitch is how high or low the voice sounds and can be a number from
 0 through 63. Zero is a whisper, 1 is the highest pitched voice, and
 63 is the lowest pitched voice. The slope is the rate at which the
 pitch changes in a spoken phrase. The slope may be a number from 0

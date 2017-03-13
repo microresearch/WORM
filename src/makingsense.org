@@ -896,8 +896,6 @@ SAM:
 
 - singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
 
-- short vocab - TESTING - how to divide up vocab as we use up SELX?Y?Z????
-
 /// possible 2 more modes 
 
 1= phonetic array (position in array (of 32), phonemes, stress)
@@ -1102,7 +1100,7 @@ wavetable as in raven, generators eg. pulse, square, and original
 2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw
 4. votrax -> TTS, phonemes, vocab is roms, raw
 
-//////////////////say 30+ so far with vocab modes/TMS = 4 weeks
+//////////////////say 30+ so far with vocab modes/TMS = 4 weeks for the rest
 
 5. SAM -> TTS, vocab(ported already), raw?, low pass filtered and not filtered - bend on one as we will have y/z for bank and vocab
 
@@ -1204,7 +1202,7 @@ MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are exte
 ** vocoding
 
 ** data sources/wavetables to generate
-* mode notes for manual
+* mode notes for manual - see now manual.org
 
 ** template
 
