@@ -21,13 +21,31 @@
 modes: 
 
 0-selx-pitch//sely-bank//selz-phrase
-1-selx-length//sely-bank//selz-phrase
-2-TTS with selx as pitch
+1-selx-speedd//sely-bank//selz-phrase
+2-TTS with selx as pitch - use other TTS rather than this one in reciter
 3-x/y select of phonemes with selx as pitch
-4-as above with length
+4-as above with speedd
 5-
 6-larger selected vocab on selz (say 128) with speed AND pitch on x/y
 7-4 params as x/y axis with z as selected vocab
+8-singing mode with shorter say 16-xy phoneme and constant pitch there
+
+TODO: how we specify pitch and speed across all as selx, or sely or both
+
+modus bits
+
+pitchmod=0; speed=72;
+if (modus&1) pitchmod=selx;
+if (modus&2) speed=sely; 
+if (modus&4) { pitchmod=exy[0]; speed=exy[1]; } // and these are all as logarithmic
+
+a la:
+
+val=_selx*130.0f;
+MAXED(val,127);
+pitchmod=logpitch[val];
+
+and then we use as a multiplier....
 
  */
 
@@ -121,7 +139,7 @@ void InsertBreath();
 void PrepareOutput();
 void SetMouthThroat(unsigned char mouth, unsigned char throat);
 
-// 168=pitches 
+// 168=pitchs 
 // 169=frequency1
 // 170=frequency2
 // 171=frequency3
