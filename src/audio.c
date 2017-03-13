@@ -1579,6 +1579,75 @@ void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 };
 */
 
+
+/////// sammy test code from discard
+
+void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=1;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  //  float xx,xxx;
+  //  float tmpbuffer[32];
+
+     // test lowpass/biquad:
+     /*
+     int_to_floot(outgoing,tmpbuffer,32);
+    for (x=0;x<32;x++){
+    xxx=tmpbuffer[x];
+    xx=BiQuad(xxx,newB); 
+    tmpbuffer[x]=xx;
+      }
+    floot_to_int(outgoing,tmpbuffer,32);
+     */
+
+ 
+   if (samplespeed<=1){ 
+     while (x<size){
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
+       //       outgoing[x]=samplel;
+
+       // TEST trigger: 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       while (howmany==0)	 howmany=(sam_get_sample(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       // TEST trigger: 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+       }
+}
+
+
 u8 toggled=1;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
@@ -1611,7 +1680,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*transform[MODE_].multiplier; //0=32 CHECKED!
   MAXED(_intmode, 31);
   trigger=0; 
-  _intmode=28;
+  _intmode=29;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;
@@ -1628,7 +1697,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sammy};
   
   //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend // 28+say8=36
 

@@ -5,7 +5,8 @@
 
 #define abs(a)	   (((a) < 0) ? -(a) : (a))
 
-extern __IO uint16_t adc_buffer[10];
+extern float _selx, _sely, _selz;
+extern u8 TTS;
 
 //timetable for more accurate c64 simulation
 u8 timetable[5][5] =
@@ -210,8 +211,11 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 
   static unsigned char phase1;
   u8 tempA;
-  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
-  
+
+  //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+  signed char pitchmod=0;
+  //  signed char pitchmod=(_selx * 64.0f)-44; // say +-32
+
   if (state==0){ // beginning /////////
 	// current phoneme's index
 	mem49 = Y;
@@ -238,8 +242,8 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	// voiced sample?
 	Y = mem49;
 	pitchmod+=pitches[mem49];
-	if (pitchmod>126) pitchmod=126;
-	else if (pitchmod<1) pitchmod=1;
+	if (pitchmod>96) pitchmod=96;
+	else if (pitchmod<20) pitchmod=20;
 	A = (pitchmod) >> 4;
 
 	// handle voiced samples here
@@ -416,21 +420,24 @@ void renderupdate(){
 }
 
 void    sam_frame_rerun() {
-  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+  //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+     signed char pitchmod=0;
+  //    signed char pitchmod=(_selx * 64.0f)-44; // say +-32
 
   //	phase1 = 0;
 	phase2 = 0;
 	phase3 = 0;
 	mem49 = 0;
-	speedcounter = speedd; //sam standard speed
-	//	speedcounter = (adc_buffer[SELY]>>4)+1;
+		speedcounter = speedd; //sam standard speed
+		//speedcounter = (_sely * 180.0f)+20;
+
 
 	mem48=mem48stored;
 
 	Y = 0;
 	pitchmod+=pitches[0];
-	if (pitchmod>126) pitchmod=126;
-	else if (pitchmod<1) pitchmod=1;
+	if (pitchmod>96) pitchmod=96;
+	else if (pitchmod<20) pitchmod=20;
 	A = (pitchmod) >> 4;
 
 	//	A = pitches[0];
@@ -441,7 +448,10 @@ void    sam_frame_rerun() {
 }
 
 u8 rendersamsample(int16_t* sample,u8* ending){
-  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+  //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
+  signed char pitchmod=0;
+  //  signed char pitchmod=(_selx * 64.0f)-44; // say +-32
+
   static u8 state=0;
   static unsigned char phase1 = 0;  //mem43
   u8 carry=0;
@@ -464,8 +474,8 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    sam_frame_rerun();
 		    return howmany; // ended
 		  }
-		  		  speedcounter = speedd;
-		  //		  speedcounter = (adc_buffer[SELY]>>4)+1;
+		  speedcounter = speedd;
+		  //		  speedcounter = (_sely * 180.0f)+20;
       }
       return howmany;
     }
@@ -516,9 +526,8 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 			  *ending=1;
 			  return howmany; // ended frame
 			}	
-						speedcounter = speedd;
-						//speedcounter = (adc_buffer[SELY]>>4)+1;
-
+			speedcounter = speedd;
+			//			speedcounter = (_sely * 180.0f)+20;
 			state=1; secondstate=0;
 			return howmany;
 			//			} // else
@@ -532,8 +541,8 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		  if (secondstate==0) {
 
 			pitchmod+=pitches[Y];
-			if (pitchmod>126) pitchmod=126;
-			else if (pitchmod<1) pitchmod=1;
+			if (pitchmod>96) pitchmod=96;
+			else if (pitchmod<20) pitchmod=20;
 
 			A = pitchmod;
 			mem44 = A;
@@ -562,8 +571,8 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		  //		pos48159:
             // fetch the next glottal pulse length
 			pitchmod+=pitches[Y];
-			if (pitchmod>126) pitchmod=126;
-			else if (pitchmod<1) pitchmod=1;
+			if (pitchmod>96) pitchmod=96;
+			else if (pitchmod<20) pitchmod=20;
 
 			A = pitchmod;
 			mem44 = A;
@@ -700,6 +709,7 @@ do
 		amplitude3[X] = ampl3data[Y];     // F3 amplitude
 		sampledConsonantFlag[X] = sampledConsonantFlags[Y];        // phoneme data for sampled consonants
 		pitches[X] = pitch + phase1;      // pitch
+		//		pitches[X] = (20+(_selx * 76.0f)) + phase1;      // pitch // 96 as peak
 		X++;
 		phase2--;
 	} while(phase2 != 0);
@@ -910,7 +920,7 @@ do
 // pitch contour. Without this, the output would be at a single
 // pitch level (monotone).
 
-/*	
+	
 	// don't adjust pitch if in sing mode
 	if (!singmode)
 	{
@@ -921,7 +931,7 @@ do
     		pitches[i] -= (frequency1[i] >> 1);
         }
 	}
-*/
+
 	phase1 = 0;
 	phase2 = 0;
 	phase3 = 0;
@@ -1020,14 +1030,9 @@ pos48406:
     mouth formant (F1) and the throat formant (F2). Only the voiced
     phonemes (5-29 and 48-53) are altered.
 */
-void SetMouthThroat(unsigned char mouth, unsigned char throat)
-{
-	unsigned char initialFrequency;
-	unsigned char newFrequency = 0;
-	//unsigned char mouth; //mem38880
-	//unsigned char throat; //mem38881
 
 	// mouth formants (F1) 5..29
+
 	unsigned char mouthFormants5_29[30] = {
 		0, 0, 0, 0, 0, 10,
 		14, 19, 24, 27, 23, 21, 16, 20, 14, 18, 14, 18, 18,
@@ -1046,6 +1051,11 @@ void SetMouthThroat(unsigned char mouth, unsigned char throat)
 	// formant 2 frequencies (throat) 48..53
 	unsigned char throatFormants48_53[6] = {72, 39, 31, 43, 30, 34};
 
+
+void SetMouthThroat(unsigned char mouth, unsigned char throat)
+{
+	unsigned char initialFrequency;
+	unsigned char newFrequency = 0;
 	unsigned char pos = 5; //mem39216
 //pos38942:
 	// recalculate formant frequencies 5..29 for the mouth (F1) and throat (F2)

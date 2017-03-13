@@ -586,12 +586,6 @@ void sammy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   //  float xx,xxx;
   //  float tmpbuffer[32];
 
-  // lpc_running
-
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
-//samplespeed=1.0f;
-
      // test lowpass/biquad:
      /*
      int_to_floot(outgoing,tmpbuffer,32);

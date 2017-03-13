@@ -1,5 +1,36 @@
 // questionable copyright! modified for WORM by Martin Howse
 
+/* notes 13/3
+
+- speed and pitch as bendings
+
+- we can also do singmode and have constant pitch per phrase - but how to select phrases?
+
+	DESCRIPTION          SPEED     PITCH     THROAT    MOUTH
+	Elf                   72        64        110       160
+	Little Robot          92        60        190       190
+	Stuffy Guy            82        72        110       105
+	Little Old Lady       82        32        145       145
+	Extra-Terrestrial    100        64        150       200
+	SAM                   72        64        128       128
+
+- how to have these different voices - do we want to bend throat and mouth
+
+- try varying mouth and throat
+
+modes: 
+
+0-selx-pitch//sely-bank//selz-phrase
+1-selx-length//sely-bank//selz-phrase
+2-TTS with selx as pitch
+3-x/y select of phonemes with selx as pitch
+4-as above with length
+5-
+6-larger selected vocab on selz (say 128) with speed AND pitch on x/y
+7-4 params as x/y axis with z as selected vocab
+
+ */
+
 #include "sam.h"
 #include "samvocab.h"
 #include "render.h"
@@ -7,16 +38,18 @@
 #include "english2phoneme/TTS.h"
 #include <stdio.h>
 
-extern __IO uint16_t adc_buffer[10];
+extern float _selx, _sely, _selz;
+extern float exy[64];
+extern char TTSinarray[17];
 
-char input[256];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
+static char input[512];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
-char tmpinput[128];
+static char tmpinput[257];
 
 //  char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
 
-const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; 
+static const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements
 
 
 //unsigned char phoneme_array[2][16]; // 16 and potential stresses
@@ -39,10 +72,10 @@ int32_t bufferpos=0;
 
 unsigned char speedd = 72;
 unsigned char pitch = 64;
-unsigned char mouth = 128;
-unsigned char throat = 128;
+unsigned char mouth = 190;
+unsigned char throat = 190;
 unsigned char debug=0;
-//u8 singmode = 1; // we are in singmode as we vary the pitch
+u8 singmode = 1; 
 
 //int bufferpos=0;
 //char buffer[327680];
@@ -138,66 +171,65 @@ void Init()
 		stressOutput[i] = 0;
 		phonemeLengthOutput[i] = 0;
 	}
-	phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
-
+	phonemeindex[255] = 32; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
 }
 
 void sam_init(){
   Init();
 }
 
-// we need to re-init if triggered
-// sam_newsay
-
 void sam_newsay(void){
+  u8 beginning=0;
 
   // enter phrase into array - changes only on trigger or at end of whole phrase (how long)?
   // so we need to know where we are...
-  u8 beginning=0; static u8 index=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
+
+  // FOR banks selection
+  /*
+  u8 bank=_sely*33.0f;
+  MAXED(bank,31);
+  bank=31-bank;
+
+  u8 vocab=_selz*43.0f;
+  MAXED(vocab,41);
+  vocab=41-vocab;
+  strcpy(input,  vocablist_sam[bank][vocab]); // there are 32 banks of 42 vocab each ends with .\x9b 
+  */
   
-  /*  for (x=0;x<24;x++){
-    phonemeindex[x]=rand()%80;
-    phonemeLength[x]=(rand()%8)+2;
-    stress[x]=rand()%8;
-  }
-  phonemeindex[x]=254;*/ //
+  // FOR selected vocab - test with mouth and throat bend - TODO: selected vocab in samvocab.h
+  u8 mouth=(1.0f-_selx)*255.0f;
+  u8 throat=(1.0f-_sely)*255.0f;
+    SetMouthThroat(mouth, throat);
 
-  //  for (x=0;x<256;x++) input[x]=0;
-///    index=0;
-//    index=adc_buffer[SELZ]>>6;
-    //strcpy(input,  sam_vocab[index]); // 64 as test CUT TODO! - we have 1344 in vocab needs to end each with .\x9b
-
-    //    strcpy(input,"AHBAE4NDUN.\x9b"); // 64 as test CUT TODO!
-  //  index++;
-  //  if (index>8) index=0;
-    //    strcat(input,".\x9b");
+  u8 vocab=_selz*43.0f;
+  MAXED(vocab,41);
+  vocab=41-vocab;
+  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replaced with custom selected vocab!
 
 
-  //  input[strlen(input)+1]='.';
-  //  input[strlen(input)+2]=0x9b;
+  // FOR phonemes in XY list
 
-  //  strcpy(input, "KAX4MPYUX4TAH.\x9b"); // that works
+  /*
+    char teststring[256];
+    teststring[0] = '\0';
 
+    for (u8 x=0;x<64;x++){ // 64 is phoneme list length
+      //      strcat(teststring,phoneme_list[tmpinput[x]]);
+      //      strcat(teststring,phoneme_list[rand()%57]);
+      strcat(teststring,phoneme_list[(unsigned char)((1.0f-exy[x])*56.0f)]);
+      //    strcat(teststring,phoneme_list[x]);
+    }
+    strcat(teststring,".\x9b");
+    strcpy(input,teststring);
+  */
+
+
+// FOR TTS _ break out
   
-  // testing - phoneme array into index...
-  //  strcpy(input,'\0');
-  //  u8 cnt=0;
-  //  for (x=0;x<16;x++){
-  //    phoneme_array[0][x]=(rand()%7)+1; // 1-8 for stress
-  //    phoneme_array[1][x]=(rand()%54); // phoneme
-  //  }
-  //  strcat(input,".\x9b");*/
-  //  input[x+1]='.';
-  //  input[x+2]=0x9b;
-
-    ////////////////////////
-    // for TTS we need to put together phrase from vocab?
-    ////////////////////////
-  static char TTSinarray[64]="testing one two three";
-    static char teststring[128];
-    TTSinarray[21]=EOF;
-    char ttslength=text2speechforSAM(21, TTSinarray, tmpinput);
+/*
+    char teststring[256];
+    unsigned char ttslength=text2speechforSAM(16, TTSinarray, tmpinput);
     teststring[0] = '\0';
 
     for (u8 x=0;x<ttslength;x++){
@@ -205,8 +237,9 @@ void sam_newsay(void){
     }
     strcat(teststring,".\x9b");
     strcpy(input,teststring);
-    
-    if (!Parser1()) return; // if we don't parse then reject and do what? TODO!
+*/
+
+        if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
   Parser2();
   CopyStress();
   SetPhonemeLength();
@@ -307,6 +340,10 @@ void InsertBreath()
 		X = mem66;
 		index = phonemeindex[X];
 		if (index == 255) return;
+		if (X==255) {
+		  phonemeindex[255]=255;
+		  return;
+		}
 		mem55 += phonemeLength[X];
 
 		if (mem55 < 232)

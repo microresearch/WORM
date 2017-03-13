@@ -4,7 +4,7 @@
 #include "SamTabs.h"
 #include <stdio.h>
 #include <time.h>
-
+#include <string.h>
 
 char input[256];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
@@ -135,6 +135,9 @@ int sam_init(){
 
 // we need to re-init if triggered
 // sam_newsay
+const char* phoneme_list[55]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; 
+
+
 
 u8 sam_newsay(void){
 
@@ -142,26 +145,43 @@ u8 sam_newsay(void){
   // enter phrase into array - changes only on trigger or at end of whole phrase (how long)?
   // so we need to know where we are...
   u8 x, beginning=0; int temp;
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  phonemeindex[255] = 255; //to prevent buffer overflow or 255
   
 
-  /*  for (x=0;x<8;x++){
+  /*   for (x=0;x<8;x++){
     phonemeindex[x]=(rand()%79)+1;
     phonemeLength[x]=(rand()%8);
     stress[x]=rand()%8; // 8 is length of stress table
   }
-  phonemeindex[x]=255;  // not working in all cases and can give floating point exception
+  phonemeindex[x]=254;  // not working in all cases and can give floating point exception
   */
 static int index=0;
 
-    sam_frame_rerun();
+ sam_frame_rerun();
 
 
-  strcpy(input,  sam_vocab[index]); // 64 as test
-  printf("%d\n",index);
+//     strcpy(input,  sam_vocab0[index]); // 64 as test
+    //  printf("%d\n",index);
 
-  if (!Parser1()) {
-    fprintf(stderr,"ERR: %d %s %s\n",index, sam_vocab[index],input);
+  char teststring[256];
+  //    char ttslength=text2speechforSAM(16, TTSinarray, tmpinput);
+  char ttslength=16;
+    teststring[0] = '\0';
+    static inde=0;
+    for (u8 x=0;x<ttslength;x++){
+      //      strcat(teststring,phoneme_list[tmpinput[x]]);
+      strcat(teststring,phoneme_list[(unsigned char)(inde)]);
+      //    strcat(teststring,phoneme_list[x]);
+    }
+        if (inde++ == 56) inde=0;
+    strcat(teststring,".\x9b");
+    strcpy(input,teststring);
+    fprintf(stderr,"inde: %d\n", inde);
+
+
+      if (!Parser1()) {
+	// fprintf(stderr,"ERR: %d %s %s\n",index, sam_vocab0[index],input);
+ fprintf(stderr,"ERR: \n");
     //  index++;
     if (index>1343) index=0;
     return 0;
@@ -175,7 +195,7 @@ static int index=0;
 	//  index++;
   //  printf("%d\n",index);
     if (index>1342) index=0;
-
+   
 
 	do
 	{
@@ -188,6 +208,8 @@ static int index=0;
 		}
 		X++;
 	} while (X != 0);
+
+  phonemeindex[255] = 255; //to prevent buffer overflow or 255
 
 	//pos39848:
 	InsertBreath();
@@ -275,8 +297,10 @@ void InsertBreath()
 	{
 		//pos48440:
 		X = mem66;
+
 		index = phonemeindex[X];
-		if (index == 255) return;
+		//		fprintf(stderr,"X: %d %d\n",X, phonemeindex[X]);
+		if (index == 255 || X==255) return;
 		mem55 += phonemeLength[X];
 
 		if (mem55 < 232)
@@ -299,6 +323,7 @@ void InsertBreath()
 			continue;
 		}
 		X = mem54;
+		//		if (X!=255){
 		phonemeindex[X] = 31;   // 'Q*' glottal stop
 		phonemeLength[X] = 4;
 		stress[X] = 0;
