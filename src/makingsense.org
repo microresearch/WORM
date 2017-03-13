@@ -1110,13 +1110,13 @@ what is that rom from? other roms? mazerbla
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example. compost as wormed wavetable
 
-/////
+/////end this week
 
 6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
 
 13. worming of all XY modes above
 
-*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx*
+*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx* end next + HW tests and cleanups
 
 */////////// we leave from below and any LPC work for RAVEN which could have 2 inputs?*
 
