@@ -910,6 +910,8 @@ DIGI:
 - code for LAP for ROM testing: gcc digitalker.c -DLAP -o digi
 - speed is /128 there but for 8k samplerate so /32
 
+- added new roms to sort length of vocabs
+
 *** SAM
 
 - working on sam.c, render.c. List of modes to work on/seperate out in sam.c - FIRST DONE, TO TEST, then break out rest of modes
@@ -925,7 +927,7 @@ DIGI:
 
 - in general we need selx,y,z in each generator in audio.c or doesn't
   make sense in some cases (esp. if we have selx, sely there for
-  exy) - BREAKING out - To test and then implement - now just in mode 0!
+  exy) - BREAKING out - To TEST and then implement - now just in mode 0!
 
 * TTS 
 
@@ -1094,13 +1096,14 @@ wavetable as in raven, generators eg. pulse, square, and original
 
 ////test all above - say 35 modes
 
-3. digitalker ?? are there 2 roms? we have one large so stick with
-   this, bends if any=pitch _and_ repeats/zero_count, also possible
-   bend of any tables
+3. digitalker - 3 roms - to detail how much vocab we have
 
-how large is vocab in that rom?
+bends if any=pitch _and_ repeats/zero_count, also possible bend of any
+   tables
 
-what is that rom from? other roms? mazerbla
+how large is vocab in that rom? small
+
+what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
 
 /////
 
@@ -1108,7 +1111,7 @@ what is that rom from? other roms? mazerbla
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
-    oldX.Y for example. compost as wormed wavetable
+    oldX.Y for example. compost as //wormed// wavetable. speed in middle - left-backwards/right-forwards
 
 /////end this week
 

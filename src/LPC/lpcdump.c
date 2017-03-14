@@ -359,8 +359,8 @@ void main(int argc, char *argv[]){
    // dump reversed
    for (xx=0;xx<lengthy;xx++){
      //     printf("0x%X, ", byte_rev[*ptrAddr+xx]);
-     printf("0x%X, ", bitrev8(*(ptrAddr+xx)));
-     
+     //     printf("0x%X, ", bitrev8(*(ptrAddr+xx)));
+     printf("0x%X, ", *(ptrAddr+xx));
      }
 
 }

@@ -293,8 +293,8 @@ http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
 //CUT:In contrast to other speech modules which make use of a single speech
 chip or algorithm, ERD/WORM implements multiple speech codecs...
 
-softwares, worms, bends, twists and break a total of XXX well-known
-and media-historical speech codecs
+softwares, worms, bends, twists and break an unspecified total of more
+than seven well-known and media-historical speech codecs
 
 wormtable synthesis
 
