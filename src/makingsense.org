@@ -910,11 +910,11 @@ DIGI:
 - code for LAP for ROM testing: gcc digitalker.c -DLAP -o digi
 - speed is /128 there but for 8k samplerate so /32
 
-- added new roms to sort length of vocabs
-
 *** SAM
 
 - working on sam.c, render.c. List of modes to work on/seperate out in sam.c - FIRST DONE, TO TEST, then break out rest of modes
+
+
 
 - render.c -> 	//	k=5; /// ????? TODO - in our out?
 
@@ -927,7 +927,42 @@ DIGI:
 
 - in general we need selx,y,z in each generator in audio.c or doesn't
   make sense in some cases (esp. if we have selx, sely there for
-  exy) - BREAKING out - To TEST and then implement - now just in mode 0!
+  exy) - BREAKING out - To TEST and then implement - now just in mode
+  0 - seems to work DONE
+
+** 14/3 TODO
+
+- test first SAM modeDONE, implement rest of modes:
+
+0-selx-pitch//sely-bank//selz-phrase - modus=1 DONE
+1-selx-speedd//sely-bank//selz-phrase - modus=2 DONE
+
+2-TTS with selx as pitch - use other TTS rather than this one in reciter - modus=1 DONE
+3-TTS with selx as speed - modus=4 DONE
+
+////
+
+4-y/z select of phonemes with selx as pitch - modus=1  DONE
+5-as above with speedd - modus=4 DONE
+8-singing mode with constant pitch=selx there - modus=0 - just change pitch hereDONE
+
+////
+6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3 DONE
+
+7- all x params as x/y axis with z as selected vocab - modus=8 DONE
+
+9-possible bends of tables? - which tables? - frequency tables DONE
+
+///////////////////////
+
+- digitalker basic mode with bends
+- digitalker - added new roms to sort = length of vocabs and how these are addressed
+
+- start on Klatt - define all kaltt sub-types (eg. nvp, simpleklatt, TTS there etc.)
+
+*- NOTE: what needs to be done for cleaning up/final touches: TMS roms
+all included and set up, take care of changemode triggering!*
+
 
 * TTS 
 
@@ -1107,6 +1142,8 @@ what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
 
 /////
 
+6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
+
 10. tube and ntube/glottal/wavetable and wormed tubes 
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
@@ -1114,8 +1151,6 @@ what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
     oldX.Y for example. compost as //wormed// wavetable. speed in middle - left-backwards/right-forwards
 
 /////end this week
-
-6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
 
 13. worming of all XY modes above
 

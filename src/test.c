@@ -289,6 +289,29 @@ typedef struct TMS_vocab__ {
 
  printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
+ /*
+	if (modus&1) {
+	  u8 val=_selx*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}
+	else if (modus&8) {
+	  u8 val=exy[0]*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}	
+	else
+	  pitchmod=pitches[Y];
+ */
+ u8 modus=2;
+	if (modus&2) {
+	  printf("MOD");
+	}
+	else if (modus&8) {
+	  printf("MODD");
+	}	
+	else
+	  printf("MODDD");
 
 
   // with exy=0.0// exy=0.99

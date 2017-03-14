@@ -114,6 +114,7 @@ void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=tms_get_sample();
@@ -132,6 +133,7 @@ void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=tms_get_sample();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -158,6 +160,7 @@ void tmsphon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=tms_get_sample_allphon();
@@ -176,6 +179,7 @@ void tmsphon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=tms_get_sample_allphon();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -202,6 +206,7 @@ void tmsTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=tms_get_sample_TTS();
@@ -220,6 +225,7 @@ void tmsTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=tms_get_sample_TTS();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -246,6 +252,7 @@ void tmsbendlength(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=tms_get_sample_bendlength();
@@ -264,6 +271,7 @@ void tmsbendlength(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=tms_get_sample_bendlength();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -290,6 +298,7 @@ void tmslowbit(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=tms_get_sample_lowbit();
@@ -308,6 +317,7 @@ void tmslowbit(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=tms_get_sample_lowbit();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -336,6 +346,7 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
               if (parammode==0){
 		u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
 		MAXED(xaxis,tmsraw5200extent.max);
@@ -360,6 +371,7 @@ void tmsraw5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
+       doadc();
               if (parammode==0){
          u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,tmsraw5200extent.max);
@@ -394,6 +406,7 @@ void tmsraw5220(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
               if (parammode==0){
 		u8 xaxis=_selx*tmsraw5220extent.maxplus; //0-16 for r, but now 14 params 0-13
 		MAXED(xaxis,tmsraw5220extent.max);
@@ -418,6 +431,7 @@ void tmsraw5220(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
+       doadc();
               if (parammode==0){
          u8 xaxis=_selx*tmsraw5220extent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,tmsraw5220extent.max);
@@ -453,6 +467,7 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
               if (parammode==0){
 		u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
 		MAXED(xaxis,tmsraw5100extent.max);
@@ -477,6 +492,7 @@ void tmsraw5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
+       doadc();
               if (parammode==0){
          u8 xaxis=_selx*tmsraw5100extent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,tmsraw5100extent.max);
@@ -512,6 +528,7 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tmsraw5200extent.max);
        xaxis=tmsraw5200extent.max-xaxis;
@@ -534,6 +551,7 @@ void tmsbend5200(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tmsraw5200extent.max);
        xaxis=tmsraw5200extent.max-xaxis;
@@ -565,6 +583,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -587,6 +606,7 @@ void tms5100ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -618,6 +638,7 @@ void tms5200ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -640,6 +661,7 @@ void tms5200ktablebend(int16_t* incoming,  int16_t* outgoing, float samplespeed,
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -671,6 +693,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -693,6 +716,7 @@ void tms5100pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -733,6 +757,7 @@ void tmsbend5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tmsraw5200extent.max);
        xaxis=tmsraw5200extent.max-xaxis;
@@ -755,6 +780,7 @@ void tmsbend5100(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tmsraw5200extent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tmsraw5200extent.max);
        xaxis=tmsraw5200extent.max-xaxis;
@@ -784,6 +810,7 @@ void tms5200pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -805,6 +832,7 @@ void tms5200pitchtablebend(int16_t* incoming,  int16_t* outgoing, float samplesp
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -834,6 +862,7 @@ void tms5100kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samp
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -856,6 +885,7 @@ void tms5100kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samp
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -886,6 +916,7 @@ void tms5200kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samp
   samplespeed*=0.25f;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -908,6 +939,7 @@ void tms5200kandpitchtablebend(int16_t* incoming,  int16_t* outgoing, float samp
    }
    else { 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*tableextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,tableextent.max);
        xaxis=tableextent.max-xaxis;
@@ -940,10 +972,10 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
   u8 xx=0,readpos;
   float remainder;
 
-  doadc();
   
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=sp0256_get_sample();
@@ -962,7 +994,8 @@ void sp0256(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
    }
    else { 
      while (xx<size){
-              samplel=sp0256_get_sample();
+       doadc();
+       samplel=sp0256_get_sample();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
@@ -988,6 +1021,7 @@ void sp0256_1219(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
   float remainder;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	  samplel=sp0256_get_sample1219();
@@ -1006,6 +1040,7 @@ void sp0256_1219(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=sp0256_get_sample1219();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -1033,6 +1068,7 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=sp0256_get_sampleTTS();
@@ -1052,6 +1088,7 @@ void sp0256TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=sp0256_get_sampleTTS();
 
        if (samplepos>=samplespeed) {       
@@ -1079,6 +1116,7 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
   float remainder;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=sp0256_get_samplevocabbankone();
@@ -1098,6 +1136,7 @@ void sp0256vocabone(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=sp0256_get_samplevocabbankone();
 
        if (samplepos>=samplespeed) {       
@@ -1125,6 +1164,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
   float remainder;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=sp0256_get_samplevocabbanktwo();
@@ -1144,6 +1184,7 @@ void sp0256vocabtwo(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=sp0256_get_samplevocabbanktwo();
 
        if (samplepos>=samplespeed) {       
@@ -1172,6 +1213,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
   float remainder;
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
        MAXED(xaxis,sp0256bendextent.max);
        xaxis=sp0256bendextent.max-xaxis;
@@ -1195,6 +1237,7 @@ void sp0256bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
+       doadc();
          u8 xaxis=_selx*sp0256bendextent.maxplus; //0-16 for r, but now 14 params 0-13
 	 MAXED(xaxis,sp0256bendextent.max);
 	 xaxis=sp0256bendextent.max-xaxis;
@@ -1230,6 +1273,7 @@ void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sample();
@@ -1249,6 +1293,7 @@ void votrax(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=votrax_get_sample();
 
        if (samplepos>=samplespeed) {       
@@ -1277,6 +1322,7 @@ void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_sampleTTS();
@@ -1296,6 +1342,7 @@ void votraxTTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=votrax_get_sampleTTS();
 
        if (samplepos>=samplespeed) {       
@@ -1324,6 +1371,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_samplegorf();
@@ -1343,6 +1391,7 @@ void votraxgorf(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=votrax_get_samplegorf();
 
        if (samplepos>=samplespeed) {       
@@ -1371,6 +1420,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_samplewow();
@@ -1390,6 +1440,7 @@ void votraxwow(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=votrax_get_samplewow();
 
        if (samplepos>=samplespeed) {       
@@ -1418,6 +1469,7 @@ void votraxwowfilterbend(int16_t* incoming,  int16_t* outgoing, float samplespee
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=votrax_get_samplewow_bendfilter();
@@ -1437,6 +1489,7 @@ void votraxwowfilterbend(int16_t* incoming,  int16_t* outgoing, float samplespee
    }
    else { 
      while (xx<size){
+       doadc();
               samplel=votrax_get_samplewow_bendfilter();
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
@@ -1465,6 +1518,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (parammode==0){
 	 u8 xaxis=_selx*votraxparamextent.maxplus; // 9 params 0-8 - as int rounds down
 	 MAXED(xaxis,votraxparamextent.max);
@@ -1490,6 +1544,7 @@ void votrax_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 s
    }
    else { 
      while (xx<size){
+       doadc();
 
        if (parammode==0){
 	 u8 xaxis=_selx*votraxparamextent.maxplus; 
@@ -1527,6 +1582,7 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 
    if (samplespeed<=1){ 
      while (xx<size){
+       doadc();
 	 u8 xaxis=_selx*votraxbendextent.maxplus; // 8 params 
 	 MAXED(xaxis,votraxbendextent.max); 
 	 xaxis=votraxbendextent.max-xaxis;
@@ -1549,6 +1605,7 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
    }
    else { 
      while (xx<size){
+       doadc();
 	 u8 xaxis=_selx*votraxbendextent.maxplus; //
 	 MAXED(xaxis,votraxbendextent.max);
 	 xaxis=votraxbendextent.max-xaxis;
@@ -1575,6 +1632,7 @@ void votrax_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
   uint16_t val;
+  doadc();
   val=_selz*1030.0f;
   MAXED(val,1023);
   val=1023-val;
@@ -1598,7 +1656,7 @@ void LPCanalyzer(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 si
 /////// [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ SAM 
 
 void sam_banks0(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  TTS=1;
+  TTS=0;
   static u8 triggered=0;
   u8 x=0,readpos;
   static u8 howmany=0;
@@ -1606,6 +1664,7 @@ void sam_banks0(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
  
    if (samplespeed<=1){ 
      while (x<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 while (howmany==0) howmany=(sam_get_sample_banks0(&samplel)); 
@@ -1626,6 +1685,7 @@ void sam_banks0(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
    else { 
      while (x<size){
+       doadc();
        while (howmany==0)	 howmany=(sam_get_sample_banks0(&samplel)); 
        howmany--;
        if (samplepos>=samplespeed) {       
@@ -1643,6 +1703,526 @@ void sam_banks0(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 }
 
+void sam_banks1(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+ 
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_banks1(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_banks0(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       while (howmany==0)	 howmany=(sam_get_sample_banks1(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_banks0(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_TTS(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=1;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+ 
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_TTS(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_TTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       while (howmany==0)	 howmany=(sam_get_sample_TTS(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_TTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_TTSs(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=1;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+ 
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_TTSs(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_TTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       while (howmany==0)	 howmany=(sam_get_sample_TTSs(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_TTS(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_phon(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent samphonextent={15,18.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_phon(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; 
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+
+       while (howmany==0)	 howmany=(sam_get_sample_phon(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_phons(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent samphonextent={15,18.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_phons(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; 
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+
+       while (howmany==0)	 howmany=(sam_get_sample_phons(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_param(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent samphonextent={3,5.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_selx*samphonextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_sely;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_param(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_selx*samphonextent.maxplus; 
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_sely;
+	      }
+
+       while (howmany==0)	 howmany=(sam_get_sample_param(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+
+void sam_phonsing(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent samphonextent={15,18.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_phonsing(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*samphonextent.maxplus; 
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+
+       while (howmany==0)	 howmany=(sam_get_sample_phonsing(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent samphonextent={239,243.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_selx*samphonextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=1.0f-_sely;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_bend(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_selx*samphonextent.maxplus; 
+	 MAXED(xaxis,samphonextent.max);
+	 xaxis=samphonextent.max-xaxis;
+	 exy[xaxis]=1.0f-_sely;
+	      }
+
+       while (howmany==0)	 howmany=(sam_get_sample_bend(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 //	 sam_newsay_phon(); // selector is in newsay
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+void sam_xy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+ 
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(sam_get_sample_xy(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_xy(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       while (howmany==0)	 howmany=(sam_get_sample_xy(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 sam_newsay_xy(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+
+//////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
 u8 toggled=1;
 
@@ -1664,11 +2244,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   smoothed_adc_value[1] += 0.1f * (value - smoothed_adc_value[1]);
   _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
+
   oldmode=_intmode;
-  _intmode=_mode*32.0f;
-  MAXED(_intmode, 31);
+  _intmode=_mode*65.0f;
+  MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=29;
+  _intmode=38;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;
@@ -1685,9 +2266,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend};
   
-  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_bank0s // 
+  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend // 
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
@@ -1700,7 +2281,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
   }
 
-    if (TTS){
+  if (TTS){ // so this doesn't change as fast as generators
     u8 xax=_sely*18.0f; 
     u8 selz=_selz*65.0f; 
     MAXED(xax,16);

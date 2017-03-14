@@ -7,8 +7,10 @@
 #include "SamTabs.h"
 #include "english2phoneme/TTS.h"
 #include <stdio.h>
+#include "resources.h"
 
 extern float _selx, _sely, _selz;
+extern float exy[64];
 extern char TTSinarray[17];
 u8 modus;
 
@@ -30,9 +32,11 @@ int32_t bufferpos=0;
 
 unsigned char speedd = 72;
 unsigned char pitch = 64;
-unsigned char mouth = 190;
-unsigned char throat = 190;
+unsigned char mouth = 128;
+unsigned char throat = 128;
 u8 singmode = 0; 
+
+//pitch=64; mouth=128; throat=128; // TODO - reset these in newsays
 
 unsigned char mem39;
 unsigned char mem44;
@@ -124,27 +128,9 @@ void sam_init(){
   Init();
 }
 
-/*
-modes: 
-
-0-selx-pitch//sely-bank//selz-phrase - modus=1
-1-selx-speedd//sely-bank//selz-phrase - modus=2
-
-2-TTS with selx as pitch - use other TTS rather than this one in reciter - modus=1
-3-TTS with selx as speed - modus=2
-
-4-y/z select of phonemes with selx as pitch - modus=1
-5-as above with speedd - modus=2
-
-6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3
-7-4 params as x/y axis with z as selected vocab - modus=8
-
-8-singing mode with shorter say 16-yz phoneme and constant pitch=selx there - modus=0 - just change pitch here
-*/
-
 void sam_newsay_banks0(void){
+  singmode=0;
   u8 beginning=0;
-  modus=1;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
   // FOR banks selection
@@ -201,35 +187,12 @@ void sam_newsay_banks0(void){
 	}	
 }
 
-/* other modes
+void sam_newsay_TTS(void){
+  u8 beginning=0;
+  singmode=0;
+  phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
-// FOR selected vocab - test with mouth and throat bend - TODO: selected vocab in samvocab.h
-  u8 mouth=(1.0f-_selx)*255.0f;
-  u8 throat=(1.0f-_sely)*255.0f;
-    SetMouthThroat(mouth, throat);
-
-  u8 vocab=_selz*43.0f;
-  MAXED(vocab,41);
-  vocab=41-vocab;
-  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replaced with custom selected vocab!
-
-
-  // FOR phonemes in XY list
-
-    char teststring[256];
-    teststring[0] = '\0';
-
-    for (u8 x=0;x<64;x++){ // 64 is phoneme list length
-      //      strcat(teststring,phoneme_list[tmpinput[x]]);
-      //      strcat(teststring,phoneme_list[rand()%57]);
-      strcat(teststring,phoneme_list[(unsigned char)((1.0f-exy[x])*56.0f)]);
-      //    strcat(teststring,phoneme_list[x]);
-    }
-    strcat(teststring,".\x9b");
-    strcpy(input,teststring);
-
-
-// FOR TTS _ break out
+// FOR TTS
     char teststring[256];
     unsigned char ttslength=text2speechforSAM(16, TTSinarray, tmpinput);
     teststring[0] = '\0';
@@ -240,13 +203,389 @@ void sam_newsay_banks0(void){
     strcat(teststring,".\x9b");
     strcpy(input,teststring);
 
- */
+        if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  Parser2();
+  CopyStress();
+  SetPhonemeLength();
+  AdjustLengths();
+  Code41240();
+  		do
+	{
+		A = phonemeindex[X];
+		if (A > 80)
+		{
+		  phonemeindex[X] = 255;
+		  break; // error: delete all behind it
+		}
+		X++;
+		} while (X != 0);
+  InsertBreath();
+	A=0; X=0; Y=0;
+
+	while(beginning==0){
+    A = phonemeindex[X];
+    if (A == 254)
+	{
+	  X++;
+	  phonemeIndexOutput[Y] = 255;
+	  renderframe(); // this is a new frame
+	  Y = 0;
+	  beginning=1;
+	}
+      else if (A == 0)
+	{
+	  X++;
+	}
+      else {
+    phonemeIndexOutput[Y] = A;
+    phonemeLengthOutput[Y] = phonemeLength[X];
+    stressOutput[Y] = stress[X];
+    X++;
+    Y++;
+      }
+	}	
+}
+
+void sam_newsay_phon(void){
+  u8 beginning=0;
+  singmode=0;
+    phonemeindex[255] = 32; //to prevent buffer overflow or 255
+
+// set input
+  char teststring[256];
+  teststring[0] = '\0';
+
+  for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
+      u8 val=exy[x]*57.0f;
+      MAXED(val,55);
+      val=55-val;
+      strcat(teststring,phoneme_list[val]);
+    }
+      strcat(teststring,".\x9b");
+  //  teststring[64]=0x9b;
+    strcpy(input,teststring);
+
+    if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  Parser2();
+  CopyStress();
+  SetPhonemeLength();
+  AdjustLengths();
+  Code41240();
+  		do
+	{
+		A = phonemeindex[X];
+		if (A > 80)
+		{
+		  //		  printf("X %d A %d\n",X,A);
+		  phonemeindex[X] = 255;
+			break; // error: delete all behind it
+		}
+		X++;
+		} while (X != 0);
+  InsertBreath();
+	A=0; X=0; Y=0;
+
+	while(beginning==0){
+    A = phonemeindex[X];
+    if (A == 254)
+	{
+	  X++;
+	  phonemeIndexOutput[Y] = 255;
+	  renderframe(); // this is a new frame
+	  Y = 0;
+	  beginning=1;
+	}
+      else if (A == 0)
+	{
+	  X++;
+	}
+      else {
+    phonemeIndexOutput[Y] = A;
+    phonemeLengthOutput[Y] = phonemeLength[X];
+    stressOutput[Y] = stress[X];
+    X++;
+    Y++;
+      }
+	}	
+}
+
+void sam_newsay_xy(void){ // TODO for extended Vocab - is just basic select now
+  u8 beginning=0;
+  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+
+// set input
+  u8 vocab=_selz*43.0f;
+  MAXED(vocab,41);
+  vocab=41-vocab;
+  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replace with custom selected vocab!
+
+  if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  Parser2();
+  CopyStress();
+  SetPhonemeLength();
+  AdjustLengths();
+  Code41240();
+  		do
+	{
+		A = phonemeindex[X];
+		if (A > 80)
+		{
+		  //		  printf("X %d A %d\n",X,A);
+		  phonemeindex[X] = 255;
+			break; // error: delete all behind it
+		}
+		X++;
+		} while (X != 0);
+  InsertBreath();
+	A=0; X=0; Y=0;
+
+	while(beginning==0){
+    A = phonemeindex[X];
+    if (A == 254)
+	{
+	  X++;
+	  phonemeIndexOutput[Y] = 255;
+	  renderframe(); // this is a new frame
+	  Y = 0;
+	  beginning=1;
+	}
+      else if (A == 0)
+	{
+	  X++;
+	}
+      else {
+    phonemeIndexOutput[Y] = A;
+    phonemeLengthOutput[Y] = phonemeLength[X];
+    stressOutput[Y] = stress[X];
+    X++;
+    Y++;
+      }
+	}	
+}
+
+void sam_newsay_param(void){ // TODO for extended Vocab - is just basic select now
+  u8 beginning=0;
+  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+
+// set input
+  u8 vocab=_selz*43.0f;
+  MAXED(vocab,41);
+  vocab=41-vocab;
+  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replace with custom selected vocab!
+
+  u8 mouth=exy[2]*255.0;
+  MAXED(mouth,254);
+  u8 throat=exy[3]*255.0;
+  MAXED(throat,254);
+  SetMouthThroat(mouth, throat);
+
+  if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  Parser2();
+  CopyStress();
+  SetPhonemeLength();
+  AdjustLengths();
+  Code41240();
+  		do
+	{
+		A = phonemeindex[X];
+		if (A > 80)
+		{
+		  //		  printf("X %d A %d\n",X,A);
+		  phonemeindex[X] = 255;
+			break; // error: delete all behind it
+		}
+		X++;
+		} while (X != 0);
+  InsertBreath();
+	A=0; X=0; Y=0;
+
+	while(beginning==0){
+    A = phonemeindex[X];
+    if (A == 254)
+	{
+	  X++;
+	  phonemeIndexOutput[Y] = 255;
+	  renderframe(); // this is a new frame
+	  Y = 0;
+	  beginning=1;
+	}
+      else if (A == 0)
+	{
+	  X++;
+	}
+      else {
+    phonemeIndexOutput[Y] = A;
+    phonemeLengthOutput[Y] = phonemeLength[X];
+    stressOutput[Y] = stress[X];
+    X++;
+    Y++;
+      }
+	}	
+}
+
+
+void sam_newsay_phonsing(void){
+  u8 beginning=0;
+  singmode=1;
+  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  u8 val=_selx*130.0f;
+  MAXED(val,127);
+  pitch=64.0f*logpitch[val];
+
+  char teststring[256];
+  teststring[0] = '\0';
+
+  for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
+      u8 val=exy[x]*57.0f;
+      MAXED(val,55);
+      val=55-val;
+      strcat(teststring,phoneme_list[val]);
+    }
+      strcat(teststring,".\x9b");
+  //  teststring[64]=0x9b;
+    strcpy(input,teststring);
+
+    if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  Parser2();
+  CopyStress();
+  SetPhonemeLength();
+  AdjustLengths();
+  Code41240();
+  		do
+	{
+		A = phonemeindex[X];
+		if (A > 80)
+		{
+		  //		  printf("X %d A %d\n",X,A);
+		  phonemeindex[X] = 255;
+			break; // error: delete all behind it
+		}
+		X++;
+		} while (X != 0);
+  InsertBreath();
+	A=0; X=0; Y=0;
+
+	while(beginning==0){
+    A = phonemeindex[X];
+    if (A == 254)
+	{
+	  X++;
+	  phonemeIndexOutput[Y] = 255;
+	  renderframe(); // this is a new frame
+	  Y = 0;
+	  beginning=1;
+	}
+      else if (A == 0)
+	{
+	  X++;
+	}
+      else {
+    phonemeIndexOutput[Y] = A;
+    phonemeLengthOutput[Y] = phonemeLength[X];
+    stressOutput[Y] = stress[X];
+    X++;
+    Y++;
+      }
+	}	
+}
+
+//6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3
+
+u8 sam_get_sample_xy(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=3; // x AND y
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_xy();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+u8 sam_get_sample_bend(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=16; // bends frequencies
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_xy();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+
+//7- all x params as x/y axis with z as selected vocab - modus=8
+
+u8 sam_get_sample_param(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=8; // selx mode
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_param();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+
+u8 sam_get_sample_phon(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=1;
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_phon();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+u8 sam_get_sample_phons(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=4; // now with speed on selx
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_phon();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+u8 sam_get_sample_phonsing(int16_t* newsample){
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=0; 
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_phonsing();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
 
 u8 sam_get_sample_banks0(int16_t* newsample){
   static int16_t lastsample;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
+  modus=1;
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_banks0();
   *newsample=lastsample;
@@ -254,6 +593,50 @@ u8 sam_get_sample_banks0(int16_t* newsample){
   howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
   return howmany;
 }
+
+u8 sam_get_sample_banks1(int16_t* newsample){ // same newsay only change is modus - selx is speed
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=4; // speed on selx
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_banks0();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+u8 sam_get_sample_TTS(int16_t* newsample){ 
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=1; // pitch on selx
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_TTS();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+u8 sam_get_sample_TTSs(int16_t* newsample){ 
+  static int16_t lastsample;
+  int16_t swopsample;
+  u8 howmany=0; u8 ending=0;
+  int32_t oldbufferpos=bufferpos;
+  modus=4; // speed on selx
+  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  if (ending) sam_newsay_TTS();
+  *newsample=lastsample;
+  lastsample=swopsample;
+  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  return howmany;
+}
+
+
 
 //void Code48431()
 void InsertBreath()

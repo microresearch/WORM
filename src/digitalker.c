@@ -3,6 +3,13 @@
 
 // modified for WORM by Martin Howse
 
+#ifndef LAP
+#include "audio.h"
+extern float _selx, _sely, _selz;
+#else
+#include "forlap.h"
+#endif
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
@@ -10,13 +17,6 @@
 #include "digitalker.h"
 #include "digitalker_roms.h"
 #include "resources.h"
-
-#ifndef LAP
-#include "audio.h"
-extern float _selx, _sely, _selz;
-#else
-#include "forlap.h"
-#endif
 
 typedef u16 UINT16;
 typedef int16_t INT16;

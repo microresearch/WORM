@@ -60,7 +60,7 @@ unsigned char phase3;
 //unsigned char mem66;
 unsigned char mem38;
 unsigned char mem40;
-unsigned char speedcounter; //mem45
+signed int speedcounter; //mem45
 unsigned char mem48;
 unsigned char mem48stored;
 
@@ -185,7 +185,7 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
   u8 tempA;
 
   //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
-  signed char pitchmod;
+  signed int pitchmod;
   //  signed char pitchmod=(_selx * 64.0f)-44; // say +-32
 
   if (state==0){ // beginning /////////
@@ -215,18 +215,18 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	Y = mem49;
 	//	pitchmod+=pitches[mem49];
 
-			  if (modus&1) {
-		    u8 val=_selx*130.0f;
-		    MAXED(val,127);
-		    pitchmod=pitches[Y]*logpitch[val];
-		  }
-		  else if (modus&8) {
-		    u8 val=exy[0]*130.0f;
-		    MAXED(val,127);
-		    pitchmod=pitches[Y]*logpitch[val];
-		  }	
-		  else
-		    pitchmod=pitches[Y];
+	if (modus&1) {
+	  u8 val=_selx*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[mem49]*logpitch[val];
+	}
+	else if (modus&8) {
+	  u8 val=exy[0]*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[mem49]*logpitch[val];
+	}	
+	else
+	  pitchmod=pitches[mem49];
 
 	
 	if (pitchmod>254) pitchmod=254;
@@ -407,7 +407,7 @@ void renderupdate(){
 }
 
 void    sam_frame_rerun() {
-     signed char pitchmod;
+     signed int pitchmod;
   //	phase1 = 0;
 	phase2 = 0;
 	phase3 = 0;
@@ -462,7 +462,7 @@ void    sam_frame_rerun() {
 
 u8 rendersamsample(int16_t* sample,u8* ending){
   //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
-  signed char pitchmod;
+  signed int pitchmod;
   //  signed char pitchmod=(_selx * 64.0f)-44; // say +-32
 
   static u8 state=0;
@@ -505,6 +505,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		  }	
 		  else
 		    speedcounter = speedd;
+		  //		  if (speedcounter<1) speedcounter=1;
       }
       return howmany;
     }
@@ -587,7 +588,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 
 		    //			pitchmod+=pitches[Y];
 
-		    		  if (modus&1) {
+		    if (modus&1) {
 		    u8 val=_selx*130.0f;
 		    MAXED(val,127);
 		    pitchmod=pitches[Y]*logpitch[val];
@@ -623,15 +624,30 @@ u8 rendersamsample(int16_t* sample,u8* ending){
     else {
         // decrement the remaining length of the glottal pulse
 		mem44--;
+
 		
 		// finished with a glottal pulse?
 		if(mem44 == 0)
 		{
 		  //		pos48159:
             // fetch the next glottal pulse length
-			pitchmod+=pitches[Y];
-			if (pitchmod>96) pitchmod=96;
-			else if (pitchmod<20) pitchmod=20;
+	if (modus&1) {
+	  u8 val=_selx*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}
+	else if (modus&8) {
+	  u8 val=exy[0]*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}	
+	else
+	  pitchmod=pitches[Y];
+
+	
+	if (pitchmod>254) pitchmod=254;
+	else if (pitchmod<1) pitchmod=1;
+
 
 			A = pitchmod;
 			mem44 = A;
@@ -670,9 +686,27 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		//FILL IN		RenderSample(&mem66);
 		secondstate=rendervoicedsample(&mem66,sample,secondstate,&howmany);
 		  if (secondstate==0) { // finish render
-		    pitchmod+=pitches[Y];
-		    if (pitchmod>126) pitchmod=126;
-		    else if (pitchmod<1) pitchmod=1;
+
+		    //		    pitchmod+=pitches[Y];
+
+
+	if (modus&1) {
+	  u8 val=_selx*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}
+	else if (modus&8) {
+	  u8 val=exy[0]*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[Y]*logpitch[val];
+	}	
+	else
+	  pitchmod=pitches[Y];
+
+	
+	if (pitchmod>254) pitchmod=254;
+	else if (pitchmod<1) pitchmod=1;
+		
 
 			A = pitchmod;
 			mem44 = A;
@@ -760,9 +794,22 @@ do
 	// copy from the source to the frames list
 	do
 	{
+	  if (modus&16){
+	      u8 val=exy[X]*130.0f;
+	      MAXED(val,127);
+	      frequency1[X] = freq1data[Y]*logpitch[val];
+	      val=exy[80+X]*130.0f;
+	      MAXED(val,127);
+	      frequency2[X] = freq2data[Y]*logpitch[val];
+	      val=exy[160+X]*130.0f;
+	      MAXED(val,127);
+	      frequency3[X] = freq3data[Y]*logpitch[val];
+	  }
+	  else {
 		frequency1[X] = freq1data[Y];     // F1 frequency
 		frequency2[X] = freq2data[Y];     // F2 frequency
 		frequency3[X] = freq3data[Y];     // F3 frequency
+	  }
 		amplitude1[X] = ampl1data[Y];     // F1 amplitude
 		amplitude2[X] = ampl2data[Y];     // F2 amplitude
 		amplitude3[X] = ampl3data[Y];     // F3 amplitude
@@ -995,7 +1042,7 @@ do
 	phase2 = 0;
 	phase3 = 0;
 	mem49 = 0;
-	speedcounter = 72; //sam standard speed
+	//	speedcounter = 72; //sam standard speed
 
 // RESCALE AMPLITUDE
 //
