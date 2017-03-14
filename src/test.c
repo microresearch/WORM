@@ -2,7 +2,7 @@
 #include "math.h"
 #include "stdlib.h"
 #include "forlap.h"
-
+#include "resources.h"
 #include "LPC/roms/vocab_2303.h"
 
 
@@ -312,6 +312,16 @@ typedef struct TMS_vocab__ {
 	}	
 	else
 	  printf("MODDD");
+
+static const int pitch_vals[32] = {
+	97, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63,
+	61, 60, 58, 56, 55, 53, 52, 50, 49, 48, 46, 45, 43, 42, 41, 40
+};
+
+
+ unsigned char val=1.0*127.0f; 
+ int m_pitch = pitch_vals[10] * logpitch[val];
+  printf("mmmmmmmmmmmmmmmmmPPPP: %d\n",m_pitch); 
 
 
   // with exy=0.0// exy=0.99

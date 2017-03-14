@@ -36,7 +36,7 @@ unsigned char mouth = 128;
 unsigned char throat = 128;
 u8 singmode = 0; 
 
-//pitch=64; mouth=128; throat=128; // TODO - reset these in newsays
+
 
 unsigned char mem39;
 unsigned char mem44;
@@ -129,7 +129,7 @@ void sam_init(){
 }
 
 void sam_newsay_banks0(void){
-  singmode=0;
+  singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
@@ -189,7 +189,7 @@ void sam_newsay_banks0(void){
 
 void sam_newsay_TTS(void){
   u8 beginning=0;
-  singmode=0;
+  singmode=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // FOR TTS
@@ -248,7 +248,7 @@ void sam_newsay_TTS(void){
 
 void sam_newsay_phon(void){
   u8 beginning=0;
-  singmode=0;
+  singmode=0; pitch=64; mouth=128; throat=128; 
     phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
@@ -310,7 +310,7 @@ void sam_newsay_phon(void){
 }
 
 void sam_newsay_xy(void){ // TODO for extended Vocab - is just basic select now
-  u8 beginning=0;
+  u8 beginning=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
@@ -426,7 +426,7 @@ void sam_newsay_param(void){ // TODO for extended Vocab - is just basic select n
 
 void sam_newsay_phonsing(void){
   u8 beginning=0;
-  singmode=1;
+  singmode=1; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
   u8 val=_selx*130.0f;
   MAXED(val,127);

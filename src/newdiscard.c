@@ -943,58 +943,48 @@ void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 }; // use this as NEW template
 
 void digitalker(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  // MODEL GENERATOR: TODO is speed and interpolation options
+  TTS=0;
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  // lpc_running
+  samplespeed=samplespeed*8.0f;
 
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
-  float tmpsamplespeed=samplespeed*32.0f;
-
-   if (tmpsamplespeed<=1){ // slower=DOWNSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+   if (tmpsamplespeed<=1){ 
      while (xx<size){
+       doadc();
        if (samplepos>=1.0f) {
 	 lastval=samplel;
 	 samplel=(digitalk_get_sample());//<<6)-32768; 
 	 samplepos-=1.0f;
        }
        remainder=samplepos; 
-       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
-       //       outgoing[xx]=samplel;
-
-       // TEST trigger: 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
        if (incoming[xx]>THRESH && !triggered) {
 	 digitalk_newsay(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
        xx++;
        samplepos+=tmpsamplespeed;
      }
    }
-   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+   else { 
      while (xx<size){
+       doadc();
        samplel=(digitalk_get_sample());//<<6)-32768; 
-
        if (samplepos>=tmpsamplespeed) {       
 	 outgoing[xx]=samplel;
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
 	 digitalk_newsay(); // selector is in newsay
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
-
 	 xx++;
 	 samplepos-=tmpsamplespeed;
        }
        samplepos+=1.0f;
      }
    }
-
 };
 
 

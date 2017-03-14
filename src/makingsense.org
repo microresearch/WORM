@@ -908,7 +908,7 @@ DIGI:
 *** digi
 
 - code for LAP for ROM testing: gcc digitalker.c -DLAP -o digi
-- speed is /128 there but for 8k samplerate so /32
+- speed is /128 there but for 8k samplerate so /32DONE
 
 *** SAM
 
@@ -953,12 +953,22 @@ DIGI:
 
 9-possible bends of tables? - which tables? - frequency tables DONE
 
-///////////////////////
+*** digitalker
 
-- digitalker basic mode with bends
+- digitalker basic mode with bends=on pitch(which is speed) and repeats
+- new rom modes (say 3 modes) - sort vocab first
+
+- modes: basic pitch and speed ADDED, test (not bending - also check we have this for all modes so is a bit like singing)
+
+- TODO: table bends: pcm_levels (64), delta1 and 2 (16+16), pitch_vals (32)
+
 - digitalker - added new roms to sort = length of vocabs and how these are addressed
 
-- start on Klatt - define all kaltt sub-types (eg. nvp, simpleklatt, TTS there etc.)
+// so 3 roms with x/y bend as is, 3 roms with straightest, 1 rom with each set of bends on xy = 9 modes
+
+*** general
+
+- start on Klatt - define all klatt sub-types (eg. nvp, simpleklatt, TTS there etc.)
 
 *- NOTE: what needs to be done for cleaning up/final touches: TMS roms
 all included and set up, take care of changemode triggering!*

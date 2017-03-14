@@ -26,7 +26,8 @@ typedef int32_t INT32;
 typedef unsigned char UINT8;
 typedef signed char INT8;
 
-
+static const unsigned char *m_rom;
+static u8 modus=0;
 
 static UINT16 m_bpos;
 static UINT16 m_apos;
@@ -38,7 +39,7 @@ static UINT8 m_segments;
 static UINT8 m_repeats;
 
 static UINT8 m_prev_pitch;
-static UINT8 m_pitch;
+static u16 m_pitch;
 static UINT8 m_pitch_pos;
 
 static UINT8 m_stop_after;
@@ -363,17 +364,8 @@ void digitalker_step_mode_0()
 	UINT16 bits = 0x80;
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
-
-	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6); 
-#ifndef LAP
-	u8 val=_selx*130.0f;
-	MAXED(val,127);
-	val=127-val;
-	m_pitch = pitch_vals[pitch_id] * logpitch[val];
-#else
 	m_pitch = pitch_vals[pitch_id];
-#endif
-	
+
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
 
@@ -425,17 +417,7 @@ void digitalker_step_mode_2()
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	//	m_pitch = pitch_vals[pitch_id]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
-#ifndef LAP
-	u8 val=_selx*130.0f;
-	MAXED(val,127);
-	val=127-val;
-	m_pitch = pitch_vals[pitch_id] * logpitch[val];
-#else
 	m_pitch = pitch_vals[pitch_id];
-#endif
-
-	
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
@@ -496,16 +478,7 @@ void digitalker_step_mode_3()
 	UINT8 dac, apos, wpos;
 	int k, l;
 
-	//	m_pitch = pitch_vals[h & 0x1f]+(adc_buffer[SELY]>>6);  // TODO - _selx pitch bend
-
-#ifndef LAP
-	u8 val=_selx*130.0f;
-	MAXED(val,127);
-	val=127-val;
-	m_pitch = pitch_vals[h & 0x1f] * logpitch[val];
-#else
 	m_pitch = pitch_vals[h & 0x1f];
-#endif
 
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
@@ -546,7 +519,17 @@ void digitalker_step()
 			UINT8 v3 = m_rom[m_bpos++];
 			m_apos = v2 | ((v3 << 8) & 0x3f00);
 			m_segments = (v1 & 15) + 1;
-			m_repeats = ((v1 >> 4) & 7) + 1;
+			// try bend of m_repeats
+
+			u8 val=_sely*66.0f;
+			MAXED(val,63);
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+			if (modus==0){
+			m_repeats+=val;
+			}
+			else m_repeats=val+1;
+			
+
 			m_mode = (v3 >> 6) & 3;
 			m_stop_after = (v1 & 0x80) != 0;
 
@@ -585,25 +568,25 @@ void digitalker_step()
 
 
 void digitalk_init(void){
-	m_dac_index = 128;
-	//	m_data = 0xff;
-	//	m_cs = m_cms = m_wr = 1;
-		m_bpos = 0xffff;
+  m_rom=m_rom_SSR1; // TODO: where we set our m_rom
+  m_dac_index = 128;
+  m_bpos = 0xffff;
 }
 
 //static u8 alwayswhich;
 
+
+// start this as basic model and test bends here...
 void digitalk_newsay(){
 #ifndef LAP
   u8 val=_selz*67.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
   MAXED(val,64);
   val=64-val;
-  u8 which=val+1; // 65 - do we hit the end? TODO TEST
+  u8 which=val; // 65 - do we hit the end? TODO TEST
 #else
        u8 which =1;
 #endif
   digitalker_start_command(which);
-  //  alwayswhich=which;
 }
 
 #ifdef LAP
@@ -628,7 +611,7 @@ int16_t digitalk_get_sample_arg(int val){ // BREAK DOWN TO SINGLE SAMpLES - is d
 	else if(m_dac_index != 128) {// the rest here
 	    short v = m_dac[m_dac_index];
 	    //	    int pp = m_pitch_pos;
-	    if (pp==m_pitch)
+	    if (pp>=m_pitch)
 	      {
 		pp=0;
 		m_dac_index++;
@@ -642,8 +625,6 @@ int16_t digitalk_get_sample_arg(int val){ // BREAK DOWN TO SINGLE SAMpLES - is d
 	else {
 	  digitalk_newsayarg(val);
 	  sample=0;
-	  //	  sample=digitalk_get_sample_arg(val);
-
 	}
 	return sample;
 	}
@@ -651,12 +632,10 @@ int16_t digitalk_get_sample_arg(int val){ // BREAK DOWN TO SINGLE SAMpLES - is d
 
 #endif
 
-// does it repeat?
-int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMpLES - is done?
-
-  int16_t sample; static int pp;//=m_pitch_pos;
-  
-  //	static int cpos = 0;
+#ifndef LAP
+int16_t digitalk_get_sample_sing(){ 
+  modus=1;
+  int16_t sample; static int pp;
 
 	if(m_zero_count == 0 && m_dac_index == 128)
 	  digitalker_step();
@@ -665,10 +644,12 @@ int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMpLES - is done?
 	  sample = 0;
 	  m_zero_count -= 1;
 	}
-	else if(m_dac_index != 128) {// the rest here
+	else if(m_dac_index != 128) {
 	    short v = m_dac[m_dac_index];
-	    //	    int pp = m_pitch_pos;
-	    if (pp==m_pitch)
+
+	    u8 val=_selx*130.0f;
+	    MAXED(val,127);
+	    if (pp>=(64.0f*logpitch[val]))
 	      {
 		pp=0;
 		m_dac_index++;
@@ -686,13 +667,49 @@ int16_t digitalk_get_sample(){ // BREAK DOWN TO SINGLE SAMpLES - is done?
 	return sample;
 	}
 
+int16_t digitalk_get_sample(){ 
+  modus=0;
+  int16_t sample; static int pp;
+
+	if(m_zero_count == 0 && m_dac_index == 128)
+	  digitalker_step();
+
+	if(m_zero_count) {
+	  sample = 0;
+	  m_zero_count -= 1;
+	}
+	else if(m_dac_index != 128) {
+	    short v = m_dac[m_dac_index];
+
+	    u8 val=_selx*130.0f;
+	    MAXED(val,127);
+	    if (pp>=(m_pitch*logpitch[val]))
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
+	      sample=v;
+	      pp++;
+	      return sample;
+	    }
+	}
+	else {
+	  digitalk_newsay();
+	  sample=0;
+	}
+	return sample;
+	}
+
+#endif
+
 #ifdef LAP
  void main(int argc, char *argv[]){
    u8 x; int xx;
    digitalk_init();
    digitalk_newsayarg(atoi(argv[1]));
    while(1){
-     for (x=0;x<128;x++) {
+     for (x=0;x<32;x++) {
        xx=digitalk_get_sample_arg(atoi(argv[1]));
        //       printf("%d ",x);
      }
