@@ -2173,7 +2173,7 @@ void sam_bend(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)
    }
 }
 
-void sam_xy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+void sam_xy(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // pitch on x. speed on y
   TTS=0;
   static u8 triggered=0;
   u8 x=0,readpos;
@@ -2267,6 +2267,183 @@ void digitalker(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 siz
    }
 };
 
+// get_sample_sing -
+
+void digitalker_sing(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 triggered=0;
+  u8 xx=0,readpos;
+  float remainder;
+  samplespeed=samplespeed*32.0f;
+   if (samplespeed<=1){ 
+     while (xx<size){
+       doadc();
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=(digitalk_get_sample_sing());//<<6)-32768; 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[xx]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+       xx++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (xx<size){
+       doadc();
+       samplel=(digitalk_get_sample_sing());//<<6)-32768; 
+       if (samplepos>=samplespeed) {       
+	 outgoing[xx]=samplel;
+       if (incoming[xx]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[xx]<THRESHLOW && triggered) triggered=0;
+	 xx++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+     }
+   }
+};
+
+// get_sample_benddelta - exy to 32
+
+void digitalker_benddelta(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent nextent={31,33.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*nextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(digitalk_get_sample_benddelta(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*nextent.maxplus; 
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+
+       while (howmany==0)	 howmany=(digitalk_get_sample_benddelta(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+// get_sample_bendpitchvals - exy to 32
+
+void digitalker_bendpitchvals(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 parammode=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  static u8 howmany=0;
+  float remainder;
+  extent nextent={31,33.0f};
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*nextent.maxplus; 
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 while (howmany==0) howmany=(digitalk_get_sample_bendpitchvals(&samplel)); 
+	 howmany--;
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+       if (parammode==0){
+	 u8 xaxis=_sely*nextent.maxplus; 
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_selz;
+	      }
+
+       while (howmany==0)	 howmany=(digitalk_get_sample_bendpitchvals(&samplel)); 
+       howmany--;
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 parammode^=1;
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
+
 //////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
 u8 toggled=1;
@@ -2311,9 +2488,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker};
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker, digitalker_sing, digitalker_bendpitchvals, digitalker_benddelta};
   
-  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker // 
+  //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing,  // 
 
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 

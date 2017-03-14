@@ -6,6 +6,7 @@
 #ifndef LAP
 #include "audio.h"
 extern float _selx, _sely, _selz;
+extern float exy[64];
 #else
 #include "forlap.h"
 #endif
@@ -400,6 +401,104 @@ void digitalker_step_mode_0()
 	}
 }
 
+void digitalker_step_mode_0p()
+{
+	INT8 dac = 0;
+	int i, k, l;
+	UINT8 wpos = 0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+
+	u8 val=exy[pitch_id]*130.0f;
+	MAXED(val,127);
+	m_pitch = pitch_vals[pitch_id]*logpitch[val];
+
+	for(i=0; i<32; i++)
+		m_dac[wpos++] = 0;
+
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+			dac += delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=0; l--) {
+			dac -= delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	for(i=0; i<31; i++)
+		m_dac[wpos++] = 0;
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
+void digitalker_step_mode_0d()
+{
+	INT8 dac = 0;
+	int i, k, l;
+	UINT8 wpos = 0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+	m_pitch = pitch_vals[pitch_id];
+
+	for(i=0; i<32; i++)
+		m_dac[wpos++] = 0;
+
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+			MAXED(val,127);
+			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=0; l--) {
+		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+			MAXED(val,127);
+			dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	for(i=0; i<31; i++)
+		m_dac[wpos++] = 0;
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
+
 void digitalker_step_mode_1()
 {
   //	logerror("Digitalker mode 1 unsupported");
@@ -470,6 +569,143 @@ void digitalker_step_mode_2()
 	}
 }
 
+void digitalker_step_mode_2p()
+{
+	INT8 dac = 0;
+	int k, l;
+	UINT8 wpos=0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+
+	u8 val=exy[pitch_id]*130.0f;
+	MAXED(val,127);
+	m_pitch = pitch_vals[pitch_id]*logpitch[val];
+
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+			dac += delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+			dac -= delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=1; k != 9; k++) {
+		int start = k == 1 ? 1 : 0;
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=start; l<4; l++) {
+			dac += delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+			dac -= delta1[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
+void digitalker_step_mode_2d()
+{
+	INT8 dac = 0;
+	int k, l;
+	UINT8 wpos=0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+
+	m_pitch = pitch_vals[pitch_id];
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+			MAXED(val,127);
+			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=1; k != 9; k++) {
+		int start = k == 1 ? 1 : 0;
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=start; l<4; l++) {
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  MAXED(val,127);
+		  dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
 void digitalker_step_mode_3()
 {
 	UINT8 h = m_rom[m_apos];
@@ -508,6 +744,86 @@ void digitalker_step_mode_3()
 	}
 }
 
+void digitalker_step_mode_3p()
+{
+	UINT8 h = m_rom[m_apos];
+	UINT8 vol = h >> 5;
+	UINT16 bits;
+	UINT8 dac, apos, wpos;
+	int k, l;
+	u8 val=exy[h & 0x1f]*130.0f;
+	MAXED(val,127);
+	m_pitch = pitch_vals[h & 0x1f]*logpitch[val];
+
+	if(m_cur_segment == 0 && m_cur_repeat == 0) {
+		m_cur_bits = 0x40;
+		m_cur_dac = 0;
+	}
+	bits = m_cur_bits;
+	dac = 0;
+
+	apos = m_apos + 1 + 32*m_cur_segment;
+	wpos = 0;
+	for(k=0; k != 32; k++) {
+		bits |= m_rom[apos++] << 8;
+		for(l=0; l<4; l++) {
+			dac += delta2[(bits >> (6+2*l)) & 15];
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	m_cur_bits = bits;
+	m_cur_dac = dac;
+
+	m_cur_segment++;
+	if(m_cur_segment == m_segments) {
+		m_cur_segment = 0;
+		m_cur_repeat++;
+	}
+}
+
+void digitalker_step_mode_3d()
+{
+	UINT8 h = m_rom[m_apos];
+	UINT8 vol = h >> 5;
+	UINT16 bits;
+	UINT8 dac, apos, wpos;
+	int k, l;
+
+	m_pitch = pitch_vals[h & 0x1f];
+
+	if(m_cur_segment == 0 && m_cur_repeat == 0) {
+		m_cur_bits = 0x40;
+		m_cur_dac = 0;
+	}
+	bits = m_cur_bits;
+	dac = 0;
+
+	apos = m_apos + 1 + 32*m_cur_segment;
+	wpos = 0;
+	for(k=0; k != 32; k++) {
+		bits |= m_rom[apos++] << 8;
+		for(l=0; l<4; l++) {
+		  u8 val=exy[16+((bits >> (6+2*l)) & 15)]*130.0f;
+		  MAXED(val,127);
+		  dac += delta2[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	m_cur_bits = bits;
+	m_cur_dac = dac;
+
+	m_cur_segment++;
+	if(m_cur_segment == m_segments) {
+		m_cur_segment = 0;
+		m_cur_repeat++;
+	}
+}
+
+
 void digitalker_step()
 {
 	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
@@ -520,15 +836,17 @@ void digitalker_step()
 			m_apos = v2 | ((v3 << 8) & 0x3f00);
 			m_segments = (v1 & 15) + 1;
 			// try bend of m_repeats
-
+#ifndef LAP
 			u8 val=_sely*66.0f;
 			MAXED(val,63);
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 			if (modus==0){
 			m_repeats+=val;
 			}
-			else m_repeats=val+1;
-			
+			else if (modus==1) m_repeats=val+1; // modus is neither for any xy action such as table bends
+#else
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+#endif
 
 			m_mode = (v3 >> 6) & 3;
 			m_stop_after = (v1 & 0x80) != 0;
@@ -566,6 +884,103 @@ void digitalker_step()
 		m_dac_index = 0;
 }
 
+void digitalker_step_bendp()
+{
+	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
+		if(m_stop_after == 0 && m_bpos == 0xffff)
+			return;
+		if(m_stop_after == 0) {
+			UINT8 v1 = m_rom[m_bpos++];
+			UINT8 v2 = m_rom[m_bpos++];
+			UINT8 v3 = m_rom[m_bpos++];
+			m_apos = v2 | ((v3 << 8) & 0x3f00);
+			m_segments = (v1 & 15) + 1;
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+			m_mode = (v3 >> 6) & 3;
+			m_stop_after = (v1 & 0x80) != 0;
+
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+
+			if(!m_apos) {
+				m_zero_count = 40*128*m_segments*m_repeats;
+				m_segments = 0;
+				m_repeats = 0;
+				return;
+			}
+		} else if(m_stop_after == 1) {
+			m_bpos = 0xffff;
+			m_zero_count = 81920;
+			m_stop_after = 2;
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+			m_segments = 0;
+			m_repeats = 0;
+		} else {
+			m_stop_after = 0;
+			//			digitalker_set_intr(1);
+		}
+	}
+
+	switch(m_mode) {
+	case 0: digitalker_step_mode_0p(); break;
+	case 1: digitalker_step_mode_1(); break;
+	case 2: digitalker_step_mode_2p(); break;
+	case 3: digitalker_step_mode_3p(); break;
+	}
+	if(!m_zero_count)
+		m_dac_index = 0;
+}
+
+void digitalker_step_bendd()
+{
+	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
+		if(m_stop_after == 0 && m_bpos == 0xffff)
+			return;
+		if(m_stop_after == 0) {
+			UINT8 v1 = m_rom[m_bpos++];
+			UINT8 v2 = m_rom[m_bpos++];
+			UINT8 v3 = m_rom[m_bpos++];
+			m_apos = v2 | ((v3 << 8) & 0x3f00);
+			m_segments = (v1 & 15) + 1;
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+			m_mode = (v3 >> 6) & 3;
+			m_stop_after = (v1 & 0x80) != 0;
+
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+
+			if(!m_apos) {
+				m_zero_count = 40*128*m_segments*m_repeats;
+				m_segments = 0;
+				m_repeats = 0;
+				return;
+			}
+		} else if(m_stop_after == 1) {
+			m_bpos = 0xffff;
+			m_zero_count = 81920;
+			m_stop_after = 2;
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+			m_segments = 0;
+			m_repeats = 0;
+		} else {
+			m_stop_after = 0;
+			//			digitalker_set_intr(1);
+		}
+	}
+
+	switch(m_mode) {
+	case 0: digitalker_step_mode_0d(); break;
+	case 1: digitalker_step_mode_1(); break;
+	case 2: digitalker_step_mode_2d(); break;
+	case 3: digitalker_step_mode_3d(); break;
+	}
+	if(!m_zero_count)
+		m_dac_index = 0;
+}
+
+
 
 void digitalk_init(void){
   m_rom=m_rom_SSR1; // TODO: where we set our m_rom
@@ -588,6 +1003,7 @@ void digitalk_newsay(){
 #endif
   digitalker_start_command(which);
 }
+
 
 #ifdef LAP
 void digitalk_newsayarg(int which){
@@ -633,6 +1049,7 @@ int16_t digitalk_get_sample_arg(int val){ // BREAK DOWN TO SINGLE SAMpLES - is d
 #endif
 
 #ifndef LAP
+
 int16_t digitalk_get_sample_sing(){ 
   modus=1;
   int16_t sample; static int pp;
@@ -666,6 +1083,7 @@ int16_t digitalk_get_sample_sing(){
 	}
 	return sample;
 	}
+
 
 int16_t digitalk_get_sample(){ 
   modus=0;
@@ -701,6 +1119,68 @@ int16_t digitalk_get_sample(){
 	return sample;
 	}
 
+int16_t digitalk_get_sample_benddelta(){ 
+  modus=0; // no changes
+  int16_t sample; static int pp;
+
+	if(m_zero_count == 0 && m_dac_index == 128)
+	  digitalker_step_bendd();
+
+	if(m_zero_count) {
+	  sample = 0;
+	  m_zero_count -= 1;
+	}
+	else if(m_dac_index != 128) {
+	    short v = m_dac[m_dac_index];
+	    if (pp==m_pitch)
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
+	      sample=v;
+	      pp++;
+	      return sample;
+	    }
+	}
+	else {
+	  digitalk_newsay();
+	  sample=0;
+	}
+	return sample;
+	}
+
+int16_t digitalk_get_sample_bendpitchvals(){ 
+  modus=0; // no changes
+  int16_t sample; static int pp;
+
+	if(m_zero_count == 0 && m_dac_index == 128)
+	  digitalker_step_bendp();
+
+	if(m_zero_count) {
+	  sample = 0;
+	  m_zero_count -= 1;
+	}
+	else if(m_dac_index != 128) {
+	    short v = m_dac[m_dac_index];
+	    if (pp==m_pitch)
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
+	      sample=v;
+	      pp++;
+	      return sample;
+	    }
+	}
+	else {
+	  digitalk_newsay();
+	  sample=0;
+	}
+	return sample;
+	}
+
 #endif
 
 #ifdef LAP
@@ -711,9 +1191,8 @@ int16_t digitalk_get_sample(){
    while(1){
      for (x=0;x<32;x++) {
        xx=digitalk_get_sample_arg(atoi(argv[1]));
-       //       printf("%d ",x);
-     }
-         printf("%c",(xx+2048)>>5);
+    }
+     //         printf("%c",(xx+2048)>>5);
     //	  printf("%d\n",xx+2048);
    }
    }

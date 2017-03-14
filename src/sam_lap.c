@@ -135,7 +135,7 @@ int sam_init(){
 
 // we need to re-init if triggered
 // sam_newsay
-const char* phoneme_list[55]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; 
+const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; 
 
 
 
@@ -173,7 +173,7 @@ static int index=0;
       strcat(teststring,phoneme_list[(unsigned char)(inde)]);
       //    strcat(teststring,phoneme_list[x]);
     }
-        if (inde++ == 56) inde=0;
+        if (inde++ >= 55) inde=0;
     strcat(teststring,".\x9b");
     strcpy(input,teststring);
     fprintf(stderr,"inde: %d\n", inde);

@@ -899,9 +899,9 @@ SAM:
 
 DIGI:
 
-- digitalker changed so skips one sample at end of get_sample - needs clean up // and changed pitch and selz for vocab
+- digitalker changed so skips one sample at end of get_sample - needs clean upDONE // and changed pitch and selz for vocab
 
-- watch speed 
+- watch speed DONE
 
 ** 13/3
 
@@ -912,9 +912,8 @@ DIGI:
 
 *** SAM
 
-- working on sam.c, render.c. List of modes to work on/seperate out in sam.c - FIRST DONE, TO TEST, then break out rest of modes
-
-
+- working on sam.c, render.c. List of modes to work on/seperate out in
+  sam.c - FIRST DONE, TO TEST, then break out rest of modesBELOW
 
 - render.c -> 	//	k=5; /// ????? TODO - in our out?
 
@@ -930,7 +929,7 @@ DIGI:
   exy) - BREAKING out - To TEST and then implement - now just in mode
   0 - seems to work DONE
 
-** 14/3 TODO
+** 14/3
 
 - test first SAM modeDONE, implement rest of modes:
 
@@ -947,7 +946,7 @@ DIGI:
 8-singing mode with constant pitch=selx there - modus=0 - just change pitch hereDONE
 
 ////
-6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3 DONE
+6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3 DONE samxy
 
 7- all x params as x/y axis with z as selected vocab - modus=8 DONE
 
@@ -958,21 +957,31 @@ DIGI:
 - digitalker basic mode with bends=on pitch(which is speed) and repeats
 - new rom modes (say 3 modes) - sort vocab first
 
-- modes: basic pitch and speed ADDED, test (not bending - also check we have this for all modes so is a bit like singing)
+- modes: basic pitch and speed ADDED, tested (not bending but
+  straight - *also check we have this for all chipsets so is a bit
+  like singing = :CHECK tms, votrax, sp0256*
 
-- TODO: table bends: pcm_levels (64), delta1 and 2 (16+16), pitch_vals (32)
+- *TODO: table bends: delta1 and 2 (16+16), pitch_vals (32) - DONE to test in audio.c with singmode*
 
-- digitalker - added new roms to sort = length of vocabs and how these are addressed
+- *digitalker - added new roms to sort = length of vocabs and how these are addressed*
+
+- *add roms for each new mode in newsay*
 
 // so 3 roms with x/y bend as is, 3 roms with straightest, 1 rom with each set of bends on xy = 9 modes
 
-*** general
+
+** 15/3 
+
+- if other modes table bends should be with pitchlog (try in digitalker)
+
+- all modes so far as above
+
+- SAM selected vocab
 
 - start on Klatt - define all klatt sub-types (eg. nvp, simpleklatt, TTS there etc.)
 
 *- NOTE: what needs to be done for cleaning up/final touches: TMS roms
 all included and set up, take care of changemode triggering!*
-
 
 * TTS 
 
@@ -1139,8 +1148,6 @@ wavetable as in raven, generators eg. pulse, square, and original
 4. votrax -> TTS, phonemes, vocab is roms, raw
 5. SAM -> TTS, vocab(ported already) - see sam.c for modes
 
-////test all above - say 35 modes
-
 3. digitalker - 3 roms - to detail how much vocab we have
 
 bends if any=pitch _and_ repeats/zero_count, also possible bend of any
@@ -1154,13 +1161,15 @@ what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
 
 6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
 
+fullklatt/simpleklatt/nvp
+
 10. tube and ntube/glottal/wavetable and wormed tubes 
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example. compost as //wormed// wavetable. speed in middle - left-backwards/right-forwards
 
-/////end this week
+/////////////////end this week
 
 13. worming of all XY modes above
 
