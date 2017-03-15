@@ -843,7 +843,7 @@ void digitalker_step()
 			if (modus==0){
 			m_repeats+=val;
 			}
-			else if (modus==1) m_repeats=val+1; // modus is neither for any xy action such as table bends
+			else if (modus==1) m_repeats=val; // modus is neither for any xy action such as table bends
 #else
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 #endif
@@ -1120,7 +1120,7 @@ int16_t digitalk_get_sample(){
 	}
 
 int16_t digitalk_get_sample_benddelta(){ 
-  modus=0; // no changes
+  modus=1; // no changes
   int16_t sample; static int pp;
 
 	if(m_zero_count == 0 && m_dac_index == 128)
@@ -1151,12 +1151,12 @@ int16_t digitalk_get_sample_benddelta(){
 	}
 
 int16_t digitalk_get_sample_bendpitchvals(){ 
-  modus=0; // no changes
+  modus=1; // no changes
   int16_t sample; static int pp;
 
 	if(m_zero_count == 0 && m_dac_index == 128)
+	  //	  digitalker_step();
 	  digitalker_step_bendp();
-
 	if(m_zero_count) {
 	  sample = 0;
 	  m_zero_count -= 1;

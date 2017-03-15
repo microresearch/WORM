@@ -1,3 +1,194 @@
+// from simpleklatt
+
+
+ for (y=0;y<40;y++){ // init frame
+   //        frame[y]=simpleklattset.val[y];
+	dir[y]=rand()%3;
+	}
+
+void generate_new_frame(int16_t* frame){
+unsigned char y;
+// put frame together from wormings
+
+    for (y=0;y<40;y++){
+
+      // direction change 0,1-back,2-forwards
+      switch(dir[y]){
+      case 0:
+	// no change
+	break;
+      case 1:
+	// forwards
+	val[y]+=rand()%((maxs[y]-mins[y])/10); // later do as table
+	if (val[y]>maxs[y]) dir[y]=2;
+	break;
+      case 2:
+	// backwards
+	val[y]-=rand()%((maxs[y]-mins[y])/10); // later do as table
+	if (val[y]<mins[y]) dir[y]=1;
+	break;
+      }
+//	printf("%d ",val[y]);
+// we need to fill frame parameters:
+
+//      frame=val;
+      // copy it:
+      frame[y]=val[y];
+      
+      }
+      }
+// these are constraints see klatt_params - TODO as a struct - in progress
+
+// ref here:
+
+int16_t val[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
+
+
+static wormedparamset simpleklattset={40,
+    {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60},
+    {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0},
+{4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60}
+  };
+
+wormy* straightwormy;
+
+
+/////
+/*
+void dosimpleklatt(void){
+unsigned char y;
+// put frame together from wormings
+
+    for (y=0;y<40;y++){
+
+      // direction change 0,1-back,2-forwards
+      switch(dir[y]){
+      case 0:
+	// no change
+	break;
+      case 1:
+	// forwards
+	val[y]+=rand()%((maxs[y]-mins[y])/10); // later do as table
+	if (val[y]>maxs[y]) dir[y]=2;
+	break;
+      case 2:
+	// backwards
+	val[y]-=rand()%((maxs[y]-mins[y])/10); // later do as table
+	if (val[y]<mins[y]) dir[y]=1;
+	break;
+      }
+//	printf("%d ",val[y]);
+// we need to fill frame parameters:
+
+//*framepointers[y]=val[y];
+  }
+
+// what does output point to?
+
+//simple_parwave(globals, frame);
+
+}
+*/
+
+
+
+void dosimpleklattsamples(int16_t* outgoing, u8 size){
+  u8 x=0;
+  static short samplenumber=0;
+  static u8 newframe=1;
+  while(x<size){
+ 
+    // is it a new frame? - generate new frame
+    if (newframe==1){
+            generate_worm_frame();
+      //                  generate_new_frame(frame);
+    }
+
+    single_parwave(globals,simpleklattset.val,newframe,samplenumber,x,outgoing);
+    //    outgoing[x]=rand()%32768;
+
+    if (newframe==1) newframe=0;
+    x++;
+    samplenumber++;
+    if (samplenumber>globals->nspfr) { // greater than what???? 
+      // end of frame so...????
+      newframe=1;
+      samplenumber=0;
+  }
+  }
+}
+
+
+
+
+void generate_worm_frame(){
+  // there is both speed of the worm and how many times we run frame per worm
+  // eg.
+
+  for (int16_t x=0;x<adc_buffer[SPEED]>>4; x++){
+  wormvaluedint(&simpleklattset,straightwormy, 1.0, 0, 0, 10); // paramset, worm, speed/float, offsetx/float, offsety/float, wormparam
+  }
+}
+
+
+
+// get_sample_benddelta - exy to 32
+
+void digitalker_benddelta(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  TTS=0;
+  static u8 triggered=0;
+  u8 x=0,readpos;
+  float remainder;
+  extent nextent={31,33.0f};
+  samplespeed=samplespeed*32.0f;
+
+   if (samplespeed<=1){ 
+     while (x<size){
+       doadc();
+	 u8 xaxis=_selx*nextent.maxplus; //0-16 for r, but now 14 params 0-13
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_sely;
+       if (samplepos>=1.0f) {
+	 lastval=samplel;
+	 samplel=(digitalk_get_sample_benddelta());//<<6)-32768; 
+	 samplepos-=1.0f;
+       }
+       remainder=samplepos; 
+       outgoing[x]=(lastval*(1-remainder))+(samplel*remainder); 
+       if (incoming[x]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+
+       x++;
+       samplepos+=samplespeed;
+     }
+   }
+   else { 
+     while (x<size){
+       doadc();
+	 u8 xaxis=_selx*nextent.maxplus; 
+	 MAXED(xaxis,nextent.max);
+	 xaxis=nextent.max-xaxis;
+	 exy[xaxis]=_sely;
+	 samplel=(digitalk_get_sample_benddelta());//<<6)-32768; 
+       if (samplepos>=samplespeed) {       
+	 outgoing[x]=samplel;
+       if (incoming[x]>THRESH && !triggered) {
+	 digitalk_newsay(); // selector is in newsay
+	 triggered=1;
+	   }
+       if (incoming[x]<THRESHLOW && triggered) triggered=0;
+	 x++;
+	 samplepos-=samplespeed;
+       }
+       samplepos+=1.0f;
+       }
+   }
+}
+
 //sam.h
 
 //char input[]={"/HAALAOAO MAYN NAAMAEAE IHSTT SAEBAASTTIHAAN \x9b\x9b\0"};

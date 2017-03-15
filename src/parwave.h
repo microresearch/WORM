@@ -117,4 +117,9 @@ void simpleklatt_init(void);
 void single_parwave(klatt_global_ptrr globals, int16_t* frame, u8 newframe, u16 samplenumber,u8 x, int16_t* outgoing);
 void dosimpleklattsamples(int16_t* outgoing, u8 size);
 void frame_init(klatt_global_ptrr globals, int16_t* frame);
+void flutter(klatt_global_ptrr,int16_t*);
+
+int16_t single_single_parwave(klatt_global_ptrr globals, int16_t *frame);
+void simpleklatt_newsay();
+int16_t simpleklatt_get_sample();
 #endif

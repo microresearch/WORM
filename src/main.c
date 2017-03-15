@@ -13,11 +13,7 @@
 #include "i2s.h"
 #include "adc.h"
 #include "audio.h"
-#include "mdavocoder.h"
-#include "vocode.h"
-#include "biquad.h"
 #include "effect.h"
-#include "PV_vocoder.h"
 #include "say.h"
 #include "klatt_phoneme.h"
 #include "nsynth.h"
@@ -34,6 +30,7 @@
 #include "wavetables.h"
 #include "worming.h"
 #include "vot.h"
+#include "parwave.h"
 
 //#include "raven.h"
 
@@ -85,6 +82,8 @@ void main(void)
   sam_init(); 
   sam_newsay_banks0(); // TEST!
   digitalk_init();
+  simpleklatt_init();
+   simpleklatt_newsay();
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 

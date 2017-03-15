@@ -1,14 +1,11 @@
 /* from docs/klatt simple klatt */
 
-// testing now with worming interface!
-
 #include "audio.h"
 #include "stdlib.h"
 #include "stdint.h"
 #include <stdio.h>
 #include "parwave.h"
 #include "worming.h"
-
 
 /* for default sampled glottal excitation waveform */
 
@@ -26,8 +23,8 @@
   flag raw_flag;
   flag raw_type;
 
-//  static int16_t frame[40];
-extern __IO uint16_t adc_buffer[10];
+static int16_t frame[40];
+extern float exy[64];
 
 
   static const int16_t natural_samples[NUMBER_OF_SAMPLES]=
@@ -41,32 +38,20 @@ extern __IO uint16_t adc_buffer[10];
     -1891,-1045,-1600,-1462,-1384,-1261,-949,-730
   };
 
-// these are constraints see klatt_params - TODO as a struct - in progress
 
-// ref here:
-
-
-
-int16_t val[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 int16_t mins[40]= {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
+
 int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
-int16_t dir[40]= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int16_t range[40]={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
 
+klatt_global_tt globale;
 
-static wormedparamset simpleklattset={40,
-    {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60},
-    {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0},
-{4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60}
-  };
-
-wormy* straightwormy;
 
 void simpleklatt_init(void){
 
   //  straightwormy=addworm(10.0f,10.0f,100.0f, 100.0f, straightworm);
 
-  klatt_global_tt globale;
   globals=&globale;
 
   //  globals = (klatt_global_ptrr)malloc(sizeof(klatt_global_tt));
@@ -80,128 +65,49 @@ void simpleklatt_init(void){
  globals->natural_samples = natural_samples;
  globals->num_samples = NUMBER_OF_SAMPLES;
 //  globals->sample_factor = (float) SAMPLE_FACTOR;
-  nmspf_def = 10;
+ nmspf_def = 10;
   globals->nfcascade = 0;
   globals->f0_flutter = 0;
 
 unsigned char y;
 
- for (y=0;y<40;y++){ // init frame
-   //        frame[y]=simpleklattset.val[y];
-	dir[y]=rand()%3;
-	}
-
-
 // or this could be 32 for audio.c frame
 
-globals->nspfr = (globals->samrate * nmspf_def) / 1000; // number of samples per frame = 320000 /1000 = 320
+ globals->nspfr = (globals->samrate * nmspf_def) / 100; // was / 1000// number of samples per frame = 320000 /1000 = 320
 simple_parwave_init(globals);
 }
 
-void generate_worm_frame(){
-  // there is both speed of the worm and how many times we run frame per worm
-  // eg.
-
-  for (int16_t x=0;x<adc_buffer[SPEED]>>4; x++){
-  wormvaluedint(&simpleklattset,straightwormy, 1.0, 0, 0, 10); // paramset, worm, speed/float, offsetx/float, offsety/float, wormparam
-  }
-}
-
-
-void generate_new_frame(int16_t* frame){
+void generate_exy_frame(int16_t* frame){
 unsigned char y;
-// put frame together from wormings
 
     for (y=0;y<40;y++){
-
-      // direction change 0,1-back,2-forwards
-      switch(dir[y]){
-      case 0:
-	// no change
-	break;
-      case 1:
-	// forwards
-	val[y]+=rand()%((maxs[y]-mins[y])/10); // later do as table
-	if (val[y]>maxs[y]) dir[y]=2;
-	break;
-      case 2:
-	// backwards
-	val[y]-=rand()%((maxs[y]-mins[y])/10); // later do as table
-	if (val[y]<mins[y]) dir[y]=1;
-	break;
-      }
-//	printf("%d ",val[y]);
-// we need to fill frame parameters:
-
-//      frame=val;
-      // copy it:
-      frame[y]=val[y];
-      
-      }
-
-      }
-
-void dosimpleklattsamples(int16_t* outgoing, u8 size){
-  u8 x=0;
-  static short samplenumber=0;
-  static u8 newframe=1;
-  while(x<size){
- 
-    // is it a new frame? - generate new frame
-    if (newframe==1){
-            generate_worm_frame();
-      //                  generate_new_frame(frame);
+      frame[y]=mins[y] + (range[y]*(1.0f-exy[y])); // TODO: floated loggy!
     }
-
-    single_parwave(globals,simpleklattset.val,newframe,samplenumber,x,outgoing);
-    //    outgoing[x]=rand()%32768;
-
-    if (newframe==1) newframe=0;
-    x++;
-    samplenumber++;
-    if (samplenumber>globals->nspfr) { // greater than what????
-      // end of frame so...????
-      newframe=1;
-      samplenumber=0;
-  }
-  }
-}
-
-
-
-/////
-/*
-void dosimpleklatt(void){
-unsigned char y;
-// put frame together from wormings
-
-    for (y=0;y<40;y++){
-
-      // direction change 0,1-back,2-forwards
-      switch(dir[y]){
-      case 0:
-	// no change
-	break;
-      case 1:
-	// forwards
-	val[y]+=rand()%((maxs[y]-mins[y])/10); // later do as table
-	if (val[y]>maxs[y]) dir[y]=2;
-	break;
-      case 2:
-	// backwards
-	val[y]-=rand()%((maxs[y]-mins[y])/10); // later do as table
-	if (val[y]<mins[y]) dir[y]=1;
-	break;
       }
-//	printf("%d ",val[y]);
-// we need to fill frame parameters:
 
-//*framepointers[y]=val[y];
-  }
+int16_t simpleklatt_get_sample(){
+  u8 x=0;
+  static int16_t samplenumber=0;
+  int16_t sampel;
 
-// what does output point to?
+  sampel=single_single_parwave(globals, frame);
 
-//simple_parwave(globals, frame);
-
+  samplenumber++;
+  if (samplenumber>globals->nspfr) { // greater than what???? 320 samples - this can be our selz
+      // end of frame so...????
+    samplenumber=0;
+    simpleklatt_newsay();
+    }
+    return sampel;
 }
-*/
+
+void simpleklatt_newsay(){
+  // generate the frame from our exy -> frame
+  generate_exy_frame(frame);
+  frame_init(globals,frame); 
+    if (globals->f0_flutter != 0)
+      flutter(globals,frame);  
+    globals->ns=0;
+}
+
+

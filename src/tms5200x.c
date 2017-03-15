@@ -11,6 +11,7 @@
 
 extern float _selx, _sely, _selz;
 extern float exy[64];
+static u8 modus=0;
 
 const u8 koffset[10]={0, 32, 64, 80, 96, 112, 128, 144, 152, 160};
 
@@ -1016,8 +1017,13 @@ int16_t process(u8 *ending)
 		val=_selx*130.0f;
 		MAXED(val,127);
 		//		val=127-val;
-
-		if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; // TEST - pitch bend
+		if (modus==0){
+		  if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; //  - pitch bend
+		}
+		else
+		  {
+		    if (m_pitch_count >= (64.0f*logpitch[val])) m_pitch_count = 0; //  - pitch bend
+		  }
 		m_pitch_count &= 0x1FF;
 	return sample;
 }
@@ -1196,12 +1202,27 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never z			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
-			// 168 in total
-			for (i = 0; i < 4; i++) // this is more complex as each line of ktable has different length
-			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
-			for (i = 4; i < m_coeff->num_k; i++)
-			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
+			// TODO as LOG
+			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK
+			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			MAXED(val,127);
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
+
+			// LOGGY - TEST!
+			for (i = 0; i < 4; i++) {
+			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*130.0f;
+			MAXED(val,127);
+			//			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
+			m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*logpitch[val];
+			}
+			for (i = 4; i < m_coeff->num_k; i++){
+			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*130.0f;
+			  MAXED(val,127);
+			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(1-zpar) * logpitch[val];
+
+
+			  //			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
+			}
 
 			if (m_talk_status == 0)
 			{
@@ -1333,7 +1354,13 @@ int16_t process_pitchk_tabled5200(u8 *ending) // for 5100 we have 32+168 in exy=
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never z			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+			// TODO: loggy
+
+			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			MAXED(val,127);
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
+
+			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never z			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			// 168 in total
 			for (i = 0; i < 4; i++)
 			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[64+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
@@ -1471,7 +1498,12 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never zero
+			// TODO: loggy
+			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never zero
+			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			MAXED(val,127);
+			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
+
 			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
 			for (i = 0; i < 4; i++)
 				m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]];
@@ -2990,7 +3022,12 @@ int16_t process2bends(u8 *ending)
 		//		if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
 		val=_selx*130.0f;
 		MAXED(val,127);
-		if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; // TEST - pitch bend
+		if (modus==0){
+		  if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; // - pitch bend
+		}
+		else {
+		  if (m_pitch_count >= (64.0f*logpitch[val])) m_pitch_count = 0; // - pitch bend
+		}
 		m_pitch_count &= 0x1FF;
 	return sample;
 }
@@ -3165,6 +3202,7 @@ void tms_newsay_specific(u8 whichbank){
 ///// get_samples
 
 int16_t tms_get_sample_allphon(){
+  modus=0;
   int16_t sample; u8 ending=0;
   sample=  process2bends(&ending);// TODO - expand for other vocabs
   if (ending==1){
@@ -3173,8 +3211,30 @@ int16_t tms_get_sample_allphon(){
   return sample;
 }
 
+int16_t tms_get_sample_allphon_sing(){
+  modus=1;
+  int16_t sample; u8 ending=0;
+  sample=  process2bends(&ending);// TODO - expand for other vocabs
+  if (ending==1){
+    tms_newsay_allphon();
+  }
+  return sample;
+}
+
+
 int16_t tms_get_sample(){
   int16_t sample; u8 ending=0;
+  modus=0;
+  sample=  process(&ending);
+  if (ending==1){
+    tms_newsay();
+  }
+  return sample;
+}
+
+int16_t tms_get_sample_sing(){
+  int16_t sample; u8 ending=0;
+  modus=1;
   sample=  process(&ending);
   if (ending==1){
     tms_newsay();
@@ -3183,6 +3243,7 @@ int16_t tms_get_sample(){
 }
 
 int16_t tms_get_sample_lowbit(){
+  modus=0;
   int16_t sample; u8 ending=0;
   sample=  process(&ending);
   if (ending==1){
@@ -3193,6 +3254,7 @@ int16_t tms_get_sample_lowbit(){
 
 
 int16_t tms_get_sample_TTS(){
+  modus=0;
   int16_t sample; u8 ending=0;
   sample=  process(&ending);
   if (ending==1){
@@ -3202,6 +3264,7 @@ int16_t tms_get_sample_TTS(){
 }
 
 int16_t tms_get_sample_bendlength(){
+  modus=0;
   int16_t sample; u8 ending=0;
   sample=  processbendlength(&ending);
   if (ending==1){
@@ -3211,6 +3274,7 @@ int16_t tms_get_sample_bendlength(){
 }
 
 int16_t tms_get_sample_raw5100(){
+  modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample;
   sample=  process5100raw();
@@ -3218,6 +3282,7 @@ int16_t tms_get_sample_raw5100(){
 }
 
 int16_t tms_get_sample_raw5200(){
+  modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; 
   sample=  process5200raw();
@@ -3225,6 +3290,7 @@ int16_t tms_get_sample_raw5200(){
 }
 
 int16_t tms_get_sample_raw5220(){
+  modus=0;
   m_coeff=&tms5220_coeff;
   int16_t sample; 
   sample=  process5200raw();
@@ -3234,6 +3300,7 @@ int16_t tms_get_sample_raw5220(){
 //// bends and vocab selection
 
 int16_t tms_get_sample_bend5100(u8 fix){// for a 5100 vocab such as 0 to begin with
+  modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample=processbend5100(&ending);
@@ -3245,6 +3312,7 @@ int16_t tms_get_sample_bend5100(u8 fix){// for a 5100 vocab such as 0 to begin w
 }
 
 int16_t tms_get_sample_bend5200(u8 fix){ // for allphons - TODO - other fixed vocabs
+  modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample=processbend5200(&ending);
@@ -3255,6 +3323,7 @@ int16_t tms_get_sample_bend5200(u8 fix){ // for allphons - TODO - other fixed vo
 }
 
 int16_t tms_get_sample_5100pitchtable(u8 fix){  /// additional vocabs as extra functions - which ones?
+  modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
@@ -3265,6 +3334,7 @@ int16_t tms_get_sample_5100pitchtable(u8 fix){  /// additional vocabs as extra f
 }
 
 int16_t tms_get_sample_5200pitchtable(u8 fix){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c
+  modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
@@ -3275,6 +3345,7 @@ int16_t tms_get_sample_5200pitchtable(u8 fix){ // for allphons and also one more
 }
   
 int16_t tms_get_sample_5100ktable(u8 fix){  /// additional vocabs as extra functions - which ones?
+  modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
@@ -3285,6 +3356,7 @@ int16_t tms_get_sample_5100ktable(u8 fix){  /// additional vocabs as extra funct
 }
 
 int16_t tms_get_sample_5200ktable(u8 fix){ // for allphons and also one more - is just a coeff change
+  modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
@@ -3295,6 +3367,7 @@ int16_t tms_get_sample_5200ktable(u8 fix){ // for allphons and also one more - i
 }
 
 int16_t tms_get_sample_5100kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
+  modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5100(&ending);
@@ -3305,6 +3378,7 @@ int16_t tms_get_sample_5100kandpitchtable(u8 fix){ //bend pitchtable AND ktable 
 }
 
 int16_t tms_get_sample_5200kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
+  modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5200(&ending);

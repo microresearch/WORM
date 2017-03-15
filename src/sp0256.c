@@ -46,7 +46,7 @@
 extern float _selx, _sely, _selz, _mode, _speed;
 extern u8 TTS;
 const unsigned char *m_romm;
-
+static u8 modus=0;
 
 typedef unsigned char UINT8;
 typedef signed char INT8;
@@ -216,7 +216,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		{
 		  val=_selx*130.0f;
 		  MAXED(val,127);
-		  		  f->per=f->per_orig*logpitch[val];
+		  if (modus==0)	f->per=f->per_orig*logpitch[val];
+		  else f->per=64.0f*logpitch[val];
 		  //	  f->per=f->per_orig;
 			if (f->cnt <= 0)
 			{
@@ -987,8 +988,8 @@ void micro()
 			  if (TTS==0) {
 			    val = (_sely*130.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
-			    repeat=((float)(repeat)*logpitch[val]);
-
+			    if (modus==0) repeat=((float)(repeat)*logpitch[val]);
+			    else repeat=8.0f*logpitch[val];
 			  }
 			  if (repeat<1) repeat=1;
 			  break;
@@ -1200,7 +1201,7 @@ void sp0256_newsay1219(void){
 
 int16_t sp0256_get_sample(void){
   static int16_t output; 
-   
+  modus=0;
       u8 howmany=0;
             while(howmany==0){ 
    
@@ -1214,9 +1215,27 @@ int16_t sp0256_get_sample(void){
    return output;
  }
 
+int16_t sp0256_get_sample_sing(void){
+  static int16_t output; 
+  modus=1; // singing
+   
+      u8 howmany=0;
+      while(howmany==0){ 
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsay();
+   }
+
+      micro();
+      howmany=lpc12_update(&m_filt, &output);
+          }
+   return output;
+ }
+
+
  int16_t sp0256_get_sampleTTS(void){
   static int16_t output; 
-   u8 howmany=0;
+   u8 howmany=0;   modus=0;
+
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
@@ -1232,7 +1251,9 @@ int16_t sp0256_get_sample(void){
 
  int16_t sp0256_get_samplevocabbankone(void){
   static int16_t output; 
-   u8 howmany=0;
+   u8 howmany=0;  
+modus=0;
+
    while(howmany==0){
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
@@ -1246,7 +1267,8 @@ int16_t sp0256_get_sample(void){
  }
 
  int16_t sp0256_get_samplevocabbanktwo(void){
-  static int16_t output; 
+  static int16_t output;   
+  modus=0;
    u8 howmany=0;
    while(howmany==0){
    

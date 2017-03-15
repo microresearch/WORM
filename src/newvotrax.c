@@ -54,6 +54,7 @@ extern char TTSinarray[17];
 static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
+static u8 modus=0;
 
 //this is from sc01a.bin:
 
@@ -467,12 +468,18 @@ void chip_update()
 	// tuning this DONE - TODO make exponential vot_pitch[]
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
 #ifdef LAP
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
+	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
 #else
 	u8 val=_selx*130.0f;
 	MAXED(val,127);
 	val=127-val;
+	if (modus==0){
 		if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+	}
+	else
+	  {
+	    if(m_pitch == (int)(0x7f ^ ((int)(64.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
+	  }
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
 #endif
 	// Filters are updated in index 1 of the pitch wave, which does
@@ -1148,11 +1155,24 @@ void votrax_newsay(){
   phone_commit();
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 }
 
+void votrax_newsay_sing(){
+  u8 sel=_selz*65.0f; 
+  MAXED(sel,64);
+  sel=64-sel;
+  writer(sel); // what are we writing - is ROM index
+  phone_commit();
+  u8 val=_sely*130.0f;
+  MAXED(val,127);
+  //  val=127-val;
+  lenny=(2*(2*4+1)*4*9+2)*logpitch[val]; 
+}
+
 int16_t votrax_get_sample(){ 
+  modus=0;
   uint16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1165,7 +1185,23 @@ int16_t votrax_get_sample(){
   return sample;
 }
 
+int16_t votrax_get_sample_sing(){ 
+  modus=1;
+  uint16_t sample; u8 x;
+  m_sample_count++;
+  if(m_sample_count & 1)
+    chip_update();
+  sample=analog_calc();
+  if (sample_count++>=lenny){
+    sample_count=0;
+    votrax_newsay();
+  }
+  return sample;
+}
+
+
 int16_t votrax_get_sample_rawparam(){ 
+  modus=0;
   uint16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1198,7 +1234,7 @@ void votrax_newsay_bend(u8 reset){
 
 int16_t votrax_get_sample_bend(){ 
   uint16_t sample; u8 x;
-  
+    modus=0;
   m_sample_count++;
   if(m_sample_count & 1){
     chip_update_bend();        
@@ -1233,7 +1269,7 @@ void votrax_newsaygorf(u8 reset){
   inflection_w(it>>6); 
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   }
   
@@ -1254,7 +1290,7 @@ void votrax_newsaywow(u8 reset){
   inflection_w(it>>6); // how many bits?
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 
   //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
@@ -1280,7 +1316,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
   inflection_w(it>>6); // how many bits?
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
   m_cclock = m_mainclock / 36.0f * logpitch[val]; 
 
@@ -1288,6 +1324,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
 
 int16_t votrax_get_samplegorf(){ 
   int16_t sample; u8 x;
+  modus=0;
 
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1303,6 +1340,7 @@ int16_t votrax_get_samplegorf(){
 
 int16_t votrax_get_samplewow_bendfilter(){ 
   int16_t sample; u8 x;
+  modus=0;
 
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1318,6 +1356,7 @@ int16_t votrax_get_samplewow_bendfilter(){
 
 int16_t votrax_get_samplewow(){ 
   int16_t sample; u8 x;
+  modus=0;
 
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1338,7 +1377,7 @@ void votrax_newsayTTS(){
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 
   TTSindex++;
@@ -1349,6 +1388,7 @@ void votrax_newsayTTS(){
 }
 
 int16_t votrax_get_sampleTTS(){ 
+  modus=0;
   int16_t sample; u8 x;
   m_sample_count++;
   if(m_sample_count & 1)
@@ -1369,7 +1409,7 @@ void votrax_retriggerTTS(){
   inflection_w(TTSoutarray[0]>>6); // how many bits?
   u8 val=_sely*130.0f;
   MAXED(val,127);
-  val=127-val;
+  //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   TTSindex=1;
 }

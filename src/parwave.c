@@ -34,7 +34,7 @@
 
 /* function prototypes for functions private to this file */
 
-static void flutter(klatt_global_ptrr,int16_t*);
+void flutter(klatt_global_ptrr,int16_t*);
 static float sampled_source(klatt_global_ptrr);
 static float impulsive_source(klatt_global_ptrr);
 static float natural_source(klatt_global_ptrr);
@@ -82,17 +82,17 @@ static float antiresonator(resonator_ptr r, float input)
   * slowly varying sine waves.
   */
 
-static void flutter(klatt_global_ptrr globals, int16_t* frame)
+void flutter(klatt_global_ptrr globals, int16_t* frame)
 {
   static int time_count;
-  double delta_f0;
-  double fla,flb,flc,fld,fle;
+  float delta_f0;
+  float fla,flb,flc,fld,fle;
 
-  fla = (double) globals->f0_flutter / 50;
-  flb = (double) globals->original_f0 / 100;
-  flc = sinf(2*M_PI*12.7*time_count);
-  fld = sinf(2*M_PI*7.1*time_count);
-  fle = sinf(2*M_PI*4.7*time_count);
+  fla = (float) globals->f0_flutter / 50;
+  flb = (float) globals->original_f0 / 100;
+  flc = sinf(2*M_PI*12.7f*time_count);
+  fld = sinf(2*M_PI*7.1f*time_count);
+  fle = sinf(2*M_PI*4.7f*time_count);
   delta_f0 =  fla * flb * (flc + fld + fle) * 10;
   frame[0] = frame[0] + (u16) delta_f0;
   time_count++;
@@ -304,17 +304,189 @@ void single_parwave(klatt_global_ptrr globals, int16_t *frame, u8 newframe, u16 
 
     out = resonator(&(globals->rout),out);
 
-    out = out * globals->amp_gain0;  /* Convert back to integer */
-
+    //    out = out * globals->amp_gain0;  /* Convert back to integer */
+    out = out * 32768.0f; // TODO - gain????
     if (out < -32767) out = -32767;
     if (out > 32767) out = 32767;
-    //    outgoing[x]=rand()%32768;
-
+   
     outgoing[x]=(int)out;
     //    outgoing[x]=(int)voice * globals->amp_gain0;
     //    outgoing[x]=(int)noise;
 
   globals->ns++;
+}
+
+
+int16_t single_single_parwave(klatt_global_ptrr globals, int16_t *frame){
+    float noise;
+    u8 n4;
+    float out = 0.0f;
+    float frics;
+    float glotout;
+    float aspiration;
+    float par_glotout;
+    float voice;
+    float sourc;
+    static float glotlast=0.0f;
+    static float vlast=0.0f;
+
+    /* Get low-passed random number for aspiration and frication noise */
+
+    noise = gen_noise(globals);
+
+    /*    
+      Amplitude modulate noise (reduce noise amplitude during
+      second half of glottal period) if voicing simultaneously present.
+    */
+
+    if (globals->nper > globals->nmod) 
+    {
+      noise *= (float) 0.5f;
+    }
+
+    /* Compute frication noise */
+
+    frics = globals->amp_frica * noise;
+
+    /*  
+      Compute voicing waveform. Run glottal source simulation at 4 
+      times normal sample rate to minimize quantization noise in 
+      period of female voice.
+    */
+
+    for (n4=0; n4<4; n4++) 
+    {
+      switch(globals->glsource)
+      {
+      case 1:
+	voice = impulsive_source(globals);
+	break;
+      case 2:
+	voice = natural_source(globals);	
+	break;
+      case 3:
+	voice = sampled_source(globals);
+	break;
+      }
+
+      /* Reset period when counter 'nper' reaches T0 */
+
+      if (globals->nper >= globals->T0) 
+      {
+	globals->nper = 0;
+	pitch_synch_par_reset(globals,frame);
+      }
+
+      /*        
+	Low-pass filter voicing waveform before downsampling from 4*samrate
+	to samrate samples/sec.  Resonator f=.09*samrate, bw=.06*samrate 
+      */
+
+      voice = resonator(&(globals->rlp),voice);
+
+      /* Increment counter that keeps track of 4*samrate samples per sec */
+
+      globals->nper++;
+    }
+
+    /*
+      Tilt spectrum of voicing source down by soft low-pass filtering, amount
+      of tilt determined by TLTdb
+    */
+
+
+    voice = (voice * globals->onemd) + (vlast * globals->decay);
+    vlast = voice;
+
+
+    /* 
+      Add breathiness during glottal open phase. Amount of breathiness 
+      determined by parameter Aturb Use nrand rather than noise because 
+      noise is low-passed. 
+    */
+
+
+    if (globals->nper < globals->nopen) 
+    {
+      voice += globals->amp_breth * globals->nrand;
+    }
+
+
+    /* Set amplitude of voicing */
+
+    glotout = globals->amp_voice * voice;
+    par_glotout = globals->par_amp_voice * voice;
+
+
+    /* Compute aspiration amplitude and add to voicing source */
+
+
+    aspiration = globals->amp_aspir * noise;
+    glotout += aspiration;
+  
+
+    par_glotout += aspiration;
+
+
+    if(globals->synthesis_model != 1) // paralllel
+    {
+      /*
+       * Cascade vocal tract, excited by laryngeal sources.
+       * Nasal antiresonator, then formants FNP, F5, F4, F3, F2, F1
+       */
+      float rnzout = antiresonator(&(globals->rnz),glotout);
+      float casc_next_in = resonator(&(globals->rnpc),rnzout);
+
+      switch (globals->nfcascade)
+      {
+      case 8:  casc_next_in = resonator(&(globals->r8c),casc_next_in);
+      case 7:  casc_next_in = resonator(&(globals->r7c),casc_next_in);
+      case 6:  casc_next_in = resonator(&(globals->r6c),casc_next_in);
+      case 5:  casc_next_in = resonator(&(globals->r5c),casc_next_in);
+      case 4:  casc_next_in = resonator(&(globals->r4c),casc_next_in);
+      case 3:  casc_next_in = resonator(&(globals->r3c),casc_next_in);
+      case 2:  casc_next_in = resonator(&(globals->r2c),casc_next_in);
+      case 1:  out          = resonator(&(globals->r1c),casc_next_in);
+      }
+    }
+
+    /* Excite parallel F1 and FNP by voicing waveform */
+
+    /*  
+      Standard parallel vocal tract Formants F6,F5,F4,F3,F2, 
+      outputs added with alternating sign. Sound sourc for other 
+      parallel resonators is frication plus first difference of 
+      voicing waveform. 
+    */
+
+    out += resonator(&(globals->r1p),par_glotout);
+    out += resonator(&(globals->rnpp),par_glotout);
+
+    sourc = frics + par_glotout - glotlast;
+    glotlast = par_glotout;
+
+    out = resonator(&(globals->r6p),sourc) - out;
+    out = resonator(&(globals->r5p),sourc) - out;
+    out = resonator(&(globals->r4p),sourc) - out;
+    out = resonator(&(globals->r3p),sourc) - out;
+    out = resonator(&(globals->r2p),sourc) - out;
+
+    out = globals->amp_bypas * sourc - out;
+
+    out = resonator(&(globals->rout),out);
+
+    out = out * globals->amp_gain0;  /* Convert back to integer */
+
+    if (out < -32767) out = -32767;
+    if (out > 32767) out = 32767;
+    //    out=rand()%32768;
+
+    //    outgoing[x]=(int)out;
+    //    outgoing[x]=(int)voice * globals->amp_gain0;
+    //    outgoing[x]=(int)noise;
+    
+  globals->ns++;
+  return (int)out;
 }
 
 
@@ -387,10 +559,10 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
     frame[1] = 0;
     }*/
 
-  globals->amp_aspir = DBtoLIN(frame[18]) * 0.05;
-  globals->amp_frica = DBtoLIN(frame[22]) * 0.25;
+  globals->amp_aspir = DBtoLIN(frame[18]) * 0.05f;
+  globals->amp_frica = DBtoLIN(frame[22]) * 0.25f;
   globals->par_amp_voice = DBtoLIN(frame[38]);
-  globals->amp_bypas = DBtoLIN(frame[37]) * 0.05;
+  globals->amp_bypas = DBtoLIN(frame[37]) * 0.05f;
   /*  frame[39] = frame[39] - 3;
   if (frame[39] <= 0) 
   {
@@ -436,23 +608,23 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
   /* Set coefficients of parallel resonators, and amplitude of outputs */
 
   setabc(frame[2],frame[25],&(globals->r1p),globals);
-  globals->r1p.a *= DBtoLIN(frame[24]) * 0.4;
+  globals->r1p.a *= DBtoLIN(frame[24]) * 0.4f;
   setabc(frame[16],frame[17],&(globals->rnpp),globals);
-  globals->rnpp.a *= DBtoLIN(frame[36]) * 0.6;
+  globals->rnpp.a *= DBtoLIN(frame[36]) * 0.6f;
   setabc(frame[4],frame[27],&(globals->r2p),globals);
-  globals->r2p.a *= DBtoLIN(frame[26]) * 0.15;
+  globals->r2p.a *= DBtoLIN(frame[26]) * 0.15f;
   setabc(frame[6],frame[29],&(globals->r3p),globals);
-  globals->r3p.a *= DBtoLIN(frame[28]) * 0.06;
+  globals->r3p.a *= DBtoLIN(frame[28]) * 0.06f;
   setabc(frame[8],frame[31],&(globals->r4p),globals);
-  globals->r4p.a *= DBtoLIN(frame[30]) * 0.04;
+  globals->r4p.a *= DBtoLIN(frame[30]) * 0.04f;
   setabc(frame[10],frame[33],&(globals->r5p),globals);
-  globals->r5p.a *= DBtoLIN(frame[32]) * 0.022;
+  globals->r5p.a *= DBtoLIN(frame[32]) * 0.022f;
   setabc(frame[12],frame[35],&(globals->r6p),globals);
-  globals->r6p.a *= DBtoLIN(frame[34]) * 0.03;
+  globals->r6p.a *= DBtoLIN(frame[34]) * 0.03f;
   
   /* output low-pass filter */
 
-  setabc((u16)0.0,(u16)(globals->samrate/2),&(globals->rout),globals);
+  setabc((u16)0.0f,(u16)(globals->samrate/2),&(globals->rout),globals);
 }
 
 /** @brief Generate the glottal waveform from an impulse source.
@@ -464,7 +636,7 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
   */
 static float impulsive_source(klatt_global_ptrr globals)
 {
-  static float doublet[] = {0.0,13000000.0,-13000000.0};
+  static float doublet[] = {0.0,13000000.0f,-13000000.0f};
   static float vwave;
 
   if (globals->nper < 3) 
@@ -473,7 +645,7 @@ static float impulsive_source(klatt_global_ptrr globals)
   }
   else 
   {
-    vwave = 0.0;
+    vwave = 0.0f;
   }
   
   return(resonator(&(globals->rgl),vwave));
@@ -494,14 +666,14 @@ static float natural_source(klatt_global_ptrr globals)
   {
     globals->pulse_shape_a -= globals->pulse_shape_b;
     vwave += globals->pulse_shape_a;
-    lgtemp=vwave * 0.028;
+    lgtemp=vwave * 0.028f;
 
     return(lgtemp);
   }
   else 
   {
-    vwave = 0.0;
-    return(0.0);
+    vwave = 0.0f;
+    return(0.0f);
   }
 }
 
@@ -577,7 +749,7 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
 
     /* Breathiness of voicing waveform */
 
-    globals->amp_breth = DBtoLIN(frame[20]) * 0.1;
+    globals->amp_breth = DBtoLIN(frame[20]) * 0.1f;
 
     /* Set open phase of glottal period where  40 <= open phase <= 263 */
 
@@ -608,7 +780,7 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
     /* Reset a & b, which determine shape of "natural" glottal waveform */
 
     globals->pulse_shape_b = B0[globals->nopen-40];
-    globals->pulse_shape_a = (globals->pulse_shape_b * globals->nopen) * 0.333;
+    globals->pulse_shape_a = (globals->pulse_shape_b * globals->nopen) * 0.333f;
 
     /* Reset width of "impulsive" glottal pulse */
 
@@ -618,7 +790,7 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
 
     /* Make gain at F1 about constant */
 
-    temp1 = globals->nopen *.00833;
+    temp1 = globals->nopen *.00833f;
     globals->rgl.a *= temp1 * temp1;
     
     /*
@@ -652,11 +824,11 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
   else 
   {
     globals->T0 = 4;                     /* Default for f0 undefined */
-    globals->amp_voice = 0.0;
+    globals->amp_voice = 0.0f;
     globals->nmod = globals->T0;
-    globals->amp_breth = 0.0;
-    globals->pulse_shape_a = 0.0;
-    globals->pulse_shape_b = 0.0;
+    globals->amp_breth = 0.0f;
+    globals->pulse_shape_a = 0.0f;
+    globals->pulse_shape_b = 0.0f;
   }
 
   /* Reset these pars pitch synchronously or at update rate if f0=0 */
@@ -665,15 +837,15 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
   {
     /* Set one-pole low-pass filter that tilts glottal source */
 
-    globals->decay = (0.033 * frame[21]);
+    globals->decay = (0.033f * frame[21]);
 
-    if (globals->decay > 0.0) 
+    if (globals->decay > 0.0f) 
     {
-      globals->onemd = 1.0 - globals->decay;
+      globals->onemd = 1.0f - globals->decay;
     }
     else 
     {
-      globals->onemd = 1.0;
+      globals->onemd = 1.0f;
     }
   }
 }
@@ -689,7 +861,7 @@ static void setabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr globals)
 
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * f) * 2.0;
+ rp->b = r * arm_cos_f32(2.0f * M_PI / globals->samrate * f) * 2.0f;
  rp->a = 1.0 - rp->b - rp->c;
 }
 
@@ -705,13 +877,13 @@ static void setzeroabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr global
  /* First compute ordinary resonator coefficients */
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * -f) * 2.0;
+ rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * -f) * 2.0f;
  rp->a = 1.0 - rp->b - rp->c;
 
  if (f != 0) /* prevent a', b' and c' going to INF! */
  {
   /* Now convert to antiresonator coefficients (a'=1/a, b'=b/a, c'=c/a) */
-  rp->a = 1.0 / rp->a;
+  rp->a = 1.0f / rp->a;
   rp->c *= -rp->a;
   rp->b *= -rp->a;
  }
@@ -732,7 +904,7 @@ static float gen_noise(klatt_global_ptrr globals)
   temp = (u16) getrandom(-8191,8191);
   globals->nrand = (u16) temp;
 
-  nlast = globals->nrand + (0.75 * nlast);
+  nlast = globals->nrand + (0.75f * nlast);
 
   return(nlast);
 }
@@ -757,15 +929,15 @@ static float DBtoLIN(u16 dB)
   float lgtemp;
   static const float amptable[88] = 
   {
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.0, 7.0,
-    8.0, 9.0, 10.0, 11.0, 13.0, 14.0, 16.0, 18.0, 20.0, 22.0, 25.0, 28.0, 32.0,
-    35.0, 40.0, 45.0, 51.0, 57.0, 64.0, 71.0, 80.0, 90.0, 101.0, 114.0, 128.0,
-    142.0, 159.0, 179.0, 202.0, 227.0, 256.0, 284.0, 318.0, 359.0, 405.0,
-    455.0, 512.0, 568.0, 638.0, 719.0, 811.0, 911.0, 1024.0, 1137.0, 1276.0,
-    1438.0, 1622.0, 1823.0, 2048.0, 2273.0, 2552.0, 2875.0, 3244.0, 3645.0, 
-    4096.0, 4547.0, 5104.0, 5751.0, 6488.0, 7291.0, 8192.0, 9093.0, 10207.0, 
-    11502.0, 12976.0, 14582.0, 16384.0, 18350.0, 20644.0, 23429.0,
-    26214.0, 29491.0, 32767
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 6.0f, 7.0f,
+    8.0f, 9.0f, 10.0f, 11.0f, 13.0f, 14.0f, 16.0f, 18.0f, 20.0f, 22.0f, 25.0f, 28.0f, 32.0f,
+    35.0f, 40.0f, 45.0f, 51.0f, 57.0f, 64.0f, 71.0f, 80.0f, 90.0f, 101.0f, 114.0f, 128.0f,
+    142.0f, 159.0f, 179.0f, 202.0f, 227.0f, 256.0f, 284.0f, 318.0f, 359.0f, 405.0f,
+    455.0f, 512.0f, 568.0f, 638.0f, 719.0f, 811.0f, 911.0f, 1024.0f, 1137.0f, 1276.0f,
+    1438.0f, 1622.0f, 1823.0f, 2048.0f, 2273.0f, 2552.0f, 2875.0f, 3244.0f, 3645.0f, 
+    4096.0f, 4547.0f, 5104.0f, 5751.0f, 6488.0f, 7291.0f, 8192.0f, 9093.0f, 10207.0f, 
+    11502.0f, 12976.0f, 14582.0f, 16384.0f, 18350.0f, 20644.0f, 23429.0f,
+    26214.0f, 29491.0f, 32767.0f
   };
 
   if ((dB < 0) || (dB > 87))
@@ -773,6 +945,6 @@ static float DBtoLIN(u16 dB)
       return(0);
   }            
 
-  lgtemp=amptable[dB] * .001;
+  lgtemp=amptable[dB] * .001f;
   return(lgtemp);
 }
