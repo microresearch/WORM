@@ -970,13 +970,11 @@ DIGI:
 // so 3 roms with x/y bend as is, 3 roms with straightest, 1 rom with each set of bends on xy = 9 modes
 
 
-** 15/3 
+** 15/3 +
 
 - if other modes table bends should be with pitchlog (try in digitalker)DONE
 
 - SAM selected vocab
-
-- start on Klatt - define all klatt sub-types (eg. nvp, simpleklatt, TTS there etc.)
 
 /////
 
@@ -994,23 +992,164 @@ DIGI:
 
 simpleklatt.c : raw frame - ported to generator but length and some wierdness
 
-
 *- NOTE: what needs to be done for cleaning up/final touches: TMS roms
 all included and set up, take care of changemode triggering!*
 
-*TODO: SAM selected vocab, digitalker ROM code, logarithmic bends, repeat knob orientation, Klatt breakdown:*
+*TODO: SAM selected vocab, digitalker ROM code, logarithmic bends, what is knob orientation for repeat/length of phoneme, 
 
-1-simpleklatt.c+parwave= raw frames, nvp.c -CLEANUP
+*Klatt breakdown:*
 
-2-nvp.c= phoneme frames
+1-simpleklatt.c+parwave= raw frames - check T0 and duration - what we can change on z if we have xy params
 
-3-fullklatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
+2-nvp.c= phoneme frames - check T0 and duration
 
-4-TTS for fullklatt?: TODO // would need to break down all from wav_file >??? - 	xlate_file();	PhonemeToWaveData();
+3-rsynth-2.0-port-fullklatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
 
-- or we use other TTS/mapped and figure out phoneme transitions: see ratts?
+4-rsynth-2.0-port-TTS for fullklatt?: TODO // would need to break down all from wav_file >??? - 	xlate_file();	PhonemeToWaveData();
 
-- what we parameters we have also (f0, excitation, parallel/cascade etc.. *LIST with all klatt notes* )
+// potentially 4 klatt modes some with bends... 
+
+- or we use other TTS/mapped and figure out phoneme transitions
+
+- what parameters we have also (f0, choices excitation, parallel/cascade etc.. *LIST with all klatt notes* )
+
+** 16/3
+
+***  dissecting TTS-> Klatt/rsynth-2.0-port based also on README.org notes
+
+also how we can do TTS or 2 phonemes with transitions (which we did have) without pWavbuffer and all mallocs etc...
+
+~/rsync2016/projects/earthvoice2/TTS_ADC_V002/lib/rsynth-2.0-port/ or ratts
+
+- TTS english2phoneme gives phones for ->
+
+- say.c (void PhonemeToWaveData(char *phone, int len, int verbose))
+
+phonemetowave calls phone_to_elm to generate frame and then holmes to interpol and generate samples
+
+- holmes is where frames are interpolated from phonemes/element list (our elm list)
+- parwave (nsynth.c) generates frames and samples
+
+**** notes
+
+- maybe is doable for TTS as we have holmes for single samples...
+- re-adapt for say.c and also new english2phoneme (where we map to numbers and not to a string)
+
+*** potential Klatt parameters for fullklatt 
+
+flutter?
+
+now klatt_params - see also http://linguistics.berkeley.edu/plab/guestwiki/index.php?title=Klatt_Synthesizer_Parameters
+
+Klatt derivative glottal wave? KLGLOT88, other glottal models in klsyn?
+
+- is klglott in klsyn?
+
+/*  Vwave is the differentiated glottal flow waveform, there is a weak
+    spectral zero around 800 Hz, magic constants a,b reset pitch-synch */
+
+KLGLOT88 is based on LF and is in KLSYN88 (which nvp is based on apparently)...
+
+and there is flutter in this parwave but also in the klatt/parwave we use:
+
+[[file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file:%20PARWAVE.CPP][file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file: PARWAVE.CPP]]
+
+- other klatt params (basic pitch=F0hz10), length of phoneme list, flutter, skew?)
+
+- commented pitch bend, pulled out to single sample and now try to change array of test_elm in main.cTESTING?DONE - glitchy but?
+
+- MITTalk/dectalk/klattalk - lists of targets in appendix tables
+
+how long is klatt wavetable ? in the example there are 100 sample but we can always set this...
+
+note that sampled_source is not in rsynth code but in
+simpleklatt/parwave (where is this from?)... check also klsyn - this
+doesn't have it /// but klsyn does have triangular and square sources...
+
+need to collate all of klatt sources/parameters and code bases...
+
+- check klatt params: rsynth, nvp, simpleklatt:
+
+nfcascade (how man cascading resonators): rsynth=2 but defaults to 5?,
+nvp=6 resonators all pre-set, simpleklatt=parwave/we set to ALL
+PARALLEL so NO cascade...
+
+- inverse filtered source
+
+- SELZ is pitch bend DONEbutcommented, and pulled down to single sample, put phoneme sel in main
+
+- SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!TODO
+
+Todo speed etc... triggers
+
+we need maybe length of sentence, and x,y for phoneme and position
+(but also stress and dur for each phoneme?) - trigger will take care
+of length
+
+and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
+
+excitation sources
+
+**** from README:
+
+- from command line options: flutter, base F0, tilt db, msec per
+  frame, number of formants in cascade - but default is parallel, impulse glottal source bool // holmes =
+  -S <d> [1] Speed (1.0 is 'normal') -K <lg> [1] Parameter filter
+  'fraction'
+
+- for example we can vary base (as top in holmes) dynamically, also values like duration we can alter
+
+- in rsynth: def_pars.c (what is pars.def for? - is default frame definition)
+
+long samp_rate = 32000;
+
+void init_synth(void)
+{
+	//double mSec_per_frame = 10;
+  float mSec_per_frame = 8; // 10?
+	//int impulse = 0;
+	int impulse = 1;
+	//int casc = 1;
+	int casc = 2;
+	klatt_global.samrate = samp_rate;
+	klatt_global.quiet_flag = TRUE;
+	klatt_global.glsource = NATURAL;// IMPULSIVE doesn't work - but is set below!
+	klatt_global.f0_flutter = 0;
+
+	//	klatt_global.quiet_flag, "Quiet - minimal messages",
+	//	impulse,                 "Impulse glottal source",
+	//	casc,                    "Number cascade formants",
+	//	klatt_global.f0_flutter, "F0 flutter",
+	//	mSec_per_frame,         "mSec per frame",
+	//	def_pars.TLTdb,          "Tilt dB",
+	//	def_pars.F0hz10,         "Base F0 in 0.1Hz",
+
+	if (casc > 0)
+	{
+		klatt_global.synthesis_model = CASCADE_PARALLEL;
+		klatt_global.nfcascade = casc;
+	}
+	else
+		klatt_global.synthesis_model = ALL_PARALLEL;
+
+	if (impulse)
+		klatt_global.glsource = IMPULSIVE;
+
+	klatt_global.nspfr = (klatt_global.samrate * mSec_per_frame) / 1000;
+}
+
+- and rsynth in docs:
+
+ double mSec_per_frame = 10;
+ int impulse = 0;
+ int casc = 0;
+ klatt_global.samrate = samp_rate;
+ klatt_global.quiet_flag = TRUE;
+ klatt_global.glsource = NATURAL;
+ klatt_global.f0_flutter = 0;
+
+- NATURAL changes impulses but in doc/klatt code we have natural
+  sampled source - but doesn't work - option is 2 - fixed as SAMPLE_FACTOR was very small - mult * 2.0
 
 
 
