@@ -972,16 +972,48 @@ DIGI:
 
 ** 15/3 
 
-- if other modes table bends should be with pitchlog (try in digitalker)
-
-- all modes so far as above
+- if other modes table bends should be with pitchlog (try in digitalker)DONE
 
 - SAM selected vocab
 
 - start on Klatt - define all klatt sub-types (eg. nvp, simpleklatt, TTS there etc.)
 
+/////
+
+- tested/fixed all new digitalker
+
+- added new singmodes (sort audio.c list so makes more sense)
+
+- nearly all pitch bends are logarithmic - question if we should do
+  this for freq/filter - i guess so... done in TMS: pitchk_tabled5100
+  only
+
+- check which way length knob should go 
+
+- clear all modes so far in terms of logs, vocabs, settings etc...
+
+simpleklatt.c : raw frame - ported to generator but length and some wierdness
+
+
 *- NOTE: what needs to be done for cleaning up/final touches: TMS roms
 all included and set up, take care of changemode triggering!*
+
+*TODO: SAM selected vocab, digitalker ROM code, logarithmic bends, repeat knob orientation, Klatt breakdown:*
+
+1-simpleklatt.c+parwave= raw frames, nvp.c -CLEANUP
+
+2-nvp.c= phoneme frames
+
+3-fullklatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
+
+4-TTS for fullklatt?: TODO // would need to break down all from wav_file >??? - 	xlate_file();	PhonemeToWaveData();
+
+- or we use other TTS/mapped and figure out phoneme transitions: see ratts?
+
+- what we parameters we have also (f0, excitation, parallel/cascade etc.. *LIST with all klatt notes* )
+
+
+
 
 * TTS 
 

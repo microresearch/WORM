@@ -353,7 +353,7 @@ extern __IO uint16_t adc_buffer[10];
 
 static float wave_source(long nper) {
   float res;
-  res=dosinglewavetable(&wavtable, (adc_buffer[SPEED]>>6)+(F0hz10/16.0)); // TODO freq a
+  //  res=dosinglewavetable(&wavtable, (adc_buffer[SPEED]>>6)+(F0hz10/16.0)); // TODO FIX is we use
   return res*2048.0f;
 }
 
