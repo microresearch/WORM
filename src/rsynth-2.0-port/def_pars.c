@@ -16,17 +16,17 @@ klatt_frame_t def_pars =
 
 long samp_rate = 32000;
 
-void init_synth(void)
+void klatt_init(void)
 {
 	//double mSec_per_frame = 10;
-  float mSec_per_frame = 8; // 10? or 8?
+  float mSec_per_frame = 10; // 10? or 8?
   //	int impulse = 0;
   //  int impulse = 1;
 	//int casc = 1;
-	int casc = 5;
+	int casc = 6;
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
-	klatt_global.glsource = IMPULSIVE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE
+	klatt_global.glsource = NATURAL;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE
 	klatt_global.f0_flutter = 0;
 
 	//	klatt_global.quiet_flag, "Quiet - minimal messages",

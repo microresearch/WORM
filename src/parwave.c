@@ -30,10 +30,6 @@
 
 #define getrandom(min,max) ((rand()%(int)(((max)+1)-(min)))+(min))
 
-//extern signed int audio_buffer[32768];
-
-/* function prototypes for functions private to this file */
-
 void flutter(klatt_global_ptrr,int16_t*);
 static float sampled_source(klatt_global_ptrr);
 static float impulsive_source(klatt_global_ptrr);

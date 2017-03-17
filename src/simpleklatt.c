@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "parwave.h"
 #include "worming.h"
+#include "resources.h"
 
 /* for default sampled glottal excitation waveform */
 
@@ -25,7 +26,7 @@
 
 static int16_t frame[40];
 extern float exy[64];
-
+extern float _selx, _sely, _selz;
 
   static const int16_t natural_samples[NUMBER_OF_SAMPLES]=
   {
@@ -38,12 +39,16 @@ extern float exy[64];
     -1891,-1045,-1600,-1462,-1384,-1261,-949,-730
   };
 
+// check parameters: see klattparams - could be good to have contour morphing (snap on trigger)
+// param0 is fund freq, param39 is volume
 
-int16_t mins[40]= {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
 
-int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
-int16_t range[40]={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
+const int16_t mins[40] __attribute__ ((section (".flash"))) = {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
+
+const int16_t maxs[40] __attribute__ ((section (".flash"))) = {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
+
+const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
 
 klatt_global_tt globale;
 
@@ -61,7 +66,7 @@ void simpleklatt_init(void){
 
   globals->synthesis_model = 1; // all_parallel
  globals->samrate = 32000;
- globals->glsource = 2; // 2=natural
+ globals->glsource = 2; // 1=impulsive 2=glottal impulse 3=sampled as above
  globals->natural_samples = natural_samples;
  globals->num_samples = NUMBER_OF_SAMPLES;
 //  globals->sample_factor = (float) SAMPLE_FACTOR;
@@ -93,7 +98,7 @@ int16_t simpleklatt_get_sample(){
   sampel=single_single_parwave(globals, frame);
 
   samplenumber++;
-  if (samplenumber>globals->nspfr) { // greater than what???? 320 samples - this can be our selz
+  if (samplenumber>globals->nspfr*_selz) { // greater than what???? 320 samples - this can be our selz???? 
       // end of frame so...????
     samplenumber=0;
     simpleklatt_newsay();

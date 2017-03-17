@@ -81,14 +81,13 @@ typedef struct
 
 extern klatt_global_t klatt_global;
 
-extern void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame);
-extern void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave, unsigned char ns,unsigned char xx);
-extern void parwave(klatt_global_ptr, klatt_frame_ptr pars,short *jwave);
-extern unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr pars,short *jwave, unsigned int klatthead);
-extern void parwave_init  (klatt_global_ptr);
-extern void pr_pars (void);
-extern void init_synth(void);
-extern unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns);
-extern  long samp_rate;
+void initparwave(klatt_global_ptr globals, klatt_frame_ptr frame);
+void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave, unsigned char ns,unsigned char xx);
+void parwave(klatt_global_ptr, klatt_frame_ptr pars,short *jwave);
+unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr pars,short *jwave, unsigned int klatthead);
+void parwave_init  (klatt_global_ptr);
+void pr_pars (void);
+void klatt_init(void);
+unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame, unsigned char ns);
 
 

@@ -1151,6 +1151,46 @@ void init_synth(void)
 - NATURAL changes impulses but in doc/klatt code we have natural
   sampled source - but doesn't work - option is 2 - fixed as SAMPLE_FACTOR was very small - mult * 2.0
 
+** 17/3
+
+basics for each of these:
+
+1-simpleklatt.c+parwave= raw frames - check duration - what we can
+change on z if we have xy params - can be frame duration or F0hz10; /*
+Voicing fund freq in Hz = first param (but somehow need contours
+here - snap to contours)
+
+2-nvp.c= phoneme frames - some fixes, could have vocab (see ipa.py and
+accompanying) and/or TTS (in both cases we would need pitch and length data)
+
+vocab would need to be translated by:
+
+: espeak -v en --ipa "worm"   
+
+then into our numbers (python lookup) and add pitch and length ->
+
+*TODO: script this so takes ipa list and makes arrays for our code...*
+
+- different voices
+
+
+////
+
+3-rsynth-2.0-port-fullklatt now as klatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
+
+test_elm ported in (DONE) and basic tests with x as xaxis, y as length, z as phoneme in list *CRACKLES/clicks _ FIX-DONE*
+
+TODO: singmode, pitch changes at start of phrase or all through (but we need to keep consistent length)
+
+also maybe vocab for klatt as fixed test_elms so then we can bend
+more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: so set up for bulk*
+
+- different voices
+
+/////
+
+4-rsynth-2.0-port-TTS for fullklatt?
+
 
 
 
