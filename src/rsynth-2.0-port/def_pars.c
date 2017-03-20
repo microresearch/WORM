@@ -27,7 +27,7 @@ void klatt_init(void)
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
 	klatt_global.glsource = IMPULSIVE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE - where is sample from?
-	//	klatt_global.f0_flutter = 10;
+	klatt_global.f0_flutter = 0;
 
 	//	klatt_global.quiet_flag, "Quiet - minimal messages",
 	//	impulse,                 "Impulse glottal source",

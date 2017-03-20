@@ -340,9 +340,9 @@ static void flutter(klatt_global_ptr globals, klatt_frame_ptr pars)
 	long original_f0 = pars->F0hz10 / 10.0f;
 	float fla = (float) globals->f0_flutter / 50.0f;
 	float flb = (float) original_f0 / 100.0f;
-	float flc = sin(2 * PI * 12.7f * time_count);
-	float fld = sin(2 * PI * 7.1f * time_count);
-	float fle = sin(2 * PI * 4.7f * time_count);
+	float flc = sinf(2 * PI * 12.7f * time_count);
+	float fld = sinf(2 * PI * 7.1f * time_count);
+	float fle = sinf(2 * PI * 4.7f * time_count);
 	float delta_f0 = fla * flb * (flc + fld + fle) * 10.0f;
 	F0hz10 += (long) delta_f0;
 }
