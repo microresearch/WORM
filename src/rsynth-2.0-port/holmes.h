@@ -8,4 +8,5 @@ extern int speed;
 void holmesrun(int16_t* outgoing, u8 size);
 int16_t klatt_get_sample(void);
 void klatt_newsay(void);
-extern int samp_rate;
+int16_t klatt_get_sampleTTS(void);
+void klatt_newsayTTS(void);

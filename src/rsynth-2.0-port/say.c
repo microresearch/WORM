@@ -66,7 +66,21 @@ unsigned short wav_len;
 #define StressDur(e,s) ((e->ud + (e->du - e->ud) * s / 3)*speed)
 
 
-void PhonemeToWaveData(u8 phone, int len, int verbose) // len here is 1
+// test TTS into phonemeToWave with new holmes
+
+// so TTSnewsay generates TTS list - fixed now - which then generates list of elements (wav_elm), of length wav_elm.items
+
+//	PhonemeToWaveData(eng2phonemeOUT-array from xlate, eng2phonemeOUT_ptr=length, 0);
+
+void PhonemeToWaveData(char *phone, int len)
+{
+	unsigned frames;
+ 	int i, j;
+ 	darray_init(&wav_elm, sizeof(char), len); // where is wav_elm and how long is it?
+	frames = phone_to_elm(phone, len, &wav_elm);
+	}
+
+void PhonemeToWaveDataxxx(u8 phone, int len, int verbose) // len here is 1 // this is for single phoneme?
 {
   unsigned int frames; //int16_t *pwav;
     unsigned char intern[9];
@@ -93,11 +107,13 @@ void PhonemeToWaveData(u8 phone, int len, int verbose) // len here is 1
     //				(unsigned char *) darray_find(&wav_elm, 0),
     // 			max_samples, pWavBuffer	);
 
-			    wav_len = holmes(3, 
-					     intern,
-					     max_samples, pWavBuffer	);
+    //			    wav_len = holmes(3, 
+    //					     intern,
+    //					     max_samples, pWavBuffer	);
 
 		//		}
+    //    darray_free(&wav_elm);
+
 }
 
 

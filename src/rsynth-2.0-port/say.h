@@ -5,9 +5,9 @@
 
 
 //extern short *pWavBuffer;
-extern int16_t pWavBuffer[10240];
+//extern int16_t pWavBuffer[10240];
 extern darray_t wav_elm;
 extern unsigned short wav_len;
 
-void PhonemeToWaveData(u8 phone, int len, int verbose);
+void PhonemeToWaveData(char * phone, int len);
 void FreePhonemeToWaveData(void);

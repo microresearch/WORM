@@ -1173,7 +1173,6 @@ then into our numbers (python lookup) and add pitch and length ->
 
 - different voices
 
-
 ////
 
 3-rsynth-2.0-port-fullklatt now as klatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
@@ -1191,8 +1190,18 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
 
 4-rsynth-2.0-port-TTS for fullklatt?
 
+** 20/3
 
+- so we need to generate vocabs for nvp and fullklatt/elm
 
+- re-test also 256 TTS as we changed some code there...
+
+- TODO: figure out XYZ for Klatt modes, why sounds so throaty, check sanity of holmes.c vs. other rsynth/klatt versions
+
+*** klatt TTS:
+- and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.c
+
+- next step is to generate in parse.c and test this - works but only for very short sequences so figure how to restrict this
 
 * TTS 
 
@@ -1373,6 +1382,8 @@ what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
 6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
 
 fullklatt/simpleklatt/nvp
+
+////
 
 10. tube and ntube/glottal/wavetable and wormed tubes 
 

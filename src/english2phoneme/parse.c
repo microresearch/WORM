@@ -124,9 +124,11 @@ void say_ordinal(long int value);
 void outnum(const char* ooo);
 void have_number();
 
+
+const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
+
 #ifdef LAP
 
-const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", "PAUSE", "END"};
 
 const char* SP_list[43]={};
 
@@ -175,7 +177,8 @@ void main(argc, argv)
     //    while(flag==1){
     int count=0;
     xxx=0;
-    while (xxx!=' ' && xxx!='\n'){
+    //    while (xxx!=' ' && xxx!='\n'){
+    while (xxx!='\n'){
     int xx=fread(&xxx,1,1,fp);
     //    printf("%c",xxx);
       buffer[count++]=xxx;
@@ -197,30 +200,52 @@ void main(argc, argv)
   
   //transform text to integer code phonemes
       int output_count = text2speech(count,TTSinarray,TTSoutarray);
-  for(int i = 0; i < output_count; i++){
+      //  for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
-        printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
-    //    printf("%s ..", TMS_list[TTSoutarray[i]]);
+    //        printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
+    //        printf("%s", TMS_list[TTSoutarray[i]]);
+      //    printf("%c", TTSoutarray[i]);
 	     //      printf("\n");
-  }
-  printf("\n\n");
+      //  }
+      //  printf("\n\n");
 
-    output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
+  //    output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
   //  output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
       
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
       //      printf("%s outcount: %d\n",TTSinarray, output_count);
-  for(int i = 0; i < output_count; i++){
+      int i;
+  for(i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
     //    printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
     //    printf("%d %s ..", TTSoutarray[i], TMS_list[TTSoutarray[i]]);
-        printf("%d, ", TTSoutarray[i]);
+    //    printf("%s", NRL_list[TTSoutarray[i]]);
+        for (unsigned char ii=0;ii<strlen(NRL_list[TTSoutarray[i]]);ii++){
+	  //  printf("%s",NRL_list[TTSoutarray[i]]);
+	  printf("%s",*(NRL_list+TTSoutarray[i]));
+          }
   }
   printf("\n");
   printf("COUNT: %d\n", output_count);
+  unsigned char output[1000], countme;
+
+  //  for (unsigned char ii=0;ii<output_count;ii++){
+  countme=0;
+  output[0]=0;
+
+  for (unsigned char i=0;i<output_count;i++){
+    if (countme+strlen(NRL_list[TTSoutarray[i]])<254) strcat(output, NRL_list[TTSoutarray[i]]); // how do we not overrun
+    //    else return i;
+    countme+=strlen(NRL_list[TTSoutarray[i]]);
+    printf("%s count: %d\n", NRL_list[TTSoutarray[i]], countme);
+  }
+  printf("%s %d", output, strlen(output));
+  printf("\n");
+  }  
+
   //  return output_count;
   //    }
-	}
+//	}
 #endif
 
 /*
@@ -239,6 +264,25 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
   return output_count;
 }
 
+unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  input[input_len-1] = EOF;
+  xlate_file();
+  unsigned int countme=0;
+   if (output_count>=128) output_count=128;
+   output[0] = '\0';
+  for (unsigned char i=0;i<output_count;i++){
+    countme+=strlen(NRL_list[output_array[i]]);
+    if (countme<250) strcat(output, NRL_list[output_array[i]]); // how do we not overrun
+    else return (countme-strlen(NRL_list[output_array[i]]));
+  }
+  return countme;
+}
+
+
+
 unsigned char text2speechfor256(unsigned char  input_len, signed char *input, signed char *output){ // TODO: this is our model
   input_array = input;
   input_length = input_len;
@@ -250,7 +294,9 @@ unsigned char text2speechfor256(unsigned char  input_len, signed char *input, si
   for (unsigned char i=0;i<output_count;i++){
               output[i]=remap256[output_array[i]];
 	if (output_array[i]==12){
-	  output_array[++i]=12;
+	  output[i]=15;
+	  output[i++]=15;
+	  //	  output_array[++i]=12; //>>???
 	  output_count++;
 	  if (output_count>=255) output_count=254;
  	  }
@@ -276,7 +322,6 @@ unsigned char text2speechforvotrax(unsigned char  input_len, unsigned char *inpu
     //  printf("LEN: %d\n", ourvot[output_array[i]].length);
     for (unsigned char ii=0;ii<ourvot[output_array[i]].length;ii++){
     output[countme]=ourvot[output_array[i]].mmm[ii];
-    //    printf("%s ", NRL_list[output_array[i]]);
     countme++;
     if (countme>254) countme=254;
 	}

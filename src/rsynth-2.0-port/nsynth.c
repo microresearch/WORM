@@ -45,7 +45,7 @@
 #include "audio.h"
 #ifndef PI
 #ifndef M_PI                      /* <math.h> */
-#define PI               3.1415927
+#define PI               3.1415927f
 #else /* M_PI */
 #define PI               M_PI
 #endif /* M_PI */
@@ -53,7 +53,7 @@
 
 #define ONE 1.0F
 
-  static int natural_samples[100]=
+static int natural_samples[100]= // where is this from?
   {
     -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
     605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,
@@ -241,24 +241,24 @@ static const short natglot[224] __attribute__ ((section (".flash"))) =
 
 static const float amptable[88] __attribute__ ((section (".flash"))) =
 {
- 0.0, 0.0, 0.0, 0.0, 0.0,
- 0.0, 0.0, 0.0, 0.0, 0.0,
- 0.0, 0.0, 0.0, 6.0, 7.0,
- 8.0, 9.0, 10.0, 11.0, 13.0,
- 14.0, 16.0, 18.0, 20.0, 22.0,
- 25.0, 28.0, 32.0, 35.0, 40.0,
- 45.0, 51.0, 57.0, 64.0, 71.0,
- 80.0, 90.0, 101.0, 114.0, 128.0,
- 142.0, 159.0, 179.0, 202.0, 227.0,
- 256.0, 284.0, 318.0, 359.0, 405.0,
- 455.0, 512.0, 568.0, 638.0, 719.0,
- 811.0, 911.0, 1024.0, 1137.0, 1276.0,
- 1438.0, 1622.0, 1823.0, 2048.0, 2273.0,
- 2552.0, 2875.0, 3244.0, 3645.0, 4096.0,
- 4547.0, 5104.0, 5751.0, 6488.0, 7291.0,
- 8192.0, 9093.0, 10207.0, 11502.0, 12976.0,
- 14582.0, 16384.0, 18350.0, 20644.0, 23429.0,
- 26214.0, 29491.0, 32767.0
+ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+ 0.0f, 0.0f, 0.0f, 6.0f, 7.0f,
+ 8.0f, 9.0f, 10.0f, 11.0f, 13.0f,
+ 14.0f, 16.0f, 18.0f, 20.0f, 22.0f,
+ 25.0f, 28.0f, 32.0f, 35.0f, 40.0f,
+ 45.0f, 51.0f, 57.0f, 64.0f, 71.0f,
+ 80.0f, 90.0f, 101.0f, 114.0f, 128.0f,
+ 142.0f, 159.0f, 179.0f, 202.0f, 227.0f,
+ 256.0f, 284.0f, 318.0f, 359.0f, 405.0f,
+ 455.0f, 512.0f, 568.0f, 638.0f, 719.0f,
+ 811.0f, 911.0f, 1024.0f, 1137.0f, 1276.0f,
+ 1438.0f, 1622.0f, 1823.0f, 2048.0f, 2273.0f,
+ 2552.0f, 2875.0f, 3244.0f, 3645.0f, 4096.0f,
+ 4547.0f, 5104.0f, 5751.0f, 6488.0f, 7291.0f,
+ 8192.0f, 9093.0f, 10207.0f, 11502.0f, 12976.0f,
+ 14582.0f, 16384.0f, 18350.0f, 20644.0f, 23429.0f,
+ 26214.0f, 29491.0f, 32767.0f
 };
 
 const char *par_name[] =
@@ -337,13 +337,13 @@ void show_parms(klatt_global_ptr globals, int *pars)
  */
 static void flutter(klatt_global_ptr globals, klatt_frame_ptr pars)
 {
-	long original_f0 = pars->F0hz10 / 10;
-	float fla = (float) globals->f0_flutter / 50;
-	float flb = (float) original_f0 / 100;
-	float flc = sin(2 * PI * 12.7 * time_count);
-	float fld = sin(2 * PI * 7.1 * time_count);
-	float fle = sin(2 * PI * 4.7 * time_count);
-	float delta_f0 = fla * flb * (flc + fld + fle) * 10;
+	long original_f0 = pars->F0hz10 / 10.0f;
+	float fla = (float) globals->f0_flutter / 50.0f;
+	float flb = (float) original_f0 / 100.0f;
+	float flc = sin(2 * PI * 12.7f * time_count);
+	float fld = sin(2 * PI * 7.1f * time_count);
+	float fle = sin(2 * PI * 4.7f * time_count);
+	float delta_f0 = fla * flb * (flc + fld + fle) * 10.0f;
 	F0hz10 += (long) delta_f0;
 }
 
@@ -382,14 +382,14 @@ static float triangular_source(long nper) {
 static float impulsive_source(long nper)
 {
 	static float floatt[] =
-		{0., 13000000., -13000000.};
+		{0.0f, 13000000.0f, -13000000.0f};
 	if (nper < 3)
 	{
 		vwave = floatt[nper];
 	}
 	else
 	{
-		vwave = 0.0;
+		vwave = 0.0f;
 	}
 	/* Low-pass filter the differenciated impulse with a critically-damped
     second-order filter, time constant proportional to Kopen */
@@ -409,14 +409,14 @@ static float natural_source(long nper)
 	{
 		natglot_a -= natglot_b;
 		vwave += natglot_a;
-		lgtemp = vwave * 0.028;        /* function of samp_rate ? */
+		lgtemp = vwave * 0.028f;        /* function of samp_rate ? */
 		return (lgtemp);
 	}
 	else
 	{
 		/* Glottis closed */
-		vwave = 0.0;
-		return (0.0);
+		vwave = 0.0f;
+		return (0.0f);
 	}
 }
 
@@ -438,7 +438,7 @@ static float sampled_source(long nper)
   {
     ftemp = (float) nper;
     ftemp = ftemp / T0;
-    ftemp = ftemp * 100;
+    ftemp = ftemp * 100.0f;
     itemp = (int) ftemp;
 
     temp_diff = ftemp - (float) itemp;
@@ -456,7 +456,7 @@ static float sampled_source(long nper)
   }
   else
   {
-    result = 0;
+    result = 0.0f;
   }
   return(result);
 }
@@ -476,8 +476,8 @@ static void setabc(long f, long bw, resonator_ptr rp)
 	float r = expf(arg);              /* Let r  =  exp(-pi bw t) */
 	rp->c = -(r * r);                /* Let c  =  -r**2 */
 	arg = two_pi_t * f;
-	rp->b = r * cosf(arg) * 2.0;      /* Let b = r * 2*cos(2 pi f t) */
-	rp->a = 1.0 - rp->b - rp->c;     /* Let a = 1.0 - b - c */
+	rp->b = r * cosf(arg) * 2.0f;      /* Let b = r * 2*cos(2 pi f t) */
+	rp->a = 1.0f - rp->b - rp->c;     /* Let a = 1.0 - b - c */
 }
 
 /* Convienience function for setting parallel resonators with gain */
@@ -501,7 +501,7 @@ static void setzeroabc(long f, long bw, resonator_ptr rp)
 {
 	setabc(f, bw, rp);               /* First compute ordinary resonator coefficients */
 	/* Now convert to antiresonator coefficients */
-	rp->a = 1.0 / rp->a;             /* a'=  1/a */
+	rp->a = 1.0f / rp->a;             /* a'=  1/a */
 	rp->b *= -rp->a;                 /* b'= -b/a */
 	rp->c *= -rp->a;                 /* c'= -c/a */
 }
@@ -521,12 +521,12 @@ static float DBtoLIN(klatt_global_ptr globals, long dB)
 			printf("Try to compute amptable[%ld]\n", dB);
 		dB = 87;
 	}
-	return amptable[dB] * 0.001;
+	return amptable[dB] * 0.001f;
 }
 
 /* WHAT WERE THESE FOR ? */
-#define ACOEF           0.005
-#define BCOEF           (1.0 - ACOEF)	/* Slight decay to remove dc */
+#define ACOEF           0.005f
+#define BCOEF           (1.0f - ACOEF)	/* Slight decay to remove dc */
 
 static float dBconvert(long arg)
 {
@@ -555,7 +555,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
 		/* Breathiness of voicing waveform */
 
-		amp_breth = DBtoLIN(globals, frame->Aturb) * 0.1;
+		amp_breth = DBtoLIN(globals, frame->Aturb) * 0.1f;
 
 		/* Set open phase of glottal period */
 		/* where  40 <= open phase <= 263 */
@@ -589,7 +589,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 		/* Reset a & b, which determine shape of "natural" glottal waveform */
 
 		natglot_b = natglot[nopen - 40];
-		natglot_a = (natglot_b * nopen) * .333;
+		natglot_a = (natglot_b * nopen) * .333f;
 
 		/* Reset width of "impulsive" glottal pulse */
 
@@ -598,7 +598,7 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
 		/* Make gain at F1 about constant */
 
-		temp1 = nopen * .00833;
+		temp1 = nopen * .00833f;
 		rgl.a *= (temp1 * temp1);
 	
 /*        Reset legs of triangular glottal pulse */
@@ -609,10 +609,10 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
                 if (nfirsthalf <= 0)            nfirsthalf = 1;
                 nsecondhalf = nopen - nfirsthalf;
                 Afinal = -7000.;
-                maxt2 = Afinal * 0.25;
+                maxt2 = Afinal * 0.25f;
                 slopet2 = Afinal / nsecondhalf;
                 vwave = -(Afinal * nsecondhalf) / nfirsthalf;   /* CHECK */
-                maxt1 = vwave * 0.25;
+                maxt1 = vwave * 0.25f;
                 slopet1 = - vwave / nfirsthalf;
 	    }
 
@@ -647,11 +647,11 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 	else
 	{
 		T0 = 4;                        /* Default for f0 undefined */
-		amp_voice = 0.0;
+		amp_voice = 0.0f;
 		nmod = T0;
-		amp_breth = 0.0;
-		natglot_a = 0.0;
-		natglot_b = 0.0;
+		amp_breth = 0.0f;
+		natglot_a = 0.0f;
+		natglot_b = 0.0f;
 	}
 
 	/* Reset these pars pitch synchronously or at update rate if f0=0 */
@@ -659,14 +659,14 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 	if ((T0 != 4) || (ns == 0))
 	{
 		/* Set one-pole low-pass filter that tilts glottal source */
-		decay = (0.033 * frame->TLTdb);	/* Function of samp_rate ? */
-		if (decay > 0.0)
+		decay = (0.033f * frame->TLTdb);	/* Function of samp_rate ? */
+		if (decay > 0.0f)
 		{
-			onemd = 1.0 - decay;
+			onemd = 1.0f - decay;
 		}
 		else
 		{
-			onemd = 1.0;
+			onemd = 1.0f;
 		}
 	}
 }
@@ -702,8 +702,8 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
 	if (AVdb < 0)
 		AVdb = 0;
 
-	amp_aspir = DBtoLIN(globals, frame->ASP) * .05;
-	amp_frica = DBtoLIN(globals, frame->AF) * 0.25;
+	amp_aspir = DBtoLIN(globals, frame->ASP) * .05f;
+	amp_frica = DBtoLIN(globals, frame->AF) * 0.25f;
 
 	Kskew = frame->Kskew;
 	par_amp_voice = DBtoLIN(globals, frame->AVpdb);
@@ -713,14 +713,14 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
     possible to CASCADE_PARALLEL.
     Possible problem feeding in Holmes's amplitudes given this.
 	*/
-	amp_parF1 = DBtoLIN(globals, frame->A1) * 0.4;	/* -7.96 dB */
-	amp_parF2 = DBtoLIN(globals, frame->A2) * 0.15;	/* -16.5 dB */
-	amp_parF3 = DBtoLIN(globals, frame->A3) * 0.06;	/* -24.4 dB */
-	amp_parF4 = DBtoLIN(globals, frame->A4) * 0.04;	/* -28.0 dB */
-	amp_parF5 = DBtoLIN(globals, frame->A5) * 0.022;	/* -33.2 dB */
-	amp_parF6 = DBtoLIN(globals, frame->A6) * 0.03;	/* -30.5 dB */
-	amp_parFN = DBtoLIN(globals, frame->ANP) * 0.6;	/* -4.44 dB */
-	amp_bypas = DBtoLIN(globals, frame->AB) * 0.05;	/* -26.0 db */
+	amp_parF1 = DBtoLIN(globals, frame->A1) * 0.4f;	/* -7.96 dB */
+	amp_parF2 = DBtoLIN(globals, frame->A2) * 0.15f;	/* -16.5 dB */
+	amp_parF3 = DBtoLIN(globals, frame->A3) * 0.06f;	/* -24.4 dB */
+	amp_parF4 = DBtoLIN(globals, frame->A4) * 0.04f;	/* -28.0 dB */
+	amp_parF5 = DBtoLIN(globals, frame->A5) * 0.022f;	/* -33.2 dB */
+	amp_parF6 = DBtoLIN(globals, frame->A6) * 0.03f;	/* -30.5 dB */
+	amp_parFN = DBtoLIN(globals, frame->ANP) * 0.6f;	/* -4.44 dB */
+	amp_bypas = DBtoLIN(globals, frame->AB) * 0.05f;	/* -26.0 db */
 
 	if (globals->nfcascade >= 8)
 	{
@@ -884,7 +884,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 
 		if (nper > nmod)
 		{
-			noise *= 0.5;
+			noise *= 0.5f;
 		}
 
 		/* Compute frication noise */
@@ -1003,7 +1003,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 					out = resonator(&r1c, casc_next_in);
 					break;
 				default:
-					out = 0.0;
+					out = 0.0f;
 			}
 			#if 0
 			/* Excite parallel F1 and FNP by voicing waveform */
@@ -1093,7 +1093,7 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 		*    a pole near the origin in the z-plane, i.e.
 		*    output = input + (0.75 * lastoutput) */
 
-		noise = nrand + (0.75 * nlast);	/* Function of samp_rate ? */
+		noise = nrand + (0.75f * nlast);	/* Function of samp_rate ? */
 		nlast = noise;
 
 		/* Amplitude modulate noise (reduce noise amplitude during
@@ -1102,7 +1102,7 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 
 		if (nper > nmod)
 		{
-			noise *= 0.5;
+			noise *= 0.5f;
 		}
 
 		/* Compute frication noise */
@@ -1226,7 +1226,7 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 					out = resonator(&r1c, casc_next_in);
 					break;
 				default:
-					out = 0.0;
+					out = 0.0f;
 			}
 			#if 0
 			/* Excite parallel F1 and FNP by voicing waveform */
@@ -1408,7 +1408,7 @@ void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave
 					out = resonator(&r1c, casc_next_in);
 					break;
 				default:
-					out = 0.0;
+					out = 0.0f;
 			}
 			#if 0
 			/* Excite parallel F1 and FNP by voicing waveform */
@@ -1511,7 +1511,7 @@ unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short 
 
 		if (nper > nmod)
 		{
-			noise *= 0.5;
+			noise *= 0.5f;
 		}
 
 		/* Compute frication noise */
@@ -1606,7 +1606,7 @@ unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short 
 					out = resonator(&r1c, casc_next_in);
 					break;
 				default:
-					out = 0.0;
+					out = 0.0f;
 			}
 			#if 0
 			/* Excite parallel F1 and FNP by voicing waveform */
@@ -1662,7 +1662,7 @@ void parwave_init(klatt_global_ptr globals)
 	long BLPhz = (630 * globals->samrate) / 10000;
 
 	minus_pi_t = -PI / globals->samrate;
-	two_pi_t = -2.0 * minus_pi_t;
+	two_pi_t = -2.0f * minus_pi_t;
 
 	setabc(FLPhz, BLPhz, &rlp);
 	nper = 0;                        /* LG */

@@ -74,7 +74,7 @@ static void enter(char *p,...)
 		}
 		else
 		{
-			fprintf(stderr, "Cannot find %s\n", s);
+		  //			fprintf(stderr, "Cannot find %s\n", s);
 		}
 	}
 	va_end(ap);
@@ -84,7 +84,7 @@ static void enter(char *p,...)
 		memcpy(x, buf, buf[0] + 1);
 		trie_insert(&phtoelm, p, x);
 	}else{
-		fprintf(stderr, "memory shortage (enter)\n");
+	  //		fprintf(stderr, "memory shortage (enter)\n");
 	}
 }
 
@@ -155,7 +155,7 @@ unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
 				case '-':                 /* hyphen in input */
 				break;
 				default:
-				fprintf(stderr, "Ignoring %c in '%.*s'\n", ch, n, phone);
+				  //				fprintf(stderr, "Ignoring %c in '%.*s'\n", ch, n, phone);
 				break;
 			}
 		}
