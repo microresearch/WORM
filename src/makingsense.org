@@ -1196,10 +1196,12 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
 
 - re-test also 256 TTS as we changed some code there...
 
-- TODO: figure out XYZ for Klatt modes, why sounds so throaty, check sanity of holmes.c vs. other rsynth/klatt versions
+- TODO: figure out XYZ for Klatt modes, *why sounds so throaty*, check sanity of holmes.c vs. other rsynth/klatt versions
+
+checking and changes in klatt_get_sample and get_sample_TTS to CHECK! - check dur (one more and...)?
 
 *** klatt TTS:
-- and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.c
+- and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.cDONE
 
 - next step is to generate in parse.c and test this - works but only for very short sequences so figure how to restrict this
 

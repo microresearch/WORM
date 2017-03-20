@@ -33,7 +33,7 @@ extern float _selx, _sely, _selz;
 int speed = 1;			//normal
 // int speed = 2; 		//slow
 
-float frac = 1.0;
+float frac = 1.0f;
 
 typedef struct
  {
@@ -80,7 +80,7 @@ static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
 		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
 	
 		if (t[i].t)
-			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01;
+			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01f;
 		else
 			t[i].v = b->p[i].stdy;
 	}
@@ -138,10 +138,10 @@ static float interpolate(char *w, char *p, slope_t *s, slope_t *e, float mid, in
 	}
 	else
 	{
-		float f = (float) 1.0 - ((float) t / (float) d);
+		float f = (float) 1.0f - ((float) t / (float) d);
 		float sp = linear(s->v, mid, t, s->t);
 		float ep = linear(e->v, mid, d - t, e->t);
-		return f * sp + ((float) 1.0 - f) * ep;
+		return f * sp + ((float) 1.0f - f) * ep;
 	}
 }
 
@@ -181,7 +181,7 @@ unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_b
 	{
 		flt[j].v = le->p[j].stdy;
 		flt[j].a = frac;
-		flt[j].b = (float) 1.0 - (float) frac;
+		flt[j].b = (float) 1.0f - (float) frac;
 	}
 	while (i < nelm)
 	{
@@ -247,7 +247,7 @@ unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_b
 							if (s)
 								stress_e.v = (float) s / 3.0f;
 							else
-								stress_e.v = (float) 0.1;
+								stress_e.v = (float) 0.1f;
 							do
 							{
 								d += du;
@@ -313,21 +313,18 @@ unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_b
 	return (samp - samp_base);
 }
 
-extern int16_t audio_buffer[AUDIO_BUFSZ];
-
 extern u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
 
-
-filter_t flt[nEparm];
-Elm_ptr le;// = &Elements[0];
-Elm_ptr ne;
-unsigned i = 31;
-unsigned tstress = 0;
-unsigned ntstress = 0;
-slope_t stress_s;
-slope_t stress_e;
-float top;// = 1.1 * def_pars.F0hz10;
-unsigned char t;
+static filter_t flt[nEparm];
+static Elm_ptr le;// = &Elements[0];
+static Elm_ptr ne;
+static unsigned i = 31;
+static unsigned tstress = 0;
+static unsigned ntstress = 0;
+static slope_t stress_s;
+static slope_t stress_e;
+static float top;// = 1.1 * def_pars.F0hz10;
+static unsigned char t;
 
 static u8 nextelement=1;
 static klatt_frame_t pars;
@@ -373,9 +370,9 @@ int16_t klatt_get_sample(){
   unsigned char *elm=test_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
   u8 j; 
   static u8 dur,first=0;
-  slope_t startyy[nEparm];
-  slope_t end[nEparm];
-  if (i>nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
+  static slope_t startyy[nEparm];
+  static slope_t end[nEparm];
+  if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
     klatt_newsay();
   }
 
@@ -420,7 +417,7 @@ int16_t klatt_get_sample(){
 	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
 	newframe=1;
       } // if dur==0
-  }
+  } // is nextelement==1
   
   if (newframe==1) { // this is a new frame - so we need new parameters
     newframe=0;
@@ -449,7 +446,7 @@ int16_t klatt_get_sample(){
 		  if (s)
 		    stress_e.v = (float) s / 3.0f;
 		  else
-		    stress_e.v = (float) 0.1d;
+		    stress_e.v = (float) 0.1f;
 		  do
 		    {
 		      d += du;
@@ -501,7 +498,7 @@ int16_t klatt_get_sample(){
       tstress++; t++;
     } // if t<dur
     else { // hit end of DUR number of frames...
-      nextelement=1;
+      nextelement=1; // one extra sample below
       le = ce; // where we can put this?????? TODO!!!
     }
 }
@@ -554,13 +551,13 @@ top*=logpitch[val];
     /* Set stress attack/decay slope */
     stress_s.t = 40;
     stress_e.t = 40;
-    stress_e.v = 0.0;
+    stress_e.v = 0.0f;
 
     for (u8 j = 0; j < nEparm; j++)
       {
 	flt[j].v = le->p[j].stdy;
 	flt[j].a = frac;
-	flt[j].b = (float) 1.0 - (float) frac;
+	flt[j].b = (float) 1.0f - (float) frac;
       }
     nextelement=1;
 }
@@ -572,12 +569,12 @@ int16_t klatt_get_sampleTTS(){
   int16_t sample=0;
   unsigned nelm=wav_elm.items; // 10 phonemes = how many frames approx ???? - in test case we have 87 frames - now 16 phonemes
   u8 j; 
-unsigned char *elm=elmer;
+  unsigned char *elm=elmer;
 
   static u8 dur,first=0;
-  slope_t startyy[nEparm];
-  slope_t end[nEparm];
-  if (i>nelm){   // NEW utterance which means we hit nelm=0 in our cycling:
+  static slope_t startyy[nEparm];
+  static slope_t end[nEparm];
+  if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
     klatt_newsayTTS();
   }
 
@@ -706,7 +703,7 @@ unsigned char *elm=elmer;
       nextelement=1;
       le = ce; // where we can put this?????? TODO!!!
     }
-}
+  }
 //  if (nextelement==0){// causes clicks
     // always run through samples till we hit next frame
     //    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); 
