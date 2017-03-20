@@ -1151,7 +1151,7 @@ void init_synth(void)
 - NATURAL changes impulses but in doc/klatt code we have natural
   sampled source - but doesn't work - option is 2 - fixed as SAMPLE_FACTOR was very small - mult * 2.0
 
-** 17/3
+** 17/3 - 21/3
 
 basics for each of these:
 
@@ -1165,11 +1165,27 @@ accompanying) and/or TTS (in both cases we would need pitch and length data)
 
 vocab would need to be translated by:
 
-: espeak -v en --ipa "worm"   
+: espeak -v en --ipa "worm" -q
 
 then into our numbers (python lookup) and add pitch and length ->
 
 *TODO: script this so takes ipa list and makes arrays for our code...*
+
+test_speakIpa.py - test first of all:
+
+ordering:               print str(looky.get(phon))+",",
+print str(phoneme['voicePitch'])+",",
+print str(phoneme['endVoicePitch'])+",",
+print str(frameDuration)+",",
+print str(fadeDuration)+" },"
+
+/TEST/
+
+const worm[] =  { { 46, 110.190511588, 101.54464594, 42.0, 28.0}, { 6, 101.54464594, 83.3883280795, 88.2, 35.0}, { 41, 83.3883280795, 74.7424624317, 42.0, 14.0}};
+
+const code[] =  { { 49, { 40, 110.190511588, 110.190511588, 6.0, 0.001}, { 49, { 32, 110.190511588, 93.077660271, 84.0, 14.0}, { 20, 93.077660271, 75.9648089544, 84.0, 14.0}, { 49, { 8, 75.9648089544, 74.7424624317, 6.0, 0.001}};
+
+const raod[] =  { { 47, 110.190511588, 105.227784706, 42.0, 28.0}, { 36, 105.227784706, 95.3023309422, 84.0, 35.0}, { 10, 95.3023309422, 85.3768771785, 84.0, 14.0}, { 4, 85.3768771785, 75.4514234149, 84.0, 14.0}, { 49, { 8, 75.4514234149, 74.7424624317, 6.0, 0.001}};
 
 - different voices
 
@@ -1192,18 +1208,21 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
 
 ** 20/3
 
-- so we need to generate vocabs for nvp and fullklatt/elm
+- so we need to generate vocabs for nvp and fullklatt/elm - see above
 
 - re-test also 256 TTS as we changed some code there...
 
-- TODO: figure out XYZ for Klatt modes, *why sounds so throaty*, check sanity of holmes.c vs. other rsynth/klatt versions
-
-checking and changes in klatt_get_sample and get_sample_TTS to CHECK! - check dur (one more and...)?
+- TODO: figure out XYZ for Klatt modes, *why sounds so throaty*, check
+  sanity of holmes.c vs. other rsynth/klatt versions->checking and
+  changes in klatt_get_sample and get_sample_TTS to CHECK! - check dur
+  (one more and...)?
 
 *** klatt TTS:
 - and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.cDONE
 
-- next step is to generate in parse.c and test this - works but only for very short sequences so figure how to restrict this
+- next step is to generate in parse.c and test this - works but only
+  for very short sequences so figure how to restrict this as TTS
+  length should be reduced // maybe remove numbers and capitals here
 
 * TTS 
 
