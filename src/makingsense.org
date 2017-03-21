@@ -1173,7 +1173,8 @@ then into our numbers (python lookup) and add pitch and length ->
 
 test_speakIpa.py - test first of all:
 
-ordering:               print str(looky.get(phon))+",",
+ordering:               
+print str(looky.get(phon))+",",
 print str(phoneme['voicePitch'])+",",
 print str(phoneme['endVoicePitch'])+",",
 print str(frameDuration)+",",
@@ -1186,6 +1187,8 @@ const worm[] =  { { 46, 110.190511588, 101.54464594, 42.0, 28.0}, { 6, 101.54464
 const code[] =  { { 49, { 40, 110.190511588, 110.190511588, 6.0, 0.001}, { 49, { 32, 110.190511588, 93.077660271, 84.0, 14.0}, { 20, 93.077660271, 75.9648089544, 84.0, 14.0}, { 49, { 8, 75.9648089544, 74.7424624317, 6.0, 0.001}};
 
 const raod[] =  { { 47, 110.190511588, 105.227784706, 42.0, 28.0}, { 36, 105.227784706, 95.3023309422, 84.0, 35.0}, { 10, 95.3023309422, 85.3768771785, 84.0, 14.0}, { 4, 85.3768771785, 75.4514234149, 84.0, 14.0}, { 49, { 8, 75.4514234149, 74.7424624317, 6.0, 0.001}};
+
+*mistake in last 2 with 49!*
 
 - different voices
 
@@ -1218,11 +1221,35 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
   (one more and...)?
 
 *** klatt TTS:
+
 - and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.cDONE
 
 - next step is to generate in parse.c and test this - works but only
   for very short sequences so figure how to restrict this as TTS
   length should be reduced // maybe remove numbers and capitals here
+
+** 21/3
+
+TODO:
+
+- test rsynth code on lap to check what is causing breathiness
+- nvp vocab needs pitch and duration code from other NVP
+- generate test_elm vocab lists for fullklatt: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: so set up for bulk
+
+////
+
+- lastphoneme and newphoneme in holmes.c for single phoneme code - DONE _single
+- reduce size of TTS for klattDONE - stress TEST still CRASHES - one
+  mistake in NRL_list - still... seems OK for some compiles maybe?
+
+- on lap test parse.c/elm generation - tested and also output accords with other english2phoneme for rsynthTTS-DONE
+
+//  PhonemeToWaveData(eng2phonemeOUT, eng2phonemeOUT_ptr, 0);
+
+
+
+- work over all of klatt
+- Q of len-1 for input in TTS/parse.c?
 
 * TTS 
 

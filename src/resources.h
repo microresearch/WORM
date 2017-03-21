@@ -6,4 +6,5 @@
 extern const float logspeed[];
 extern const float logpitch[];
 extern const unsigned char mapytoascii[];
+extern const unsigned char mapytoletters[];
 #endif

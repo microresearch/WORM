@@ -16,7 +16,7 @@
 
 extern char TTSinarray[17];
 static u8 TTSoutarray[256];
-
+extern const u8 phoneme_prob_remap[64];
 
 //#if 0
 //	#define AMP_ADJ 14
@@ -306,10 +306,10 @@ unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_b
 				samp += klatt_global.nspfr;
 				/* Declination of f0 envelope 0.25Hz / cS */
 				top -= 0.5;
-			}
-		}
+}
+}
 		le = ce;
-	} 
+} 
 	return (samp - samp_base);
 }
 
@@ -329,7 +329,228 @@ static unsigned char t;
 static u8 nextelement=1;
 static klatt_frame_t pars;
 
-void klatt_newsay(){
+static u8 elm_single[6]={28, 10, 0, 47, 6, 0};
+
+void klatt_newsay_single(){ /// elm_single is our list selx is pitch // sely is len // selz is next phoneme
+i=0; 
+le = &Elements[0];// but what do we do with le?
+top = 1.1 * def_pars.F0hz10;
+
+u8 val=_selx*130.0f;
+MAXED(val,127);
+val=127-val;
+top*=logpitch[val];
+
+u8 len=_sely*130.0f;
+MAXED(len,127);
+len=127-len;
+len=logpitch[len]*10.0f;
+
+// list of two phonemes in elm_single - newsay shifts last phoneme out and adds new one
+// selz selects phoneme (set standard lengthy for each phoneme) - there are 64 phonemes also:
+// test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
+
+val=_selz*65.0f;
+MAXED(val,63);
+val=63-val;
+val=phoneme_prob_remap[val];
+
+// deal with old phoneme 
+
+elm_single[0]=elm_single[3];
+elm_single[1]=elm_single[4];
+elm_single[2]=elm_single[5];
+
+// new phoneme
+
+elm_single[3]=val;
+elm_single[4]=len; // TEST - just fixed for now
+elm_single[5]=0; // always
+
+
+    pars = def_pars;
+    pars.FNPhz = le->p[fn].stdy;
+    pars.B1phz = pars.B1hz = 60;
+    pars.B2phz = pars.B2hz = 90;
+    pars.B3phz = pars.B3hz = 150;
+    pars.B4phz = def_pars.B4phz;
+
+    parwave_init(&klatt_global);
+    /* Set stress attack/decay slope */
+    stress_s.t = 40;
+    stress_e.t = 40;
+    stress_e.v = 0.0f;
+
+    for (u8 j = 0; j < nEparm; j++)
+      {
+	flt[j].v = le->p[j].stdy;
+	flt[j].a = frac;
+	flt[j].b = (float) 1.0f - (float) frac;
+      }
+    nextelement=1;
+}
+
+int16_t klatt_get_sample_single(){
+  static short samplenumber=0;
+  static u8 newframe=0;
+  static Elm_ptr ce; 
+  int16_t sample;
+  unsigned nelm=6; // only 2 phonemes=6 elements
+  unsigned char *elm=elm_single; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
+  u8 j; 
+  static u8 dur,first=0;
+  static slope_t startyy[nEparm];
+  static slope_t end[nEparm];
+  if (i>2 && nextelement==1){   // we just have one element
+    klatt_newsay_single();
+  }
+
+  //////// are we on first or next element
+  if (nextelement==1){
+    ce = &Elements[elm[i++]];
+    dur = elm[i++];
+    i++; /* skip stress */
+    /* Skip zero length elements which are only there to affect
+       boundary values of adjacent elements
+    */
+
+    if (dur == 0) { // do what? NOTHING
+    }
+    else
+      { // startyy to process next frames
+	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+
+	if (ce->rk > le->rk)
+	  {
+	    set_trans(startyy, ce, le, 0, 's');
+	    /* we dominate last */
+	  }
+	else
+	  {
+	    set_trans(startyy, le, ce, 1, 's');
+	    /* last dominates us */
+	  }
+
+	if (ne->rk > ce->rk)
+	  {
+	    set_trans(end, ne, ce, 1, 'e');
+	    /* next dominates us */
+	  }
+	else
+	  {
+	    set_trans(end, ce, ne, 0, 'e');
+	    /* we dominate next */
+	  }
+	// next set of frames what do we need to init?
+	t=0;
+	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+	newframe=1;
+      } // if dur==0
+  } // is nextelement==1
+  
+  if (newframe==1) { // this is a new frame - so we need new parameters
+    newframe=0;
+    // inc and are we at end of frames in which case we need next element?
+
+    if (t<=dur){ //
+                  float base = top * 0.8f /* 3 * top / 5 */;
+      //      float base =      200+ adc_buffer[SELZ];
+      float tp[nEparm];
+
+           if (tstress == ntstress)
+	{
+	  j = i;
+	  stress_s = stress_e;
+	  tstress = 0;
+	  ntstress = dur;
+
+	  while (j <= nelm)
+	    {
+	      Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+	      unsigned du = (j < nelm) ? elm[j++] : 0;
+	      unsigned s  = (j < nelm) ? elm[j++] : 3;
+	      if (s || e->feat & vwl)
+		{
+		  unsigned d = 0;
+		  if (s)
+		    stress_e.v = (float) s / 3.0f;
+		  else
+		    stress_e.v = (float) 0.1f;
+		  do
+		    {
+		      d += du;
+		      e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+		      du = elm[j++];
+		    }
+		  while ((e->feat & vwl) && elm[j++] == s);
+		  ntstress += d / 2;
+		  break;
+		}
+	      ntstress += du;
+	    }
+	    }
+
+      for (j = 0; j < nEparm; j++)
+	tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &startyy[j], &end[j], (float) ce->p[j].stdy, t, dur));
+
+      /* Now call the synth for each frame */
+
+      pars.F0hz10 = base + (top - base) *
+	interpolate("", "f0", &stress_s, &stress_e, (float) 0, tstress, ntstress);
+
+      pars.AVdb = pars.AVpdb = tp[av];
+      pars.AF = tp[af];
+      pars.FNZhz = tp[fn];
+      pars.ASP = tp[asp];
+      pars.Aturb = tp[avc];
+      pars.B1phz = pars.B1hz = tp[b1];
+      pars.B2phz = pars.B2hz = tp[b2];
+      pars.B3phz = pars.B3hz = tp[b3];
+      pars.F1hz = tp[f1];
+      pars.F2hz = tp[f2];
+      pars.F3hz = tp[f3];
+      /* AMP_ADJ + is a bodge to get amplitudes up to klatt-compatible levels
+	 Needs to be fixed properly in tables
+      */
+      /*
+	pars.ANP  = AMP_ADJ + tp[an];
+      */
+      pars.AB = AMP_ADJ + tp[ab];
+      pars.A5 = AMP_ADJ + tp[a5];
+      pars.A6 = AMP_ADJ + tp[a6];
+      pars.A1 = AMP_ADJ + tp[a1];
+      pars.A2 = AMP_ADJ + tp[a2];
+      pars.A3 = AMP_ADJ + tp[a3];
+      pars.A4 = AMP_ADJ + tp[a4];
+      initparwave(&klatt_global, &pars);
+      nextelement=0;
+      tstress++; t++;
+    } // if t<dur
+    else { // hit end of DUR number of frames...
+      nextelement=1; 
+      le = ce; // where we can put this?????? TODO!!!
+      klatt_get_sample_single();
+    }
+}
+//  if (nextelement==0){
+    // always run through samples till we hit next frame
+    //    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); 
+    sample=parwavesinglesample(&klatt_global, &pars, samplenumber); 
+    
+    ///x++;
+  //  outgoing[samplenumber]=rand()%32768;
+    samplenumber++;
+    if (samplenumber>=klatt_global.nspfr) {
+      // end of frame so...????
+      newframe=1;
+      samplenumber=0;
+      top -= 0.5; 
+    }
+//  }
+  return sample;
+}
+
+void klatt_newsay(){ /// elm is our list
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
@@ -423,8 +644,8 @@ int16_t klatt_get_sample(){
     newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
-    if (t<dur){ //
-                  float base = top * 0.8 /* 3 * top / 5 */;
+    if (t<=dur){ //
+                  float base = top * 0.8f /* 3 * top / 5 */;
       //      float base =      200+ adc_buffer[SELZ];
       float tp[nEparm];
 
@@ -498,8 +719,9 @@ int16_t klatt_get_sample(){
       tstress++; t++;
     } // if t<dur
     else { // hit end of DUR number of frames...
-      nextelement=1; // one extra sample below
+      nextelement=1; 
       le = ce; // where we can put this?????? TODO!!!
+      klatt_get_sample();
     }
 }
 //  if (nextelement==0){
@@ -514,7 +736,7 @@ int16_t klatt_get_sample(){
       // end of frame so...????
       newframe=1;
       samplenumber=0;
-      top -= 0.5; // where we can put this?
+      top -= 0.5; 
     }
 //  }
   return sample;
@@ -527,14 +749,15 @@ void klatt_newsayTTS(){
 //static signed char testphone[]="sEHEHvEHEHntIYIY sEHEHvAXAXn THTHAWAWzAEAEnd sEHEHvAXAXn hAHAHndrEHEHd sEHEHvEHEHntIYIY sEHEHvAXAXn";
 darray_free(&wav_elm);
 
-u8 lenny=text2speechforklatt(16,TTSinarray,TTSoutarray);
-PhonemeToWaveData(TTSoutarray, 32); // only works out if restricted  to say 32 - NOT 64 _ STRESS TESTING 
-//PhonemeToWaveData(testphone, 64);
+u8 lenny=text2speechforklatt(32,TTSinarray,TTSoutarray); // restrict TTS to just ascii
+if (lenny>32) lenny=32;
+PhonemeToWaveData(TTSoutarray, lenny); // only works out if restricted  to say 32 - NOT 64 _ STRESS TESTING - still crashes on 32
+//PhonemeToWaveData(testphone, 16);
 
 elmer=(unsigned char *) darray_find(&wav_elm, 0); // is our list of phonemes in order phon_number, duration, stress - we cycle through it
 i=0; 
 le = &Elements[0];
-top = 1.1 * def_pars.F0hz10;
+top = 1.1f * def_pars.F0hz10;
 u8 val=_selx*130.0f;
 MAXED(val,127);
 val=127-val;
@@ -625,8 +848,8 @@ int16_t klatt_get_sampleTTS(){
     newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
-    if (t<dur){ //
-                  float base = top * 0.8 /* 3 * top / 5 */;
+    if (t<=dur){ //
+                  float base = top * 0.8f /* 3 * top / 5 */;
       //      float base =      200+ adc_buffer[SELZ];
       float tp[nEparm];
 
@@ -702,6 +925,7 @@ int16_t klatt_get_sampleTTS(){
     else { // hit end of DUR number of frames...
       nextelement=1;
       le = ce; // where we can put this?????? TODO!!!
+      klatt_get_sampleTTS();
     }
   }
 //  if (nextelement==0){// causes clicks

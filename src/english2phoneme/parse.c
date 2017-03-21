@@ -125,7 +125,7 @@ void outnum(const char* ooo);
 void have_number();
 
 
-const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "h", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
+const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "HH", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
 
 #ifdef LAP
 
@@ -188,9 +188,17 @@ void main(argc, argv)
     
     strcpy(TTSinarray,buffer);
 
+    //unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
+    /*    while(1){
+      for (int i=0;i<8;i++){
+	TTSinarray[i]=97+rand()%26;
+      }
+      text2speechforklatt(8, TTSinarray, TTSoutarray);
+      printf("%s %s\n",TTSinarray, TTSoutarray);
+      }*/
+
     //        TTSinarray[count] = 0; // place in text2speech
 
-    //         printf("%s %d\n",TTSinarray, input_size);
 
   //  u8 TTSlength= text2speechfor256(9,TTSinarray,TTSoutarray); // 7 is length how? or is fixed?
 
@@ -241,7 +249,7 @@ void main(argc, argv)
   }
   printf("%s %d", output, strlen(output));
   printf("\n");
-  }  
+	}
 
   //  return output_count;
   //    }
@@ -268,14 +276,14 @@ unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input,
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
-  input[input_len-1] = EOF;
+  input[input_len] = EOF;
   xlate_file();
-  unsigned int countme=0;
-   if (output_count>=128) output_count=128;
+  unsigned char countme=0;
+   if (output_count>=32) output_count=32;
    output[0] = '\0';
   for (unsigned char i=0;i<output_count;i++){
     countme+=strlen(NRL_list[output_array[i]]);
-    if (countme<250) strcat(output, NRL_list[output_array[i]]); // how do we not overrun
+    if (countme<32) strcat(output, NRL_list[output_array[i]]); // how do we not overrun
     else return (countme-strlen(NRL_list[output_array[i]]));
   }
   return countme;

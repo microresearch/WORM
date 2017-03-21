@@ -28,6 +28,26 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 
 // 0 = ʃ 1 = ʍ 2 = a 3 = ɐ 4 = ɒ 5 = ɔ 6 = ɜ 7 = b 8 = d 9 = f 10 = ɪ 11 = t(3 12 = l 13 = n 14 = p 15 = t 16 = v 17 = z 18 = ɾ 19 = j 20 = ʊ 21 = ʌ 22 = ʒ 23 = ɔj 24 = ʔ 25 = d͡ʒ 26 = θ 27 = ɑw 28 = I 29 = ŋ 30 = t͡ʃ 31 = ɑ 32 = ə 33 = ɛ 34 = ɑj 35 = ɡ 36 = e 37 = g 38 = æ 39 = i 40 = k 41 = m 42 = o 43 = ð 44 = s 45 = u 46 = w 47 = ɹ
 
+/*
+
+test data structure for vocab... need end phoneme = 255
+
+print str(looky.get(phon))+",",
+print str(phoneme['voicePitch'])+",",
+print str(phoneme['endVoicePitch'])+",",
+print str(frameDuration)+",",
+print str(fadeDuration)+" },"
+ */
+
+typedef struct {
+  unsigned char phon;
+  float voicePitch;
+  float endVoicePitch;
+  float frameDuration;
+  float fadeDuration;
+} nvp_vocab_;
+
+static const nvp_vocab_ nvp_v_worm[] =  { { 46, 110.190511588, 101.54464594, 42.0, 28.0}, { 6, 101.54464594, 83.3883280795, 88.2, 35.0}, { 41, 83.3883280795, 74.7424624317, 42.0, 14.0}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
 
 const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 220.0f , 75.0f , 225.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 200.0f, 100.0f, 300.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.466666666667f, 0.4f, 0.4f, 0.383333333333 , 0.0f , 1.0f , 0.0f, 0.0f },
@@ -389,6 +409,30 @@ u8 nvp_newsay(){
   return nextframe;
 }
 
+u8 nvp_newsay_vocab(){
+  static u8 counter=0, nextframe=0;
+  // nextframe is next in struct
+  nextframe=nvp_v_worm[counter].phon;
+  counter++;
+  if (nextframe==255) {
+    counter=1;
+    nextframe=nvp_v_worm[0].phon;
+  }
+  changed=1;
+    if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
+  else {
+  for (u8 i=0;i<39;i++){
+    *indexy[i]=data[nextframe-1][i];
+  }
+  }
+  // frame length, interpol sets to half that and pitch = SELY, SELZ,
+    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
+  this_interpol=this_frame_length/2;
+  // pitch
+  return nextframe;
+}
+
+
 int16_t nvp_get_sample(){
   float val=0;
   unsigned int j;
@@ -397,6 +441,48 @@ int16_t nvp_get_sample(){
   // is this a new frame?
     memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
     nvp_newsay();
+    count=0;
+    //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+  }// new frame - we also need to take care of pitch and pitch interpol
+
+    if (count<this_interpol && changed){
+    float curFadeRatio=(float)count/(this_interpol);
+    for(j=0;j<speechPlayer_frame_numParams;++j) {
+      ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
+    }
+    }
+
+  //  &tempframe=&framer;
+  // for pitch interpolates: but we just use our pitch here
+
+		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
+		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
+		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
+		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
+    int16_t vale=1024.0f*(1.0f-_selx);
+  tempframe.voicePitch=256.0f*logspeed[vale]; 
+
+  float voice=getNextVOICE(&tempframe);
+  float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
+  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude;
+  float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
+  float out=(cascadeOut+parallelOut)*tempframe.outputGain;
+
+  count++;
+  out=out*4000.0f;
+  if (out>32000.0f) out=32000.0f;
+  else if (out<-32000.0f) out=-32000.0f;
+   return (int)out;
+}
+
+int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
+  float val=0;
+  unsigned int j;
+  static u16 count=0;
+  if (count>this_frame_length){
+  // is this a new frame?
+    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    nvp_newsay_vocab();
     count=0;
     //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
