@@ -1171,24 +1171,9 @@ then into our numbers (python lookup) and add pitch and length ->
 
 *TODO: script this so takes ipa list and makes arrays for our code...*
 
-test_speakIpa.py - test first of all:
+*test_speakIpa.py*
 
-ordering:               
-print str(looky.get(phon))+",",
-print str(phoneme['voicePitch'])+",",
-print str(phoneme['endVoicePitch'])+",",
-print str(frameDuration)+",",
-print str(fadeDuration)+" },"
-
-/TEST/
-
-const worm[] =  { { 46, 110.190511588, 101.54464594, 42.0, 28.0}, { 6, 101.54464594, 83.3883280795, 88.2, 35.0}, { 41, 83.3883280795, 74.7424624317, 42.0, 14.0}};
-
-const code[] =  { { 49, { 40, 110.190511588, 110.190511588, 6.0, 0.001}, { 49, { 32, 110.190511588, 93.077660271, 84.0, 14.0}, { 20, 93.077660271, 75.9648089544, 84.0, 14.0}, { 49, { 8, 75.9648089544, 74.7424624317, 6.0, 0.001}};
-
-const raod[] =  { { 47, 110.190511588, 105.227784706, 42.0, 28.0}, { 36, 105.227784706, 95.3023309422, 84.0, 35.0}, { 10, 95.3023309422, 85.3768771785, 84.0, 14.0}, { 4, 85.3768771785, 75.4514234149, 84.0, 14.0}, { 49, { 8, 75.4514234149, 74.7424624317, 6.0, 0.001}};
-
-*mistake in last 2 with 49!*
+*mistake in last 2 with 49!-FIXED*
 
 - different voices
 
@@ -1198,10 +1183,10 @@ const raod[] =  { { 47, 110.190511588, 105.227784706, 42.0, 28.0}, { 36, 105.227
 
 test_elm ported in (DONE) and basic tests with x as xaxis, y as length, z as phoneme in list *CRACKLES/clicks _ FIX-DONE*
 
-TODO: singmode, pitch changes at start of phrase or all through (but we need to keep consistent length)
+TODO: singing mode, pitch changes at start of phrase or all through (but we need to keep consistent length)
 
 also maybe vocab for klatt as fixed test_elms so then we can bend
-more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: so set up for bulk*
+more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: see below*
 
 - different voices
 
@@ -1233,8 +1218,14 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
 TODO:
 
 - test rsynth code on lap to check what is causing breathiness
+
+- fix nvp vocab generation:
+
 - nvp vocab needs pitch and duration code from other NVP
-- generate test_elm vocab lists for fullklatt: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: so set up for bulk
+
+- generate test_elm vocab lists for fullklatt: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: 
+
+with length... ->DONE *test example vocab in holmes.c*
 
 ////
 
@@ -1246,10 +1237,18 @@ TODO:
 
 //  PhonemeToWaveData(eng2phonemeOUT, eng2phonemeOUT_ptr, 0);
 
-
+- end of phoneme in element list: 1,6,0 twice???? - to keep always in elements so don't overwrite?
 
 - work over all of klatt
 - Q of len-1 for input in TTS/parse.c?
+
+** 22/3
+
+- ditch klatt TTS if necessary and concentrate on vocab and bends for all
+
+- test nvp/fullklatt vocabs and work on these
+
+- notes above
 
 * TTS 
 

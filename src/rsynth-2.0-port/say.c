@@ -76,7 +76,7 @@ void PhonemeToWaveData(char *phone, int len)
 {
 	unsigned frames;
  	int i, j;
- 	darray_init(&wav_elm, sizeof(char), 128); // where is wav_elm and how long is it?
+ 	darray_init(&wav_elm, sizeof(char), len); // where is wav_elm and how long is it?
 	frames = phone_to_elm(phone, len, &wav_elm);
 	}
 

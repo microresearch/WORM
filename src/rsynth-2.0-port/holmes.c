@@ -14,6 +14,13 @@
 #include "resources.h"
 #include "english2phoneme/TTS.h"
 
+typedef struct {
+  unsigned char length;
+  unsigned char elements[];
+} klattvocab_;
+
+static const klattvocab_ vocab_help={24, 28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0}; // test this!
+
 extern char TTSinarray[17];
 static u8 TTSoutarray[256];
 extern const u8 phoneme_prob_remap[64];
@@ -741,6 +748,206 @@ int16_t klatt_get_sample(){
 //  }
   return sample;
 }
+
+static u8 elm_plen;
+static u8 const *vocab_elm;
+
+void klatt_newsay_vocab(){ /// elm is our list
+i=0; 
+le = &Elements[0];
+top = 1.1 * def_pars.F0hz10;
+u8 val=_selx*130.0f;
+MAXED(val,127);
+val=127-val;
+top*=logpitch[val];
+
+// select vocab but for now
+
+ elm_plen=vocab_help.length;
+ vocab_elm=vocab_help.elements;
+ 
+    pars = def_pars;
+    pars.FNPhz = le->p[fn].stdy;
+    pars.B1phz = pars.B1hz = 60;
+    pars.B2phz = pars.B2hz = 90;
+    pars.B3phz = pars.B3hz = 150;
+    pars.B4phz = def_pars.B4phz;
+
+    parwave_init(&klatt_global);
+    /* Set stress attack/decay slope */
+    stress_s.t = 40;
+    stress_e.t = 40;
+    stress_e.v = 0.0f;
+
+    for (u8 j = 0; j < nEparm; j++)
+      {
+	flt[j].v = le->p[j].stdy;
+	flt[j].a = frac;
+	flt[j].b = (float) 1.0f - (float) frac;
+      }
+    nextelement=1;
+}
+
+int16_t klatt_get_sample_vocab(){
+  static short samplenumber=0;
+  static u8 newframe=0;
+  static Elm_ptr ce; 
+  int16_t sample;
+  unsigned nelm=elm_plen; 
+  unsigned char const *elm=vocab_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
+  u8 j; 
+  static u8 dur,first=0;
+  static slope_t startyy[nEparm];
+  static slope_t end[nEparm];
+  if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
+    klatt_newsay_vocab();
+  }
+
+  //////// are we on first or next element
+  if (nextelement==1){
+    ce = &Elements[elm[i++]];
+    dur = elm[i++];
+    i++; /* skip stress */
+    /* Skip zero length elements which are only there to affect
+       boundary values of adjacent elements
+    */
+
+    if (dur == 0) { // do what? NOTHING
+    }
+    else
+      { // startyy to process next frames
+	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+
+	if (ce->rk > le->rk)
+	  {
+	    set_trans(startyy, ce, le, 0, 's');
+	    /* we dominate last */
+	  }
+	else
+	  {
+	    set_trans(startyy, le, ce, 1, 's');
+	    /* last dominates us */
+	  }
+
+	if (ne->rk > ce->rk)
+	  {
+	    set_trans(end, ne, ce, 1, 'e');
+	    /* next dominates us */
+	  }
+	else
+	  {
+	    set_trans(end, ce, ne, 0, 'e');
+	    /* we dominate next */
+	  }
+	// next set of frames what do we need to init?
+	t=0;
+	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+	newframe=1;
+      } // if dur==0
+  } // is nextelement==1
+  
+  if (newframe==1) { // this is a new frame - so we need new parameters
+    newframe=0;
+    // inc and are we at end of frames in which case we need next element?
+
+    if (t<=dur){ //
+                  float base = top * 0.8f /* 3 * top / 5 */;
+      //      float base =      200+ adc_buffer[SELZ];
+      float tp[nEparm];
+
+           if (tstress == ntstress)
+	{
+	  j = i;
+	  stress_s = stress_e;
+	  tstress = 0;
+	  ntstress = dur;
+
+	  while (j <= nelm)
+	    {
+	      Elm_ptr e   = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+	      unsigned du = (j < nelm) ? elm[j++] : 0;
+	      unsigned s  = (j < nelm) ? elm[j++] : 3;
+	      if (s || e->feat & vwl)
+		{
+		  unsigned d = 0;
+		  if (s)
+		    stress_e.v = (float) s / 3.0f;
+		  else
+		    stress_e.v = (float) 0.1f;
+		  do
+		    {
+		      d += du;
+		      e = (j < nelm) ? &Elements[elm[j++]] : &Elements[0];
+		      du = elm[j++];
+		    }
+		  while ((e->feat & vwl) && elm[j++] == s);
+		  ntstress += d / 2;
+		  break;
+		}
+	      ntstress += du;
+	    }
+	    }
+
+      for (j = 0; j < nEparm; j++)
+	tp[j] = filter(flt + j, interpolate(ce->name, Ep_name[j], &startyy[j], &end[j], (float) ce->p[j].stdy, t, dur));
+
+      /* Now call the synth for each frame */
+
+      pars.F0hz10 = base + (top - base) *
+	interpolate("", "f0", &stress_s, &stress_e, (float) 0, tstress, ntstress);
+
+      pars.AVdb = pars.AVpdb = tp[av];
+      pars.AF = tp[af];
+      pars.FNZhz = tp[fn];
+      pars.ASP = tp[asp];
+      pars.Aturb = tp[avc];
+      pars.B1phz = pars.B1hz = tp[b1];
+      pars.B2phz = pars.B2hz = tp[b2];
+      pars.B3phz = pars.B3hz = tp[b3];
+      pars.F1hz = tp[f1];
+      pars.F2hz = tp[f2];
+      pars.F3hz = tp[f3];
+      /* AMP_ADJ + is a bodge to get amplitudes up to klatt-compatible levels
+	 Needs to be fixed properly in tables
+      */
+      /*
+	pars.ANP  = AMP_ADJ + tp[an];
+      */
+      pars.AB = AMP_ADJ + tp[ab];
+      pars.A5 = AMP_ADJ + tp[a5];
+      pars.A6 = AMP_ADJ + tp[a6];
+      pars.A1 = AMP_ADJ + tp[a1];
+      pars.A2 = AMP_ADJ + tp[a2];
+      pars.A3 = AMP_ADJ + tp[a3];
+      pars.A4 = AMP_ADJ + tp[a4];
+      initparwave(&klatt_global, &pars);
+      nextelement=0;
+      tstress++; t++;
+    } // if t<dur
+    else { // hit end of DUR number of frames...
+      nextelement=1; 
+      le = ce; // where we can put this?????? TODO!!!
+      klatt_get_sample();
+    }
+}
+//  if (nextelement==0){
+    // always run through samples till we hit next frame
+    //    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); 
+    sample=parwavesinglesample(&klatt_global, &pars, samplenumber); 
+    
+    ///x++;
+  //  outgoing[samplenumber]=rand()%32768;
+    samplenumber++;
+    if (samplenumber>=klatt_global.nspfr) {
+      // end of frame so...????
+      newframe=1;
+      samplenumber=0;
+      top -= 0.5; 
+    }
+//  }
+  return sample;
+}
+
 
 static unsigned char *elmer;
 

@@ -13,3 +13,6 @@ void klatt_newsayTTS(void);
 
 int16_t klatt_get_sample_single(void);
 void klatt_newsay_single(void);
+
+int16_t klatt_get_sample_vocab(void);
+void klatt_newsay_vocab(void);
