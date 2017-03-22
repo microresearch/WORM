@@ -38,7 +38,7 @@
 #include "stm32f4xx.h"
 #include "wavetable.h"
 #include "audio.h"
-#include "resources.c"
+#include "resources.h"
 #else
 #include "forlap.h"
 #endif
