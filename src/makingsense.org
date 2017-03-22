@@ -1239,16 +1239,37 @@ with length... ->DONE *test example vocab in holmes.c*
 
 - end of phoneme in element list: 1,6,0 twice???? - to keep always in elements so don't overwrite?
 
-- work over all of klatt
 - Q of len-1 for input in TTS/parse.c?
 
 ** 22/3
 
-- ditch klatt TTS if necessary and concentrate on vocab and bends for all
+- *ditch klatt TTS and concentrate on vocab and bends for all*
 
 - test nvp/fullklatt vocabs and work on these
 
-- notes above
+- all other rsynths: note also opsynth in ... - which can we use for testing on lap?
+
+* KLATT/rsynth notes
+
+** our ported rsynth-2.0-port (from TTS)
+
+to test on lap
+
+** rsynth-2-un
+
+shows elements...
+
+is as our port
+
+** rsynth-2
+
+????
+
+** rsynth-2005-12-16
+
+shows also our elements (different to rsynth-2 and has longer list) and works on lap
+
+uses different klatt scheme (see holmes and also opsynth) but *could be ported*
 
 * TTS 
 
