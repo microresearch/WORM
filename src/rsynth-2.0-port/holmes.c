@@ -1,10 +1,29 @@
 #include <config.h>
 /* holmes.c
  */
+
+#define ELM_LEN 48
+
+
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
+#ifndef LAP
 #include "audio.h"
+extern u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
+extern char TTSinarray[17];
+#else
+#include "forlap.h"
+#include "resources.c"
+const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
+u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
+char TTSinarray[17];
+
+unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
+  return 0;
+}
+
+#endif
 #include "nsynth.h"
 #include "elements.h"
 #include "darray.h"
@@ -16,12 +35,11 @@
 
 typedef struct {
   unsigned char length;
-  unsigned char elements[64];
+  unsigned char elements[64]; // max number of elements
 } klattvocab_;
 
 static const klattvocab_ vocab_help={24, 28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0}; // test this!
 
-extern char TTSinarray[17];
 static u8 TTSoutarray[256];
 extern const u8 phoneme_prob_remap[64];
 
@@ -30,8 +48,6 @@ extern const u8 phoneme_prob_remap[64];
 //#else
 	#define AMP_ADJ 0
 //#endif
-
-#define ELM_LEN 48
 
 //extern uint16_t adc_buffer[10];
 
@@ -319,8 +335,6 @@ unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_b
 } 
 	return (samp - samp_base);
 }
-
-extern u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
 
 static filter_t flt[nEparm];
 static Elm_ptr le;// = &Elements[0];
@@ -756,11 +770,13 @@ void klatt_newsay_vocab(){ /// elm is our list
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
-u8 val=_selx*130.0f;
+#ifndef LAP
+ u8 val=_selx*130.0f;
 MAXED(val,127);
 val=127-val;
 top*=logpitch[val];
-
+#endif
+ 
 // select vocab but for now
 
  elm_plen=vocab_help.length; // TODO: sely bend on length
@@ -843,7 +859,7 @@ int16_t klatt_get_sample_vocab(){
 	  }
 	// next set of frames what do we need to init?
 	t=0;
-	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0];
+	//	ne = (i < nelm) ? &Elements[elm[i]] : &Elements[0]; // ????
 	newframe=1;
       } // if dur==0
   } // is nextelement==1
@@ -1155,5 +1171,27 @@ int16_t klatt_get_sampleTTS(){
   return sample;
 }
 
+#ifdef LAP
+void main(){
+  klatt_init();
+    klatt_newsay_vocab();
 
+    //    while(1){
+    uint16_t samp=klatt_get_sample_vocab()+32768;
+    printf("%c", samp>>8);
+    //    }
+
+    uint16_t samples[32000];
+  vocab_elm=vocab_help.elements;
+  unsigned char *elm=vocab_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
+
+      while(1){
+    holmes(vocab_help.length, elm, 16000, samples);
+  for (int16_t x=0;x<16000;x++){
+    uint16_t samp=samples[x]+32768;
+    printf("%c", samp>>8);
+    }
+      }
+      }
+#endif
 

@@ -3,11 +3,13 @@
 /* phtoelm.c
  */
 
+#ifndef LAP
 #include "stm32f4xx.h"
-//#include "platform_config.h"
-//#include "hw_config.h"
-#include "stdlib.h"
+#else
+#include "forlap.h"
+#endif
 
+#include "stdlib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,8 +83,8 @@ static void enter(char *p,...)
 	buf[0] = (x - buf) - 1;
 	x = malloc(buf[0] + 1);
 	if(x){
-		memcpy(x, buf, buf[0] + 1);
-		trie_insert(&phtoelm, p, x);
+	  memcpy(x, buf, buf[0] + 1);
+	  trie_insert(&phtoelm, p, x);
 	}else{
 	  //		fprintf(stderr, "memory shortage (enter)\n");
 	}

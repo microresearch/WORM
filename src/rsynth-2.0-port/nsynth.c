@@ -33,16 +33,21 @@
  * 000016 20-Apr-91 ATS Modified for SPARCSTATION
  */
 
-#include "stm32f4xx.h"
 
+#ifndef LAP
+#include "stm32f4xx.h"
+#include "wavetable.h"
+#include "audio.h"
+#include "resources.c"
+#else
+#include "forlap.h"
+#endif
 #include "stdlib.h"
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
 #include <math.h>
 #include "nsynth.h"
-#include "wavetable.h"
-#include "audio.h"
 #ifndef PI
 #ifndef M_PI                      /* <math.h> */
 #define PI               3.1415927f
@@ -347,8 +352,8 @@ static void flutter(klatt_global_ptr globals, klatt_frame_ptr pars)
 	F0hz10 += (long) delta_f0;
 }
 
-extern Wavetable wavtable;
-extern __IO uint16_t adc_buffer[10];
+//extern Wavetable wavtable;
+//extern __IO uint16_t adc_buffer[10];
 
 
 static float wave_source(long nper) {
@@ -1649,7 +1654,7 @@ unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short 
 		//		*(jwave+klatthead) = rand()%32768;
 				jwave[klatthead] = clip(globals, out); /* Convert back to integer */
 		klatthead++;
-		if (klatthead>=AUDIO_BUFSZ) klatthead=0;
+		//		if (klatthead>=AUDIO_BUFSZ) klatthead=0;
 
 	}
 	return klatthead;

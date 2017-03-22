@@ -23,7 +23,7 @@ void klatt_init(void)
   //	int impulse = 0;
   //  int impulse = 1;
 	//int casc = 1;
-	int casc = 6;
+	int casc = 2;
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
 	klatt_global.glsource = IMPULSIVE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE - where is sample from?

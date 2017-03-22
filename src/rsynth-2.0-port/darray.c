@@ -1,10 +1,9 @@
 #include <config.h>
 /* darray.c
  */
-
+#ifndef LAP
 #include "stm32f4xx.h"
-//#include "platform_config.h"
-//#include "hw_config.h"
+#endif
 #include "stdlib.h"
 #include <stdio.h>
 #include <string.h>

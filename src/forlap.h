@@ -21,5 +21,8 @@ typedef unsigned short uint16_t;
 
 #define TRUE 1
 #define FALSE 0
+#define MAXED(var, max)
+
+float _selx,_sely,_selz;
 
 //#define float float32_t

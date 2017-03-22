@@ -24,6 +24,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			digitalker.o nvp.o \
 			ntube.o worming.o wavetable.o newvotrax.o sp0256bend.o\
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
+			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o 
 #			lpcanalysis.o 
 #			ownvocoder.o
 
@@ -48,7 +49,7 @@ LDSCRIPT = stm32_flash.ld
 
 # LACH is -DTEST option!
 
-CFLAGS  =  -I. -IInclude -I/~/ARM/CMSIS_5 -Iinc -I./rsynth-2.0-port -I./LPC -I./vocoder -std=gnu99 \
+CFLAGS  =  -I. -IInclude -I/~/ARM/CMSIS_5 -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
 	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' \
 	-mthumb \
 	-mfpu=fpv4-sp-d16 \

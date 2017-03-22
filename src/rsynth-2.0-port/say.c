@@ -41,10 +41,11 @@
  */
 extern char *Revision;
 
+#ifndef LAP
 #include "stm32f4xx.h"
-//#include "platform_config.h"
-//#include "hw_config.h"
-
+#else
+#include "forlap.h"
+#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>

@@ -1258,7 +1258,13 @@ nvp also seems quite breathy
 
 ** our ported rsynth-2.0-port (from TTS)
 
-to test on lap
+to test on lap:
+
+: gcc darray.c def_pars.c elements.c holmes.c nsynth.c phtoelm.c say.c trie.c -olapr -I. -I.. -DLAP -std=gnu99 -lm 
+
+we have the same breathiness with new holmes/nsynth as previous but now we can test vocabs and sort this maybe...
+
+check nsynth etc. against originalCHECKED
 
 ** rsynth-2-un
 
@@ -1275,6 +1281,12 @@ is as our port
 shows also our elements (different to rsynth-2 and has longer list) and works on lap
 
 uses different klatt scheme (see holmes and also opsynth) but *could be ported*
+
+// port in progress: compiles but we need to break down frame:DONE 
+
+TO FIX: init, where do we set speaker
+
+// use rsynth-2005 for vocab generation
 
 * TTS 
 
