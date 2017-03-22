@@ -311,10 +311,6 @@ void init_nvp(void){
   change_nvpparams(&framer, 1.0f, 1.0f, 0.0f, 0.0f, 250.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
   framer.preFormantGain=0;
 
-
-   // this shouldn't change
-  
-
    // voice or TEST!
   framer.preFormantGain=0.6f; // keep low-ish
   framer.vibratoPitchOffset=0.1f;
@@ -365,6 +361,7 @@ outputgain: frame.outputGain=2.0 unless we need silence!
 
 
 static u16 this_frame_length, this_interpol;
+static float this_pitch, this_pitch_inc;
 
 void nvp_newvoice(voice* voiced){
 
@@ -381,7 +378,7 @@ void nvp_newvoice(voice* voiced){
 void nvp_init(){
   init_nvp();
   this_frame_length=3840; this_interpol=1900;
-  nvp_newvoice(&caleb); // caleb, adam, nullie, benjie
+  nvp_newvoice(&benjie); // caleb, adam, nullie, benjie
 }
 
 u8 changed=0;
@@ -413,12 +410,10 @@ u8 nvp_newsay_vocab(){
   static u8 counter=0, nextframe=0;
   // nextframe is next in struct
   nextframe=nvp_v_worm[counter].phon;
-  counter++;
   if (nextframe==255) {
-    counter=1;
-    nextframe=nvp_v_worm[0].phon;
+    counter=0;
+    nextframe=nvp_v_worm[0].phon;    
   }
-  changed=1;
     if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
   for (u8 i=0;i<39;i++){
@@ -426,10 +421,15 @@ u8 nvp_newsay_vocab(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
-  this_interpol=this_frame_length/2;
-  // pitch
-  return nextframe;
+    //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
+      //    this_interpol=this_frame_length/2;
+    this_frame_length=nvp_v_worm[counter].frameDuration*(256.0f*_sely);
+    this_interpol=nvp_v_worm[counter].fadeDuration;
+    this_pitch=nvp_v_worm[counter].voicePitch;
+    this_pitch_inc=(nvp_v_worm[counter].endVoicePitch-nvp_v_worm[counter].voicePitch)/this_frame_length;
+    counter++;
+    changed=1;
+    return nextframe;
 }
 
 
@@ -455,10 +455,10 @@ int16_t nvp_get_sample(){
   //  &tempframe=&framer;
   // for pitch interpolates: but we just use our pitch here
 
-		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
-		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
-		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
-		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
+    // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
+    // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
+    // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
+    // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
     int16_t vale=1024.0f*(1.0f-_selx);
   tempframe.voicePitch=256.0f*logspeed[vale]; 
 
@@ -496,17 +496,21 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
 
   //  &tempframe=&framer;
   // for pitch interpolates: but we just use our pitch here
+    
 
 		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
 		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
 		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
 		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
     int16_t vale=1024.0f*(1.0f-_selx);
-  tempframe.voicePitch=256.0f*logspeed[vale]; 
+    //  tempframe.voicePitch=256.0f*logspeed[vale]; 
+    // TEST pitchinc...
+    tempframe.voicePitch=this_pitch*logspeed[vale];
+    this_pitch+=this_pitch_inc;
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude;
+  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude; // was 0.3
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
 

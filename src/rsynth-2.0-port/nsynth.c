@@ -829,7 +829,7 @@ static float antiresonator(resonator_ptr r, float input)
 void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 {
 	long ns;
-	float out = 0.0;
+	float out = 0.0f;
 	/* Output of cascade branch, also final output  */
 
 	/* Initialize synthesizer and get specification for current speech
@@ -875,7 +875,7 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 		*    a pole near the origin in the z-plane, i.e.
 		*    output = input + (0.75 * lastoutput) */
 
-		noise = nrand + (0.75 * nlast);	/* Function of samp_rate ? */
+		noise = nrand + (0.75f * nlast);	/* Function of samp_rate ? */
 		nlast = noise;
 
 		/* Amplitude modulate noise (reduce noise amplitude during

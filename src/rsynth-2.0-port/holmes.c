@@ -16,7 +16,7 @@
 
 typedef struct {
   unsigned char length;
-  unsigned char elements[];
+  unsigned char elements[64];
 } klattvocab_;
 
 static const klattvocab_ vocab_help={24, 28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0}; // test this!
@@ -763,7 +763,7 @@ top*=logpitch[val];
 
 // select vocab but for now
 
- elm_plen=vocab_help.length;
+ elm_plen=vocab_help.length; // TODO: sely bend on length
  vocab_elm=vocab_help.elements;
  
     pars = def_pars;
@@ -813,6 +813,8 @@ int16_t klatt_get_sample_vocab(){
     */
 
     if (dur == 0) { // do what? NOTHING
+      // try next element
+      klatt_get_sample_vocab();
     }
     else
       { // startyy to process next frames
@@ -927,7 +929,7 @@ int16_t klatt_get_sample_vocab(){
     else { // hit end of DUR number of frames...
       nextelement=1; 
       le = ce; // where we can put this?????? TODO!!!
-      klatt_get_sample();
+      klatt_get_sample_vocab();
     }
 }
 //  if (nextelement==0){

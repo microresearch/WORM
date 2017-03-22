@@ -2686,7 +2686,7 @@ void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
     if (trigger==1) nvp_newsay();
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  //  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        doadc();
@@ -2731,7 +2731,7 @@ void nvpvocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)
     if (trigger==1) nvp_newsay_vocab();
   u8 xx=0,readpos;
   float remainder;
-  samplespeed*=0.5f;
+  //  samplespeed*=0.5f;
    if (samplespeed<=1){ 
      while (xx<size){
        doadc();
@@ -2945,7 +2945,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*65.0f;
   MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=49;
+  _intmode=52;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;

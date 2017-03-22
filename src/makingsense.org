@@ -1245,9 +1245,14 @@ with length... ->DONE *test example vocab in holmes.c*
 
 - *ditch klatt TTS and concentrate on vocab and bends for all*
 
-- test nvp/fullklatt vocabs and work on these
+- test nvp/fullklatt vocabsTESTED and add full vocabs and selection code
+
+nvp vocab sounds a bit strange (added length and pitchinc) but maybe try with larger vocab!
+nvp also seems quite breathy
 
 - all other rsynths: note also opsynth in ... - which can we use for testing on lap?
+
+- what we need to do to complete nvp/klatt - per sample bends, breathiness, port of opsynth (below)
 
 * KLATT/rsynth notes
 
@@ -1453,7 +1458,8 @@ fullklatt/simpleklatt/nvp
 
 ////
 
-10. tube and ntube/glottal/wavetable and wormed tubes 
+10. tube and ntube/glottal/wavetable and wormed tubes: RavenTube in
+    raven.c, Ntube in ntube.c and full glottis and tube in tube.c
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
