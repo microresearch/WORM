@@ -1215,8 +1215,6 @@ more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/
 
 ** 21/3
 
-TODO:
-
 - test rsynth code on lap to check what is causing breathiness
 
 - fix nvp vocab generation:
@@ -1235,24 +1233,30 @@ with length... ->DONE *test example vocab in holmes.c*
 
 - on lap test parse.c/elm generation - tested and also output accords with other english2phoneme for rsynthTTS-DONE
 
-//  PhonemeToWaveData(eng2phonemeOUT, eng2phonemeOUT_ptr, 0);
-
-- end of phoneme in element list: 1,6,0 twice???? - to keep always in elements so don't overwrite?
-
-- Q of len-1 for input in TTS/parse.c?
-
 ** 22/3
 
 - *ditch klatt TTS and concentrate on vocab and bends for all*
 
-- test nvp/fullklatt vocabsTESTED and add full vocabs and selection code
+- test nvp/fullklatt vocabsTESTED and *add full vocabs and selection code*
 
-nvp vocab sounds a bit strange (added length and pitchinc) but maybe try with larger vocab!
-nvp also seems quite breathy
-
-- all other rsynths: note also opsynth in ... - which can we use for testing on lap?
+- nvp vocab sounds a bit strange (added length and pitchinc) but maybe
+  try with larger vocab! nvp also seems quite breathy
 
 - what we need to do to complete nvp/klatt - per sample bends, breathiness, port of opsynth (below)
+
+- added rsynth/opsynth(below) to audio.c TO TEST!
+
+** 23/3+
+
+*- Q of len-1 for input in TTS/parse.c? for most gens*
+
+- test new rsynth
+
+- vocabs for nvp and klatt 0 implement and test vocab lists selection
+
+for nvp:  python test_speakIpa.py with list in /root/test
+
+for klatt: list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
 
 * KLATT/rsynth notes
 
@@ -1282,9 +1286,7 @@ shows also our elements (different to rsynth-2 and has longer list) and works on
 
 uses different klatt scheme (see holmes and also opsynth) but *could be ported*
 
-// port in progress: compiles but we need to break down frame:DONE 
-
-TO FIX: init, where do we set speaker
+// port in progress: compiles but we need to break down frame:DONE vocab - needs work to abstract TEST first!
 
 // use rsynth-2005 for vocab generation
 
