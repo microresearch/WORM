@@ -86,7 +86,7 @@ void main(void)
   simpleklatt_newsay();
   nvp_init(); 
   klatt_init();
-  rsynth_init(32000, 10); //void rsynth_init(long sr, float ms_per_frame)
+  rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 

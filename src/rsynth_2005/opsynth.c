@@ -17,6 +17,10 @@
     MA 02111-1307, USA
 
 */
+#include "stm32f4xx.h"
+#include "arm_math.h"
+#include "arm_const_structs.h"
+
 #include <config.h>
 #include <useconfig.h>
 #include <stdio.h>
@@ -105,15 +109,15 @@ set_pole_fbw(long sr, float f, float bw, resonator_ptr rp, char *name,
        on sample rate -it does not work very well.
        So cascade path has its own conditional to skip r5c
      */
-    if (2 * f - bw <= sr) {
+    if (2.0f * f - bw <= sr) {
 	float arg;
 	float r;
-	if (2 * (f + bw) > sr) {
+	if (2.0f * (f + bw) > sr) {
 	    /* This is a little dubious - keep lower skirt in place and
 	       move centre frequency so upper skirt hits Nyquist freq
 	     */
 	    float low = f - bw;
-	    f = (sr / 2 + low) / 2;
+	    f = (sr / 2.0f + low) / 2.0f;
 	    bw = f - low;
 	}
 	arg = minus_pi_t * bw;
@@ -197,7 +201,7 @@ static float
 DBtoLIN(float dB)
 {
     if (dB > 0) {
-	float val = 32768 * pow(10.0f, (dB - 87) / 20 - 3);
+	float val = 32768.0f * powf(10.0f, (dB - 87.0f) / 20.0f - 3.0f);
 	FPCHECK(val);
 	return val;
     }
@@ -213,7 +217,7 @@ set_cascade(rsynth_t * rsynth)
 		 RES(rnpc), 1);
     set_zero_fbw(sr, rsynth->ep[fn], rsynth->speaker->BNhz, RES(rnz));
     /* Rest of cascade path */
-    set_pole_fbw(sr, 3500, 1800, RES(rsc), 1);
+    set_pole_fbw(sr, 3500.0f, 1800.0f, RES(rsc), 1);
     set_pole_fbw(sr, rsynth->speaker->F5hz, rsynth->speaker->B5hz,
 		 RES(r5c), 1);
     set_pole_fbw(sr, rsynth->speaker->F4hz, rsynth->speaker->B4hz,
@@ -229,10 +233,10 @@ pitch_sync(rsynth_t * rsynth)
     float F0Hz = PVT(F0Hz);
 
     if (rsynth->ep[av] > 0 || rsynth->ep[avc] > 0) {
-	PVT(T0) = (long) ((4 * rsynth->sr) / F0Hz);	/* Period in samp*4 */
+	PVT(T0) = (long) ((4.0f * rsynth->sr) / F0Hz);	/* Period in samp*4 */
 	PVT(amp_av) = DBtoLIN(rsynth->ep[av]);	/* Voice amplitude */
 	PVT(amp_avc) = DBtoLIN(rsynth->ep[avc]);	/* Voice-bar amplitude */
-	PVT(amp_turb) = PVT(amp_avc) * 0.1;	/* Breathiness of voicing waveform */
+	PVT(amp_turb) = PVT(amp_avc) * 0.1f;	/* Breathiness of voicing waveform */
 
 
 	/* Duration of period before amplitude modulation */
@@ -254,7 +258,7 @@ pitch_sync(rsynth_t * rsynth)
 	   of plosives etc. - high frequencies are much reduced
 	   but try and keep some 2nd harmonic by setting cuttoff to twice f0.
 	 */
-	set_pole_fbw(rsynth->sr, 0L, (long) (2 * F0Hz), RES(rgl), 1);
+	set_pole_fbw(rsynth->sr, 0L, (long) (2.0f * F0Hz), RES(rgl), 1);
 
 
 	/* Holmes also says that when glotis is open BW of formants
@@ -271,19 +275,38 @@ pitch_sync(rsynth_t * rsynth)
     }
 }
 
-static float
-gen_voice(rsynth_t * rsynth, float noise)
+/*
+static float gen_voice(rsynth_t * rsynth, float noise)
+{
+  static int nper=0;int T0=1280;
+    int i;
+    float voice;
+    for (i = 0; i < 4; i++) {
+	float alpha;
+	const float amp = 4096.0f;
+	if (nper >= T0) {
+	    nper = 0;
+	    //	    pitch_sync(rsynth);
+	}
+	alpha = (float) nper / T0;
+	if (alpha <= 1.0f / 3.0f) {
+	    voice = 3.0f * amp * alpha;
+	}
+	else {
+	    voice = amp * ((9.0f * alpha - 12.0f) * alpha + 3.0f);
+	}
+
+	nper++;
+    }
+    FPCHECK(voice);
+    return voice;
+    }
+*/
+
+static float gen_voice(rsynth_t * rsynth, float noise)
 {
     int i;
     float voice;
-    /* Generate voice waveform at sr*4 to give better resolution
-       of T0 and hence period of f0
-       The sr*4 was for 10kHz system - using impulse train
-       as voicing source.
-       With interpolated voice scheme, and without the
-       lowpass filter used to cancel output 1st difference
-       this loop seems to be pointless.
-     */
     for (i = 0; i < 4; i++) {
 	float alpha;
 	const float amp = 4096.0f;
@@ -291,32 +314,20 @@ gen_voice(rsynth_t * rsynth, float noise)
 	    PVT(nper) = 0;
 	    pitch_sync(rsynth);
 	}
-	/* Voice source shape is linear ramp up for 1/3 of
-	   period, then instant drop to baseline and
-	   a parabolic loop below baseline for 2nd 2/3rds
-	   of period. Shape developed by doing LPC analysis
-	   of sample vowels and inverse filtering raw (un differenced)
-	   sample data to approximate excitation of LPC filter.
-	   May still be too "spiky" to be natural, and cosine arch
-	   might be better than parabola.
-	 */
 	alpha = (float) PVT(nper) / PVT(T0);
-	if (alpha <= 1.0f / 3) {
-	    voice = 3 * amp * alpha;
+	if (alpha <= 1.0f / 3.0f) {
+	    voice = 3.0f * amp * alpha;
 	}
 	else {
-	    voice = amp * ((9 * alpha - 12) * alpha + 3);
+	    voice = amp * ((9.0f * alpha - 12.0f) * alpha + 3.0f);
 	}
-
-	/* The Klatt model had a low-passed voice term
-	   which needs further analysis
-	 */
 
 	PVT(nper)++;
     }
     FPCHECK(voice);
     return voice;
-}
+    }
+
 
 float
 gen_noise(rsynth_t * rsynth)
@@ -345,14 +356,14 @@ gen_noise(rsynth_t * rsynth)
 	noise += nrand;
     }
     /* now divide by 2 - just to balance amplitide of noise with voice source */
-    return noise / 2;
+    return noise / 2.0f;
 }
 
 static void
 setup_frame(rsynth_t * rsynth)
 {
     long sr = rsynth->sr;
-    float Gain0 = rsynth->speaker->Gain0 - 3;
+    float Gain0 = rsynth->speaker->Gain0 - 3.0f;
 
 #ifndef SYNC_CASCADE
     set_cascade(sr, frame);
@@ -382,8 +393,8 @@ setup_frame(rsynth_t * rsynth)
 
 
     /* fold overall gain into output resonator */
-    if (Gain0 <= 0)
-	Gain0 = 57;
+    if (Gain0 <= 0.0f)
+	Gain0 = 57.0f;
     /* output low-pass filter - resonator with freq 0 and BW = samrate
      */
     set_pole_fbwg(sr, 0L, sr / 2, RES(rout), DBtoLIN(Gain0), 1);
@@ -448,123 +459,29 @@ int16_t rsynth_frame_single(rsynth_t * rsynth, float F0Hz, float *frame){
   PVT(F0Hz) = F0Hz;
 
   float noise = gen_noise(rsynth);
-  float voice = gen_voice(rsynth, noise);
-  float lpvoice = resonator(RES(rgl), voice);
+
+    float voice = gen_voice(rsynth, noise);
+    float lpvoice = resonator(RES(rgl), voice);
   if (PVT(nper) < PVT(nopen)) {
-	    /* Add breathiness during glottal open phase - using noise
-	       Note that amp_avc is further modified by amp_av below.
-	     */
 	    voice += PVT(amp_turb) * noise;
 	}
 
-  /* Original Klatt derived code had a 1st difference
-	   which needed a compsenating soft low-pass filter.
-	 */
   if (PVT(nper) < PVT(nopen)) {
-	    /* less noise in 2nd half of glottal (open phase) */
-	    /* Should that apply to frictation ? */
-	    noise *= 0.5;
-	}
+	    noise *= 0.5f;
+  }       
 
 	voice *= PVT(amp_av);
-	/* Add in aspiration noise to glottal source */
 	voice += (PVT(amp_asp) * noise);
 #if 1
-	/* Add in sinusoidal voice-bar element */
 	voice += (PVT(amp_avc) * lpvoice);
 #endif
-
-
-	/* From now on noise is frictation source */
 	noise *= PVT(amp_af);
 
-
 	voice = rsynth_filter(rsynth, voice, noise);
-
+  
 	return voice;
 
-}
-
-long
-rsynth_frame(rsynth_t * rsynth, float F0Hz, float *frame, const char *name)
-{
-    unsigned long es;
-    rsynth->ep = frame;
-    setup_frame(rsynth);
-    PVT(F0Hz) = F0Hz;
-
-/*
- fprintf(stderr,"F0=%g T0=%ld @ %ld\n",0.1*F0hz10,T0,ns);
-*/
-    for (es = PVT(ns) + rsynth->samples_frame; PVT(ns) < es; PVT(ns)++) {
-	float noise = gen_noise(rsynth);
-	float voice = gen_voice(rsynth, noise);
-	float lpvoice = resonator(RES(rgl), voice);
-	if (PVT(nper) < PVT(nopen)) {
-	    /* Add breathiness during glottal open phase - using noise
-	       Note that amp_avc is further modified by amp_av below.
-	     */
-	    voice += PVT(amp_turb) * noise;
-	}
-	RGCHECK(noise);
-
-	/* Original Klatt derived code had a 1st difference
-	   which needed a compsenating soft low-pass filter.
-	 */
-	if (PVT(nper) < PVT(nopen)) {
-	    /* less noise in 2nd half of glottal (open phase) */
-	    /* Should that apply to frictation ? */
-	    noise *= 0.5;
-	}
-
-	voice *= PVT(amp_av);
-	/* Add in aspiration noise to glottal source */
-	voice += (PVT(amp_asp) * noise);
-#if 1
-	/* Add in sinusoidal voice-bar element */
-	voice += (PVT(amp_avc) * lpvoice);
-#endif
-
-
-	/* From now on noise is frictation source */
-	noise *= PVT(amp_af);
-
-
-	voice = rsynth_filter(rsynth, voice, noise);
-
-
-
-	/* Original Klatt code did  1st difference of output - which
-	   boosts high frequency.  Idea was based on the "lip radiation"
-	   (terminating impedance) of the vocal-tract-as-tubes model.
-	   As waveform is normally slowly varying
-	   it also reduced amplitude considerably which meant earlier
-	   stages needed a lot of dynamic range.
-	   This synth attempts to get same overall response by folding
-	   this high-pass element of transfer function into the excitation.
-	   This not only keeps values more bounded but is computationally
-	   simpler as high-pass is achieved by removing low-pass elements.
-	   The 1st difference also exaggerated problems of an impulse
-	   train as a voicing source and made sampling rate much more important.
-	 */
-	if (rsynth->sample_p)
-	    rsynth->user_data =
-		(*rsynth->sample_p) (rsynth->user_data, voice,
-				     PVT(usrsamp)++, rsynth);
-    }
-    return PVT(usrsamp) + rsynth->samples_frame;
-}
-
-void
-rsynth_flush(rsynth_t * rsynth, unsigned nsamp)
-{
-    if (!nsamp)
-	nsamp = PVT(usrsamp);
-    if (rsynth->flush_p)
-	rsynth->user_data =
-	    (*rsynth->flush_p) (rsynth->user_data, nsamp, rsynth);
-    PVT(usrsamp) = 0;
-}
+  }
 
 /* This is here so we can keep rsynth_private private to this file */
 
@@ -572,21 +489,19 @@ rsynth_flush(rsynth_t * rsynth, unsigned nsamp)
 
 rsynth_t rsynthi;
 struct rsynth_private priv;
+static rsynth_t *rsynth;
 
 void rsynth_init(long sr, float ms_per_frame)
 {
-  rsynth_t *rsynth = &rsynthi;
-  struct rsynth_private *pvt = &priv;
-  //  struct rsynth_private *pvt = (struct rsynth_private *)
-  //	malloc(sizeof(struct rsynth_private));
-    //    if (rsynth && pvt) {
-      //	memset(rsynth, 0, sizeof(*rsynth));
-      //	memset(pvt, 0, sizeof(*pvt));
+  rsynth = &rsynthi;
+    struct rsynth_private *pvt = &priv;
+    //    memset(rsynth, 0, sizeof(*rsynth));
+    //    memset(pvt, 0, sizeof(*pvt));
 	rsynth->pvt = pvt;
 	PVT(seed) = 5;		/* Fixed staring value */
 	rsynth->sr = sr;
 	rsynth->samples_frame = (long) ((sr * ms_per_frame) / 1000);
 	rsynth->speaker = rsynth_speaker(133.3f, 57, Elementz); // set our speaker f0Hz and amp
-	rsynth->smooth = 0.5F;
-	rsynth->speed = 1.0F;
+	rsynth->smooth = 0.5f;
+	rsynth->speed = 1.0f;
 }

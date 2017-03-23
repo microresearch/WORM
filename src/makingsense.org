@@ -1242,15 +1242,13 @@ with length... ->DONE *test example vocab in holmes.c*
 - nvp vocab sounds a bit strange (added length and pitchinc) but maybe
   try with larger vocab! nvp also seems quite breathy
 
-- what we need to do to complete nvp/klatt - per sample bends, breathiness, port of opsynth (below)
-
-- added rsynth/opsynth(below) to audio.c TO TEST!
+- what we need to do to complete nvp/klatt - per sample bends, breathiness
 
 ** 23/3+
 
-*- Q of len-1 for input in TTS/parse.c? for most gens*
+*- Q of len-1 for input in TTS/parse.c? for most gens* RE_TEST!
 
-- test new rsynth
+- test new rsynth: fixing, suggested samplerate is 8k-12k maybe for all klatt!FIXED/TESTED-TODO: add bends, add vocab
 
 - vocabs for nvp and klatt 0 implement and test vocab lists selection
 

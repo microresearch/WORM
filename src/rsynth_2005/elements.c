@@ -21,6 +21,7 @@
 /* $Id: //depot/rsynth/elements.c#11 $
  */
 char *elements_id = "$Id: //depot/rsynth/elements.c#11 $";
+#include "stm32f4xx.h"
 #include <stdio.h>
 #include <math.h>
 #include "rsynth.h"
@@ -41,10 +42,11 @@ char *Ep_namez[nEparm] = {
     "avc", "asp", "af"
 };
 
+speaker_t pars;
+
 speaker_t *
 rsynth_speaker(float F0Hz, float gain, Elm_t * e)
 {
-    static speaker_t pars;
     // memset(&pars,-1,sizeof(pars));
     pars.F0Hz = F0Hz;
 

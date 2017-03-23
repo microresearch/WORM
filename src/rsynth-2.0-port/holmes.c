@@ -487,7 +487,7 @@ int16_t klatt_get_sample_single(){
     newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
-    if (t<=dur){ //
+    if (t<dur){ //
                   float base = top * 0.8f /* 3 * top / 5 */;
       //      float base =      200+ adc_buffer[SELZ];
       float tp[nEparm];
@@ -826,7 +826,7 @@ int16_t klatt_get_sample_vocab(){
   unsigned nelm=elm_plen; 
   unsigned char const *elm=vocab_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
   u8 j; 
-  static u8 dur,first=0;
+  static u8 dur;
   static slope_t startyy[nEparm];
   static slope_t end[nEparm];
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:

@@ -295,6 +295,13 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
  }
  printf("\n\n");
 
+ float contour[3]={0.1,0.2,0.3};
+ float *f0=contour;
+    while(1){
+    float f0s = *f0++;
+    printf("%f\n",f0s);
+    }
+
 
  printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 

@@ -98,8 +98,6 @@ typedef struct
 
 
 typedef struct rsynth_s rsynth_t;
-typedef void *rsynth_sample_p(void *user_data,float sample, unsigned nsamp, rsynth_t *rsynth);
-typedef void *rsynth_flush_p(void *user_data,unsigned nsamp, rsynth_t *rsynth);
 
   int16_t rsynth_frame_single(rsynth_t * rsynth, float F0Hz, float *frame);
   
@@ -110,13 +108,9 @@ struct rsynth_s
   long samples_frame;       	/* Number of samples in a frame */
   speaker_t *speaker;       	/* Current speaker (voice) characteristics */
   float *ep;                 	/* Paramters for current frame */
-  FILE *voice_file;         	/* File to print voicing waveforms */
-  FILE *parm_file;         	/* File to print parameter values */
-  rsynth_sample_p *sample_p;    /* sample handler */
-  rsynth_flush_p  *flush_p;     /* sample handler */
-  void *user_data;              /* Argument to handlers */
   float speed;	    	    	/* element duration multiplier */
   float smooth;     	    	/* smoothing "filter" coefficent for parameters */
+  float testit;
   struct rsynth_private *pvt;   /* Private data to backend synth */
 };
 
@@ -125,31 +119,12 @@ struct rsynth_s
 #define RSYNTH_MONOTONE  (1L << 2)
 #define RSYNTH_F0TRACE   (1L << 3)
 
-extern speaker_t *rsynth_speaker(float F0Hz, float gain, Elm_t *elements);
+speaker_t *rsynth_speaker(float F0Hz, float gain, Elm_t *elements);
 
-extern void rsynth_init(long samrate,
+void rsynth_init(long samrate,
                              float ms_per_frame);
 			
-/* Simple top level */
-extern void rsynth_phones(struct rsynth_s *rsynth, char *s, int len);
-
-/* Synth from "mbrola" style .pho file */
-extern void rsynth_pho(struct rsynth_s *rsynth, const char *path, int dodur,char *phoneset);
-
 			
-/* Middle level - interpolate parameters of element sequence */			
-extern unsigned rsynth_interpolate(rsynth_t *rsynth,
-                       unsigned char *elm, unsigned nelm,
-                       float *f0, unsigned nf0);
-		
-extern void rsynth_flush(rsynth_t *rsynth,unsigned nsamp);		
-		
-/* Bottom level - generate a frame based on paramters */		
-extern long rsynth_frame(rsynth_t *rsynth, float F0Hz, float *frame, const char *name);
-
-extern void rsynth_term(rsynth_t *rsynth);
-
-#define rsynth_verbose(rsynth) ((!rsynth) || (rsynth)->flags & RSYNTH_VERBOSE)
 
 #ifdef __cplusplus
 }
