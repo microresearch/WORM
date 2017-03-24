@@ -7,3 +7,4 @@ u8 nvp_newsay();
 u8 nvp_newsay_vocab();
 int16_t nvp_get_sample();
 int16_t nvp_get_sample_vocab();
+u8 nvp_newsay_vocab_trigger(); 

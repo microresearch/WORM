@@ -367,25 +367,20 @@ static klatt_frame_t pars;
 static u8 elm_single[6]={28, 10, 0, 47, 6, 0};
 
 void klatt_newsay_single(){ /// elm_single is our list selx is pitch // sely is len // selz is next phoneme
+static u8 furst=0;
 i=0; 
-le = &Elements[0];// but what do we do with le?
+//le = &Elements[0];// but what do we do with le?
 top = 1.1 * def_pars.F0hz10;
 
-u8 val=_selx*130.0f;
-MAXED(val,127);
-val=127-val;
-top*=logpitch[val];
+// TODO break out so works a bit faster
 
-u8 len=_sely*130.0f;
-MAXED(len,127);
-len=127-len;
-len=logpitch[len]*10.0f;
+ unsigned char len=10;
 
 // list of two phonemes in elm_single - newsay shifts last phoneme out and adds new one
 // selz selects phoneme (set standard lengthy for each phoneme) - there are 64 phonemes also:
 // test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
 
-val=_selz*65.0f;
+u8 val=_selz*65.0f;
 MAXED(val,63);
 val=63-val;
 val=phoneme_prob_remap[val];
@@ -410,7 +405,10 @@ elm_single[5]=0; // always
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
 
-    parwave_init(&klatt_global);
+    if (furst==0){
+      parwave_init(&klatt_global);
+      furst=1;
+    }
     /* Set stress attack/decay slope */
     stress_s.t = 40;
     stress_e.t = 40;
@@ -487,7 +485,7 @@ int16_t klatt_get_sample_single(){
     newframe=0;
     // inc and are we at end of frames in which case we need next element?
 
-    if (t<dur){ //
+    if (t<=dur){ //
                   float base = top * 0.8f /* 3 * top / 5 */;
       //      float base =      200+ adc_buffer[SELZ];
       float tp[nEparm];
@@ -557,6 +555,13 @@ int16_t klatt_get_sample_single(){
       pars.A2 = AMP_ADJ + tp[a2];
       pars.A3 = AMP_ADJ + tp[a3];
       pars.A4 = AMP_ADJ + tp[a4];
+
+#ifndef LAP
+      u8 val=_selx*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  pars.F0hz10*=logpitch[val];
+#endif
       initparwave(&klatt_global, &pars);
       nextelement=0;
       tstress++; t++;
@@ -564,7 +569,7 @@ int16_t klatt_get_sample_single(){
     else { // hit end of DUR number of frames...
       nextelement=1; 
       le = ce; // where we can put this?????? TODO!!!
-      klatt_get_sample_single();
+           klatt_get_sample_single();
     }
 }
 //  if (nextelement==0){
@@ -575,7 +580,13 @@ int16_t klatt_get_sample_single(){
     ///x++;
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
-    if (samplenumber>=klatt_global.nspfr) {
+
+  // TEST duration bend = sely
+      u8 val=_sely*130.0f;
+      MAXED(val,127);
+      val=127-val;
+      //      if (samplenumber>=klatt_global.nspfr) {
+            if (samplenumber>=klatt_global.nspfr*logpitch[val]) {
       // end of frame so...????
       newframe=1;
       samplenumber=0;
@@ -590,10 +601,15 @@ i=0;
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
 //        top= 200+ adc_buffer[SELX];
+
+// TEST - removed as we use _selx elsewhere
+
+/*
 u8 val=_selx*130.0f;
 MAXED(val,127);
 val=127-val;
 top*=logpitch[val];
+*/
 
     pars = def_pars;
     pars.FNPhz = le->p[fn].stdy;
@@ -777,24 +793,19 @@ int16_t klatt_get_sample(){
   return sample;
 }
 
-static u8 elm_plen;
+static unsigned int elm_plen;
 static u8 const *vocab_elm;
 
 void klatt_newsay_vocab(){ /// elm is our list
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
-#ifndef LAP
- u8 val=_selx*130.0f;
-MAXED(val,127);
-val=127-val;
-top*=logpitch[val];
-#endif
  
+u8 val=1;
 // select vocab but for now
-
- elm_plen=vocab_help.length; // TODO: sely bend on length
- vocab_elm=vocab_help.elements;
+ const klattvocab_ *ourvocab=vocabklatt[val];
+ elm_plen=ourvocab->length; 
+ vocab_elm=ourvocab->elements;
  
     pars = def_pars;
     pars.FNPhz = le->p[fn].stdy;
@@ -823,7 +834,7 @@ int16_t klatt_get_sample_vocab(){
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;
-  unsigned nelm=elm_plen; 
+  unsigned int nelm=elm_plen; 
   unsigned char const *elm=vocab_elm; // is our list of phonemes in order phon_number, duration, stress - we cycle through it
   u8 j; 
   static u8 dur;
@@ -952,6 +963,13 @@ int16_t klatt_get_sample_vocab(){
       pars.A2 = AMP_ADJ + tp[a2];
       pars.A3 = AMP_ADJ + tp[a3];
       pars.A4 = AMP_ADJ + tp[a4];
+
+#ifndef LAP
+  u8 val=_selx*130.0f;
+  MAXED(val,127);
+  val=127-val;
+  pars.F0hz10*=logpitch[val];
+#endif
       initparwave(&klatt_global, &pars);
       nextelement=0;
       tstress++; t++;
@@ -962,6 +980,9 @@ int16_t klatt_get_sample_vocab(){
       klatt_get_sample_vocab();
     }
 }
+
+
+
 //  if (nextelement==0){
     // always run through samples till we hit next frame
     //    parwavesample(&klatt_global, &pars, outgoing, samplenumber,x); 
@@ -970,7 +991,12 @@ int16_t klatt_get_sample_vocab(){
     ///x++;
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
-    if (samplenumber>=klatt_global.nspfr) {
+
+  // TEST duration bend = sely
+      u8 val=_sely*130.0f;
+      MAXED(val,127);
+      val=127-val;
+      if (samplenumber>=klatt_global.nspfr*logpitch[val]) {
       // end of frame so...????
       newframe=1;
       samplenumber=0;

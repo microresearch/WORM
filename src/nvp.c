@@ -69,7 +69,7 @@ static const nvp_vocab_ nvp_v_nine[]  __attribute__ ((section (".flash"))) =  { 
 
 static const nvp_vocab_ nvp_v_ten[]  __attribute__ ((section (".flash"))) =  { { 49, 1.0f, 1.0f, 30.0f, 0.0f}, { 15, 110.190511588f, 110.190511588f, 6.0f, 0.001f}, { 49, 1.0f, 1.0f, 42.0f, 0.0f}, { 33, 110.190511588f, 86.5584788171f, 84.0f, 14.0f}, { 13, 86.5584788171f, 74.7424624317f, 42.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
 
-static const nvp_vocab_ *nvp_vocab[]={nvp_v_worm, nvp_v_one, nvp_v_two};
+static const nvp_vocab_ *nvp_vocab[]={nvp_v_worm, nvp_v_one, nvp_v_two, nvp_v_three, nvp_v_four};
 
 
 const float data[48][39]  __attribute__ ((section (".flash"))) ={
@@ -429,13 +429,20 @@ u8 nvp_newsay(){
   return nextframe;
 }
 
-u8 nvp_newsay_vocab(){
+u8 nvp_newsay_vocab(){ // note that this cycles thru vocab
   static u8 counter=0, nextframe=0;
   // nextframe is next in struct
-  nextframe=nvp_v_worm[counter].phon;
+
+  // TODO - vocab and selection
+
+  u8 value=4;
+
+  const nvp_vocab_ *ourvocab=nvp_vocab[value];
+
+  nextframe=ourvocab[counter].phon;
   if (nextframe==255) {
     counter=0;
-    nextframe=nvp_v_worm[0].phon;    
+    nextframe=ourvocab[0].phon;    
   }
     if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
@@ -446,10 +453,40 @@ u8 nvp_newsay_vocab(){
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
     //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
       //    this_interpol=this_frame_length/2;
-    this_frame_length=nvp_v_worm[counter].frameDuration*(256.0f*_sely);
-    this_interpol=nvp_v_worm[counter].fadeDuration;
-    this_pitch=nvp_v_worm[counter].voicePitch;
-    this_pitch_inc=(nvp_v_worm[counter].endVoicePitch-nvp_v_worm[counter].voicePitch)/this_frame_length;
+    this_frame_length=ourvocab[counter].frameDuration*(256.0f*_sely);
+    this_interpol=ourvocab[counter].fadeDuration;
+    this_pitch=ourvocab[counter].voicePitch;
+    this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
+    counter++;
+    changed=1;
+    return nextframe;
+}
+
+u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
+  static u8 counter=0, nextframe=0;
+  // nextframe is next in struct
+
+  // TODO - vocab and selection
+  u8 value=4;
+
+  const nvp_vocab_ *ourvocab=nvp_vocab[value];
+
+    counter=0;
+    nextframe=ourvocab[0].phon;    
+
+    if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
+  else {
+  for (u8 i=0;i<39;i++){
+    *indexy[i]=data[nextframe-1][i];
+  }
+  }
+  // frame length, interpol sets to half that and pitch = SELY, SELZ,
+    //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
+      //    this_interpol=this_frame_length/2;
+    this_frame_length=ourvocab[counter].frameDuration*(256.0f*_sely);
+    this_interpol=ourvocab[counter].fadeDuration;
+    this_pitch=ourvocab[counter].voicePitch;
+    this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
     counter++;
     changed=1;
     return nextframe;

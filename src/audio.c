@@ -2730,7 +2730,7 @@ void nvp(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 void nvpvocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   TTS=0;
   static u8 triggered=0;
-    if (trigger==1) nvp_newsay_vocab();
+  if (trigger==1) nvp_newsay_vocab_trigger(); // resets to start of vocab
   u8 xx=0,readpos;
   float remainder;
   //  samplespeed*=0.5f;
@@ -2745,7 +2745,7 @@ void nvpvocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder);
        if (incoming[xx]>THRESH && !triggered) {
-	 nvp_newsay_vocab();
+	 nvp_newsay_vocab_trigger();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -2760,7 +2760,7 @@ void nvpvocab(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
        if (incoming[xx]>THRESH && !triggered) {
-	 nvp_newsay_vocab();
+	 nvp_newsay_vocab_trigger();
 	 triggered=1;
 	   }
        if (incoming[xx]<THRESHLOW && triggered) triggered=0;
@@ -2992,7 +2992,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*65.0f;
   MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=53;
+  _intmode=50;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;

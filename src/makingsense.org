@@ -1246,22 +1246,55 @@ with length... ->DONE *test example vocab in holmes.c*
 
 ** 23/3+24/3
 
-*- Q of len-1 for input in TTS/parse.c? for most gens* RE_TEST!
+- test new rsynth: fixing, suggested samplerate is 8k-12k maybe for all klatt!FIXED/TESTED-TODO: add bendsDONE, add vocab
 
-- test new rsynth: fixing, suggested samplerate is 8k-12k maybe for all klatt!FIXED/TESTED-TODO: add bends, add vocab
+- vocabs for nvp and klatt - implement and test vocab lists selectionTESTEDnvpTESTEDall - *need to add full vocabs for all three*
 
-- vocabs for nvp and klatt - implement and test vocab lists selection
+rsynth: bend frequency and...rsynth->samples_frame DONE 
+
+*** klatt-based modes:
+
+1-[simpleklatt -xy and selz is rough length of frame]
+
+2-klatt- nelm list with x/y/z no bends ALL but means can change slowly
+
+       maybe do nelm list with changing pitch/length on each sample
+
+[klattTTS]
+
+3-klattsingle - TODO faster - clicks?FIXED
+
+k4-lattvocab - all bends done
+
+///
+
+5-nvp- xy done
+
+6-nvpvocab - xy done - also added return start of vocab trigger
+
+/////
+
+7rsynthy - is with vocab and xy bends
+
+8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt
+
+*** vocabs
 
 for nvp:  python test_speakIpa.py with vocab list in /root/test
 
 for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
 
-- vocabs for new rsynth just here with f0 contour also...
+for rsynth: 2005 ./say need to modify to take list
 
-- how we can do different voices with new rsynth? is just F0Hz to vary which we will do as bend
+** 25/3 TODO+
 
-rsynth: bend frequency and...rsynth->samples_frame DONE 
+- rsynthy for nelm list and single phonemes as in klatt
 
+- all vocabs
+
+*- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
+*- which way round are all length bends*
+- fix remaining modes, tubes, compost and start on wormings
 
 * KLATT/rsynth notes
 
@@ -1475,16 +1508,16 @@ what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
 
 fullklatt/simpleklatt/nvp
 
-////
+//// end 24 MARCH
 
 10. tube and ntube/glottal/wavetable and wormed tubes: RavenTube in
-    raven.c, Ntube in ntube.c and full glottis and tube in tube.c
+    raven.c, Ntube in ntube.c and full glottis and tube in tube.c - 3 tube sets
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example. compost as //wormed// wavetable. speed in middle - left-backwards/right-forwards
 
-/////////////////end this week
+/////////////////end next week
 
 13. worming of all XY modes above
 
