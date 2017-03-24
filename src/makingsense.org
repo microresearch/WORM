@@ -1256,27 +1256,11 @@ for nvp:  python test_speakIpa.py with vocab list in /root/test
 
 for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
 
-- vocabs for new rsynth just here with f0 contour also:
+- vocabs for new rsynth just here with f0 contour also...
 
-help me please
-37, 10, 66, 4, 38, 8, 2, 8, 3, 1, 4, 2, 1, 6, 21, 8, 57, 7, 1, 6, 2, 8, 3, 1, 4, 2, 38, 8, 57, 7, 32, 4, 1, 6, 
-146.300003, 
-96.000000, 
-134.779999,
+- how we can do different voices with new rsynth? is just F0Hz to vary which we will do as bend
 
-computer love
-14, 8, 15, 1, 16, 4, 82, 6, 21, 8, 2, 8, 3, 1, 4, 2, 42, 7, 62, 9, 8, 6, 9, 1, 10, 2, 72, 4, 26, 10, 1, 6, 38, 8, 77, 6, 28, 5, 1, 6, 
-146.300003, 
-108.000000, 
-133.339996,
-
-worm speaks worm
-41, 8, 75, 16, 21, 8, 1, 6, 31, 12, 2, 8, 3, 1, 4, 2, 57, 7, 14, 8, 15, 1, 16, 4, 31, 12, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6, 
-146.300003, 
-137.000000, 
-129.860001,
-
-- how we can do different voices with new rsynth?
+rsynth: bend frequency and...rsynth->samples_frame DONE 
 
 
 * KLATT/rsynth notes
