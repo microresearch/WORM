@@ -17,7 +17,7 @@
 #include "worming.h"
 #include "vot.h"
 #include "resources.h"
-#include "rsynth_2005/rs.h"
+#include "rs.h"
 
 //#include "raven.h"
 
