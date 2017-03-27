@@ -1284,17 +1284,24 @@ for nvp:  python test_speakIpa.py with vocab list in /root/test
 
 for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
 
-for rsynth: 2005 ./say need to modify to take list
+for rsynth: 2005 - python speakyr using vocab in /root/test - what is that VOCAB?
+
 
 ** 25/3 TODO+
 
-- rsynthy for nelm list and single phonemes as in klatt
+- length bends - long to short on all modes
 
-- all vocabs
+- when we should re-init klatt in all klatt-based modes?
+
+- rsynthy with nelm list and single phonemes as in klatt
+
+- all vocabs for nvp, klatt, rsynthy - see above
+
+- summarise all klatt-based modes - add any singing modes (ie. non bends but pure pitch)
 
 *- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
-*- which way round are all length bends*
-- fix remaining modes, tubes, compost and start on wormings
+
+- fix remaining modes = tubes, compost and start on wormings
 
 * KLATT/rsynth notes
 
