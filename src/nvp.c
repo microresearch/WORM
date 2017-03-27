@@ -22,6 +22,9 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 #include "audio.h"
 #include "resources.h"
 
+static u16 count=0;
+
+
 //#include "forlap.h"
 
 /// below is from data.py in no particular order output by print.py - no order of phonemes but parameter data is ordered...
@@ -216,7 +219,7 @@ float getNextFREQ(float* lastCyclePos, float frequency) {
 bool glottisOpen;
 
 float getNextVOICE(const speechPlayer_frame_t* frame) {
-  float vibrato=(sinf(getNextFREQ(&lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06*frame->vibratoPitchOffset)+1.0f; // but we need diff instances of getNExtFREQ - DONE
+  float vibrato=(sinf(getNextFREQ(&lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06f*frame->vibratoPitchOffset)+1.0f; // but we need diff instances of getNExtFREQ - DONE
   float voice=getNextFREQ(&lastCyclePosTwo,frame->voicePitch*vibrato);
   float aspiration=getNextNOISE(&lastValueOne)*0.2f; // again noise instancesDONE
   float turbulence=aspiration*frame->voiceTurbulenceAmplitude;
@@ -408,6 +411,7 @@ u8 changed=0;
 
 u8 nvp_newsay(){
   static u8 oldframe=0, nextframe=0;
+  count=0;
   oldframe=nextframe;
   nextframe=_selz*50.0f;
   MAXED(nextframe,48);
@@ -423,7 +427,9 @@ u8 nvp_newsay(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
+    int val=_sely*1027.0f;
+    MAXED(val,1023);
+    this_frame_length=(int)(1024.0f*logspeed[val])<<2; // sely
   this_interpol=this_frame_length/2;
   // pitch
   return nextframe;
@@ -453,23 +459,29 @@ u8 nvp_newsay_vocab(){ // note that this cycles thru vocab
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
     //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
       //    this_interpol=this_frame_length/2;
-    this_frame_length=ourvocab[counter].frameDuration*(256.0f*_sely);
+    int val=_sely*1027.0f;
+    MAXED(val,1023);
+    this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);
     this_interpol=ourvocab[counter].fadeDuration;
     this_pitch=ourvocab[counter].voicePitch;
     this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
     counter++;
     changed=1;
+    count=0;
+
     return nextframe;
 }
 
 u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
-  static u8 counter=0, nextframe=0;
+  static u8 nextframe=0;
   // nextframe is next in struct
+  count=0;
 
   // TODO - vocab and selection
   u8 value=4;
 
   const nvp_vocab_ *ourvocab=nvp_vocab[value];
+  static u16 counter=0;
 
     counter=0;
     nextframe=ourvocab[0].phon;    
@@ -480,10 +492,10 @@ u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
     *indexy[i]=data[nextframe-1][i];
   }
   }
-  // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
-      //    this_interpol=this_frame_length/2;
-    this_frame_length=ourvocab[counter].frameDuration*(256.0f*_sely);
+
+    int val=_sely*1027.0f;
+    MAXED(val,1023);
+    this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);
     this_interpol=ourvocab[counter].fadeDuration;
     this_pitch=ourvocab[counter].voicePitch;
     this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
@@ -496,7 +508,7 @@ u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
 int16_t nvp_get_sample(){
   float val=0;
   unsigned int j;
-  static u16 count=0;
+  //  static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
     memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
@@ -538,7 +550,7 @@ int16_t nvp_get_sample(){
 int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
   float val=0;
   unsigned int j;
-  static u16 count=0;
+  //  static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
     memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
@@ -580,4 +592,43 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
   else if (out<-32000.0f) out=-32000.0f;
    return (int)out;
 }
+
+int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
+  float val=0;
+  unsigned int j;
+  //  static u16 count=0;
+  if (count>this_frame_length){
+  // is this a new frame?
+    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    nvp_newsay_vocab();
+    count=0;
+    //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+  }// new frame - we also need to take care of pitch and pitch interpol
+
+    if (count<this_interpol && changed){
+    float curFadeRatio=(float)count/(this_interpol);
+    for(j=0;j<speechPlayer_frame_numParams;++j) {
+      ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
+    }
+    }
+    int16_t vale=1024.0f*(1.0f-_selx);
+      tempframe.voicePitch=256.0f*logspeed[vale]; 
+    // TEST pitchinc...
+    //    tempframe.voicePitch=this_pitch*logspeed[vale];
+    //    this_pitch+=this_pitch_inc;
+
+  float voice=getNextVOICE(&tempframe);
+  float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
+  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude; // was 0.3
+  float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
+  float out=(cascadeOut+parallelOut)*tempframe.outputGain;
+
+  count++;
+  out=out*4000.0f;
+  if (out>32000.0f) out=32000.0f;
+  else if (out<-32000.0f) out=-32000.0f;
+   return (int)out;
+}
+
+
 

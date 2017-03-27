@@ -263,7 +263,7 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
-  input[input_len-1] = EOF;
+  input[input_len] = EOF;
   xlate_file();
   //  printf("xxxxx %d\n", output_count);
   for (unsigned char i=0;i<output_count;i++){

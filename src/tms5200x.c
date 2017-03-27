@@ -3013,7 +3013,7 @@ int16_t process2bends(u8 *ending)
 		else if (m_subcycle == 3)
 		{
 			m_subcycle = m_subc_reload;
-			if (counter++>(10-(_sely*10.0f))){ // TEST - bend of length but doesn't make faster
+			if (counter++>(_sely*10.0f)){ // TEST - bend of length but doesn't make faster
 			m_PC++;
 			counter=0;
 			}
