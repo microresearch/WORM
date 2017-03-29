@@ -1278,30 +1278,65 @@ k4-lattvocab - all bends done
 
 8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt
 
-*** vocabs
-
-for nvp:  python test_speakIpa.py with vocab list in /root/test
-
-for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
-
-for rsynth: 2005 - python speakyr using vocab in /root/test - what is that VOCAB?
 
 
 ** 25/3 TODO+
 
 - length bends - long to short on all modes
 
-- when we should re-init klatt in all klatt-based modes?
+- when we should re-init klatt in all klatt-based modes?DONE
 
-- rsynthy with nelm list and single phonemes as in klatt
+- rsynthy with nelm list and single phonemes as in klattDONE
 
-- all vocabs for nvp, klatt, rsynthy - see above
+- summarise all klatt-based modes - add any singing modes (ie. non bends but pure pitch)DONE
 
-- summarise all klatt-based modes - add any singing modes (ie. non bends but pure pitch)
+
+** 27/3 +
+
+/// klattt
+
+- changes to Klatt voices - croaky-fry(also low F0), female, NOTES?
+
+flutter, skew->klsyn/tilt, where is wavetable from? natural_samples[]? ->
+from docs/klatt (which we use as simpleklatt) - seems also very noisy? check out possibilities here?
+
+klsyn: The variable 'sk', "skew to alternate periods", is the number
+        of 25 microsecond increments to be added to and subtracted
+        from successive fundamental period durations in order to
+        simulate one aspect of vocal fry, the tendency for alternate
+        periods to be more similar in duration than adjacent periods.
+
+
+- MITTalk book transition tables 
+
+- how can we shimmer the wavetable (see shimmer in Klatt 1990 female voice: http://www.fon.hum.uva.nl/david/ma_ssp/doc/Klatt-1990-JAS000820.pdf
+
+///
+
+- still check all length long->short (fixed for all klatts and few others)
 
 *- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
 
-- fix remaining modes = tubes, compost and start on wormings
+*- fix remaining modes = tubes, compost and start on wormings*
+
+*- all vocabs for nvp, klatt, rsynthy - see above- what do we use as base vocab*
+
+- FIXED: new klatt sing modes TEST, re-inits, rsynthy with nelm list and single phonemes as in klattDONE_TESTED
+
+** 29/3
+
+- vocab as 1000 most common words... try testing this first? -> nvp, klatt, rsynthy
+
+- and/or vocab as selected (say 128 words + phrases???)
+
+*** vocabs
+
+for nvp:  python test_speakIpa.py with vocab list in /root/test
+
+for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
+
+for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VOCAB?
+
 
 * KLATT/rsynth notes
 
