@@ -333,20 +333,14 @@ void init_nvp(void){
   INITRES(&rr5,0);
   INITRES(&rr6,0);
 
-  //change_nvpparams(1.0, 1.0, 0.125, 5.5, 250.0, 2.0, 0, 1.0, 0); // envpitch=endVoicePitch is unused, 
-  change_nvpparams(&framer, 1.0f, 1.0f, 0.0f, 0.0f, 250.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
-  framer.preFormantGain=0;
+  //change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-   // voice or TEST!
-  framer.preFormantGain=0.6f; // keep low-ish
-  framer.vibratoPitchOffset=0.1f;
-  framer.vibratoSpeed=5.5f;
-    //    framer.voicePitch=150;
 
-    // copy into indexy
+  change_nvpparams(&framer, 1.0f, 1.0f, 0.125f, 5.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  //  change_nvpparams(&framer, 1.0f, 1.0f, 0.0f, 0.0f, 250.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
-    *indexy[i]=data[0][i]; // TESTY!
+    *indexy[i]=data[0][i]; 
   }
 
   memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
@@ -380,6 +374,7 @@ outputgain: frame.outputGain=2.0 unless we need silence!
   framer.preFormantGain=prefgain;
   framer.vibratoPitchOffset=vpoffset;
   framer.vibratoSpeed=vspeed;
+
   framer.voicePitch=vpitch;
   framer.outputGain=outgain;
   framer.endVoicePitch=envpitch;
@@ -404,7 +399,7 @@ void nvp_newvoice(voice* voiced){
 void nvp_init(){
   init_nvp();
   this_frame_length=3840; this_interpol=1900;
-  nvp_newvoice(&benjie); // caleb, adam, nullie, benjie
+  nvp_newvoice(&adam); // caleb, adam, nullie, benjie
 }
 
 u8 changed=0;
@@ -532,7 +527,7 @@ int16_t nvp_get_sample(){
     // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
     // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
     int16_t vale=1024.0f*(1.0f-_selx);
-  tempframe.voicePitch=256.0f*logspeed[vale]; 
+  tempframe.voicePitch=framer.voicePitch*logspeed[vale]; 
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);

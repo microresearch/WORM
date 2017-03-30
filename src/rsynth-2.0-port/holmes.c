@@ -795,10 +795,10 @@ top*=logpitch[val];
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
 
-    if (furst==0){
+        if (furst==0){
       parwave_init(&klatt_global);
       furst=1;
-    }
+          }
 
 
     //    parwave_init(&klatt_global);

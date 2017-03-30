@@ -1298,16 +1298,13 @@ k4-lattvocab - all bends done
 - changes to Klatt voices - croaky-fry(also low F0), female, NOTES?
 
 flutter, skew->klsyn/tilt, where is wavetable from? natural_samples[]? ->
-from docs/klatt (which we use as simpleklatt) - seems also very noisy? check out possibilities here?
+from docs/klatt (which we use as simpleklatt) - seems also very noisy? check out possibilities here - FIXED
 
 klsyn: The variable 'sk', "skew to alternate periods", is the number
         of 25 microsecond increments to be added to and subtracted
         from successive fundamental period durations in order to
         simulate one aspect of vocal fry, the tendency for alternate
         periods to be more similar in duration than adjacent periods.
-
-
-- MITTalk book transition tables 
 
 - how can we shimmer the wavetable (see shimmer in Klatt 1990 female voice: http://www.fon.hum.uva.nl/david/ma_ssp/doc/Klatt-1990-JAS000820.pdf
 
@@ -1323,11 +1320,36 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 - FIXED: new klatt sing modes TEST, re-inits, rsynthy with nelm list and single phonemes as in klattDONE_TESTED
 
-** 29/3
+** 29/3////30/3
 
 - vocab as 1000 most common words... try testing this first? -> nvp, klatt, rsynthy
 
-- and/or vocab as selected (say 128 words + phrases???)
+- and/or vocab as selected makes more sense (say 128 words + phrases???)
+
+*- what can be varies with each of klatt voices: and how - on basis of fixed voice parameters?*
+
+-- rsynth: just base freq which we multiply
+
+-- nvp:   framer.glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+  framer.voiceTurbulenceAmplitude=turby;
+  framer.preFormantGain=prefgain;
+  framer.vibratoPitchOffset=vpoffset;
+  framer.vibratoSpeed=vspeed;
+
+  framer.voicePitch - when this is not from vocab
+
+[ignore voices otherwise]
+
+-- klatt: // and still some clicks in 48klatt/nelm list - def_pars.c
+
+  is F0 base? 		def_pars.F0hz10=1200;//         "Base F0 in 0.1Hz",
+  see notes above:
+	klatt_global.f0_flutter = 2.0f;
+	def_pars.TLTdb=10;
+	def_pars.Kskew=10;
+
+ and different sources such as IMPULSIVE, and length of cascade
+
 
 *** vocabs
 

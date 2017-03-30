@@ -3286,7 +3286,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*65.0f;
   MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=59;
+  _intmode=48;
  // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
  if (firsttime==0){// TEST CODE - for fake trigger
    trigger=1;

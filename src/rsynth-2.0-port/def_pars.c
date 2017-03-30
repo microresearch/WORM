@@ -23,11 +23,11 @@ void klatt_init(void)
   //	int impulse = 0;
   //  int impulse = 1;
 	//int casc = 1;
-	int casc = 2;
+	int casc = 6;
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
 	klatt_global.glsource = IMPULSIVE;/// SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE - where is sample from?
-	klatt_global.f0_flutter = 0;
+	klatt_global.f0_flutter = 2.0f;
 
 	//	klatt_global.quiet_flag, "Quiet - minimal messages",
 	//	impulse,                 "Impulse glottal source",
@@ -37,9 +37,9 @@ void klatt_init(void)
 	//	def_pars.TLTdb,          "Tilt dB",
 	//	def_pars.F0hz10,         "Base F0 in 0.1Hz",
 
-	//def_pars.TLTdb=10;
-		def_pars.F0hz10=1200;//         "Base F0 in 0.1Hz",
-		//	def_pars.Kskew=10;
+	def_pars.TLTdb=10;
+	def_pars.F0hz10=1600;//         "Base F0 in 0.1Hz",
+	def_pars.Kskew=10;
 	if (casc > 0)
 	{
 		klatt_global.synthesis_model = CASCADE_PARALLEL;
