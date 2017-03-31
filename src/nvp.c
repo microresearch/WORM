@@ -135,30 +135,6 @@ typedef unsigned char bool;
 #define false 0
 #define true 1
 
-typedef struct {
-  unsigned char index;
-  float value;
-  bool override;
-} voicer;
-
-typedef struct {
-  unsigned char howmany;
-  voicer voices[10];
-} voice;
-
-voice benjie= { 9,{ {0,1.01f,0},{1,1.02,0},{2,3770.0f,1},{3,4110.0f,1},{4,5000.0f,1},{7,0.9f,0},{8,1.3f,0},{36,0.7f,0},{34,1.3f,0}}};
-voice nullie= { 0,{ {0,1.01f,0},{1,1.02,0},{2,3770.0f,1},{3,4110.0f,1},{4,5000.0f,1},{7,0.9f,0},{8,1.3f,0},{36,0.7f,0},{34,1.3f,0}}};
-voice adam= {3,{ {8,1.3f,0},{34,1.3f,0},{36,0.85f,0}}};
-voice caleb= {2,{ {38,1.0f,1}, {37,0.0f,1}}};
-
-// add singing voice but this is via setnvpparams
-/*
-frame.preFormantGain=2.0 // 
-frame.voiceAmplitude=1.0 // 37
-frame.vibratoPitchOffset=0.125 
-frame.vibratoSpeed=5.5
-*/
-
 extern float _selx, _sely, _selz;
 
 inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
@@ -168,7 +144,6 @@ inline float calculateValueAtFadePosition(float oldVal, float newVal, float curF
 typedef float speechPlayer_frameParam_t;
 
 typedef struct {
-  // varying globally depending on voice - but we still need to interpolate 
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
@@ -335,8 +310,8 @@ void init_nvp(void){
 
   //change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-
-  change_nvpparams(&framer, 1.0f, 1.0f, 0.125f, 5.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  // ====================== glott, prgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
   //  change_nvpparams(&framer, 1.0f, 1.0f, 0.0f, 0.0f, 250.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
@@ -384,22 +359,9 @@ outputgain: frame.outputGain=2.0 unless we need silence!
 static u16 this_frame_length, this_interpol;
 static float this_pitch, this_pitch_inc;
 
-void nvp_newvoice(voice* voiced){
-
- voice* voicey= voiced;
- //  voice* voicey= &adam;
-
- for (u8 i=0;i<voicey->howmany;i++){
-      if (voicey->voices[i].override) *indexy[voicey->voices[i].index]=voicey->voices[i].value;
-      else *indexy[voicey->voices[i].index]*=voicey->voices[i].value; // TODO apply during samples
- }
-
-}
-
 void nvp_init(){
   init_nvp();
   this_frame_length=3840; this_interpol=1900;
-  nvp_newvoice(&adam); // caleb, adam, nullie, benjie
 }
 
 u8 changed=0;
@@ -527,7 +489,7 @@ int16_t nvp_get_sample(){
     // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
     // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
     int16_t vale=1024.0f*(1.0f-_selx);
-  tempframe.voicePitch=framer.voicePitch*logspeed[vale]; 
+  tempframe.voicePitch=framer.voicePitch*logspeed[vale]*2.0f; 
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
@@ -572,7 +534,7 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
     int16_t vale=1024.0f*(1.0f-_selx);
     //  tempframe.voicePitch=256.0f*logspeed[vale]; 
     // TEST pitchinc...
-    tempframe.voicePitch=this_pitch*logspeed[vale];
+    tempframe.voicePitch=this_pitch*logspeed[vale]*2.0f;
     this_pitch+=this_pitch_inc;
 
   float voice=getNextVOICE(&tempframe);

@@ -1087,16 +1087,11 @@ biquad* newBB;
 
 
 void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-
-  // MODEL GENERATOR: TODO is speed and interpolation options DONE
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
 
-  // we need to take account of speed ... also this fractional way here/WITH/interpolation? TODO
-  // as is set to 8k samples/sec and we have 32k samplerate
-
-   if (samplespeed<=1){ // slower=UPSAMPLE where we need to interpolate... then low pass afterwards - for what frequency?
+   if (samplespeed<=1){ 
      while (xx<size){
        if (samplepos>=1.0f) {
 	 lastval=samplel;
@@ -1105,9 +1100,6 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        }
        remainder=samplepos; 
        outgoing[xx]=(lastval*(1-remainder))+(samplel*remainder); // interpol with remainder - to test - 1 sample behind
-       //       outgoing[xx]=samplel;
-
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
 	 tube_newsay(); // selector is in newsay
 	 triggered=1;
@@ -1118,13 +1110,12 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        samplepos+=samplespeed;
      }
    }
-   else { // faster=UPSAMPLE? = low pass first for 32000/divisor???
+   else { 
      while (xx<size){
        samplel=tube_get_sample();
 
        if (samplepos>=samplespeed) {       
 	 outgoing[xx]=samplel;
-       // TEST trigger: 
        if (incoming[xx]>THRESH && !triggered) {
 	 tube_newsay(); // selector is in newsay
 	 triggered=1;
@@ -1136,8 +1127,6 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        samplepos+=1.0f;
      }
    }
-
-  // refill back counter etc.
 };
 
 

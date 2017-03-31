@@ -105,14 +105,14 @@
 #define SINE                      1
 
 /*  OVERSAMPLING FIR FILTER CHARACTERISTICS  */
-#define FIR_BETA                  .2
-#define FIR_GAMMA                 .1
-#define FIR_CUTOFF                .00000001
+#define FIR_BETA                  .2f
+#define FIR_GAMMA                 .1f
+#define FIR_CUTOFF                .00000001f
 
 /*  PITCH VARIABLES  */
 #define PITCH_BASE                220.0f
-#define PITCH_OFFSET              3           /*  MIDDLE C = 0  */
-#define LOG_FACTOR                3.32193
+#define PITCH_OFFSET              3.0f           /*  MIDDLE C = 0  */
+#define LOG_FACTOR                3.32193f
 
 /*  RANGE OF ALL VOLUME CONTROLS  */
 #define VOL_MAX                   60
@@ -120,12 +120,12 @@
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
 //#define VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
-#define VT_SCALE                  0.125     /*  2^(-3)  */
+#define VT_SCALE                  0.125f     /*  2^(-3)  */
 //#define VT_SCALE                  1.0     /*  2^(-5)  */
 
 
 /*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
-#define OUTPUT_SCALE              0.25
+#define OUTPUT_SCALE              0.25f
 
 /*  CONSTANTS FOR THE FIR FILTER  */
 #define LIMIT                     200
@@ -141,7 +141,7 @@
 #define RANGE_MAX                 32767.0f
 
 /*  MATH CONSTANTS  */
-#define TUBEPI                        3.1415927
+#define TUBEPI                        3.1415927f
 #define TWO_PI                    (2.0f * TUBEPI)
 
 /*  FUNCTION RETURN CONSTANTS  */
@@ -177,11 +177,9 @@
 #define mValue(x)                 ((x) & M_MASK)
 #define fractionValue(x)          ((x) & FRACTION_MASK)
 
-#define BETA                      5.658        /*  kaiser window parameters  */
+#define BETA                      5.658f        /*  kaiser window parameters  */
 #define IzeroEPSILON              1E-21 // was 21
 
-#define OUTPUT_SRATE_LOW          22050.0f
-#define OUTPUT_SRATE_HIGH         44100.0f
 //#define BUFFER_SIZE               1024                 /*  ring buffer size  */
 
 //extern signed int audio_buffer[32768];
@@ -198,20 +196,42 @@
 
 /*  DERIVED VALUES  */
 
+// fix parameter_list - what is what there?
+
 //// replace all of these with calcs from parameter_list below
-const int    controlPeriod=4869;
-const int    sampleRate=19476;
-const float nyquist= 9738.0;
-const float actualTubeLength=18.0;            /*  actual length in cm  */
-const float dampingFactor=0.985;               /*  calculated damping factor  */
-const float crossmixFactor=3.98;              /*  calculated crossmix factor  */
+
+// and if we change samplerate?
+
+//	actualTubeLength = (c * TOTAL_SECTIONS * 100.0) / sampleRate;
+//	nyquist = (double)sampleRate / 2.0;
+
+/*
+  length=18.0f
+	double c = speedOfSound(temperature);
+	controlPeriod =
+	    rint((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+	sampleRate = controlRate * controlPeriod;
+	actualTubeLength = (c * TOTAL_SECTIONS * 100.0) / sampleRate;
+	nyquist = (double)sampleRate / 2.0;
+*/
+
+
+/// from test.c TUBES: controlp 4769 samplerate 19076 tubelength 18.001677 nyquist 9538.000000
+
+const int    controlPeriod=4769; // what is control period - unused
+const int    sampleRate=19076; // this is not real samplerate
+const float nyquist= 9538.0f;
+const float actualTubeLength=18.001677f;            /*  actual length in cm  */
+const float dampingFactor=0.985f;               /*  calculated damping factor  */
+const float crossmixFactor=3.98f;              /*  calculated crossmix factor  */
 const int    tableDiv1=154;
 const int    tableDiv2=317;
-const float tnLength=163.0;
-const float tnDelta=82.0;
-const float breathinessFactor=0.025;
-const float basicIncrement=0.026289;
-const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35, 1.96, 1.91, 1.3, 0.73};  /*  fixed nose radii (0 - 3 cm)  */
+const float tnLength=163.0f;
+const float tnDelta=82.0f;
+const float breathinessFactor=0.025f;
+//const float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
+const float basicIncrement=0.008f; // 0.016 for 32k samplerate // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
+const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35f, 1.96f, 1.91f, 1.3f, 0.73f};  /*  fixed nose radii (0 - 3 cm)  */
 const u8 pulsed=0;
 const float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
@@ -280,15 +300,27 @@ int decrement(int pointer, int modulus);
 // example input to convert to arrays in first INIT
 // and transcribe that list of vowels/frames
 
+/*diphones.degas:
 
-static float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
+ph'
+*ph' phone contoid fricative checked lhack 
 
-//float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
+	microInt: *-1.000000		r2: *0.890000
+	glotVol: *0.000000		r3: *0.990000
+	aspVol: *0.000000		r4: *0.810000
+	fricVol: *24.000000		r5: *0.600000
+	fricPos: *7.000000		r6: *0.520000
+	fricCF: *864.000000		r7: *0.710000
+	fricBW: *3587.000000		r8: *0.240000
+	r1: *0.800000		velum: *0.100000
+	
+*/
+
+//static float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
+
+float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
 
 /// with microint 64 x 16:
-
-
-
 
 /*
 // parameters from input
@@ -623,7 +655,7 @@ void initializeNasalCavity(void)
 
 void initializeThroat(void)
 {
-    ta0 = (parameter_list[17] * 2.0)/sampleRate;
+    ta0 = (parameter_list[17] * 2.0f)/sampleRate;
     tb1 = 1.0 - ta0;
 
     throatGain = amplitude(parameter_list[18]);

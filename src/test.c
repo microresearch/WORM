@@ -291,19 +291,25 @@ int16_t mins[40]= {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200
 int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
  for (X=0;X<40;X++){
-   printf("%d, ", maxs[X]-mins[X]);
+   //   printf("%d, ", maxs[X]-mins[X]);
  }
- printf("\n\n");
+ // printf("\n\n");
 
  float contour[3]={0.1,0.2,0.3};
- float *f0=contour;
-    while(1){
-    float f0s = *f0++;
-    printf("%f\n",f0s);
-    }
 
+ // printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
- printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
+#define TOTAL_SECTIONS            10 
+ float controlRate=4.0;
+
+ float length=18.0;
+ float cc = speedOfSound(20.0f);
+ int controlPeriod =   rint((cc * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+ int sampleRate = controlRate * controlPeriod;
+ float actualTubeLength = (cc * TOTAL_SECTIONS * 100.0) / sampleRate;
+ float nyquist = (float)sampleRate / 2.0;
+
+ printf("TUBES: controlp %d samplerate %d tubelength %f nyquist %f\n",controlPeriod, sampleRate, actualTubeLength, nyquist);
 
  /*
 	if (modus&1) {
@@ -336,8 +342,8 @@ static const int pitch_vals[32] = {
 
 
  unsigned char val=1.0*127.0f; 
- int m_pitch = pitch_vals[10] * logpitch[val];
-  printf("mmmmmmmmmmmmmmmmmPPPP: %d\n",m_pitch); 
+ // int m_pitch = pitch_vals[10] * logpitch[val];
+ //  printf("mmmmmmmmmmmmmmmmmPPPP: %d\n",m_pitch); 
 
 
   // with exy=0.0// exy=0.99
@@ -417,9 +423,9 @@ static const int pitch_vals[32] = {
     //    printf("DOENV: %f\n",x);
     }
 
-  float c = speedOfSound(32);
-  int controlPeriod =    rint((c * 10 * 100.0) /(18.0 * 1.0));
-  int sampleRate = 4.0 * controlPeriod;
+  //  float c = speedOfSound(32);
+  //  int controlPeriod =    rint((c * 10 * 100.0) /(18.0 * 1.0));
+  //  int sampleRate = 4.0 * controlPeriod;
 
   //  printf("controlperiod %d\n",controlPeriod);
 

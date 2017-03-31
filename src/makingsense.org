@@ -995,7 +995,7 @@ simpleklatt.c : raw frame - ported to generator but length and some wierdness
 *- NOTE: what needs to be done for cleaning up/final touches: TMS roms
 all included and set up, take care of changemode triggering!*
 
-*TODO: SAM selected vocab, digitalker ROM code, logarithmic bends, what is knob orientation for repeat/length of phoneme, 
+*TODO: SAM selected vocab, digitalker ROM code, logarithmic bendsDONE, what is knob orientation for repeat/length of phonemeLONG->SHORT_DONE, 
 
 *Klatt breakdown:*
 
@@ -1332,7 +1332,7 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 [ignore voices otherwise]
 
--- klatt: // and still some clicks in 48klatt/nelm list - def_pars.c
+-- klatt: 
 
   is F0 base? 		def_pars.F0hz10=1200;//         "Base F0 in 0.1Hz",
   see notes above:
@@ -1352,13 +1352,76 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 
 ** 31/3+
 
-*- still check all length long->short (fixed for all klatts and few others)*
-*- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
+*- still check all length long->short (fixed for all klatts and few others)* DONE
+
+*- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases?*
+*- in sam.c sam_newsay_xy(void){ // TODO for extended Vocab - is just basic select now*
+
 *- fix remaining modes = tubes, compost and start on wormings*
 *- all vocabs for nvp, klatt, rsynthy*
-*- all klatt extra voices as above*
+*- all klatt extra voices as above - easy way of testing these?*
 
-- where we are at with modes and development (also HW-builds/tests)?
+*** tubes.c - question of interpolation, data, newsay - lots more TODO?
+
+trying to extract data from diphones.xml in postures_demo.py we have:
+
+: for s, p in repertoire.postures.iteritems():
+:        print s, p.targets
+
+
+
+**** older notes:
+
+do we want phonemes here?
+
+*where are we at: question of list of frames in earlier version and where this came from, how we manipulate, all notes above?*
+
+*looks like frames are from: [[file:~/projects/ERD_modules/worm/docs/temped/diphones.degas]]*
+
+*also other frames in py-trm and diphones.xml*
+
+*control rate interpolation of params by storing lastframe TODO!*
+
+tube and ntube: open tube=reflection with inversion(mouth), closed=without inversion (but glottis opens and closes!)
+
+TRM tube notes assembled...
+
+seems to work but lots of messiness with mallocs and possibly slow to adjust:
+
+inlinings, what else - do we need interpolate/filter:
+
+what is sampleRateRatio=    32000 / (float)sampleRate;
+
+sampleRate = controlRate=4.0 * controlPeriod;
+
+	controlPeriod =
+	    rintf((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+
+samplerate calced in test.c is 19478 - try without interpol = rougher but no sense to interpol twice for speed
+
+issues: generator and interpolation, linked list and generation of params, changing major parameters
+
+start with just one list = input_frame and do without interpolation, then implement as lastblah
+
+*working but need to do generation of new parameters and interpolation*
+
+* FINAL TODO:
+
+- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!
+- put back in missing TMS vocabs, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
+- test/document each mode
+- manual outline
+
+- HW tests: test programming, finish build, test all (maybe code one
+  test mode for quick upload: TESTING: ADC extents, CV ins, trigger in
+  with say wavetable code
+
+** manual
+
+- all licensing in place and acknowledgments
+
+
+
 
 * KLATT/rsynth notes
 
@@ -1579,7 +1642,11 @@ fullklatt/simpleklatt/nvp
 
 12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
-    oldX.Y for example. compost as //wormed// wavetable. speed in middle - left-backwards/right-forwards
+    oldX.Y for example. 
+
+if start>end then we run backwards between the two points
+
+13. compost as //wormed// wavetable. 
 
 /////////////////end next week
 

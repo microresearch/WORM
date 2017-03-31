@@ -91,6 +91,7 @@ void main(void)
   nvp_init(); 
   klatt_init();
   rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
+  tube_init(); // tube.c
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 
