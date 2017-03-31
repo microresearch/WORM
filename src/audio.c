@@ -18,8 +18,7 @@
 #include "vot.h"
 #include "resources.h"
 #include "rs.h"
-
-//#include "raven.h"
+#include "raven.h"
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
@@ -59,6 +58,7 @@ int16_t lastval;//=genstruct->prevsample;
 
 Wavetable wavtable;
 wormy myworm;
+NTube tuber;
 
 char TTSinarray[17];
 
@@ -3305,6 +3305,20 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        }
    }
 };
+
+// test code for both raven and ntube with worm wavetable TODO!
+
+void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  float lastbuffer[32], otherbuffer[32];
+        dowavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+  //  dowormwavetable(otherbuffer, &wavtable, adc_buffer[SELX], size);
+	//  NTube_do(&tuber, otherbuffer, lastbuffer, 32);
+  //donoise(otherbuffer,32);
+
+	//	RavenTube_next(otherbuffer, lastbuffer, size);
+  floot_to_int(outgoing,lastbuffer,size);
+}  
+
 
 //////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 

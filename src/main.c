@@ -31,6 +31,7 @@
 #include "worming.h"
 #include "vot.h"
 #include "parwave.h"
+#include "raven.h"
 
 void rsynth_init(long sr, float ms_per_frame);
 
@@ -65,6 +66,7 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 
 extern Wavetable wavtable;
 extern wormy myworm;
+extern NTube tuber;
 extern char TTSinarray[17];
 
 char TTStester[16]={'w','o','r','m',' ','s', 'p', 'e','e','c','h',' ','w', 'o', 'r', 'm'};
@@ -92,6 +94,9 @@ void main(void)
   klatt_init();
   rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
   tube_init(); // tube.c
+  NTube_init(&tuber);
+  RavenTube_init();
+
  ////////
   ADC1_Init((uint16_t *)adc_buffer);
   Codec_Init(32000); 

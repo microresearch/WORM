@@ -1366,11 +1366,20 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 trying to extract data from diphones.xml in postures_demo.py we have:
 
 : for s, p in repertoire.postures.iteritems():
-:        print s, p.targets
+:        print s, p.targets, p.duration, p.transition
 
+to use as basis for frames and interpolation
 
+for each we have:
 
-**** older notes:
+<symbol name="duration" value="87.2"/>
+<symbol name="transition" value="30"/>
+<symbol name="qssa" value="43.6"/>
+<symbol name="qssb" value="43.6"/>
+
+how are these used?
+
+**** older tubes notes:
 
 do we want phonemes here?
 
@@ -1404,6 +1413,13 @@ issues: generator and interpolation, linked list and generation of params, chang
 start with just one list = input_frame and do without interpolation, then implement as lastblah
 
 *working but need to do generation of new parameters and interpolation*
+
+
+*** RavenTube in raven.c
+
+*** Ntube in ntube.c
+
+
 
 * FINAL TODO:
 
