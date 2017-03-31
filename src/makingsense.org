@@ -1310,14 +1310,6 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 ///
 
-- still check all length long->short (fixed for all klatts and few others)
-
-*- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
-
-*- fix remaining modes = tubes, compost and start on wormings*
-
-*- all vocabs for nvp, klatt, rsynthy - see above- what do we use as base vocab*
-
 - FIXED: new klatt sing modes TEST, re-inits, rsynthy with nelm list and single phonemes as in klattDONE_TESTED
 
 ** 29/3////30/3
@@ -1350,7 +1342,6 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
  and different sources such as IMPULSIVE, and length of cascade
 
-
 *** vocabs
 
 for nvp:  python test_speakIpa.py with vocab list in /root/test
@@ -1359,6 +1350,15 @@ for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2
 
 for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VOCAB?
 
+** 31/3+
+
+*- still check all length long->short (fixed for all klatts and few others)*
+*- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!*
+*- fix remaining modes = tubes, compost and start on wormings*
+*- all vocabs for nvp, klatt, rsynthy*
+*- all klatt extra voices as above*
+
+- where we are at with modes and development (also HW-builds/tests)?
 
 * KLATT/rsynth notes
 
