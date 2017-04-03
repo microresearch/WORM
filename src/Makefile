@@ -21,7 +21,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
 			syscalls.o resources.o audio.o effect.o biquad.o \
 			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o tube.o  \
-			digitalker.o nvp.o \
+			digitalker.o nvp.o samplerate.o \
 			ntube.o worming.o wavetable.o newvotrax.o sp0256bend.o\
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
 			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o raven.o

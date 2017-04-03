@@ -3389,17 +3389,30 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
 
 // test new tubes and samplerate
 
-// we would need to pass incoming, outgoing, float speed, size, generator and newsay
+/* TODO:
 
-//void samplerate(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size, void(*getsample)(void), void(*newsay)(void));
+void samplerate(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size, int16_t(*getsample)(void), void(*newsay)(void), u8 trigger, float sampleratio);
+
+xysamplerate also with extents and so on - (we need to wrap newsay_specific)
+
+*/
+
+typedef struct wormer_ {
+  uint16_t maxextent;
+  float maxplusextent;
+  float sampleratio;
+  int16_t(*getsample)(void);
+  void(*newsay)(void);  
+} wormer;
+
+wormer t_uber={0, 0.0f, 0.5f, tube_get_sample, tube_newsay};
 
 void tubestest(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  //  samplerate(incoming, outgoing, samplespeed, size, *tube_get_sample, tube_newsay);
-  //samplespeed*=0.1f;
   //    if (trigger==1) sp0256_newsay();
-       doadc();
        samplespeed*=0.5f;
-       samplerate(incoming, outgoing, samplespeed, size, tube_get_sample, tube_newsay); // TODO: add trigger
+       samplerate(incoming, outgoing, samplespeed, size, t_uber.getsample, t_uber.newsay, trigger, t_uber.sampleratio); // TODO: add trigger, incorporate doadc, xy version
+       // dooadc only if we want a sample
+       
 }
 
 // test code for both raven and ntube with worm wavetable TODO!

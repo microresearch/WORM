@@ -1433,11 +1433,11 @@ start with just one list = input_frame and do without interpolation, then implem
 
 - do we need to face up to interpolation - try various strategies -
   see samplerate.c (wrap up with function pointer to newsay and
-  getsample plus how we handle the rest of stuff??)
+  getsample plus how we handle the rest of stuff - but sounds terrible with sinc)
 
 - check all logarithmics for length(64 or 1024 is necessary) and if is needed...
 - Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!
-- put back in missing TMS vocabs, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
+- put back in missing TMS vocabs+ new modes=newsay_specific, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
 - test/document each mode
 - manual outline
 

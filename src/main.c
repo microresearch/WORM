@@ -117,7 +117,6 @@ void main(void)
   tube_init(); // tube.c
   NTube_init(&tuber);
   RavenTube_init();
-  sample_rate_init();
 #endif
 
  ////////
