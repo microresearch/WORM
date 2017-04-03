@@ -257,6 +257,32 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
   unit->m_y12 = y12;
 }
 
+#define WIDTH 64                /* this controls the number of neighboring samples
+				   which are used to interpolate the new samples.  The
+				   processing time is linearly related to this width */
+
+#define SAMPLES_PER_ZERO_CROSSING 32    /* this defines how finely the sinc function */
+
+float sinc_table[WIDTH * SAMPLES_PER_ZERO_CROSSING] = { 0.0 };
+
+#define PI 3.14159263
+
+void make_sinc()
+{
+    int i;
+    double temp,win_freq,win;
+    win_freq = PI / WIDTH / SAMPLES_PER_ZERO_CROSSING;
+    sinc_table[0] = 1.0;
+    for (i=1;i<WIDTH * SAMPLES_PER_ZERO_CROSSING;i++)   {
+	temp = (double) i * PI / SAMPLES_PER_ZERO_CROSSING;
+	sinc_table[i] = sin(temp) / temp;
+	win = 0.5 + 0.5 * cos(win_freq * i);
+	sinc_table[i] *= win;
+	printf("%f, ", sinc_table[i]);
+
+    }
+}
+
 
 void main(){
   //  indexy={1.0,1.0}; 
@@ -299,6 +325,8 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 
  // printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
+ make_sinc();
+
 #define TOTAL_SECTIONS            10 
  float controlRate=4.0;
 
@@ -310,6 +338,8 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
  float nyquist = (float)sampleRate / 2.0;
 
  printf("TUBES: controlp %d samplerate %d tubelength %f nyquist %f\n",controlPeriod, sampleRate, actualTubeLength, nyquist);
+
+
 
  /*
 	if (modus&1) {
