@@ -24,7 +24,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			digitalker.o nvp.o \
 			ntube.o worming.o wavetable.o newvotrax.o sp0256bend.o\
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
-			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o 
+			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o raven.o
 #			lpcanalysis.o 
 #			ownvocoder.o
 

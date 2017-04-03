@@ -1352,16 +1352,21 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 
 ** 31/3+
 
-*- still check all length long->short (fixed for all klatts and few others)* DONE
+- still check all length long->short (fixed for all klatts and few others) *DONE*
 
-*- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases?*
-*- in sam.c sam_newsay_xy(void){ // TODO for extended Vocab - is just basic select now*
+TODO:
 
-*- fix remaining modes = tubes, compost and start on wormings*
-*- all vocabs for nvp, klatt, rsynthy*
-*- all klatt extra voices as above - easy way of testing these?*
+*- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases->LAP?*
+*- in sam.c sam_newsay_xy(void) // TODO for extended Vocab - is just basic select now->LAP*
+*- remaining modes = tubes, compost and start on wormings*
+*- all vocabs for nvp, klatt, rsynthy ->LAP*
+*- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
 
-*** tubes.c - question of interpolation, data, newsay - lots more TODO?
+*** tubes.c - question of interpolation, data, newsay 
+
+- has excitation, TODO: newsay, duration, interpol
+
+- raw mode (max and min for each as other modes like this), phoneme mode, bends (pitch?)
 
 trying to extract data from diphones.xml in postures_demo.py we have:
 
@@ -1417,12 +1422,20 @@ start with just one list = input_frame and do without interpolation, then implem
 
 *** RavenTube in raven.c
 
+- excitation? 
+
 *** Ntube in ntube.c
 
+- excitation?
 
 
-* FINAL TODO:
+* FINAL/FURTHER TODO:
 
+- do we need to face up to interpolation - try various strategies -
+  see samplerate.c (wrap up with function pointer to newsay and
+  getsample plus how we handle the rest of stuff??)
+
+- check all logarithmics for length(64 or 1024 is necessary) and if is needed...
 - Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!
 - put back in missing TMS vocabs, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
 - test/document each mode
