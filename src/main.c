@@ -4,6 +4,19 @@
  make stlink_flash
 */
 
+#ifdef TESTING
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
+#include "stm32f4xx.h"
+#include "codec.h"
+#include "i2s.h"
+#include "adc.h"
+#include "audio.h"
+#include "wavetable.h"
+#include "wavetables.h"
+#else
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/times.h>
@@ -32,6 +45,8 @@
 #include "vot.h"
 #include "parwave.h"
 #include "raven.h"
+#include "samplerate.h"
+#endif
 
 void rsynth_init(long sr, float ms_per_frame);
 
@@ -65,8 +80,10 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
 
 extern Wavetable wavtable;
+#ifndef TESTING
 extern wormy myworm;
 extern NTube tuber;
+#endif
 extern char TTSinarray[17];
 
 char TTStester[16]={'w','o','r','m',' ','s', 'p', 'e','e','c','h',' ','w', 'o', 'r', 'm'};
@@ -74,6 +91,10 @@ char TTStester[16]={'w','o','r','m',' ','s', 'p', 'e','e','c','h',' ','w', 'o', 
 void main(void)
 {
   int16_t x;
+
+#ifdef TESTING
+  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 
+#else
   for (x=0;x<16;x++){
     TTSinarray[x]=TTStester[x];
   }
@@ -96,6 +117,8 @@ void main(void)
   tube_init(); // tube.c
   NTube_init(&tuber);
   RavenTube_init();
+  sample_rate_init();
+#endif
 
  ////////
   ADC1_Init((uint16_t *)adc_buffer);

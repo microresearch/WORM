@@ -1,6 +1,12 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
+#ifdef TESTING
+#include "audio.h"
+#include "effect.h"
+#include "wavetable.h"
+#include "resources.h"
+#else
 #include "audio.h"
 #include "effect.h"
 #include "klatt_phoneme.h"
@@ -19,6 +25,8 @@
 #include "resources.h"
 #include "rs.h"
 #include "raven.h"
+#include "samplerate.h"
+#endif
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 
@@ -57,11 +65,12 @@ int16_t lastval;//=genstruct->prevsample;
 #define THRESHLOW 10000
 
 Wavetable wavtable;
+#ifndef TESTING
 wormy myworm;
 NTube tuber;
+#endif
 
 char TTSinarray[17];
-
 
 inline void audio_comb_stereo(int16_t sz, int16_t *dst, int16_t *lsrc, int16_t *rsrc)
 {
@@ -93,7 +102,78 @@ inline void doadc(){
   CONSTRAIN(_selz,0.0f,1.0f);
 }
 
+#ifdef TESTING
 
+void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
+  float lastbuffer[32];
+  uint16_t val;
+  doadc();
+  val=_selz*1030.0f; // how can we test all others????
+  MAXED(val,1023);
+  val=1023-val;
+  dowavetable(lastbuffer, &wavtable, 2.0f+(logspeed[val]*440.0f), size); // for exp/1v/oct test
+  floot_to_int(outgoing,lastbuffer,size);
+}  
+
+u8 toggled=1;
+
+void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
+{
+  float samplespeed;
+  float value;
+  u16 samplespeedref;
+  static u16 cc;
+  u8 oldmode=255;
+  static u8 firsttime=0;
+  value =(float)adc_buffer[SPEED]/65536.0f; 
+  smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
+  _speed=smoothed_adc_value[0];
+  CONSTRAIN(_speed,0.0f,1.0f);
+  _speed=1.0f-_speed;
+
+  value =(float)adc_buffer[MODE]/65536.0f; 
+  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.0f for SMOOTHER mode locking
+  _mode=smoothed_adc_value[1];
+  CONSTRAIN(_mode,0.0f,1.0f);
+
+  oldmode=_intmode;
+  _intmode=_mode*65.0f;
+  MAXED(_intmode, 63);
+  trigger=0; 
+  _intmode=0;
+ // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
+ if (firsttime==0){// TEST CODE - for fake trigger
+   trigger=1;
+   firsttime=1;
+ }
+ 
+  samplespeedref=_speed*1027.0f;
+  MAXED(samplespeedref, 1023);
+  samplespeed=logspeed[samplespeedref];  
+  
+  // splitting input
+  for (u8 x=0;x<sz/2;x++){
+    sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
+    src++;
+  }
+
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={test_wave}; 
+  
+  generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
+
+  // copy sample buffer into audio_buffer as COMPOST
+  if (!toggled){
+  for (u8 x=0;x<sz/2;x++) {
+    audio_buffer[cc]=mono_buffer[x];
+    cc++;
+    if (cc>AUDIO_BUFSZ) cc=0;
+  }
+  }
+
+  audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
+}
+
+#else
 ///[[[[[[[[[[[[[[[[[[[[[[[[ TMS - lots of vocabs to handle - is it 8KHz = *0.25f - seems OK
 
 void tms(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ 
@@ -3267,7 +3347,7 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   static u8 triggered=0;
   u8 xx=0,readpos;
   float remainder;
-  //  samplespeed=1.0f;
+  samplespeed*=0.5f;
 
    if (samplespeed<=1.0f){ 
      while (xx<size){
@@ -3305,6 +3385,22 @@ void tubes(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
        }
    }
 };
+
+
+// test new tubes and samplerate
+
+// we would need to pass incoming, outgoing, float speed, size, generator and newsay
+
+//void samplerate(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size, void(*getsample)(void), void(*newsay)(void));
+
+void tubestest(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
+  //  samplerate(incoming, outgoing, samplespeed, size, *tube_get_sample, tube_newsay);
+  //samplespeed*=0.1f;
+  //    if (trigger==1) sp0256_newsay();
+       doadc();
+       samplespeed*=0.5f;
+       samplerate(incoming, outgoing, samplespeed, size, tube_get_sample, tube_newsay); // TODO: add trigger
+}
 
 // test code for both raven and ntube with worm wavetable TODO!
 
@@ -3364,7 +3460,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker, digitalker_sing, digitalker_bendpitchvals, sp0256sing, votraxsing, tmssing, tmsphonsing, simpleklatt, nvp, klatt, klattTTS, nvpvocab, klattsingle, klattvocab, rsynthy, rsynthelm, rsynthsingle, nvpvocabsing, rsynthysing, klattsinglesing, klattvocabsing, tubes}; 
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker, digitalker_sing, digitalker_bendpitchvals, sp0256sing, votraxsing, tmssing, tmsphonsing, simpleklatt, nvp, klatt, klattTTS, nvpvocab, klattsingle, klattvocab, rsynthy, rsynthelm, rsynthsingle, nvpvocabsing, rsynthysing, klattsinglesing, klattvocabsing, tubestest}; 
   
   //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 42sp0256sing, 43votraxsing, 44tmssing, 45tmsphonsing, /// 46simpleklatt, 47nvp, 48klatt, 49klattTTS, 50nvpvocab, 51klattsingle, 52klattvocab, 53rsynthy, 54rsynthelm, 55rsynthsingle, 56nvpvocabsing, 57rsynthsing, 58klattsinglesing, 59klattvocabsing, 60tubes=tube.c
 
@@ -3389,9 +3485,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     TTSinarray[xax]=mapytoascii[selz];
     }
 
-#ifdef TEST
-  audio_comb_stereo(sz, dst, left_buffer, mono_buffer);
-#else // left is out on our WORM BOARD!
   audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
-#endif
 }
+#endif

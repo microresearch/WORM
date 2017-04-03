@@ -83,6 +83,7 @@ inline static void WavetableIncrementPosition(Wavetable *wavetable, float freque
 wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wavetable->basicIncrement), wavetable->length);
 }
 
+#ifndef TESTING
 extern wormy myworm;
 
 inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
@@ -94,6 +95,29 @@ inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float fr
   wavetable->currentPosition = wm;//mod0(wm,wavetable->length);
 }
 
+void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  Plain oscillator
+{
+    int lowerPosition, upperPosition;
+    for (int ii = 0; ii < length; ii++) {
+
+    //  First increment the table position, depending on frequency
+    WORMWavetableIncrementPosition(wavetable, frequency);
+
+    //  Find surrounding integer table positions
+    lowerPosition = (int)wavetable->currentPosition;
+    upperPosition = mod0(lowerPosition + 1, wavetable->length);
+
+    //  Return interpolated table value
+    float sample= (wavetable->wavetable[lowerPosition] +
+            ((wavetable->currentPosition - lowerPosition) *
+             (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
+
+    outgoing[ii]=sample;
+    }
+}
+
+
+#endif
 
 #if OVERSAMPLING_OSCILLATOR
 void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  2X oversampling oscillator
@@ -163,28 +187,6 @@ float dosinglewavetable(Wavetable *wavetable, float frequency)
              (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
 
     return sample;
-}
-
-
-void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  Plain oscillator
-{
-    int lowerPosition, upperPosition;
-    for (int ii = 0; ii < length; ii++) {
-
-    //  First increment the table position, depending on frequency
-    WORMWavetableIncrementPosition(wavetable, frequency);
-
-    //  Find surrounding integer table positions
-    lowerPosition = (int)wavetable->currentPosition;
-    upperPosition = mod0(lowerPosition + 1, wavetable->length);
-
-    //  Return interpolated table value
-    float sample= (wavetable->wavetable[lowerPosition] +
-            ((wavetable->currentPosition - lowerPosition) *
-             (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
-
-    outgoing[ii]=sample;
-    }
 }
 
 TRMFIRFilter firfilt;
