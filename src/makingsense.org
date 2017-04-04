@@ -1318,7 +1318,7 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 - and/or vocab as selected makes more sense (say 128 words + phrases???)
 
-*- what can be varies with each of klatt voices: and how - on basis of fixed voice parameters?*
+*- what can be varied with each of klatt voices: and how - on basis of fixed voice parameters?*
 
 -- rsynth: just base freq which we multiply
 
@@ -1357,10 +1357,12 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 TODO:
 
 *- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases->LAP?*
-*- in sam.c sam_newsay_xy(void) // TODO for extended Vocab - is just basic select now->LAP*
-*- remaining modes = tubes, compost and start on wormings*
-*- all vocabs for nvp, klatt, rsynthy ->LAP*
+*- in sam.c sam_newsay_xy(void) // TODO new custom selected Vocab - is just basic select now->LAP*
+*- all vocabs for nvp, klatt, rsynthy ->LAP = vocabinprogress*
 *- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
+
+*- remaining modes = tubes, compost and start on wormings*
+*- remaining fixes below*
 
 *** tubes.c - question of interpolation, data, newsay 
 
@@ -1368,7 +1370,7 @@ TODO:
 
 - raw mode (max and min for each as other modes like this), phoneme mode, bends (pitch?)
 
-trying to extract data from diphones.xml in postures_demo.py we have:
+- extracting data from diphones.xml in postures_demo.py (T60 or?) we have:
 
 : for s, p in repertoire.postures.iteritems():
 :        print s, p.targets, p.duration, p.transition
@@ -1441,7 +1443,7 @@ start with just one list = input_frame and do without interpolation, then implem
 - test/document each mode
 - manual outline
 
-- HW tests: test programming, finish build, test all (maybe code one
+- HW tests: test programmingDONE, finish build, test all = maybe code one
   test mode for quick upload: TESTING: ADC extents, CV ins, trigger in
   with say wavetable code
 
