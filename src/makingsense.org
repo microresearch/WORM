@@ -1357,7 +1357,7 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 TODO:
 
 *- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases->LAP?*
-*- in sam.c sam_newsay_xy(void) // TODO new custom selected Vocab - is just basic select now->LAP*
+*- in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now->LAP*
 *- all vocabs for nvp, klatt, rsynthy ->LAP = vocabinprogress*
 *- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
 
@@ -1421,7 +1421,6 @@ start with just one list = input_frame and do without interpolation, then implem
 
 *working but need to do generation of new parameters and interpolation*
 
-
 *** RavenTube in raven.c
 
 - excitation? 
@@ -1429,6 +1428,18 @@ start with just one list = input_frame and do without interpolation, then implem
 *** Ntube in ntube.c
 
 - excitation?
+
+
+** 4/4+
+
+- new interpolation scheme seems to work now in samplerate.c: shift
+  out old audio.c and start to rework with new struct so is also all a
+  bit cleaner (will need to fix tms passing vocab issue and xy
+  generators) - make templates for this...
+
+
+
+- maybe keep only tubes.c and ditch other tube code so we can easily finish modes...
 
 
 * FINAL/FURTHER TODO:

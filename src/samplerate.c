@@ -42,7 +42,7 @@ void new_data(int16_t data)
     delay_buffer[DELAY_SIZE-5] = data;
 }
 
-#define SINCMODE 0
+#define SINCMODE 1
 
 float linear_interp(float first_number,float second_number,float fraction)
 {

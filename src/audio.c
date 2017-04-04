@@ -3405,11 +3405,12 @@ typedef struct wormer_ {
   void(*newsay)(void);  
 } wormer;
 
-wormer t_uber={0, 0.0f, 0.5f, tube_get_sample, tube_newsay};
+wormer t_uber={0, 0.0f, 0.5f, tms_get_sample, tms_newsay};
 
 void tubestest(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
   //    if (trigger==1) sp0256_newsay();
        samplespeed*=0.5f;
+       doadc();
        samplerate(incoming, outgoing, samplespeed, size, t_uber.getsample, t_uber.newsay, trigger, t_uber.sampleratio); // TODO: add trigger, incorporate doadc, xy version
        // dooadc only if we want a sample
        
