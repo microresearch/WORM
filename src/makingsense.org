@@ -1386,6 +1386,8 @@ for each we have:
 
 how are these used?
 
+this data is now in postures...
+
 **** older tubes notes:
 
 do we want phonemes here?
@@ -1437,16 +1439,12 @@ start with just one list = input_frame and do without interpolation, then implem
   bit cleaner (will need to fix tms passing vocab issue and xy
   generators) - make templates for this...
 
-
+- also more tests as a few at slow speeds seem to drop audio altogether
 
 - maybe keep only tubes.c and ditch other tube code so we can easily finish modes...
 
 
 * FINAL/FURTHER TODO:
-
-- do we need to face up to interpolation - try various strategies -
-  see samplerate.c (wrap up with function pointer to newsay and
-  getsample plus how we handle the rest of stuff - but sounds terrible with sinc)
 
 - check all logarithmics for length(64 or 1024 is necessary) and if is needed...
 - Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!

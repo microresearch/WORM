@@ -138,9 +138,9 @@ void samplerate(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsa
   float alpha;
   float temp1=0.0f;
   static float time_now=0.0f;
-  int32_t j;
-  int32_t left_limit,right_limit,last_time=0;
-  static int32_t int_time=0;
+  long j;
+  long left_limit,right_limit,last_time=0;
+  static long int_time=0;
   factor*=sampleratio;
   
 for (u8 ii=0;ii<size;ii++){
