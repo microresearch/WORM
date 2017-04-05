@@ -1341,13 +1341,16 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
  and different sources such as IMPULSIVE, and length of cascade
 
-*** vocabs
+*** vocabs - redo
 
-for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.h
+*ALL Are 128 0-127 long!*
 
-for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.h
+for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.hREDONE-TEST
 
-for rsynth: 2005 - python speakyr.py using vocab in /root/test ->
+for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.hREDONE-TEST
+
+for rsynth: 2005 - python speakyr.py using vocab in /root/test -> rsynthy_vocab.hREDONE-TEST
+
 
 ** 31/3+
 
@@ -1355,20 +1358,22 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test ->
 
 TODO:
 
-*- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases->LAP?*
+- digitalker ROM modes - ssr1, AND scorpion - DONE - both added - *TEST*
 
 ////ssr1=0-64
 ////ssr2=0-figure out as skip some
-///scorpion=0-figure out as skip some
+///scorpion=0-44
 
-*- in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now->LAP*
+*-digitalker raw mode maybe*
 
+- in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now *DONE-TEST*
 
+////
 
-*- all vocabs for nvp, klatt, rsynthy ->LAP = vocabinprogress*
+*- all vocabs for nvp, klatt, rsynthy ->LAP* - implement and  TEST each...
+
 *- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
-
-*- remaining modes = tubes, compost and start on wormings*
+*- remaining modes = tubes, compost*
 *- remaining fixes below*
 
 *** tubes.c - question of interpolation, data, newsay 
@@ -1438,7 +1443,6 @@ start with just one list = input_frame and do without interpolation, then implem
 
 - excitation?
 
-
 ** 4/4+
 
 - new interpolation scheme seems to work now in samplerate.c: shift
@@ -1456,7 +1460,20 @@ start with just one list = input_frame and do without interpolation, then implem
 - tubes.c is close but could break further into frames so less interpolation
 - also slippage on selection and we need to figure how much we can get on one knob and smoothings
 
-- TODO for tubes: singing mode (straight freq and length), raw xy mode
+*- for nvp.c we need frame 49 as silent frame - NEARLY DONE*
+
+** 6/4++
+
+- check all klatt vocabs and fix nvp silence
+- check sam selected vocab
+- TODO for tubes: singing mode (straight freq and length), raw xy mode (16 params + reset volume thing)
+- digitalker raw mode
+
+- compost
+- klatt extra voices
+- redo all modes in audio.c - xy business, test and document
+
+
 
 * FINAL/FURTHER TODO:
 

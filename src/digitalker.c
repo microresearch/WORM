@@ -1020,7 +1020,12 @@ void digitalker_step_bendd()
 
 
 void digitalk_init(void){
-  m_rom=m_rom_scorpion; // TODO: where we set our m_rom
+  m_rom=m_rom_SSR1; // TODO: where we set our m_rom
+
+  // SSR1=0-64
+  // SSR2=WRONG!
+  // scorpion = 0-44
+  
   m_dac_index = 128;
   m_bpos = 0xffff;
 }
@@ -1031,10 +1036,18 @@ void digitalk_init(void){
 // start this as basic model and test bends here...
 void digitalk_newsay(){
 #ifndef LAP
-  u8 val=_selz*67.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
-  MAXED(val,64);
-  val=64-val;
-  u8 which=val; // 65 - do we hit the end? TODO TEST
+  // say 44+64=108
+
+  u8 val=_selz*109.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
+  MAXED(val,107);
+  val=107-val;
+  if (val>63){
+    val=val-64;
+    m_rom=m_rom_scorpion;
+  }
+  else 
+    m_rom=m_rom_SSR1;
+  u8 which=val; 
 #else
        u8 which =1;
 #endif
@@ -1045,6 +1058,7 @@ void digitalk_newsay(){
 #ifdef LAP
 void digitalk_newsayarg(int which){
   digitalker_start_command(which);
+  //  fprintf(stderr, "HERE");
   //  alwayswhich=which;
 }
 
@@ -1222,15 +1236,21 @@ int16_t digitalk_get_sample_bendpitchvals(){
 
 #ifdef LAP
  void main(int argc, char *argv[]){
-   u8 x; int xx;
+   u8 x; int xx, xxx, w=atoi(argv[1]);
    digitalk_init();
-   digitalk_newsayarg(atoi(argv[1]));
-   while(1){
+     while(1){
+   digitalk_newsayarg(w);
+   for (xx=0;xx<64000;xx++){
      for (x=0;x<32;x++) {
-       xx=digitalk_get_sample_arg(atoi(argv[1]));
+       xxx=digitalk_get_sample_arg(w);
     }
-     printf("%c",(xx+2048)>>5);
+     //     printf("%d\n",(xxx));
+     printf("%c",(xxx+32768)>>8);
     //	  printf("%d\n",xx+2048);
+     //       }
    }
-   }
+   //   sleep(1);
+      fprintf(stderr, "NUMBER: %d\n",w++);
+     }
+ }
 #endif

@@ -21,6 +21,8 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 #include "stm32f4xx.h"
 #include "audio.h"
 #include "resources.h"
+#include "nvp_vocab.h"
+
 
 static u16 count=0;
 
@@ -41,39 +43,6 @@ print str(phoneme['endVoicePitch'])+",",
 print str(frameDuration)+",",
 print str(fadeDuration)+" },"
  */
-
-typedef struct {
-  unsigned char phon;
-  float voicePitch;
-  float endVoicePitch;
-  float frameDuration;
-  float fadeDuration;
-} nvp_vocab_;
-
-static const nvp_vocab_ nvp_v_worm[]   __attribute__ ((section (".flash"))) =  { { 46, 110.190511588, 101.54464594, 42.0, 28.0}, { 6, 101.54464594, 83.3883280795, 88.2, 35.0}, { 41, 83.3883280795, 74.7424624317, 42.0, 14.0}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_one[]  __attribute__ ((section (".flash"))) =  { { 46, 110.190511588f, 101.328499299f, 42.0f, 28.0f}, { 4, 101.328499299f, 83.6044747207f, 84.0f, 35.0f}, { 13, 83.6044747207f, 74.7424624317f, 42.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_two[]  __attribute__ ((section (".flash"))) =  { { 49, 1.0f, 1.0f, 30.0f, 0.0f}, { 15, 110.190511588f, 110.190511588f, 6.0f, 0.001f}, { 49, 1.0f, 1.0f, 42.0f, 0.0f}, { 45, 110.190511588f, 74.7424624317f, 88.2f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_three[]  __attribute__ ((section (".flash"))) =  { { 26, 97.2654947412f, 97.2654947412f, 45.0f, 10.0f}, { 47, 110.190511588f, 98.7556570212f, 42.0f, 28.0f}, { 39, 98.7556570212f, 74.7424624317f, 88.2f, 35.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_four[]  __attribute__ ((section (".flash"))) =  { { 9, 110.190511588f, 110.190511588f, 63.0f, 14.0f}, { 5, 110.190511588f, 74.7424624317f, 88.2f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_five[]  __attribute__ ((section (".flash"))) =  { { 9, 110.190511588f, 110.190511588f, 63.0f, 14.0f}, { 2, 110.190511588f, 96.0112919253f, 84.0f, 14.0f}, { 10, 96.0112919253f, 81.8320722629f, 84.0f, 14.0f}, { 16, 81.8320722629f, 74.7424624317f, 42.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_six[]  __attribute__ ((section (".flash"))) =  { { 44, 110.190511588f, 110.190511588f, 63.0f, 14.0f}, { 10, 110.190511588f, 74.7424624317f, 84.0f, 14.0f}, { 49, 1.0f, 1.0f, 42.0f, 0.0f}, { 40, 74.7424624317f, 74.7424624317f, 6.0f, 0.001f}, { 44, 74.7424624317f, 74.7424624317f, 63.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_seven[]  __attribute__ ((section (".flash"))) =  { { 44, 114.8698355f, 114.8698355f, 63.0f, 14.0f}, { 33, 114.8698355f, 80.106987759f, 84.0f, 14.0f}, { 16, 83.5087919428f, 80.8788930895f, 30.0f, 10.0f}, { 32, 80.8788930895f, 77.3723612851f, 40.0f, 10.0f}, { 13, 77.3723612851f, 74.7424624317f, 30.0f, 10.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_eight[]  __attribute__ ((section (".flash"))) =  { { 36, 110.190511588f, 92.4664870097f, 84.0f, 14.0f}, { 10, 92.4664870097f, 74.7424624317f, 84.0f, 14.0f}, { 49, 1.0f, 1.0f, 42.0f, 0.0f}, { 15, 74.7424624317f, 74.7424624317f, 6.0f, 0.001f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_nine[]  __attribute__ ((section (".flash"))) =  { { 13, 110.190511588f, 104.282503395f, 42.0f, 14.0f}, { 2, 104.282503395f, 92.4664870097f, 84.0f, 14.0f}, { 10, 92.4664870097f, 80.6504706244f, 84.0f, 14.0f}, { 13, 80.6504706244f, 74.7424624317f, 42.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ nvp_v_ten[]  __attribute__ ((section (".flash"))) =  { { 49, 1.0f, 1.0f, 30.0f, 0.0f}, { 15, 110.190511588f, 110.190511588f, 6.0f, 0.001f}, { 49, 1.0f, 1.0f, 42.0f, 0.0f}, { 33, 110.190511588f, 86.5584788171f, 84.0f, 14.0f}, { 13, 86.5584788171f, 74.7424624317f, 42.0f, 14.0f}, {255, 0.0f, 0.0f, 0.0f, 0.0f}};
-
-static const nvp_vocab_ *nvp_vocab[]={nvp_v_worm, nvp_v_one, nvp_v_two, nvp_v_three, nvp_v_four};
-
 
 const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 220.0f , 75.0f , 225.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 200.0f, 100.0f, 300.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.466666666667f, 0.4f, 0.4f, 0.383333333333 , 0.0f , 1.0f , 0.0f, 0.0f },
@@ -392,18 +361,25 @@ u8 nvp_newsay(){
   return nextframe;
 }
 
+static u8 lastphon=0;
+
 u8 nvp_newsay_vocab(){ // note that this cycles thru vocab
   static u8 counter=0, nextframe=0;
-  // nextframe is next in struct
-
-  // TODO - vocab and selection
-
-  u8 value=4;
-
+  static u8 value=0;
+  
   const nvp_vocab_ *ourvocab=nvp_vocab[value];
 
   nextframe=ourvocab[counter].phon;
+
+ if (nextframe==49) nextframe=lastphon;
+ lastphon=nextframe;
+  
+  
+
   if (nextframe==255) {
+    value=_selz*129.0f;
+    MAXED(value,127);
+    value=127-value;
     counter=0;
     nextframe=ourvocab[0].phon;    
   }
@@ -413,7 +389,11 @@ u8 nvp_newsay_vocab(){ // note that this cycles thru vocab
     *indexy[i]=data[nextframe-1][i];
   }
   }
-  // frame length, interpol sets to half that and pitch = SELY, SELZ,
+
+    // if it is 49 then - we use last frame and set amplitudes to 0.0f
+
+
+    // frame length, interpol sets to half that and pitch = SELY, SELZ,
     //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
       //    this_interpol=this_frame_length/2;
     int val=_sely*1027.0f;
@@ -434,15 +414,20 @@ u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
   // nextframe is next in struct
   count=0;
 
-  // TODO - vocab and selection
-  u8 value=4;
+  //  u8 value=4;
+  u8 value=_selz*129.0f;
+  MAXED(value,127);
+  value=127-value;
 
   const nvp_vocab_ *ourvocab=nvp_vocab[value];
-  static u16 counter=0;
+  u16 counter=0;
 
-    counter=0;
-    nextframe=ourvocab[0].phon;    
+  nextframe=ourvocab[0].phon;    
 
+ if (nextframe==49) nextframe=lastphon;
+ lastphon=nextframe;
+ 
+  
     if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
   for (u8 i=0;i<39;i++){
@@ -450,6 +435,9 @@ u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
   }
   }
 
+      // if it is 49 then - we use last frame and set amplitudes to 0.0f
+
+    
     int val=_sely*1027.0f;
     MAXED(val,1023);
     this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);

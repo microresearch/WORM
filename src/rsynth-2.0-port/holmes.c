@@ -35,23 +35,12 @@ unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input,
 
 typedef struct {
   unsigned char length;
-  unsigned char elements[64]; // max number of elements
+  unsigned char elements[84]; // max number of elements
 } klattvocab_;
 
+#include "klatt_vocab.h"
 
-static const klattvocab_ vocab_help  __attribute__ ((section (".flash"))) ={24, 28, 10, 0, 47, 6, 0, 40, 8, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 1, 6, 0, 1, 6, 0}; // test this!
-static const klattvocab_ one  __attribute__ ((section (".flash"))) = {15, 44, 8, 0, 49, 7, 0, 21, 8, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ two  __attribute__ ((section (".flash")))= {18, 5, 6, 0, 6, 1, 0, 7, 2, 0, 57, 11, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ three  __attribute__ ((section (".flash"))) = {15, 24, 15, 0, 43, 11, 0, 53, 9, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ four __attribute__ ((section (".flash"))) = {15, 23, 12, 0, 56, 13, 0, 43, 11, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ five  __attribute__ ((section (".flash")))= {24, 23, 12, 0, 59, 7, 0, 46, 7, 0, 29, 4, 0, 30, 0, 0, 29, 4, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ six  __attribute__ ((section (".flash")))= {24, 25, 12, 0, 46, 7, 0, 8, 8, 0, 9, 1, 0, 10, 4, 0, 25, 12, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ seven  __attribute__ ((section (".flash"))) = {27, 25, 12, 0, 53, 9, 0, 29, 4, 0, 30, 0, 0, 29, 4, 0, 47, 6, 0, 21, 8, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ eight __attribute__ ((section (".flash"))) = {21, 58, 7, 0, 46, 7, 0, 5, 6, 0, 6, 1, 0, 7, 2, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ nine  __attribute__ ((section (".flash")))= {18, 21, 8, 0, 59, 7, 0, 46, 7, 0, 21, 8, 0, 1, 6, 0, 1, 6, 0};
-static const klattvocab_ ten  __attribute__ ((section (".flash")))= {21, 5, 6, 0, 6, 1, 0, 7, 2, 0, 47, 6, 0, 21, 8, 0, 1, 6, 0, 1, 6, 0};
-
-static const klattvocab_ *vocabklatt[3]={&one, &two, &three};
+//static const klattvocab_ *vocabklatt[3]={&one, &two, &three};
 
 
 static u8 TTSoutarray[256];
@@ -986,8 +975,11 @@ i=0;
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
  
-u8 val=1;
-// select vocab but for now
+//u8 val=1;
+  u8 val=_selz*129.0f;
+  MAXED(val,127);
+  val=127-val;
+
  const klattvocab_ *ourvocab=vocabklatt[val];
  elm_plen=ourvocab->length; 
  vocab_elm=ourvocab->elements;

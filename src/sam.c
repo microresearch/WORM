@@ -309,15 +309,15 @@ void sam_newsay_phon(void){
 	}	
 }
 
-void sam_newsay_xy(void){ // TODO for extended Vocab - is just basic select now
+void sam_newsay_xy(void){ 
   u8 beginning=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
-  u8 vocab=_selz*43.0f;
-  MAXED(vocab,41);
-  vocab=41-vocab;
-  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replace with custom selected vocab!
+  u8 vocab=_selz*132.0f;
+  MAXED(vocab,130);
+  vocab=130-vocab;
+  strcpy(input,  sam_vocab_custom[vocab]); // TODO -replace with custom selected vocab!
 
   if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
   Parser2();
