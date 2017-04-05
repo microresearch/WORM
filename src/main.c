@@ -115,8 +115,8 @@ void main(void)
   klatt_init();
   rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
   tube_init(); // tube.c
-  NTube_init(&tuber);
-  RavenTube_init();
+  //  NTube_init(&tuber);
+  //  RavenTube_init();
 #endif
 
  ////////

@@ -17,6 +17,17 @@
 //#define AUDIO_BUFSZ 58870 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 #define AUDIO_BUFSZ 32768 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 
+enum adcchannel {
+  MODE_,
+  SELX_,
+  SELY_,
+  SELZ_,
+  SPEED_
+};
+
+#define THRESH 16000
+#define THRESHLOW 10000
+
 #define MAXED(var, max) \
   if (var > (max)) {	\
     var = (max);	\

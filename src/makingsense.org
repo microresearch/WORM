@@ -1393,7 +1393,7 @@ for each we have:
 
 how are these used?
 
-this data is now in postures...
+this data is now in posture.h
 
 **** older tubes notes:
 
@@ -1444,13 +1444,19 @@ start with just one list = input_frame and do without interpolation, then implem
 - new interpolation scheme seems to work now in samplerate.c: shift
   out old audio.c and start to rework with new struct so is also all a
   bit cleaner (will need to fix tms passing vocab issue and xy
-  generators) - make templates for this...
+  generators)
 
-- also more tests as a few at slow speeds seem to drop audio altogether - maybe fixed
+- also more tests as a few at slow speeds seem to drop audio altogether - maybe fixedFIXED
 
 - maybe keep only tubes.c and ditch other tube code so we can easily
   finish modes - also as we have extra TMS modes and compost
 
+** 5/4++
+
+- tubes.c is close but could break further into frames so less interpolation
+- also slippage on selection and we need to figure how much we can get on one knob and smoothings
+
+- TODO for tubes: singing mode (straight freq and length), raw xy mode
 
 * FINAL/FURTHER TODO:
 

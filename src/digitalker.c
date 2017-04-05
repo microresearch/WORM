@@ -489,7 +489,7 @@ void digitalker_step_mode_0d()
 		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
-		  else
+		  #else
 		    dac -= delta1[(bits >> (6+2*l)) & 15];
 		  #endif
 			digitalker_write(&wpos, vol, dac);

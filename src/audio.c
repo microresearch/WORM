@@ -47,22 +47,11 @@ float _mode, _speed, _selx, _sely, _selz;
 u8 _intspeed, _intmode=0, trigger=0;
 u8 TTS=0;
 
-enum adcchannel {
-  MODE_,
-  SELX_,
-  SELY_,
-  SELZ_,
-  SPEED_
-};
-
 #define float float32_t
 
 float samplepos=0;//=genstruct->samplepos;
 int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
-
-#define THRESH 16000
-#define THRESHLOW 10000
 
 Wavetable wavtable;
 #ifndef TESTING
@@ -97,7 +86,7 @@ inline void doadc(){
   CONSTRAIN(_sely,0.0f,1.0f);
 
   value =(float)adc_buffer[SELZ]/65536.0f; 
-  smoothed_adc_value[4] += 0.1f * (value - smoothed_adc_value[4]);
+  smoothed_adc_value[4] += 0.05f * (value - smoothed_adc_value[4]); // try to smooth it!
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
 }
@@ -3405,12 +3394,11 @@ typedef struct wormer_ {
   void(*newsay)(void);  
 } wormer;
 
-wormer t_uber={0, 0.0f, 1.0f, tms_get_sample, tms_newsay};
+wormer t_uber={0, 0.0f, 1.0f, tube_get_sample, tube_newsay};
 
 void tubestest(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
-  //    if (trigger==1) sp0256_newsay();
-       samplespeed*=0.5f;
-       doadc();
+  if (trigger==1) tube_newsay();
+  //       samplespeed*=0.5f;
        samplerate(incoming, outgoing, samplespeed, size, t_uber.getsample, t_uber.newsay, trigger, t_uber.sampleratio); // TODO: add trigger, incorporate doadc, xy version
        // dooadc only if we want a sample
        
@@ -3474,11 +3462,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker, digitalker_sing, digitalker_bendpitchvals, sp0256sing, votraxsing, tmssing, tmsphonsing, simpleklatt, nvp, klatt, klattTTS, nvpvocab, klattsingle, klattvocab, rsynthy, rsynthelm, rsynthsingle, nvpvocabsing, rsynthysing, klattsinglesing, klattvocabsing, tubestest}; 
+  // array of t_uber style we select the mode from - but what of x/y modes...
+
+  samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, t_uber.getsample, t_uber.newsay, trigger, t_uber.sampleratio);
+
+  //  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend, sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend, digitalker, digitalker_sing, digitalker_bendpitchvals, sp0256sing, votraxsing, tmssing, tmsphonsing, simpleklatt, nvp, klatt, klattTTS, nvpvocab, klattsingle, klattvocab, rsynthy, rsynthelm, rsynthsingle, nvpvocabsing, rsynthysing, klattsinglesing, klattvocabsing, tubestest}; 
   
   //INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 42sp0256sing, 43votraxsing, 44tmssing, 45tmsphonsing, /// 46simpleklatt, 47nvp, 48klatt, 49klattTTS, 50nvpvocab, 51klattsingle, 52klattvocab, 53rsynthy, 54rsynthelm, 55rsynthsingle, 56nvpvocabsing, 57rsynthsing, 58klattsinglesing, 59klattvocabsing, 60tubes=tube.c
 
-  generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
+  //  generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   // copy sample buffer into audio_buffer as COMPOST
   if (!toggled){

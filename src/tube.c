@@ -13,12 +13,17 @@
 
 #include "tubeset.h"
 #include "audio.h"
+#include "resources.h"
+#include "posture.h"
+
+extern float _selx, _sely, _selz;
+
 
 #define FALSE 0
 #define TRUE 1
 
 /*  COMPILE WITH OVERSAMPLING OR PLAIN OSCILLATOR  */
-#define OVERSAMPLING_OSCILLATOR   1
+#define OVERSAMPLING_OSCILLATOR   0
 
 /*  COMPILE SO THAT INTERPOLATION NOT DONE FOR SOME CONTROL RATE PARAMETERS  */
 #define MATCH_DSP                 1
@@ -236,7 +241,7 @@ const u8 pulsed=0;
 const float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; // all floats???
 
 
-static float wavetable[TABLE_LENGTH];
+static float wavetable[TABLE_LENGTH]; 
 static float currentPosition;
 static float a10, b11, a20, a21, b21;
 static float na10, nb11, na20, na21, nb21;
@@ -316,9 +321,14 @@ ph'
 	
 */
 
-//static float input_frame[16]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1};
+//static float input_frame[18]={-12.5, 54.0, 0.0, 0.0, 4.0, 4400, 600, 0.8, 0.8, 0.4, 0.4, 1.78, 1.78, 1.26, 0.8, 0.1, 74.0, 27.8};
 
-float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
+//float input_frame[16]=  {-1.000000, 0.000000, 0.000000, 24.000000, 7.000000, 864.000000, 3587.000000, 0.800000, 0.890000, 0.990000, 0.810000, 0.600000, 0.520000, 0.710000, 0.240000, 0.100000};
+
+//float input_frame[16]=  {0.0, 60.0, 0.0, 0.0, 5.5, 2500.0, 500.0, 0.8, 0.89, 0.99, 0.81, 0.76, 1.05, 1.23, 1.12, 0.1};
+
+static float input_frame[18];
+static float *last_frame;
 
 /// with microint 64 x 16:
 
@@ -393,10 +403,7 @@ void tube_init(void)
     /*  INITIALIZE THE THROAT LOWPASS FILTER  */
             initializeThroat();
 
-    /*  INITIALIZE THE SAMPLE RATE CONVERSION ROUTINES  */
-	    //        initializeConversion(); // not now
-
-    //    return 1;
+	    //	    input_frame=vocablist_posture[0];
 }
 
 void initializeWavetable(void)
@@ -574,27 +581,67 @@ float nasalRadiationFilter(float input)
     return (output);
 }
 
-void tube_newsay(void){
-  // what we need to reset
+static float f0, ax, ah1;
+static u8 lastsel=0, sel=0;
+static u16 lengthy=64; // say 1-128 or so
+static float interpol;
 
-  //  setControlRateParameters(); // TODO - just replace with straight array in
+void tube_newsay(void){
+  // set input_frame to vocablist_posture[130]
+    lastsel=sel;
+    sel=_selz*131.0f; 
+    MAXED(sel,129);
+    sel=129-sel;
+    //    last_frame=input_frame;
+    //    input_frame=vocablist_posture[sel]; // now copy 16 values
+    for (u8 i=0;i<16;i++) input_frame[i]=vocablist_posture[lastsel][i];
+
+    // do logspeed
+    int val=_sely*1027.0f;
+    MAXED(val,1023);
+    //    val=1023-val;
+    //logspeed[val];
+
+  lengthy=32.0f*logspeed[val]*vocablist_posture[lastsel][16]; // lastsel is our current sel is our target
+  interpol=1.0f/(float)lengthy;
 }
+
 
 int16_t tube_get_sample(void)
 {
   //  static int16_t j=0;
   int16_t samplerr;
-  float f0, ax, ah1, pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
   static float maximumSampleValue = 0.0f;
-      
-    // do we have a new frame? -> newsay 
-    f0 = frequency(input_frame[0]); // without interpol these are all the same?
+  static u16 sample_count=0;
+  float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
+
+    // TODO!
+    // do interpolation but then we need to know what next frame is...
+    // so we have one frame to the next and then interpol input_frames...
+    // how often do we call calculations?
+
+    if (sample_count++ >= lengthy) {
+    tube_newsay();
+    sample_count=0;
+    }
+
+    for (u8 i=0;i<16;i++) {
+      input_frame[i]+=(vocablist_posture[sel][i]-vocablist_posture[lastsel][i])*interpol; // sel is target...
+    }
+    
+u8 val=_selx*130.0f;
+ MAXED(val,127);
+ val=127-val;
+    f0 = frequency(input_frame[0])* logpitch[val];; 
     ax = amplitude(input_frame[1]);
-    ah1 = amplitude(input_frame[2]);
+    ah1 = amplitude(input_frame[2]);    
+
     calculateTubeCoefficients();
     setFricationTaps();
     calculateBandpassCoefficients();
-    
+
+
+
 
 	    lp_noise = noiseFilter(noise());
 	    if (pulsed == PULSE)		updateWavetable(ax);
@@ -624,9 +671,10 @@ int16_t tube_get_sample(void)
 	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
 	    if (maximumSampleValue > 0.0f)
 	      //	      scale = (RANGE_MAX / maximumSampleValue);
-	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
-
-	    samplerr=signal*scale;
+	      //	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
+	      scale= (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
+	      //      scale= RANGE_MAX;// * amplitude(parameter_list[0]);
+	      	    samplerr=signal*scale;
 
 	    //samplerr=rand()%32768;
 	    return samplerr;
