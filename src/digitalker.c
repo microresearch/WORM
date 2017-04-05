@@ -410,11 +410,13 @@ void digitalker_step_mode_0p()
 	UINT16 bits = 0x80;
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
-
+#ifdef LAP
+	m_pitch = pitch_vals[pitch_id];
+#else	
 	u8 val=exy[pitch_id]*130.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[pitch_id]*logpitch[val];
-
+#endif
 	for(i=0; i<32; i++)
 		m_dac[wpos++] = 0;
 
@@ -466,9 +468,13 @@ void digitalker_step_mode_0d()
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta1[(bits >> (6+2*l)) & 15];
+		#else	
 		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 			MAXED(val,127);
 			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			#endif
 			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
@@ -479,9 +485,13 @@ void digitalker_step_mode_0d()
 	for(k=7; k >= 0; k--) {
 		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
-		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
-			MAXED(val,127);
-			dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+#ifndef LAP
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  else
+		    dac -= delta1[(bits >> (6+2*l)) & 15];
+		  #endif
 			digitalker_write(&wpos, vol, dac);
 		}
 	}
@@ -578,11 +588,13 @@ void digitalker_step_mode_2p()
 	UINT16 bits = 0x80;
 	UINT8 vol = h >> 5;
 	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
-
+#ifdef LAP
+	m_pitch = pitch_vals[pitch_id];
+	#else
 	u8 val=exy[pitch_id]*130.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[pitch_id]*logpitch[val];
-
+#endif
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
@@ -649,9 +661,14 @@ void digitalker_step_mode_2d()
 	for(k=1; k != 9; k++) {
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
-		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+
+#ifdef LAP
+			dac += delta1[(bits >> (6+2*l)) & 15];
+#else
+			u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 			MAXED(val,127);
 			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			#endif
 			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
@@ -663,9 +680,14 @@ void digitalker_step_mode_2d()
 		int limit = k ? 0 : 1;
 		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=limit; l--) {
+#ifdef LAP
+		  dac -= delta1[(bits >> (6+2*l)) & 15];
+		  
+		  #else
 		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
 		  digitalker_write(&wpos, vol, dac);
 		}
 	}
@@ -676,9 +698,13 @@ void digitalker_step_mode_2d()
 		int start = k == 1 ? 1 : 0;
 		bits |= m_rom[m_apos+k] << 8;
 		for(l=start; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta1[(bits >> (6+2*l)) & 15];
+		  #else
 		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 		  MAXED(val,127);
 		  dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
 		  digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
@@ -690,9 +716,13 @@ void digitalker_step_mode_2d()
 		int limit = k ? 0 : 1;
 		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=limit; l--) {
+		  #ifdef LAP
+		  dac -= delta1[(bits >> (6+2*l)) & 15];
+		  #else
 		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
 		  digitalker_write(&wpos, vol, dac);
 		}
 	}
@@ -751,10 +781,13 @@ void digitalker_step_mode_3p()
 	UINT16 bits;
 	UINT8 dac, apos, wpos;
 	int k, l;
+	#ifdef LAP
+	m_pitch = pitch_vals[h & 0x1f];
+	#else
 	u8 val=exy[h & 0x1f]*130.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[h & 0x1f]*logpitch[val];
-
+	#endif
 	if(m_cur_segment == 0 && m_cur_repeat == 0) {
 		m_cur_bits = 0x40;
 		m_cur_dac = 0;
@@ -805,9 +838,13 @@ void digitalker_step_mode_3d()
 	for(k=0; k != 32; k++) {
 		bits |= m_rom[apos++] << 8;
 		for(l=0; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta2[(bits >> (6+2*l)) & 15];
+		  #else
 		  u8 val=exy[16+((bits >> (6+2*l)) & 15)]*130.0f;
 		  MAXED(val,127);
 		  dac += delta2[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
 		  digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
@@ -983,7 +1020,7 @@ void digitalker_step_bendd()
 
 
 void digitalk_init(void){
-  m_rom=m_rom_SSR1; // TODO: where we set our m_rom
+  m_rom=m_rom_scorpion; // TODO: where we set our m_rom
   m_dac_index = 128;
   m_bpos = 0xffff;
 }
@@ -1192,7 +1229,7 @@ int16_t digitalk_get_sample_bendpitchvals(){
      for (x=0;x<32;x++) {
        xx=digitalk_get_sample_arg(atoi(argv[1]));
     }
-     //         printf("%c",(xx+2048)>>5);
+     printf("%c",(xx+2048)>>5);
     //	  printf("%d\n",xx+2048);
    }
    }

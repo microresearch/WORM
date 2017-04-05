@@ -1264,7 +1264,7 @@ rsynth: bend frequency and...rsynth->samples_frame DONE
 
 3-klattsingle - TODO faster - clicks?FIXED
 
-k4-lattvocab - all bends done
+4-klattvocab - all bends done
 
 ///
 
@@ -1289,7 +1289,6 @@ k4-lattvocab - all bends done
 - rsynthy with nelm list and single phonemes as in klattDONE
 
 - summarise all klatt-based modes - add any singing modes (ie. non bends but pure pitch)DONE
-
 
 ** 27/3 +
 
@@ -1344,11 +1343,11 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 *** vocabs
 
-for nvp:  python test_speakIpa.py with vocab list in /root/test
+for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.h
 
-for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say
+for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.h
 
-for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VOCAB?
+for rsynth: 2005 - python speakyr.py using vocab in /root/test ->
 
 ** 31/3+
 
@@ -1357,7 +1356,15 @@ for rsynth: 2005 - python speakyr.py using vocab in /root/test - what is that VO
 TODO:
 
 *- digitalker ROM modes - ssr1, ssr2, scorpion - how many phrases->LAP?*
+
+////ssr1=0-64
+////ssr2=0-figure out as skip some
+///scorpion=0-figure out as skip some
+
 *- in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now->LAP*
+
+
+
 *- all vocabs for nvp, klatt, rsynthy ->LAP = vocabinprogress*
 *- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
 
@@ -1439,9 +1446,10 @@ start with just one list = input_frame and do without interpolation, then implem
   bit cleaner (will need to fix tms passing vocab issue and xy
   generators) - make templates for this...
 
-- also more tests as a few at slow speeds seem to drop audio altogether
+- also more tests as a few at slow speeds seem to drop audio altogether - maybe fixed
 
-- maybe keep only tubes.c and ditch other tube code so we can easily finish modes...
+- maybe keep only tubes.c and ditch other tube code so we can easily
+  finish modes - also as we have extra TMS modes and compost
 
 
 * FINAL/FURTHER TODO:
