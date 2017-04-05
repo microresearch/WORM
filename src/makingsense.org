@@ -1276,9 +1276,7 @@ rsynth: bend frequency and...rsynth->samples_frame DONE
 
 7rsynthy - is with vocab and xy bends
 
-8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt
-
-
+8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt DONE?
 
 ** 25/3 TODO+
 
@@ -1436,44 +1434,36 @@ start with just one list = input_frame and do without interpolation, then implem
 *working but need to do generation of new parameters and interpolation*
 
 *** RavenTube in raven.c
-
-- excitation? 
-
 *** Ntube in ntube.c
-
-- excitation?
-
 ** 4/4+
-
-- new interpolation scheme seems to work now in samplerate.c: shift
-  out old audio.c and start to rework with new struct so is also all a
-  bit cleaner (will need to fix tms passing vocab issue and xy
-  generators)
 
 - also more tests as a few at slow speeds seem to drop audio altogether - maybe fixedFIXED
 
-- maybe keep only tubes.c and ditch other tube code so we can easily
-  finish modes - also as we have extra TMS modes and compost
 
 ** 5/4++
 
 - tubes.c is close but could break further into frames so less interpolation
 - also slippage on selection and we need to figure how much we can get on one knob and smoothings
 
-*- for nvp.c we need frame 49 as silent frame - NEARLY DONE*
-
 ** 6/4++
 
-- check all klatt vocabs and fix nvp silence
+- TEST all klatt vocabs and fix nvp silence - *- for nvp.c we need frame 49 as silent frame - NEARLY DONE - just need to set volumes*
+
 - check sam selected vocab
-- TODO for tubes: singing mode (straight freq and length), raw xy mode (16 params + reset volume thing)
+- TODO for tubes: singing mode (straight freq and length), raw xy mode (16 params + reset volume thing in that)
 - digitalker raw mode
 
 - compost
 - klatt extra voices
 - redo all modes in audio.c - xy business, test and document
 
+- new interpolation scheme seems to work now in samplerate.c: shift
+  out old audio.c and start to rework with new struct so is also all a
+  bit cleaner (will need to fix tms passing vocab issue and xy
+  generators)
 
+- keep only tubes.c and ditch other tube code so we can easily
+  finish modes - also as we have extra TMS modes and compost
 
 * FINAL/FURTHER TODO:
 
@@ -1711,7 +1701,7 @@ fullklatt/simpleklatt/nvp
 10. tube and ntube/glottal/wavetable and wormed tubes: RavenTube in
     raven.c, Ntube in ntube.c and full glottis and tube in tube.c - 3 tube sets
 
-12. compost as last modes - startX, endY in compost buffer and Z? Z as last mode
+12. compost as last modes - startX, endY in compost buffer and Z as last mode
     still writing or NOT-but no poti changes HOW? - 2 stages with
     oldX.Y for example. 
 

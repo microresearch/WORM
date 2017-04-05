@@ -104,7 +104,7 @@ void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
-u8 toggled=1;
+//u8 toggled=1;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
@@ -151,13 +151,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   // copy sample buffer into audio_buffer as COMPOST
-  if (!toggled){
+  //  if (!toggled){
   for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc]=mono_buffer[x];
     cc++;
     if (cc>AUDIO_BUFSZ) cc=0;
   }
-  }
+  //  }
 
   audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
 }
@@ -3417,10 +3417,20 @@ void test_worm_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
+//////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]COMPOST
+
+/*
+12. compost as last modes - startX, endY in compost buffer and Z as last mode
+    still writing or NOT-but no poti changes HOW? - 2 stages with
+    oldX.Y for example. 
+
+if start>end then we run backwards between the two points
+*/
+
 
 //////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
 
-u8 toggled=1;
+//u8 toggled=1;
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
@@ -3473,12 +3483,10 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
 
   // copy sample buffer into audio_buffer as COMPOST
-  if (!toggled){
   for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc]=mono_buffer[x];
     cc++;
     if (cc>AUDIO_BUFSZ) cc=0;
-  }
   }
 
   if (TTS){ // so this doesn't change as fast as generators
