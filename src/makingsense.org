@@ -1276,7 +1276,7 @@ rsynth: bend frequency and...rsynth->samples_frame DONE
 
 7rsynthy - is with vocab and xy bends
 
-8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt DONE?
+8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt DONE
 
 ** 25/3 TODO+
 
@@ -1343,11 +1343,11 @@ klsyn: The variable 'sk', "skew to alternate periods", is the number
 
 *ALL Are 128 0-127 long!*
 
-for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.hREDONE-TEST
+for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.hREDONE-TESTDONE
 
-for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.hREDONE-TEST
+for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.hREDONE-TESTDONE
 
-for rsynth: 2005 - python speakyr.py using vocab in /root/test -> rsynthy_vocab.hREDONE-TEST
+for rsynth: 2005 - python speakyr.py using vocab in /root/test -> rsynthy_vocab.hREDONE-TESTDONE
 
 
 ** 31/3+
@@ -1362,17 +1362,8 @@ TODO:
 ////ssr2=0-figure out as skip some
 ///scorpion=0-44
 
-*-digitalker raw mode maybe*
-
 - in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now *DONE-TEST*
 
-////
-
-*- all vocabs for nvp, klatt, rsynthy ->LAP* - implement and  TEST each...
-
-*- all klatt extra voices as above - easy way of testing these?->LAP=rsynth-port, nvp?*
-*- remaining modes = tubes, compost*
-*- remaining fixes below*
 
 *** tubes.c - question of interpolation, data, newsay 
 
@@ -1458,16 +1449,13 @@ limits for the 16 params... also template for that is where - now in templateDON
 
 child_params copied in to tubes.c from py-trm stuff
 
+- compost -> in audio.c and samplerate.c STARTED-> fill in modes and TEST!
+
 /////
 
-- digitalker raw mode also - what do we bend?
-
-- compost -> in audio.c and samplerate.c STARTED
-
-
-- klatt/all extra voices/bends
-
-- redo all modes in audio.c - xy business, test and document
+- klatt and tubes -/all extra voices/bends if we need these - add up
+  to 64 modes! 61+tubesing, 62tubebend, 63tuberaw - lose klattTTS +
+  compost gives us 64 total OR????
 
 ////
 
@@ -1480,6 +1468,12 @@ child_params copied in to tubes.c from py-trm stuff
 
 - keep only tubes.c and ditch other tube code so we can easily
   finish modes - also as we have extra TMS modes and compost
+
+** 7/4+
+
+- tests as above and new list of modes - wrappings of newsays etc. with parameters
+- ditch klattTTS with reduced set
+- test digitalker modes
 
 * FINAL/FURTHER TODO:
 

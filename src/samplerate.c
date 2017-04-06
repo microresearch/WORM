@@ -25,7 +25,7 @@ extern float _selx, _sely, _selz;
 extern float exy[64];
 extern float smoothed_adc_value[5];
 
-inline void doadc(){
+static inline void doadc(){
   float value;
   
   value =(float)adc_buffer[SELX]/65536.0f; 
