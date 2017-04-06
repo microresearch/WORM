@@ -12,3 +12,6 @@ int16_t tube_get_sample_sing();
 
 void tube_newsay_bend(); 
 int16_t tube_get_sample_bend();
+
+void tube_newsay_raw(); 
+int16_t tube_get_sample_raw();

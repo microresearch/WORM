@@ -44,6 +44,7 @@ float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
 
 extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
+static float oldselx, oldsely, oldselz;
 u8 _intspeed, _intmode=0, trigger=0;
 u8 TTS=0;
 
@@ -165,16 +166,62 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
 //////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]COMPOST
 
-/*
-12. compost as last modes - startX, endY in compost buffer and Z as last mode
-    still writing or NOT-but no poti changes HOW? - 2 stages with
-    oldX.Y for example. 
+static int16_t comp_counter=0;
 
-if start>end then we run backwards between the two points
-*/
+static inline void doadc_compost(){
+  float value;
+  _selx=oldselx;
+  _sely=oldsely;
+  _selz=oldselz;
+}
 
+int16_t compost_get_sample(){
+  
+  int16_t startx=_selx*32768.0f;
+  int16_t endy=_sely*32768.0f;
 
-//////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+  float value =(float)adc_buffer[MODE]/65536.0f; 
+  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
+  float _mode=smoothed_adc_value[1];
+  CONSTRAIN(_mode,0.0f,1.0f);
+  u8 compostmode= _mode*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
+
+  int16_t sample=audio_buffer[startx+comp_counter];
+  
+  if (startx>endy){
+    comp_counter--;
+    if (comp_counter<=startx) comp_counter=endy;
+  }
+  else if (startx<=endy){
+    comp_counter++;
+    if (comp_counter>-endy) comp_counter=startx;
+  }
+  
+  // generate into audio_buffer based on selz mode and struct list
+  doadc_compost();
+  
+}
+
+void compost_newsay(){ 
+  // reset counter to start 
+  int16_t startx=_selx*32768.0f;
+  int16_t endy=_sely*32768.0f;
+
+  float value =(float)adc_buffer[MODE]/65536.0f; 
+  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
+  float _mode=smoothed_adc_value[1];
+  CONSTRAIN(_mode,0.0f,1.0f);
+  u8 compostmode= _mode*65.0f; // as mode - adapt
+
+  if (startx>endy){
+    comp_counter=endy;
+  }
+  else if (startx<=endy){
+    comp_counter=startx;
+  }  
+}
+
+////////--->>> list of modes
 
 /// we need all of this as array of generators and distinguish xy gens..
 
@@ -182,10 +229,16 @@ typedef struct wormer_ {
   u8 maxextent;
   float sampleratio;
   int16_t(*getsample)(void);
-  void(*newsay)(void);  
+  void(*newsay)(void);
+  u8 xy;
 } wormer;
 
-wormer t_uber={0, 1.0f, tube_get_sample, tube_newsay};
+// list them
+
+static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0};
+static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0};
+
+static const wormer *wormlist[]={&tuber, &composter};
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
@@ -193,7 +246,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   float value;
   u16 samplespeedref;
   static u16 cc;
-  u8 oldmode=255;
+  static u8 oldmode=255;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
@@ -202,7 +255,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _speed=1.0f-_speed;
 
   value =(float)adc_buffer[MODE]/65536.0f; 
-  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.0f for SMOOTHER mode locking
+  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
   _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
 
@@ -210,9 +263,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*65.0f;
   MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=36;
- // if (oldmode!=_intmode) trigger=1; // for now this is never/always called TEST
- if (firsttime==0){// TEST CODE - for fake trigger
+  _intmode=0;
+  /* if (oldmode!=_intmode) {// IF there is a modechange!
+  trigger=1; // for now this is never/always called TEST
+  oldselx=_selx;
+  oldsely=_sely;
+  oldselz=_selz;
+  }*/
+  
+ if (firsttime==0){// TEST CODE - for fake trigger - replace with above
    trigger=1;
    firsttime=1;
  }
@@ -232,15 +291,19 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //      samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, t_uber.getsample, t_uber.newsay, trigger, t_uber.sampleratio);
   //  samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, tube_get_sample_sing, tube_newsay_sing , trigger, t_uber.sampleratio);
 
-  samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, tube_get_sample_bend, tube_newsay_bend, trigger, 1.0f, 16);
+  if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio);
+  else
+    samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
-  // copy sample buffer into audio_buffer as COMPOST
+  // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
+  if (_intmode!=64){// TODO - whatever is compost mode 64 or???
   for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc]=mono_buffer[x];
     cc++;
     if (cc>AUDIO_BUFSZ) cc=0;
   }
-
+  }
+  
   if (TTS){ // so this doesn't change as fast as generators
     u8 xax=_sely*18.0f; 
     u8 selz=_selz*65.0f; 
