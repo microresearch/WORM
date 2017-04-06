@@ -285,17 +285,18 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
   else
     {
-  // generate into audio_buffer based on selz mode and struct list
-  for (u8 x=0;x<sz/2;x++) {
+      // generate into audio_buffer based on selz mode and struct list
       float value =(float)adc_buffer[SELZ]/65536.0f; 
       smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
       _selz=smoothed_adc_value[4];
       CONSTRAIN(_selz,0.0f,1.0f);
       oldcompost=compostmode;
       compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
-      doadc_compost();
       //if mode change do a newsay or not?
       if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
+
+      for (u8 x=0;x<sz/2;x++) {
+      doadc_compost();
       audio_buffer[cc++]=wormlist[compostmode]->getsample();
       if (cc>AUDIO_BUFSZ) cc=0;
   }
