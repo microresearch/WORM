@@ -314,7 +314,7 @@ void sam_newsay_xy(void){
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
-  u8 vocab=_selz*132.0f;
+  u8 vocab=_selz*136.0f;
   MAXED(vocab,130);
   vocab=130-vocab;
   strcpy(input,  sam_vocab_custom[vocab]); // TODO -replace with custom selected vocab!

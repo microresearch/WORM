@@ -25,6 +25,7 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 
 
 static u16 count=0;
+static nvp_vocab_ const *ourvocab;
 
 
 //#include "forlap.h"
@@ -112,12 +113,11 @@ inline float calculateValueAtFadePosition(float oldVal, float newVal, float curF
 
 typedef float speechPlayer_frameParam_t;
 
-typedef struct {
+typedef struct  __attribute__((packed)) values  {
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
 	speechPlayer_frameParam_t voiceTurbulenceAmplitude; // amplitude of voice breathiness from 0 to 1 
-  ////
 	speechPlayer_frameParam_t glottalOpenQuotient; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
   ////// here on is in phonem params:
 	speechPlayer_frameParam_t voiceAmplitude; // amplitude of voice (phonation) source between 0 and 1.
@@ -139,7 +139,7 @@ typedef struct {
 
 const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
 
-speechPlayer_frame_t framer,oldframer, tempframe;
+speechPlayer_frame_t framer, oldframer, tempframe;
 
 const float PITWO=M_PI*2.0f;
 
@@ -252,12 +252,12 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 };
 
 
-void change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
+void change_nvpparams(speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
 float* indexy[39];
 
 void init_nvp(void){
-  // set up frame, buffer, fill buffer and write as wav following other example votrax?
+
      float *indexyy[39]={&framer.cf1, &framer.cf2, &framer.cf3, &framer.cf4, &framer.cf5, &framer.cf6, &framer.cfN0, &framer.cfNP,  &framer.cb1, &framer.cb2, &framer.cb3, &framer.cb4, &framer.cb5, &framer.cb6, &framer.cbN0, &framer.cbNP, &framer.caNP, &framer.pf1, &framer.pf2, &framer.pf3, &framer.pf4, &framer.pf5, &framer.pf6, &framer.pb1, &framer.pb2, &framer.pb3, &framer.pb4, &framer.pb5, &framer.pb6, &framer.pa1, &framer.pa2, &framer.pa3, &framer.pa4, &framer.pa5, &framer.pa6, &framer.parallelBypass, &framer.fricationAmplitude, &framer.voiceAmplitude, &framer.aspirationAmplitude}; 
 
      for (u8 x=0;x<39;x++) indexy[x]=indexyy[x];
@@ -279,19 +279,21 @@ void init_nvp(void){
 
   //change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-  change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
-  // ====================== glott, prgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
-  //  change_nvpparams(&framer, 1.0f, 1.0f, 0.0f, 0.0f, 250.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  //      change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
+       change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[0][i]; 
   }
 
-  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
+ourvocab=nvp_vocab[0];
+
+  //  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
 
 }
 
-void change_nvpparams(const speechPlayer_frame_t* frame,float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby){
+void change_nvpparams(speechPlayer_frame_t* frame,float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby){
 
   /// globals and sets of voices
   /// also start and end pitch
@@ -335,7 +337,7 @@ void nvp_init(){
 
 u8 changed=0;
 
-u8 nvp_newsay(){
+void nvp_newsay(){
   static u8 oldframe=0, nextframe=0;
   count=0;
   oldframe=nextframe;
@@ -349,7 +351,7 @@ u8 nvp_newsay(){
     if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
   for (u8 i=0;i<39;i++){
-    *indexy[i]=data[nextframe-1][i];
+    *indexy[i]=data[nextframe][i];
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
@@ -358,95 +360,91 @@ u8 nvp_newsay(){
     this_frame_length=(int)(1024.0f*logspeed[val])<<2; // sely
   this_interpol=this_frame_length/2;
   // pitch
-  return nextframe;
+  //  return nextframe;
 }
 
-static u8 lastphon=0;
+//static u8 lastphon=0;
 
-u8 nvp_newsay_vocab(){ // note that this cycles thru vocab
-  static u8 counter=0, nextframe=0;
-  static u8 value=0;
+static u8 counter=0;
+
+void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
+  u8 nextframe;
+  u8 value;
+  u8 silence=0;
   
-  const nvp_vocab_ *ourvocab=nvp_vocab[value];
-
   nextframe=ourvocab[counter].phon;
 
- if (nextframe==49) nextframe=lastphon;
- lastphon=nextframe;
-  
-  
-
-  if (nextframe==255) {
-    value=_selz*129.0f;
+  if (nextframe==255) { // end of frame!
+    value=_selz*132.0f;
     MAXED(value,127);
     value=127-value;
     counter=0;
+    ourvocab=nvp_vocab[value];
     nextframe=ourvocab[0].phon;    
   }
-    if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
+
+  if (nextframe==49) {
+    nextframe=0; 
+  }
+  
+  if (nextframe==0) {
+      *indexy[36]=0.0f;
+      *indexy[37]=0.0f;
+      *indexy[38]=0.0f;
+      changed=0;
+  }
   else {
   for (u8 i=0;i<39;i++){
-    *indexy[i]=data[nextframe-1][i];
+    *indexy[i]=data[nextframe][i];
   }
   }
 
-    // if it is 49 then - we use last frame and set amplitudes to 0.0f
-
-
-    // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    //    this_frame_length=(int)(4096.0f*_sely)<<2; // sely
-      //    this_interpol=this_frame_length/2;
     int val=_sely*1027.0f;
     MAXED(val,1023);
     this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);
-    this_interpol=ourvocab[counter].fadeDuration;
+    this_interpol=ourvocab[counter].fadeDuration*(64.0f*logspeed[val]);
     this_pitch=ourvocab[counter].voicePitch;
     this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
     counter++;
-    changed=1;
     count=0;
-
-    return nextframe;
+    changed=1;
 }
 
-u8 nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
+void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
   static u8 nextframe=0;
-  // nextframe is next in struct
+  u8 silence=0;
   count=0;
-
-  //  u8 value=4;
-  u8 value=_selz*129.0f;
+  u8 value=_selz*132.0f;
   MAXED(value,127);
   value=127-value;
-
-  const nvp_vocab_ *ourvocab=nvp_vocab[value];
-  u16 counter=0;
-
+  ourvocab=nvp_vocab[value];
+  counter=0;
   nextframe=ourvocab[0].phon;    
 
- if (nextframe==49) nextframe=lastphon;
- lastphon=nextframe;
+  if (nextframe==49) {
+    nextframe=0; // two silence in a row
+  }
  
-  
-    if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
+ if (nextframe==0) {
+      *indexy[36]=0.0f;
+      *indexy[37]=0.0f;
+      *indexy[38]=0.0f;
+      changed=0;
+ }
   else {
   for (u8 i=0;i<39;i++){
-    *indexy[i]=data[nextframe-1][i];
+    *indexy[i]=data[nextframe][i];
   }
   }
-
-      // if it is 49 then - we use last frame and set amplitudes to 0.0f
-
-    
     int val=_sely*1027.0f;
     MAXED(val,1023);
-    this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);
-    this_interpol=ourvocab[counter].fadeDuration;
-    this_pitch=ourvocab[counter].voicePitch;
-    this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
+    this_frame_length=ourvocab[0].frameDuration*(64.0f*logspeed[val]);
+    this_interpol=ourvocab[0].fadeDuration*(64.0f*logspeed[val]);;
+    this_pitch=ourvocab[0].voicePitch;
+    this_pitch_inc=(ourvocab[0].endVoicePitch-ourvocab[0].voicePitch)/this_frame_length;
     counter++;
     changed=1;
-    return nextframe;
+    //    return nextframe;
 }
 
 
@@ -501,27 +499,20 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
     memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
     nvp_newsay_vocab();
     count=0;
-    //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+    //      memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
 
-    if (count<this_interpol && changed){
-    float curFadeRatio=(float)count/(this_interpol);
+   
+   if (count<this_interpol && changed){
+      float curFadeRatio=(float)count/(this_interpol);
+  //    float curFadeRatio=(float)count/(this_frame_length);
     for(j=0;j<speechPlayer_frame_numParams;++j) {
       ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
     }
-    }
+       }
+ 
 
-  //  &tempframe=&framer;
-  // for pitch interpolates: but we just use our pitch here
-    
-
-		  // frameRequest->voicePitchInc=(frame->endVoicePitch-frame->voicePitch)/frameRequest->minNumSamples;
-		  // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
-		  // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
-		  // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
     int16_t vale=1024.0f*(1.0f-_selx);
-    //  tempframe.voicePitch=256.0f*logspeed[vale]; 
-    // TEST pitchinc...
     tempframe.voicePitch=this_pitch*logspeed[vale]*2.0f;
     this_pitch+=this_pitch_inc;
 

@@ -148,7 +148,7 @@ static unsigned char nextelement=1;
 
 typedef struct{
 float f0[3];
-unsigned char elements[64];
+ unsigned char elements[52];
  unsigned char length;
 } vocab_t_;
 
@@ -211,15 +211,16 @@ void rsynth_newsay_single()
 void rsynth_newsay()
 {
   //  u8 selected=1;
-  u8 selected=_sely*129.0f;
+  u8 selected=_selz*132.0f;
   MAXED(selected,127);
   selected=127-selected;
-
-
-  
   nelm=rsynth_vocab[selected]->length;
   elm=rsynth_vocab[selected]->elements;
   f0=rsynth_vocab[selected]->f0;
+  //  nelm=rsynth_test_help.length;
+  //  elm=rsynth_test_help.elements;
+  //  f0=rsynth_test_help.f0;
+
 
   //  unsigned i = 0;
   f0s = rsynth->speaker->F0Hz;
@@ -242,7 +243,6 @@ void rsynth_newsay()
 
 void rsynth_newsay_elm() 
 {
-  // SELZ from vocab but for now///
 
   nelm=106; // length
 

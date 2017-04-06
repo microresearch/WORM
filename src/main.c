@@ -100,20 +100,19 @@ void main(void)
   }
 
   // all generator inits
-  sp0256_init();
-  sp0256_initbend();
-  votrax_init();
-  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512 
-  tms_init();
-  //  LPCAnalyzer_init(); // for raven voice
-  sam_init(); 
-  sam_newsay_banks0(); // TEST!
-  digitalk_init();
-  simpleklatt_init();
-  simpleklatt_newsay();
-  nvp_init(); 
-  klatt_init();
-  rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
+  /* sp0256_init(); */
+  /* sp0256_initbend(); */
+  /* votrax_init(); */
+  /* wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512  */
+  /* tms_init(); */
+  /* sam_init();  */
+  /* sam_newsay_banks0(); // TEST! */
+  /* digitalk_init(); */
+  /* simpleklatt_init(); */
+  /* simpleklatt_newsay(); */
+  /* nvp_init();  */
+  /* klatt_init(); */
+  /* rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame) */
   tube_init(); // tube.c
   //  NTube_init(&tuber);
   //  RavenTube_init();

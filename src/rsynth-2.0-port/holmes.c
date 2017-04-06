@@ -976,7 +976,7 @@ le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
  
 //u8 val=1;
-  u8 val=_selz*129.0f;
+  u8 val=_selz*132.0f;
   MAXED(val,127);
   val=127-val;
 

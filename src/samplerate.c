@@ -22,6 +22,7 @@
 
 extern __IO uint16_t adc_buffer[10];
 extern float _selx, _sely, _selz;
+extern float exy[64];
 extern float smoothed_adc_value[5];
 
 inline void doadc(){
@@ -38,7 +39,7 @@ inline void doadc(){
   CONSTRAIN(_sely,0.0f,1.0f);
 
   value =(float)adc_buffer[SELZ]/65536.0f; 
-  smoothed_adc_value[4] += 0.1f * (value - smoothed_adc_value[4]);
+  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // smoothing!!!
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
 }
@@ -88,71 +89,6 @@ float sinc(float x)
     }
 }
 
-/*
-float sinc(float x)
-{
-  return t_sinc(x);
-}
-*/
-
-void dosamplerate(int16_t* in, int16_t* out, float factor, u8 size){
-float one_over_factor,delta_factor,final_factor,initial_factor;
-float alpha;
-//    u8 mode;
- int16_t data_in;
-float temp1=0.0f,temp3;
-static float time_now=0.0f;
-static int32_t total_written=0,j;
-int32_t left_limit,right_limit;
-static int32_t int_time=0,last_time=0;
- int16_t x=0;
-for (u8 ii=0;ii<size;ii++){
-temp1 = 0.0f;
-
-left_limit = time_now - WIDTH + 1;      /* leftmost neighboring sample used for interp.*/
-right_limit = time_now + WIDTH; /* rightmost leftmost neighboring sample used for interp.*/
-if (left_limit<0) left_limit = 0;
-//if (right_limit>size) right_limit = size;
-
-if (factor<1.0f) {
-for (j=left_limit;j<right_limit;j++)
-  temp1 += gimme_data(j-int_time) * 
-    sinc(time_now - (float) j);
-out[ii] = (int) temp1;
-}
-
- else    {
-one_over_factor = 1.0f / factor;
-for (j=left_limit;j<right_limit;j++)
-  temp1 += gimme_data(j-int_time) * one_over_factor *
-    sinc(one_over_factor * (time_now - (float) j));
-out[ii] = (int) temp1;
-}
-
-/* }// not SINCMODE but interpol
- else {
-alpha = time_now - (float) int_time;
-out[ii] = (delay_buffer[DELAY_SIZE-5] * alpha)
-  + (delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
- out[ii] = data_in;
- }*/
-
-
-//            fwrite(&data_out,2,1,sound_out);
-total_written++;
-time_now += factor;
-last_time = int_time;
-int_time = time_now;
-while(last_time<int_time)      {
-new_data(in[x%size]);
- data_in=in[x%size];
- x++;
-last_time += 1;
-}
-
-}
-//            factor  = initial_factor + (time_now * delta_factor);
-}
 
 /// test code 
 
@@ -186,11 +122,9 @@ for (u8 ii=0;ii<size;ii++){
   else if (in[ii]<THRESHLOW && triggered) triggered=0;
 
 
-  //if (SINCMODE)       {
 left_limit = time_now - WIDTH + 1;      /* leftmost neighboring sample used for interp.*/
 right_limit = time_now + WIDTH; /* rightmost leftmost neighboring sample used for interp.*/
 if (left_limit<0) left_limit = 0;
-//if (right_limit>size) right_limit = size;
 
 if (factor<1.0f) {
 for (j=left_limit;j<right_limit;j++)
@@ -205,14 +139,6 @@ for (j=left_limit;j<right_limit;j++)
        sinc(one_over_factor * (time_now - (float) j));
    out[ii] = (int) temp1;
 }
-/* }////////////////////////////////////////// not SINCMODE but interpol
- else {
-alpha = time_now - (float) int_time;
-out[ii] = (delay_buffer[DELAY_SIZE-5] * alpha)
-  + (delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
-// out[ii] = getsample();
-// out[ii]=rand()%32768;
-}*/
 
 time_now += factor;
 last_time = int_time;
@@ -221,12 +147,78 @@ int_time = time_now;
 while(last_time<int_time)      {
   int16_t val=getsample();
   new_data(val);
-  //  data_in=val;
-  // x++;
 last_time += 1;
 }
-
  }
-//            factor  = initial_factor + (time_now * delta_factor);
 }
+
+void samplerate_exy(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), u8 trigger, float sampleratio, u8 extent){
+  static u8 parammode=0;
+  float one_over_factor;
+  float alpha;
+  float temp1=0.0f;
+  static float time_now=0.0f;
+  long j;
+  long left_limit,right_limit,last_time=0;
+  static long int_time=0;
+  static u8 triggered=0;
+  factor*=sampleratio;
+ 
+  if (trigger==1) newsay();   // first trigger from mode-change
+
+for (u8 ii=0;ii<size;ii++){
+  temp1 = 0.0f;
+  // factor=1.0f;
+
+  if (time_now>327680.0){
+    int_time-=time_now; // preserve???
+    time_now=0.0f;
+  }
+
+  // deal also with trigger
+  if (in[ii]>THRESH && !triggered) {
+    parammode^=1;
+    triggered=1;
+  }
+  else if (in[ii]<THRESHLOW && triggered) triggered=0;
+
+
+left_limit = time_now - WIDTH + 1;      /* leftmost neighboring sample used for interp.*/
+right_limit = time_now + WIDTH; /* rightmost leftmost neighboring sample used for interp.*/
+if (left_limit<0) left_limit = 0;
+
+if (factor<1.0f) {
+for (j=left_limit;j<right_limit;j++)
+  temp1 += gimme_data(j-int_time) * 
+    sinc(time_now - (float) j);
+ out[ii] = (int) temp1;
+}
+ else    {
+   one_over_factor = 1.0f / factor;
+   for (j=left_limit;j<right_limit;j++)
+     temp1 += gimme_data(j-int_time) * one_over_factor *
+       sinc(one_over_factor * (time_now - (float) j));
+   out[ii] = (int) temp1;
+}
+
+time_now += factor;
+last_time = int_time;
+int_time = time_now;
+ doadc();
+
+ if (parammode==0){
+   u8 xaxis=_selx*((float)extent+4.0f); //0-16 for r, but now 14 params 0-13
+   MAXED(xaxis,extent);
+   xaxis=extent-xaxis;
+   exy[xaxis]=_sely;
+ }
+
+while(last_time<int_time)      {
+  int16_t val=getsample();
+  new_data(val);
+last_time += 1;
+}
+ }
+}
+
 
