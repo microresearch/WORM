@@ -1472,8 +1472,10 @@ child_params copied in to tubes.c from py-trm stuff
 ** 7/4+
 
 - tests as above and new list of modes - wrappings of newsays etc. with parameters
-- ditch klattTTS with reduced set
+- ditch klattTTS with reduced set problem
 - test digitalker modes
+
+- plan!
 
 * FINAL/FURTHER TODO:
 

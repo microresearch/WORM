@@ -179,7 +179,7 @@ static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 
 static const wormer tubbender={16, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0};
 static const wormer tubrawer={16, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
 
-static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0};
+static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 
 static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter};
 
@@ -197,10 +197,8 @@ static inline void doadc_compost(){
 }
 
 int16_t compost_get_sample(){
-
-  doadc();
-  int16_t startx=_selx*32768.0f;
-  int16_t endy=_sely*32768.0f;
+  u16 startx=_selx*32768.0f;
+  u16 endy=_sely*32768.0f;
   int16_t sample=audio_buffer[startx+comp_counter];
   
   if (startx>endy){
@@ -211,18 +209,13 @@ int16_t compost_get_sample(){
     comp_counter++;
     if (comp_counter>-endy) comp_counter=startx;
   }
+  return sample;
 }
 
 void compost_newsay(){ 
-  // reset counter to start 
-  int16_t startx=_selx*32768.0f;
-  int16_t endy=_sely*32768.0f;
-
-  float value =(float)adc_buffer[MODE]/65536.0f; 
-  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
-  float _mode=smoothed_adc_value[1];
-  CONSTRAIN(_mode,0.0f,1.0f);
-  u8 compostmode= _mode*65.0f; // as mode - adapt
+  // just reset counter to start 
+  u16 startx=_selx*32768.0f;
+  u16 endy=_sely*32768.0f;
 
   if (startx>endy){
     comp_counter=endy;
@@ -240,7 +233,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   float value;
   u16 samplespeedref;
   static u16 cc;
-  static u8 oldmode=255;
+  static u8 oldmode=255, oldcompost=255, compostmode=0;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
@@ -290,7 +283,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (cc>AUDIO_BUFSZ) cc=0;
   }
   }
-  // else we need to copy in newly generated
   else
     {
   // generate into audio_buffer based on selz mode and struct list
@@ -299,11 +291,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
       _selz=smoothed_adc_value[4];
       CONSTRAIN(_selz,0.0f,1.0f);
-
-    u8 compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
-    doadc_compost();
-    audio_buffer[cc++]=wormlist[compostmode]->getsample();
-    if (cc>AUDIO_BUFSZ) cc=0;
+      oldcompost=compostmode;
+      compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
+      doadc_compost();
+      //if mode change do a newsay or not?
+      if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
+      audio_buffer[cc++]=wormlist[compostmode]->getsample();
+      if (cc>AUDIO_BUFSZ) cc=0;
   }
     }
   
