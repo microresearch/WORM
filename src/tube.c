@@ -70,7 +70,7 @@ static const float mins[17] __attribute__ ((section (".flash"))) = {-10.0, 0.0, 
 
 static const float maxs[17] __attribute__ ((section (".flash"))) = {0.0, 60.0, 10.0, 10.0, 10.0, 6000.0, 6000.0, 0.8, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 2.0, 200.0};//last is length
 
-static const float range[17] __attribute__ ((section (".flash"))) ={-10.0, 60.0, 10.0, 10.0, 9.0, 5900.0, 5900.0, 0.0, 1.4, 1.9, 1.9, 1.9, 1.9, 1.9, 2.99, 1.9, 199.0};//last is length
+static const float range[17] __attribute__ ((section (".flash"))) ={10.0, 60.0, 10.0, 10.0, 9.0, 5900.0, 5900.0, 0.0, 1.4, 1.9, 1.9, 1.9, 1.9, 1.9, 2.99, 1.9, 199.0};//last is length
 
 
 #define FALSE 0
@@ -595,7 +595,7 @@ int16_t tube_get_sample(void)
 {
   //  static int16_t j=0;
   int16_t samplerr;
-  maximumSampleValue = 0.0f;
+//  maximumSampleValue = 0.0f;
   float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
 
     if (sample_count++ >= lengthy) {
@@ -716,7 +716,6 @@ int16_t tube_get_sample_bend(void)
 int16_t tube_get_sample_raw(void)
 {
   int16_t samplerr;
-  static float maximumSampleValue = 0.0f;
   float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
 
     if (sample_count++ >= lengthy) {
@@ -727,8 +726,15 @@ int16_t tube_get_sample_raw(void)
 	  //          input_frame[i]=vocablist_posture[sel][i]*(exy[i]+0.1f)*2.0f; // sel is target...
 	  input_frame[i]=mins[i]+(range[i]*exy[i]);
         }
-    
-    f0 = frequency(input_frame[0]); 
+
+// but z is pitch bend
+
+    u8 val=_selz*130.0f;
+    MAXED(val,127);
+    val=127-val;
+
+    // these are done at samplerate
+    f0 = frequency(input_frame[0])* logpitch[val];
     ax = amplitude(input_frame[1]);
     ah1 = amplitude(input_frame[2]);    
 
@@ -779,7 +785,7 @@ int16_t tube_get_sample_sing(void)
 {
   //  static int16_t j=0;
   int16_t samplerr;
-  static float maximumSampleValue = 0.0f;
+//  static float maximumSampleValue = 0.0f;
   float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
 
     if (sample_count++ >= lengthy) {
@@ -790,16 +796,16 @@ int16_t tube_get_sample_sing(void)
       input_frame[i]+=(vocablist_posture[sel][i]-vocablist_posture[lastsel][i])*interpol; // sel is target...
     }
     
-u8 val=_selx*130.0f;
- MAXED(val,127);
- val=127-val;
+    u8 val=_selx*130.0f;
+    MAXED(val,127);
+    val=127-val;
 
-	    // these are done at samplerate
+    // these are done at samplerate
 
-
- f0 = 440.0f * logpitch[val];; 
- ax = amplitude(input_frame[1]);
- ah1 = amplitude(input_frame[2]);    
+    
+    f0 = 440.0f * logpitch[val];; 
+    ax = amplitude(input_frame[1]);
+    ah1 = amplitude(input_frame[2]);    
 
     calculateTubeCoefficients();
     setFricationTaps();

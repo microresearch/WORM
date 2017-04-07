@@ -181,10 +181,6 @@ static const wormer tubrawer={16, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1,
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 
-static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter};
-
-
-
 //////////////]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]COMPOST
 
 static int16_t comp_counter=0;
@@ -250,7 +246,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _intmode=_mode*65.0f;
   MAXED(_intmode, 63);
   trigger=0; 
-  _intmode=0;
   /* if (oldmode!=_intmode) {// IF there is a modechange!
   trigger=1; // for now this is never/always called TEST
   oldselx=_selx;
@@ -271,6 +266,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     sample_buffer[x]=*(src++); 
     src++;
   }
+
+  _intmode=3; // TESTY!
+
+  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter};
+
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter};
 
   if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio);
   else

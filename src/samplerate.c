@@ -201,7 +201,7 @@ int_time = time_now;
    u8 xaxis=_selx*((float)extent+4.0f); //0-16 for r, but now 14 params 0-13
    MAXED(xaxis,extent);
    xaxis=extent-xaxis;
-   exy[xaxis]=_sely;
+   exy[xaxis]=1.0f-_sely; // invert or?
  }
 
 while(last_time<int_time)      {
