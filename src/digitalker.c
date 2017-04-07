@@ -1038,7 +1038,7 @@ void digitalk_newsay(){
 #ifndef LAP
   // say 44+64=108
 
-  u8 val=_selz*109.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
+  u8 val=_selz*112.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
   MAXED(val,107);
   val=107-val;
   if (val>63){
@@ -1105,6 +1105,8 @@ int16_t digitalk_get_sample_sing(){
   modus=1;
   int16_t sample; static int pp;
 
+  for (u8 xx=0;xx<32;xx++){
+
 	if(m_zero_count == 0 && m_dac_index == 128)
 	  digitalker_step();
 
@@ -1125,13 +1127,14 @@ int16_t digitalk_get_sample_sing(){
 	    else {
 	      sample=v;
 	      pp++;
-	      return sample;
+	      //	      return sample;
 	    }
 	}
 	else {
 	  digitalk_newsay();
 	  sample=0;
 	}
+  }
 	return sample;
 	}
 
@@ -1139,6 +1142,8 @@ int16_t digitalk_get_sample_sing(){
 int16_t digitalk_get_sample(){ 
   modus=0;
   int16_t sample; static int pp;
+
+  for (u8 xx=0;xx<32;xx++){
 
 	if(m_zero_count == 0 && m_dac_index == 128)
 	  digitalker_step();
@@ -1160,19 +1165,22 @@ int16_t digitalk_get_sample(){
 	    else {
 	      sample=v;
 	      pp++;
-	      return sample;
+	      //	      return sample;
 	    }
 	}
 	else {
 	  digitalk_newsay();
 	  sample=0;
 	}
+  }
 	return sample;
 	}
 
 int16_t digitalk_get_sample_benddelta(){ 
   modus=1; // no changes
   int16_t sample; static int pp;
+
+  for (u8 xx=0;xx<32;xx++){
 
 	if(m_zero_count == 0 && m_dac_index == 128)
 	  digitalker_step_bendd();
@@ -1191,19 +1199,22 @@ int16_t digitalk_get_sample_benddelta(){
 	    else {
 	      sample=v;
 	      pp++;
-	      return sample;
+	      //	      return sample;
 	    }
 	}
 	else {
 	  digitalk_newsay();
 	  sample=0;
 	}
+  }
 	return sample;
 	}
 
 int16_t digitalk_get_sample_bendpitchvals(){ 
   modus=1; // no changes
   int16_t sample; static int pp;
+
+  for (u8 xx=0;xx<32;xx++){
 
 	if(m_zero_count == 0 && m_dac_index == 128)
 	  //	  digitalker_step();
@@ -1222,13 +1233,14 @@ int16_t digitalk_get_sample_bendpitchvals(){
 	    else {
 	      sample=v;
 	      pp++;
-	      return sample;
+	      //	      return sample;
 	    }
 	}
 	else {
 	  digitalk_newsay();
 	  sample=0;
 	}
+  }
 	return sample;
 	}
 

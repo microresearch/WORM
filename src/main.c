@@ -107,7 +107,7 @@ void main(void)
   /* tms_init(); */
   /* sam_init();  */
   /* sam_newsay_banks0(); // TEST! */
-  /* digitalk_init(); */
+  digitalk_init();
   /* simpleklatt_init(); */
   /* simpleklatt_newsay(); */
   /* nvp_init();  */

@@ -1445,7 +1445,7 @@ start with just one list = input_frame and do without interpolation, then implem
 - TODO for tubes: singing mode (straight freq and length)DONE, bendmode-TEST-crashes, FIXEDnow
 
 raw xy mode (16 params + reset volume thing in that) - how do we find
-limits for the 16 params... also template for that is where - now in templateDONE -> add on T60 - TO TEST
+limits for the 16 params... also template for that is where - now in templateDONE -> add on T60 - TO TEST-DONE
 
 child_params copied in to tubes.c from py-trm stuff
 
@@ -1471,12 +1471,14 @@ child_params copied in to tubes.c from py-trm stuff
 
 ** 7/4+
 
-- test digitalker modes
+- compost in progress - some tests still STRESS TEST TODOXS
+
+- test digitalker modes 
 
 - tests as above and new list of modes - wrappings of newsays etc. with parameters
 - ditch klattTTS with reduced set problem
 
-- plan!
+- plan! - also need frozen compost mode where buffer stays the way it is
 
 * FINAL/FURTHER TODO:
 

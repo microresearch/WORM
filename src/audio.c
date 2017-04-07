@@ -36,7 +36,7 @@ float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
 
 extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
-static float oldselx, oldsely, oldselz;
+static float oldselx=0.5f, oldsely=0.5f, oldselz=1.0f;
 static u8 _intspeed, _intmode=0, trigger=0;
 u8 TTS=0;
 
@@ -169,12 +169,15 @@ typedef struct wormer_ {
   u8 TTS;
 } wormer;
 
-// list them!
+// start to add for testings:
+
+static const wormer digitalker={0, 1.0f, digitalk_get_sample, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
+
+///
 
 static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0};
 
 // these are extra tubes modes not in oldaudio+sing, bend, raw(TEST!)
-
 static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
 static const wormer tubbender={16, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0};
 static const wormer tubrawer={16, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
@@ -193,23 +196,29 @@ static inline void doadc_compost(){
 }
 
 int16_t compost_get_sample(){
-  u16 startx=_selx*32768.0f;
-  u16 endy=_sely*32768.0f;
-  int16_t sample=audio_buffer[startx+comp_counter];
-  
+  doadc();
+  u16 startx=(1.0f-_selx)*32768.0f, diff;
+  u16 endy=(1.0f-_sely)*32768.0f;
+  signed char dir=1;
+
   if (startx>endy){
-    comp_counter--;
+    dir=-1;
     if (comp_counter<=startx) comp_counter=endy;
   }
-  else if (startx<=endy){
-    comp_counter++;
-    if (comp_counter>-endy) comp_counter=startx;
+  else {
+    dir=1;
+    if (comp_counter>=endy) comp_counter=startx;
   }
+
+  u16 pos=comp_counter;
+  int16_t sample=audio_buffer[pos%32768];
+  comp_counter+=dir;
   return sample;
 }
 
 void compost_newsay(){ 
   // just reset counter to start 
+  doadc();
   u16 startx=_selx*32768.0f;
   u16 endy=_sely*32768.0f;
 
@@ -229,7 +238,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   float value;
   u16 samplespeedref;
   static u16 cc;
-  static u8 oldmode=255, oldcompost=255, compostmode=0;
+  static u8 oldmode=255, oldcompost=255, compostmode=255;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
@@ -248,6 +257,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   trigger=0; 
   /* if (oldmode!=_intmode) {// IF there is a modechange!
   trigger=1; // for now this is never/always called TEST
+  doadc();
   oldselx=_selx;
   oldsely=_sely;
   oldselz=_selz;
@@ -267,18 +277,18 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=3; // TESTY!
+  _intmode=4; // TESTY!
 
-  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter};
+  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter};
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker};
 
   if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio);
   else
     samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
-  if (_intmode!=64){// TODO - whatever is compost mode 64 or???
+  if (_intmode!=4){// TODO - whatever is compost mode 64 or??? - at  moment test with 4
   for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc++]=mono_buffer[x];
     if (cc>AUDIO_BUFSZ) cc=0;
@@ -294,16 +304,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       oldcompost=compostmode;
       compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
       //if mode change do a newsay or not?
-      if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
-
-      for (u8 x=0;x<sz/2;x++) {
+      compostmode=5; // testy!
       doadc_compost();
-      audio_buffer[cc++]=wormlist[compostmode]->getsample();
+      if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
+      for (u8 x=0;x<sz/2;x++) {
+	audio_buffer[cc++]=wormlist[compostmode]->getsample();
       if (cc>AUDIO_BUFSZ) cc=0;
   }
     }
   
   if (wormlist[_intmode]->TTS){ // so this doesn't change as fast as generators
+    doadc();
     u8 xax=_sely*18.0f; 
     u8 selz=_selz*65.0f; 
     MAXED(xax,16);

@@ -561,7 +561,7 @@ void tube_newsay_bend(void){
 
 void tube_newsay_raw(void){
 
-  lengthy=256.0f*(exy[16]+0.1f); // should be loggy 
+  lengthy=1024.0f*(exy[16]+0.001f); // should be loggy but? 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
   maximumSampleValue = 0.0f;    
