@@ -201,17 +201,18 @@ int16_t compost_get_sample(){
   u16 endy=(1.0f-_sely)*32768.0f;
   signed char dir=1;
 
+  // resets at start or end - newsay will reset in full
   if (startx>endy){
     dir=-1;
-    if (comp_counter<=startx) comp_counter=endy;
+    if (comp_counter<=startx) comp_counter=startx;
   }
   else {
     dir=1;
     if (comp_counter>=endy) comp_counter=startx;
   }
 
-  u16 pos=comp_counter;
-  int16_t sample=audio_buffer[pos%32768];
+  int16_t pos=comp_counter; // restricted to 32768
+  int16_t sample=audio_buffer[pos];
   comp_counter+=dir;
   return sample;
 }

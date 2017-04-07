@@ -321,7 +321,35 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 
  printf("\n\nPICHBASE %f\n", (440.0f * powf(2.0f,(((float)(pittch+3.0f))/12.0f))));
 
+ // test compost
 
+ signed char dir=1;
+
+ uint16_t comp_counter=0;
+ 
+ for (int bbb=0;bbb<3200000;bbb++){
+
+
+   
+   u16 startx=rand()%32768;
+   u16 endy=rand()%32768;
+ if (startx>endy){
+    dir=-1;
+    if (comp_counter<=endy) comp_counter=startx;
+  }
+  else {
+    dir=1;
+    if (comp_counter>=endy) comp_counter=startx;
+  }
+    comp_counter+=dir;
+ 
+    if (comp_counter>32768)  printf("XXXXXXX comp count %d start %d end %d dir %d\n", comp_counter, startx, endy, dir);
+
+ }
+ 
+
+
+ 
 
 
  for (X=0;X<40;X++){

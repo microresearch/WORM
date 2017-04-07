@@ -1433,12 +1433,13 @@ start with just one list = input_frame and do without interpolation, then implem
 
 ** 5/4++
 
-- tubes.c is close but could break further into frames so less interpolation
+- tubes.c is close but could break further into frames so less interpolation _ LEAVE AS IS
 
 ** 6/4++
 
 - TEST all klatt vocabs and fix nvp silence - DONE but nvp is always a
   bit STRANGE sounding with wierd dissonances-FIXED to some degree
+
 - check sam selected vocabDONE
 
 //////
@@ -1459,7 +1460,7 @@ child_params copied in to tubes.c from py-trm stuff
 
 ////
 
-*- decide on all voices/klatt and tubes and implement*
+*- decide on all/any voices/klatt and tubes and implement*
 
 - new interpolation scheme seems to work now in samplerate.c: shift
   out old audio.c and start to rework with new struct so is also all a
@@ -1471,14 +1472,14 @@ child_params copied in to tubes.c from py-trm stuff
 
 ** 7/4+
 
-- compost in progress - some tests still STRESS TEST TODOXS
+- compost in progress - some tests still -> FIXED - test in full
+- need frozen compost mode where buffer stays the way it is
 
-- test digitalker modes 
-
-- tests as above and new list of modes - wrappings of newsays etc. with parameters
+- new list of modes - wrappings of newsays etc. with parameters
 - ditch klattTTS with reduced set problem
 
-- plan! - also need frozen compost mode where buffer stays the way it is
+- test all modes as we add them
+
 
 * FINAL/FURTHER TODO:
 
