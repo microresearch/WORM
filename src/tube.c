@@ -793,9 +793,13 @@ int16_t tube_get_sample_sing(void)
 u8 val=_selx*130.0f;
  MAXED(val,127);
  val=127-val;
-    f0 = 440.0f * logpitch[val];; 
-    ax = amplitude(input_frame[1]);
-    ah1 = amplitude(input_frame[2]);    
+
+	    // these are done at samplerate
+
+
+ f0 = 440.0f * logpitch[val];; 
+ ax = amplitude(input_frame[1]);
+ ah1 = amplitude(input_frame[2]);    
 
     calculateTubeCoefficients();
     setFricationTaps();
@@ -820,6 +824,7 @@ u8 val=_selx*130.0f;
 	    signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE), bandpassFilter(signal));
 
 	    signal += throaty(pulse * VT_SCALE);
+
 	    
 	    //	    dataFill(signal); // this is where we get samples - no interpolation of samples OR control - just to test
 	    absoluteSampleValue = fabsf(signal);
