@@ -361,15 +361,17 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 
  // printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
- make_sinc();
+ // make_sinc();
 
 #define TOTAL_SECTIONS            10 
- float controlRate=4.0;
+ float controlRate=16.0;
 
  float length=18.0;
  float cc = speedOfSound(20.0f);
  int controlPeriod =   rint((cc * TOTAL_SECTIONS * 100.0) /(length * controlRate));
  int sampleRate = controlRate * controlPeriod;
+ sampleRate= rint((cc * TOTAL_SECTIONS * 100.0)/length);
+
  float actualTubeLength = (cc * TOTAL_SECTIONS * 100.0) / sampleRate;
  float nyquist = (float)sampleRate / 2.0;
 

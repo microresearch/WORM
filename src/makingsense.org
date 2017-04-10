@@ -1481,6 +1481,13 @@ child_params copied in to tubes.c from py-trm stuff
 - test all modes as we add them
 
 
+** 10/4+
+
+Klatt and tube voices:
+
+- tube: 
+
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f

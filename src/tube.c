@@ -46,7 +46,20 @@ extern float exy[64];
 const float parameter_list[21]={60.0, 0, 30.0, 16.0, 32.0, 2.50, 18.0, 32.0, 1.50, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0}; 
 const float parameter_list_child[21]={60.0, 0, 40.0, 22.0, 45.0, 2.50, 10.0, 32.0, 1.0, 3.05, 5000.0, 5000.0, 1.35, 1.96, 1.91, 1.3, 0.73, 1500.0, 6.0, 1, 48.0};
 
-// these we can adjust also...
+/* these we can adjust also ->
+
+glottal pulse rise [2] tp , fall min [3] tnmin, fall max [4] tnmax, -> would mean new wavetable calc
+
+
+breathiness [5] breathiness, -> nonew init
+
+tube length [6] leads to samplerate calc -> all init for new filters
+
+junction loss [8] lossfactor -> damping -> nonew init
+
+but what do we need to re-init - none of these in parameter list are used!
+
+*/
 
 
 /*diphones.degas:
@@ -243,18 +256,39 @@ static const float range[17] __attribute__ ((section (".flash"))) ={10.0, 60.0, 
 /// from test.c TUBES: controlp 4769 samplerate 19076 tubelength 18.001677 nyquist 9538.000000
 
 const int    controlPeriod=4769; // what is control period - unused
-const int    sampleRate=19076; // this is not real samplerate
+const int    sampleRate=19076; // this is not real samplerate but is calculated from length of tube!
+
+/*
+	double c = speedOfSound(temperature);
+	controlPeriod =	rint((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+	sampleRate = controlRate * controlPeriod;
+	actualTubeLength = (c * TOTAL_SECTIONS * 100.0) / sampleRate;
+	nyquist = (double)sampleRate / 2.0;
+
+so for tube length of 18=  19076
+
+rather as  sampleRate= rint((cc * TOTAL_SECTIONS * 100.0)/length); if we skip controlrate stuff
+
+*/
+
 const float nyquist= 9538.0f;
 const float actualTubeLength=18.001677f;            /*  actual length in cm  */
-const float dampingFactor=0.985f;               /*  calculated damping factor  */
-const float crossmixFactor=3.98f;              /*  calculated crossmix factor  */
-const int    tableDiv1=154;
-const int    tableDiv2=317;
-const float tnLength=163.0f;
+const float dampingFactor=0.985f;               /*  calculated damping factor  */ //     dampingFactor = (1.0 - (lossFactor / 100.0));
+const float crossmixFactor=3.98f;              /*  calculated crossmix factor  */ //     crossmixFactor = 1.0 / amplitude(mixOffset);
+
+
+/*
+    tableDiv1 = rint(TABLE_LENGTH * (tp / 100.0));
+    tableDiv2 = rint(TABLE_LENGTH * ((tp + tnMax) / 100.0));
+    tnLength = tableDiv2 - tableDiv1;
+*/
+
+const int    tableDiv1=154; // 
+const int    tableDiv2=317; //
+const float tnLength=163.0f; // how is that calc -> glottal calc with tp and tnmax
 const float tnDelta=82.0f;
-const float breathinessFactor=0.025f;
-//const float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
-const float basicIncrement=0.008f; // 0.016 for 32k samplerate // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
+const float breathinessFactor=0.025f; // in parameter list is 2.5f - as there is     breathinessFactor = breathiness / 100.0;
+const float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
 const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35f, 1.96f, 1.91f, 1.3f, 0.73f};  /*  fixed nose radii (0 - 3 cm)  */
 const u8 pulsed=0;
 
@@ -542,6 +576,7 @@ void tube_newsay(void){
   lengthy=32.0f*logspeed[val]*vocablist_posture[lastsel][16]; // lastsel is our current sel is our target
   interpol=1.0f/(float)lengthy;
     sample_count=0;
+    maximumSampleValue = 0.01f;
 }
 
 
@@ -556,7 +591,7 @@ void tube_newsay_bend(void){
     interpol=1.0f/(float)lengthy;
 
     sample_count=0;
-    maximumSampleValue = 0.0f;
+    maximumSampleValue = 0.01f;
 }
 
 void tube_newsay_raw(void){
@@ -564,7 +599,7 @@ void tube_newsay_raw(void){
   lengthy=1024.0f*(exy[16]+0.001f); // should be loggy but? 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
-  maximumSampleValue = 0.0f;    
+  maximumSampleValue = 0.01f;    
 }
 
 void tube_newsay_sing(void){
@@ -588,6 +623,7 @@ void tube_newsay_sing(void){
   lengthy=1024.0f*logspeed[val]; 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
+    maximumSampleValue = 0.01f;
 
 }
 
