@@ -12,12 +12,19 @@
 ******************************************************************************/
 
 #include "tubeset.h"
+#ifdef LAP
+#include "forlap.h"
+float _selx=0.5, _sely=0.5, _selz=0.2;
+float exy[64]={0.5};
+float logspeed[1024]={0.5};
+float logpitch[128]={0.5};
+#else
 #include "audio.h"
-#include "resources.h"
-#include "posture.h"
-
 extern float _selx, _sely, _selz;
 extern float exy[64];
+#include "resources.h"
+#endif
+#include "posture.h"
 
 /* - parameters
 60.0	  ; master volume (0 - 60 dB)
@@ -48,16 +55,15 @@ const float parameter_list_child[21]={60.0, 0, 40.0, 22.0, 45.0, 2.50, 10.0, 32.
 
 /* these we can adjust also ->
 
-glottal pulse rise [2] tp , fall min [3] tnmin, fall max [4] tnmax, -> would mean new wavetable calc
+glottal pulse rise [2] tp , fall min [3] tnmin, fall max [4] tnmax, -> would mean new wavetable calc - have say 16 different variants?
 
+////
 
-breathiness [5] breathiness, -> nonew init
-
-tube length [6] leads to samplerate calc -> all init for new filters
+tube length [6] leads to samplerate calc -> initializeThroat
 
 junction loss [8] lossfactor -> damping -> nonew init
 
-but what do we need to re-init - none of these in parameter list are used!
+breathiness [5] breathiness, -> nonew init
 
 */
 
@@ -79,11 +85,13 @@ ph'
 */
 
 
-static const float mins[17] __attribute__ ((section (".flash"))) = {-10.0, 0.0, 0.0, 0.0, 1.0, 100.0, 100.0, 0.8, 0.6, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.1, 1.0};//last is length
+static const float mins[21] __attribute__ ((section (".flash"))) = {-10.0, 0.0, 0.0, 0.0, 1.0, 100.0, 100.0, 0.8, 0.8, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.1, 0.0, 1.0, 8.0, 1.0, 1.0};//last is length
 
-static const float maxs[17] __attribute__ ((section (".flash"))) = {0.0, 60.0, 10.0, 10.0, 10.0, 6000.0, 6000.0, 0.8, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 2.0, 200.0};//last is length
+static const float maxs[21] __attribute__ ((section (".flash"))) = {0.0, 60.0, 10.0, 10.0, 10.0, 6000.0, 6000.0, 0.8, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 2.0, 10.0, 5.0, 26.0, 15.0, 200.0};//last is length
 
-static const float range[17] __attribute__ ((section (".flash"))) ={10.0, 60.0, 10.0, 10.0, 9.0, 5900.0, 5900.0, 0.0, 1.4, 1.9, 1.9, 1.9, 1.9, 1.9, 2.99, 1.9, 199.0};//last is length
+static const float range[22] __attribute__ ((section (".flash"))) ={10.0, 60.0, 10.0, 10.0, 9.0, 5900.0, 5900.0, 0.0, 1.9, 1.9, 1.9, 1.0, 1.9, 1.9, 2.99, 1.9, 10.0, 4.0, 18.0, 15.0, 199.0};//last is length
+
+//+ breathiness=0-10 , damping=loss=1-5 , lengthoftube=1-64say, glottalwaveform=0-15, last is length
 
 
 #define FALSE 0
@@ -192,8 +200,8 @@ static const float range[17] __attribute__ ((section (".flash"))) ={10.0, 60.0, 
 /*  SCALING CONSTANT FOR INPUT TO VOCAL TRACT & THROAT (MATCHES DSP)  */
 //#define VT_SCALE                  0.03125     /*  2^(-5)  */
 // this is a temporary fix only, to try to match dsp synthesizer
-#define VT_SCALE                  0.125f     /*  2^(-3)  */
-//#define VT_SCALE                  1.0     /*  2^(-5)  */
+//#define VT_SCALE                  0.125f     /*  2^(-3)  */
+#define VT_SCALE                  1.0     /*  2^(-5)  */
 
 
 /*  FINAL OUTPUT SCALING, SO THAT .SND FILES APPROX. MATCH DSP OUTPUT  */
@@ -256,7 +264,7 @@ static const float range[17] __attribute__ ((section (".flash"))) ={10.0, 60.0, 
 /// from test.c TUBES: controlp 4769 samplerate 19076 tubelength 18.001677 nyquist 9538.000000
 
 const int    controlPeriod=4769; // what is control period - unused
-const int    sampleRate=19076; // this is not real samplerate but is calculated from length of tube!
+uint16_t    sampleRate=19076; // this is not real samplerate but is calculated from length of tube!
 
 /*
 	double c = speedOfSound(temperature);
@@ -271,9 +279,9 @@ rather as  sampleRate= rint((cc * TOTAL_SECTIONS * 100.0)/length); if we skip co
 
 */
 
-const float nyquist= 9538.0f;
+float nyquist= 9538.0f;
 const float actualTubeLength=18.001677f;            /*  actual length in cm  */
-const float dampingFactor=0.985f;               /*  calculated damping factor  */ //     dampingFactor = (1.0 - (lossFactor / 100.0));
+float dampingFactor=0.75f;               /*  calculated damping factor  */ //     dampingFactor = (1.0 - (lossFactor / 100.0));
 const float crossmixFactor=3.98f;              /*  calculated crossmix factor  */ //     crossmixFactor = 1.0 / amplitude(mixOffset);
 
 
@@ -287,14 +295,14 @@ const int    tableDiv1=154; //
 const int    tableDiv2=317; //
 const float tnLength=163.0f; // how is that calc -> glottal calc with tp and tnmax
 const float tnDelta=82.0f;
-const float breathinessFactor=0.025f; // in parameter list is 2.5f - as there is     breathinessFactor = breathiness / 100.0;
-const float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
+float breathinessFactor=0.025f; // in parameter list is 2.5f - as there is     breathinessFactor = breathiness / 100.0;
+float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
 const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35f, 1.96f, 1.91f, 1.3f, 0.73f};  /*  fixed nose radii (0 - 3 cm)  */
 const u8 pulsed=0;
 
 // we can try vary length of tube from 18.0, also maybe bend parameter list but when do we re-init
 
-static float wavetable[TABLE_LENGTH]; 
+static float wavetable[TABLE_LENGTH]; // this can be const? - 2 or more different variants - but then we have updatewavetable?
 static float currentPosition;
 static float a10, b11, a20, a21, b21;
 static float na10, nb11, na20, na21, nb21;
@@ -310,8 +318,8 @@ static u8 prev_ptr = 0;
 static float fricationTap[TOTAL_FRIC_COEFFICIENTS];
 
 /*  VARIABLES FOR FIR LOWPASS FILTER  */
-static float FIRData[256];
-static float FIRCoef[256];
+static float FIRData[256]; 
+static float FIRCoef[256]; // this can be const?
 //float *FIRData, *FIRCoef;
 
 static u8 FIRPtr, numberTaps;
@@ -571,10 +579,14 @@ void tube_newsay(void){
     sel=129-sel;
     for (u8 i=0;i<16;i++) input_frame[i]=vocablist_posture[lastsel][i];
 
+#ifdef LAP
+    lengthy=32.0f*vocablist_posture[lastsel][16]; // lastsel is our current sel is our target
+#else
     int val=_sely*1027.0f;
     MAXED(val,1023);
-  lengthy=32.0f*logspeed[val]*vocablist_posture[lastsel][16]; // lastsel is our current sel is our target
-  interpol=1.0f/(float)lengthy;
+    lengthy=32.0f*logspeed[val]*vocablist_posture[lastsel][16]; // lastsel is our current sel is our target
+#endif
+    interpol=1.0f/(float)lengthy;
     sample_count=0;
     maximumSampleValue = 0.01f;
 }
@@ -586,17 +598,32 @@ void tube_newsay_bend(void){
     sel=_selz*133.0f; 
     MAXED(sel,129);
     sel=129-sel;
-    for (u8 i=0;i<16;i++) input_frame[i]=vocablist_posture[sel][i]; // bend here ???
 
+      sampleRate= rintf(343400.0f/(mins[18]+(range[18]*exy[18])));	
+  nyquist=sampleRate/2.0f;
+  initializeMouthCoefficients((nyquist - parameter_list[10]) / nyquist); // - 5000 which we stay above
+  initializeNasalFilterCoefficients((nyquist - parameter_list[11]) / nyquist);
+  initializeThroat();
+  basicIncrement = 512.0f / (float)sampleRate;  
+
+  //    for (u8 i=0;i<16;i++) input_frame[i]=vocablist_posture[sel][i]; // bend here ???
+    lengthy=1024.0f*((1.0f-exy[20])+0.001f); // should be loggy but? 
     interpol=1.0f/(float)lengthy;
-
     sample_count=0;
-    maximumSampleValue = 0.01f;
+    //    maximumSampleValue = 0.1f;
 }
 
 void tube_newsay_raw(void){
+  
+    sampleRate= rintf(343400.0f/(mins[18]+(range[18]*exy[18])));	
+  nyquist=sampleRate/2.0f;
+  initializeMouthCoefficients((nyquist - parameter_list[10]) / nyquist); // - 5000 which we stay above
+  initializeNasalFilterCoefficients((nyquist - parameter_list[11]) / nyquist);
+  initializeThroat();
+  basicIncrement = 512.0f / (float)sampleRate;  
+    
 
-  lengthy=1024.0f*(exy[16]+0.001f); // should be loggy but? 
+  lengthy=1024.0f*((1.0f-exy[20])+0.001f); // should be loggy but? 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
   maximumSampleValue = 0.01f;    
@@ -679,7 +706,7 @@ u8 val=_selx*130.0f;
 		maximumSampleValue = absoluteSampleValue;
 	    
 	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
-	    if (maximumSampleValue > 0.0f)
+	    if (maximumSampleValue > 0)
 	      //	      scale = (RANGE_MAX / maximumSampleValue);
 	      //	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
 	      scale= (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
@@ -694,15 +721,27 @@ int16_t tube_get_sample_bend(void)
 {
   //  static int16_t j=0;
   int16_t samplerr;
-  float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=100.0f;
+  float pulse, lp_noise, pulsed_noise, signal, crossmix, absoluteSampleValue,scale=3.0f;
 
     if (sample_count++ >= lengthy) {
       tube_newsay_bend();
     }
 
         for (u8 i=0;i<16;i++) {
-          input_frame[i]=vocablist_posture[sel][i]*(exy[i]+0.1f)*2.0f; // sel is target...
+          input_frame[i]=(vocablist_posture[sel][i])*(exy[i]*(1.0f)); // sel is target.../// 1.4 is max bend before errors hit
+	  // how can we bend between max and min???? so say range is 0-10 and our value is 7 we want to bend around 7 <0-10
+	  // 1.0 / range 
+	  
+
+
         }
+
+	// we can also do breathiness, damping, samplerate (newcalc and call):
+			breathinessFactor=(mins[16]+(range[16]*exy[16]))/100.0f;
+	//		dampingFactor = (1.0f - ((mins[17]+(range[17]*exy[17])) / 100.0f));
+
+	// length is 18 glottal wavetable would be 19
+
     
     f0 = frequency(input_frame[0]); 
     ax = amplitude(input_frame[1]);
@@ -715,6 +754,7 @@ int16_t tube_get_sample_bend(void)
 	    lp_noise = noiseFilter(noise());
 	    if (pulsed == PULSE)		updateWavetable(ax);
 	    pulse = oscillator(f0);
+	    //	    printf("PULSE %f ---", pulse);
 	    pulsed_noise = lp_noise * pulse;
 	    pulse = ax * ((pulse * (1.0 - breathinessFactor)) +
 			  (pulsed_noise * breathinessFactor));
@@ -728,9 +768,13 @@ int16_t tube_get_sample_bend(void)
 	    else
 		signal = lp_noise;
 
+	    //	    printf("signal %f ---", pulse + (ah1 * signal));
 	    signal = vocalTract(((pulse + (ah1 * signal)) * VT_SCALE), bandpassFilter(signal));
 
 	    signal += throaty(pulse * VT_SCALE);
+
+
+
 	    
 	    //	    dataFill(signal); // this is where we get samples - no interpolation of samples OR control - just to test
 	    absoluteSampleValue = fabsf(signal);
@@ -738,12 +782,13 @@ int16_t tube_get_sample_bend(void)
 		maximumSampleValue = absoluteSampleValue;
 	    
 	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
-	    if (maximumSampleValue > 0.0f)
+	    	    if (maximumSampleValue > 0)
 	      //	      scale = (RANGE_MAX / maximumSampleValue);
-	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
+	    	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
 	    //	      scale= OUTPUT_SCALE * RANGE_MAX * amplitude(parameter_list[0]);
 	      //      scale= RANGE_MAX;// * amplitude(parameter_list[0]);
-	      	    samplerr=signal*scale;
+		    //	    printf("%f\n", signal);
+	    samplerr=signal*scale;
 
 	    //samplerr=rand()%32768;
 	    return samplerr;
@@ -760,8 +805,14 @@ int16_t tube_get_sample_raw(void)
 
         for (u8 i=0;i<16;i++) {
 	  //          input_frame[i]=vocablist_posture[sel][i]*(exy[i]+0.1f)*2.0f; // sel is target...
-	  input_frame[i]=mins[i]+(range[i]*exy[i]);
+	  	  input_frame[i]=mins[i]+(range[i]*exy[i]);
         }
+
+	// we can also do breathiness, damping, samplerate (newcalc and call):
+	breathinessFactor=(mins[16]+(range[16]*exy[16]))/100.0f;
+	//	dampingFactor = (1.0f - ((mins[17]+(range[17]*exy[17])) / 100.0f));
+
+	// length is 18 glottal wavetable would be 19
 
 // but z is pitch bend
 
@@ -770,7 +821,8 @@ int16_t tube_get_sample_raw(void)
     val=127-val;
 
     // these are done at samplerate
-    f0 = frequency(input_frame[0])* logpitch[val];
+        f0 = frequency(input_frame[0])* logpitch[val];
+    //    f0 = frequency(input_frame[0]); // TESTY!
     ax = amplitude(input_frame[1]);
     ah1 = amplitude(input_frame[2]);    
 
@@ -806,7 +858,7 @@ int16_t tube_get_sample_raw(void)
 	    //	    sampleRateInterpolation(); // TODO!!! using last input_frame params - lastframeat
 	    if (maximumSampleValue > 0.0f)
 	      //	      scale = (RANGE_MAX / maximumSampleValue);
-	      scale= OUTPUT_SCALE * (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
+	      scale= (RANGE_MAX / maximumSampleValue) * amplitude(parameter_list[0]);
 	    //	      scale= OUTPUT_SCALE * RANGE_MAX * amplitude(parameter_list[0]);
 	      //      scale= RANGE_MAX;// * amplitude(parameter_list[0]);
 	      	    samplerr=signal*scale;
@@ -814,7 +866,6 @@ int16_t tube_get_sample_raw(void)
 	    //samplerr=rand()%32768;
 	    return samplerr;
 }
-
 
 
 int16_t tube_get_sample_sing(void)
@@ -1403,4 +1454,18 @@ int decrement(int pointer, int modulus)
 	return(pointer);
 }
 
+#ifdef LAP
+ void main(){
+  tube_init(); // tube.c
 
+   while(1){
+               for (u8 i=0;i<21;i++){
+     //     u8 i=9;
+       exy[i]=(float)(rand()%32768)/32767.0f;
+       //       exy[i]=0.8f;
+           }
+     int16_t smaple=tube_get_sample_raw();
+     printf("%d\n", smaple);
+   }
+ }
+#endif

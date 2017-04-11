@@ -198,7 +198,7 @@ int_time = time_now;
  doadc();
 
  if (parammode==0){
-   u8 xaxis=_selx*((float)extent+4.0f); //0-16 for r, but now 14 params 0-13
+   u8 xaxis=_selx*((float)extent+4.0f); 
    MAXED(xaxis,extent);
    xaxis=extent-xaxis;
    exy[xaxis]=1.0f-_sely; // invert or?

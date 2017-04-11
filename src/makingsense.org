@@ -1481,12 +1481,20 @@ child_params copied in to tubes.c from py-trm stuff
 - test all modes as we add them
 
 
-** 10/4+
+** 11/4+
 
-Klatt and tube voices:
+- tubes.c:
 
-- tube: 
+-- added extra params to raw and bend which change some voice elements - we could have different wavetables for voices/bend wavetable?
+-- seems a bit volatile on bends - and reset volume always adds click... - gain control in window???
 
+- bends CRASH - FIXED but esp. bend is quite dull, also extent of tubes.c postures is quite high...
+
+- klatt:
+
+- rsynth:
+
+- nvp:
 
 * FINAL/FURTHER TODO:
 

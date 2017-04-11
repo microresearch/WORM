@@ -179,8 +179,8 @@ static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0};
 
 // these are extra tubes modes not in oldaudio+sing, bend, raw(TEST!)
 static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
-static const wormer tubbender={16, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0};
-static const wormer tubrawer={16, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+static const wormer tubbender={20, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
+static const wormer tubrawer={20, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 
@@ -278,7 +278,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=0; // TESTY!
+  _intmode=3; // TESTY!
 
   static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker};
 
