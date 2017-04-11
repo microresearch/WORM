@@ -1483,18 +1483,46 @@ child_params copied in to tubes.c from py-trm stuff
 
 ** 11/4+
 
-- tubes.c:
+*** voices/bends in klatt/tbe modes
+
+only one with raw bending of voice is tubes - otherwise we will need seperate voices
+
+see if we can add xy voice bends to vocabs...
+
+- tubes.c: no vocab...
 
 -- added extra params to raw and bend which change some voice elements - we could have different wavetables for voices/bend wavetable?
--- seems a bit volatile on bends - and reset volume always adds click... - gain control in window???
+-- seems a bit volatile on bends - reduced gain/inc. damping...
 
-- bends CRASH - FIXED but esp. bend is quite dull, also extent of tubes.c postures is quite high...
+-- bends CRASH - FIXED but esp. bend is quite dull, also extent of tubes.c postures is quite high...TRIM? - *TODO*
 
-- klatt:
+-- for voices we can also change wavetable for glottis - say 16 wavetables available as const - *TODO*
 
-- rsynth:
+*- klatt: as primary here*
 
-- nvp:
+sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter, tilt, skew
+
+- rsynth: - not so important
+
+    pars.F4hz = 3900;
+    pars.B4hz = 400;
+    pars.F5hz = 4700;
+    pars.B5hz = 150;
+    pars.F6hz = 4900;
+    pars.B6hz = 150;
+
+    pars.B4phz = 500;
+    pars.B5phz = 600;
+    pars.B6phz = 800;
+
+    pars.BNhz = 500;
+
+
+- nvp: vibrato is not so important
+
+  // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
+       change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+
 
 * FINAL/FURTHER TODO:
 

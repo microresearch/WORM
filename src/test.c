@@ -306,7 +306,8 @@ void main(){
 
 typedef struct TMS_vocab__ {
   // pointer to const
-  const uint8_t **wordlist;
+  const uint8_t **wordlist;	
+
   uint16_t extent;
   float extentplus;
 } TMS_vocab;
@@ -326,6 +327,15 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
  signed char dir=1;
 
  uint16_t comp_counter=0;
+
+ float max=100.0f;
+ float valuee=70.0f;
+ float our=1.0f;
+
+ float ending= our*valuee; // our skews the whole logarithmically
+ 
+ printf("\nRANGED: %f\n", ending);
+
  
  for (int bbb=0;bbb<3200000;bbb++){
 

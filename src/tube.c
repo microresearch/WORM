@@ -588,7 +588,7 @@ void tube_newsay(void){
 #endif
     interpol=1.0f/(float)lengthy;
     sample_count=0;
-    maximumSampleValue = 0.01f;
+    //    maximumSampleValue = 0.01f;
 }
 
 
@@ -626,7 +626,7 @@ void tube_newsay_raw(void){
   lengthy=1024.0f*((1.0f-exy[20])+0.001f); // should be loggy but? 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
-  maximumSampleValue = 0.01f;    
+  //  maximumSampleValue = 0.01f;    
 }
 
 void tube_newsay_sing(void){
@@ -650,7 +650,7 @@ void tube_newsay_sing(void){
   lengthy=1024.0f*logspeed[val]; 
   interpol=1.0f/(float)lengthy;
   sample_count=0;
-    maximumSampleValue = 0.01f;
+  //    maximumSampleValue = 0.01f;
 
 }
 
@@ -728,12 +728,7 @@ int16_t tube_get_sample_bend(void)
     }
 
         for (u8 i=0;i<16;i++) {
-          input_frame[i]=(vocablist_posture[sel][i])*(exy[i]*(1.0f)); // sel is target.../// 1.4 is max bend before errors hit
-	  // how can we bend between max and min???? so say range is 0-10 and our value is 7 we want to bend around 7 <0-10
-	  // 1.0 / range 
-	  
-
-
+          input_frame[i]=vocablist_posture[sel][i]*exy[i]*1.4f; // sel is target.../// 1.4 is max bend before errors hit or can we use max and min to bound???
         }
 
 	// we can also do breathiness, damping, samplerate (newcalc and call):
@@ -1464,7 +1459,7 @@ int decrement(int pointer, int modulus)
        exy[i]=(float)(rand()%32768)/32767.0f;
        //       exy[i]=0.8f;
            }
-     int16_t smaple=tube_get_sample_raw();
+     int16_t smaple=tube_get_sample_bend();
      printf("%d\n", smaple);
    }
  }
