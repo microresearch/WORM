@@ -183,6 +183,7 @@ static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend,
 static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
 static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
 static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
+static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 
@@ -275,20 +276,22 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   MAXED(samplespeedref, 127);
   samplespeed=logpitch[samplespeedref];  
   
-  for (u8 x=0;x<sz/2;x++){
+  for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
     sample_buffer[x]=*(src++); 
     src++;
   }
 
-  _intmode=7; // TESTY!
+  _intmode=8; // TESTY!
 
-  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper};
+  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper};
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer};
 
-  if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio);
+  if (trigger==1) wormlist[_intmode]->newsay;   // first trigger from mode-change pulled out from below
+
+  if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);
   else
-    samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
+    samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
   if (_intmode!=4){// TODO - whatever is compost mode 64 or??? - at  moment test with 4

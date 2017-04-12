@@ -5,11 +5,11 @@
 #include "worming.h"
 #include "wavetable.h"
 
-// varying wavetable implementations: params - oversampling, interpolating... length and calc frequency?
+#include "resources.h"
+extern float _selx, _sely, _selz;
+Wavetable wavtable;
+Wavetable *wavetable;
 
-// note that BRAIDs uses multiple indexes into giant wavetable
-
-// from tubes:
 
 #define TWO_PI 6.28318530717958647693
 
@@ -169,6 +169,32 @@ void dowavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 leng
     }
 }
 #endif
+
+void wave_newsay(void){
+  wavetable=&wavtable;
+  wavetable->currentPosition=0.0;
+}
+  
+int16_t wave_get_sample(void) // what is the wavetable - newsay
+{
+    int lowerPosition, upperPosition;
+    // set frequency
+      uint16_t val=_selz*1030.0f; // how can we test all others????
+      MAXED(val,1023);
+      val=1023-val;
+
+    WavetableIncrementPosition(wavetable, 2.0f+(logspeed[val]*440.0f));
+    lowerPosition = (int)wavetable->currentPosition;
+    upperPosition = mod0(lowerPosition + 1, wavetable->length);
+
+    float sample= (wavetable->wavetable[lowerPosition] +
+            ((wavetable->currentPosition - lowerPosition) *
+             (wavetable->wavetable[upperPosition] - wavetable->wavetable[lowerPosition])));
+    // float to int
+    int16_t tmp = sample * 32768.0f;
+    tmp = (tmp <= -32768) ? -32768 : (tmp >= 32767) ? 32767 : tmp;
+    return tmp;
+}
 
 float dosinglewavetable(Wavetable *wavetable, float frequency) 
 {

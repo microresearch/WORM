@@ -1473,9 +1473,9 @@ child_params copied in to tubes.c from py-trm stuff
 ** 7/4+
 
 - compost in progress - some tests still -> FIXED - test in full
-- need frozen compost mode where buffer stays the way it is
 
 - new list of modes - wrappings of newsays etc. with parameters
+
 - ditch klattTTS with reduced set problem
 
 - test all modes as we add them
@@ -1548,7 +1548,16 @@ or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and 
 
 - straight nvp does crash/go into silence -> FIXED bug in NVP!
 
-- is raspiness at higher speeds property of sinc or overprocessing - try with simple wavetable/singles
+- is raspiness at higher speeds property of sinc or overprocessing -
+  try with simple wavetable/singles-code is there, how to speed up - delay
+  length/width? - re-check now as delay_size was too low, try sinc table with say 8*8
+
+- on t60 git add tables.h
+
+- for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?
+
+*- need frozen compost mode where buffer stays the way it is*
+
 
 * FINAL/FURTHER TODO:
 

@@ -81,8 +81,7 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 
 extern Wavetable wavtable;
 #ifndef TESTING
-extern wormy myworm;
-extern NTube tuber;
+wormy myworm;
 #endif
 extern char TTSinarray[17];
 
@@ -103,7 +102,7 @@ void main(void)
   /* sp0256_init(); */
   /* sp0256_initbend(); */
   /* votrax_init(); */
-  /* wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512  */
+  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
   /* tms_init(); */
   /* sam_init();  */
   /* sam_newsay_banks0(); // TEST! */
