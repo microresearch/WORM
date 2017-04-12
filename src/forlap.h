@@ -21,7 +21,12 @@ typedef unsigned short uint16_t;
 
 #define TRUE 1
 #define FALSE 0
-#define MAXED(var, max)
+
+#define MAXED(var, max) \
+  if (var > (max)) {	\
+    var = (max);	\
+  }
+
 
 float _selx,_sely,_selz;
 

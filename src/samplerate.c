@@ -67,18 +67,18 @@ float linear_interp(float first_number,float second_number,float fraction)
     return (first_number + ((second_number - first_number) * fraction));
 }
 
-float sinc(float x)
+inline float sinc(float x)
 {
     int low;
-    float temp,delta;
+    float temp;//,delta;
     if (fabsf(x)>=WIDTH-1)
 	return 0.0f;
     else {
 	temp = fabsf(x) * (float) SAMPLES_PER_ZERO_CROSSING;
-	low = temp;          /* these are interpolation steps */
-	delta = temp - low;  /* and can be ommited if desired */
-	return linear_interp(sinc_table[low],sinc_table[low + 1],delta);
-	//return sinc_table[low];
+	//	low = temp;          /* these are interpolation steps */
+	//	delta = temp - low;  /* and can be ommited if desired */
+	//	return linear_interp(sinc_table[low],sinc_table[low + 1],delta);
+	return sinc_table[(int)temp];
     }
 }
 
@@ -92,17 +92,18 @@ void samplerate(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsa
   static long int_time=0;
   static u8 triggered=0;
   factor*=sampleratio;
- 
+  
+  //  factor=32.0f;
+
   if (trigger==1) newsay();   // first trigger from mode-change
 
 for (u8 ii=0;ii<size;ii++){
   temp1 = 0.0f;
-  // factor=1.0f;
 
-  if (time_now>327680.0){
-    int_time-=time_now; // preserve???
-    time_now=0.0f;
-  }
+  //  if (time_now>327680.0){
+    //    int_time-=time_now; // preserve???
+  //    time_now=0.0f;
+  //  }
 
   // deal also with trigger
   if (in[ii]>THRESH && !triggered) {
@@ -201,7 +202,8 @@ int_time = time_now;
    u8 xaxis=_selx*((float)extent+4.0f); 
    MAXED(xaxis,extent);
    xaxis=extent-xaxis;
-   exy[xaxis]=1.0f-_sely; // invert or?
+   //   exy[xaxis]=1.0f-_sely; // invert or?
+   exy[xaxis]=_sely;
  }
 
 while(last_time<int_time)      {

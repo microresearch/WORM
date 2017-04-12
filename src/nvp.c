@@ -18,8 +18,13 @@ http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 */
 
+#ifdef LAP
+#include "forlap.h"
+#define M_PI 3.14
+#else
 #include "stm32f4xx.h"
 #include "audio.h"
+#endif
 #include "resources.h"
 #include "nvp_vocab.h"
 
@@ -98,7 +103,7 @@ const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 310.0f, 1050.0f, 1350.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 77.0f , 75.0f , 112.5f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 310.0f, 1050.0f, 2050.0f, 3300.0f, 3750.0f, 4900.0f, 70.0f, 100.0f, 150.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f }//47
 };
 
-unsigned int sampleRRate=32000;
+static unsigned int sampleRRate=32000;
 
 typedef unsigned char bool;
 
@@ -107,7 +112,7 @@ typedef unsigned char bool;
 
 extern float _selx, _sely, _selz;
 
-inline float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
+float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRatio) {
 	return oldVal+((newVal-oldVal)*curFadeRatio);
 }
 
@@ -137,9 +142,9 @@ typedef struct  __attribute__((packed)) values  {
 	speechPlayer_frameParam_t endVoicePitch; //  pitch of voice at the end of the frame length  - see ipa.py
 } speechPlayer_frame_t;
 
-const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
+static const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
 
-speechPlayer_frame_t framer, oldframer, tempframe;
+static speechPlayer_frame_t framer, oldframer, tempframe;
 
 const float PITWO=M_PI*2.0f;
 
@@ -191,7 +196,6 @@ float a, b, c;
 
 reson r1,r2,r3,r4,r5,r6,rN0,rNP;
 reson rr1,rr2,rr3,rr4,rr5,rr6;
-
 
 void INITRES(reson *res, bool anti) {
 		res->anti=anti;
@@ -281,7 +285,7 @@ void init_nvp(void){
 
   //      change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
   // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
-       change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  change_nvpparams(&framer, 0.5f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.1f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[0][i]; 
@@ -335,18 +339,18 @@ void nvp_init(){
   this_frame_length=3840; this_interpol=1900;
 }
 
-u8 changed=0;
+static u8 changed=0;
 
 void nvp_newsay(){
   static u8 oldframe=0, nextframe=0;
   count=0;
   oldframe=nextframe;
   nextframe=_selz*50.0f;
-  MAXED(nextframe,48);
-  nextframe=48-nextframe;
+  MAXED(nextframe,47);
+  nextframe=47-nextframe;
+  
   if (oldframe!=nextframe) changed=1;
   else changed=0;
-
   //  nextframe=42; // fixing that rougue frame
     if (nextframe==0) *indexy[37]=0; // NASALS=29,13,39 and give wierd resonance
   else {
@@ -355,12 +359,11 @@ void nvp_newsay(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    int val=_sely*1027.0f;
+        int val=_sely*1027.0f;
     MAXED(val,1023);
     this_frame_length=(int)(1024.0f*logspeed[val])<<2; // sely
   this_interpol=this_frame_length/2;
-  // pitch
-  //  return nextframe;
+    
 }
 
 //static u8 lastphon=0;
@@ -457,10 +460,10 @@ int16_t nvp_get_sample(){
     memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
     nvp_newsay();
     count=0;
-    //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+    //        memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
 
-    if (count<this_interpol && changed){
+      if (count<this_interpol && changed){
     float curFadeRatio=(float)count/(this_interpol);
     for(j=0;j<speechPlayer_frame_numParams;++j) {
       ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
@@ -474,15 +477,14 @@ int16_t nvp_get_sample(){
     // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
     // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
     // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
-    int16_t vale=1024.0f*(1.0f-_selx);
-  tempframe.voicePitch=framer.voicePitch*logspeed[vale]*2.0f; 
+      int16_t vale=128.0f*(1.0f-_selx);
+      tempframe.voicePitch=framer.voicePitch*logpitch[vale]*2.0f; 
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude;
+  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude;
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
-
   count++;
   out=out*4000.0f;
   if (out>32000.0f) out=32000.0f;
@@ -566,5 +568,19 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
    return (int)out;
 }
 
+#ifdef LAP
+void main(){
+  nvp_init();
+  nvp_newsay();
+  while(1){
+    //    _selx=(float)(rand()%32768)/32768.0f;
+    //    _sely=(float)(rand()%32768)/32768.0f;
+    //    _selz=(float)(rand()%32768)/32768.0f;
+    //    _selz=1.0f;
 
-
+    int16_t smaple=nvp_get_sample();
+    printf("%c", (smaple+32768)>>4);
+    //    printf("%f\n",     framer.voicePitch);
+  }
+}
+#endif

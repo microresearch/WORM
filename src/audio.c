@@ -179,8 +179,10 @@ static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0};
 
 // these are extra tubes modes not in oldaudio+sing, bend, raw(TEST!)
 static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
-static const wormer tubbender={20, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
-static const wormer tubrawer={20, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
+static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
+static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 
@@ -242,7 +244,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   static u8 oldmode=255, oldcompost=255, compostmode=255;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
-  smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
+  smoothed_adc_value[0] += 0.01f * (value - smoothed_adc_value[0]); // smooth
   _speed=smoothed_adc_value[0];
   CONSTRAIN(_speed,0.0f,1.0f);
   _speed=1.0f-_speed;
@@ -269,20 +271,20 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
    firsttime=1;
  }
  
-  samplespeedref=_speed*1027.0f;
-  MAXED(samplespeedref, 1023);
-  samplespeed=logspeed[samplespeedref];  
+  samplespeedref=_speed*133.0f;
+  MAXED(samplespeedref, 127);
+  samplespeed=logpitch[samplespeedref];  
   
   for (u8 x=0;x<sz/2;x++){
     sample_buffer[x]=*(src++); 
     src++;
   }
 
-  _intmode=3; // TESTY!
+  _intmode=7; // TESTY!
 
-  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker};
+  static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker};
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper};
 
   if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , trigger, wormlist[_intmode]->sampleratio);
   else

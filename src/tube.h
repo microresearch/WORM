@@ -4,8 +4,12 @@ int initializeSynthesizer(void);
 void synthesize(void);
 
 void tube_init();
+
 void tube_newsay(); 
 int16_t tube_get_sample();
+
+void tube_newsay_xy(); 
+int16_t tube_get_sample_xy();
 
 void tube_newsay_sing(); 
 int16_t tube_get_sample_sing();

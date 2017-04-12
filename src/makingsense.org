@@ -1494,15 +1494,19 @@ see if we can add xy voice bends to vocabs...
 -- added extra params to raw and bend which change some voice elements - we could have different wavetables for voices/bend wavetable?
 -- seems a bit volatile on bends - reduced gain/inc. damping...
 
--- bends CRASH - FIXED but esp. bend is quite dull, also extent of tubes.c postures is quite high...TRIM? - *TODO*
+-- bends CRASH - FIXED but esp. bend is quite dull, also extent of
+tubes.c postures is quite high...TRIM? - *TODO - DONE-trimmed as many
+only varied in length
 
--- for voices we can also change wavetable for glottis - say 16 wavetables available as const - *TODO*
+-- for voices we can also change wavetable for glottis - say 16 wavetables available as const - *TODO - in progress - extra tablesDONE
+
+also we should put length as first of xy on all bends/raw/etc... DONE
 
 *- klatt: as primary here*
 
 sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter, tilt, skew
 
-- rsynth: - not so important
+- rsynth: - not so important but make sure is set ok 
 
     pars.F4hz = 3900;
     pars.B4hz = 400;
@@ -1517,12 +1521,34 @@ sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter, tilt, skew
 
     pars.BNhz = 500;
 
-
-- nvp: vibrato is not so important
+- nvp: vibrato is not so important but make sure is set ok 
 
   // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
        change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
 
+test_midiSing.py -> frame.preFormantGain=2.0
+frame.voiceAmplitude=1.0
+frame.vibratoPitchOffset=0.125
+frame.vibratoSpeed=5.5
+
+frame.preFormantGain=1.0
+frame.vibratoPitchOffset=0.1
+frame.vibratoSpeed=5.5
+frame.voicePitch=150
+
+or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and turby are also only interesting ones
+
+** 12/4++
+
+- no inversion in xy in samplerate.c so we need to invert when we need to in each case CHECK!
+
+- added basics of wavetables but need to fill these out. swap length also on bend and rawDONE-test all tube modes - bend one is somehow lacking
+
+- check voices on rsynth and nvpIN PROCESS, how to approach klatt voices?
+
+- straight nvp does crash/go into silence -> FIXED bug in NVP!
+
+- is raspiness at higher speeds property of sinc or overprocessing - try with simple wavetable/singles
 
 * FINAL/FURTHER TODO:
 

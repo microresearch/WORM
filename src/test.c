@@ -203,7 +203,7 @@ void Formlet_setfreq(Formlet *unit, float frequency){
   b12 = -R2;
 
   // add slopes?
-  printf("%f %f %f %f\n",b01,b02,b11,b12);
+  //  printf("%f %f %f %f\n",b01,b02,b11,b12);
   unit->m_b01 = b01;
   unit->m_b02 = b02;
   unit->m_b11 = b11;
@@ -320,7 +320,7 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
  int pittch=-1;
  
 
- printf("\n\nPICHBASE %f\n", (440.0f * powf(2.0f,(((float)(pittch+3.0f))/12.0f))));
+ // printf("\n\nPICHBASE %f\n", (440.0f * powf(2.0f,(((float)(pittch+3.0f))/12.0f))));
 
  // test compost
 
@@ -334,7 +334,7 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 
  float ending= our*valuee; // our skews the whole logarithmically
  
- printf("\nRANGED: %f\n", ending);
+ // printf("\nRANGED: %f\n", ending);
 
  
  for (int bbb=0;bbb<3200000;bbb++){
@@ -353,7 +353,7 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
   }
     comp_counter+=dir;
  
-    if (comp_counter>32768)  printf("XXXXXXX comp count %d start %d end %d dir %d\n", comp_counter, startx, endy, dir);
+    //    if (comp_counter>32768)  printf("XXXXXXX comp count %d start %d end %d dir %d\n", comp_counter, startx, endy, dir);
 
  }
  
@@ -385,7 +385,7 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
  float actualTubeLength = (cc * TOTAL_SECTIONS * 100.0) / sampleRate;
  float nyquist = (float)sampleRate / 2.0;
 
- printf("TUBES: controlp %d samplerate %d tubelength %f nyquist %f\n",controlPeriod, sampleRate, actualTubeLength, nyquist);
+ // printf("TUBES: controlp %d samplerate %d tubelength %f nyquist %f\n",controlPeriod, sampleRate, actualTubeLength, nyquist);
 
 
 
@@ -403,15 +403,6 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 	else
 	  pitchmod=pitches[Y];
  */
- u8 modus=2;
-	if (modus&2) {
-	  printf("MOD");
-	}
-	else if (modus&8) {
-	  printf("MODD");
-	}	
-	else
-	  printf("MODDD");
 
 static const int pitch_vals[32] = {
 	97, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63,
@@ -428,11 +419,11 @@ static const int pitch_vals[32] = {
   float _sely=0.95f;
   float exy=1.0f-_sely; // no multiplier and inverted here
   int m_new_frame_energy_idx = exy*15.0f; //
-  printf("sely=0.9: result=%d\n",m_new_frame_energy_idx); 
+  //  printf("sely=0.9: result=%d\n",m_new_frame_energy_idx); 
   m_new_frame_energy_idx=16;
   exy=0.45;
   m_new_frame_energy_idx*=2*(1.0f-exy);
-  printf("DDDDDDDDDDDDDDDDDDDDDDDDDDDd: result=%d\n",m_new_frame_energy_idx); 
+  //  printf("DDDDDDDDDDDDDDDDDDDDDDDDDDDd: result=%d\n",m_new_frame_energy_idx); 
 
    
   // test coeff for ADC:
@@ -445,18 +436,18 @@ static const int pitch_vals[32] = {
   int16_t m_inflection=64;
   int16_t m_filt_f1=16;
   int16_t pitch=(0x7f ^ (m_inflection) ^ m_filt_f1) + 1; // TTS uses inflection // nothing else - what are m_filt_f1 values?
-  printf("PPPP: %d\n",pitch); 
+  //  printf("PPPP: %d\n",pitch); 
   
   int m_mainclock = 720000; // TODO as we need m_mainclock - 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 
   float m_sclock = m_mainclock / 18.0f;
-  printf("cllll: %f\n",m_sclock); 
+  //  printf("cllll: %f\n",m_sclock); 
   //  float exy=0.4f;
   int xzy=320;
   //
   
   int m_rom_closure  = exy+0.5f; // does this give us 1 or 0?
-  printf("is it: %d\n",xzy-(exy*640.0f)); 
+  //  printf("is it: %d\n",xzy-(exy*640.0f)); 
 
 
   
@@ -466,7 +457,7 @@ static const int pitch_vals[32] = {
 
   float tester=0.5f; 
   y=(256-(tester*512.0));
-  printf("FFFFF: %d\n",y); 
+  //  printf("FFFFF: %d\n",y); 
 
   for (y=0;y<3200;y++){
     x=sinf(y);
@@ -511,6 +502,56 @@ static const int pitch_vals[32] = {
 
   //  printf("indexy %f\n",ind);
 
+#define TABLE_LENGTH              512
+#define TUBEPI                        3.1415927f
+
+
+  /*  for (int i = 0; i < TABLE_LENGTH; i++) {
+    float wavetable = sinf( ((float)i/(float)TABLE_LENGTH) * 2.0 * TUBEPI );
+    printf("%f, ", wavetable);
+    }*/
+
+  int i,j; float wavetable;
+ 
+  float tp=30.0f;
+  float tnMin=10.0f;
+  float tnMax=50.0f;
+
+  int tableDiv1 = rint(TABLE_LENGTH * (tp / 100.0));
+  int tableDiv2 = rint(TABLE_LENGTH * ((tp + tnMax) / 100.0));
+  float  tnLength = tableDiv2 - tableDiv1;
+  float tnDelta = rint(TABLE_LENGTH * ((tnMax - tnMin) / 100.0));
+  // print also tndelta
+ 
+  //const int    tableDiv1=154; // this is with 30, 32 
+  //const int    tableDiv2=317; //
+  //const float tnLength=163.0f; // how is that calc -> glottal calc with tp and tnmax
+
+  printf("//{ 0, %d, %d, %f, %f,   },\n\n", tableDiv1, tableDiv2, tnLength, tnDelta);
+
+  printf("static const float pulsetableXXX[512] __attribute__ ((section (\".flash\"))) = {");
+
+	for (i = 0; i < tableDiv1; i++) {
+	    float x = (float)i / (float)tableDiv1;
+	    float x2 = x * x;
+	    float x3 = x2 * x;
+	    wavetable = (3.0 * x2) - (2.0 * x3);
+	    printf("%f, ", wavetable);
+	}
+
+	/*  CALCULATE FALL PORTION OF WAVE TABLE  */
+	for (i = tableDiv1, j = 0; i < tableDiv2; i++, j++) {
+	    float x = (float)j / tnLength;
+	    wavetable = 1.0 - (x * x);
+	    printf("%f, ", wavetable);
+	}
+
+	/*  SET CLOSED PORTION OF WAVE TABLE  */
+	for (i = tableDiv2; i < TABLE_LENGTH; i++){
+	    wavetable = 0.0;
+	printf("%f, ", wavetable);
+}
+	printf("};\n\n");
 
 
   /*  while(1){

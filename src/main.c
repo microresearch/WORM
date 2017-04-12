@@ -110,7 +110,7 @@ void main(void)
   digitalk_init();
   /* simpleklatt_init(); */
   /* simpleklatt_newsay(); */
-  /* nvp_init();  */
+  nvp_init();
   /* klatt_init(); */
   /* rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame) */
   tube_init(); // tube.c
