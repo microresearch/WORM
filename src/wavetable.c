@@ -86,14 +86,14 @@ wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wave
 #ifndef TESTING
 extern wormy myworm;
 
-inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
+/*inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
 {
   //    wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wavetable->basicIncrement));
     float speed=(float)adc_buffer[SELX]/40960.0f; 
     u8 param=adc_buffer[SELY]>>6; 
   float wm=wormonefloat(&myworm, speed, param, (float)wavetable->length);
   wavetable->currentPosition = wm;//mod0(wm,wavetable->length);
-}
+  }
 
 void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 length)  //  Plain oscillator
 {
@@ -115,7 +115,7 @@ void dowormwavetable(float* outgoing, Wavetable *wavetable, float frequency, u8 
     outgoing[ii]=sample;
     }
 }
-
+*/
 
 #endif
 
