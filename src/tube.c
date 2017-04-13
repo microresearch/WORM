@@ -334,7 +334,7 @@ float tnDelta=82.0f;    // tnDelta = rint(TABLE_LENGTH * ((tnMax - tnMin) / 100.
 float breathinessFactor=0.025f; // in parameter list is 2.5f - as there is     breathinessFactor = breathiness / 100.0;
 float basicIncrement=0.026289f; // this is     basicIncrement = (double)TABLE_LENGTH =512 / (double)sampleRate;
 const float noseRadius[TOTAL_NASAL_SECTIONS]={1.35f, 1.96f, 1.91f, 1.3f, 0.73f};  /*  fixed nose radii (0 - 3 cm)  */
-u8 pulsed=1; // 1 is sine
+u8 pulsed=0; // 1 is sine
 
 // we can try vary length of tube from 18.0, also maybe bend parameter list but when do we re-init
 
@@ -402,7 +402,6 @@ static float input_frame[18];
 
 void tube_init(void)
 {
-
 
     /*  INITIALIZE THE WAVE TABLE  */
             initializeWavetable();

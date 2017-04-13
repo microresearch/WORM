@@ -1550,9 +1550,9 @@ or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and 
 
 - is raspiness at higher speeds property of sinc or overprocessing -
   try with simple wavetable/singles-code is there, how to speed up - delay
-  length/width? - re-check now as delay_size was too low, try sinc table with say 8*8
+  length/width? - re-check now as delay_size was too low, try sinc table with say 8*8 - still no JOY!
 
-- on t60 git add tables.h
+- revert xy samplerate to simple linear interpolation which we will stick with!
 
 - for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?
 

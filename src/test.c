@@ -257,7 +257,7 @@ void Formlet_process(Formlet *unit, int inNumSamples, float* inbuffer, float* ou
   unit->m_y12 = y12;
 }
 
-#define WIDTH 64                /* this controls the number of neighboring samples
+#define WIDTH 16                /* this controls the number of neighboring samples
 				   which are used to interpolate the new samples.  The
 				   processing time is linearly related to this width */
 
@@ -371,7 +371,7 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 
  // printf("VOCAB %d\n", *(vocab_2303.wordlist[0]+1));
 
- // make_sinc();
+  make_sinc();
 
 #define TOTAL_SECTIONS            10 
  float controlRate=16.0;

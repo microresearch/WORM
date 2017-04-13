@@ -245,13 +245,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   static u8 oldmode=255, oldcompost=255, compostmode=255;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
-  smoothed_adc_value[0] += 0.01f * (value - smoothed_adc_value[0]); // smooth
+  smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]); // smooth
   _speed=smoothed_adc_value[0];
   CONSTRAIN(_speed,0.0f,1.0f);
   _speed=1.0f-_speed;
 
   value =(float)adc_buffer[MODE]/65536.0f; 
-  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
+  smoothed_adc_value[1] += 0.05f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
   _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
 
@@ -271,34 +271,35 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
    trigger=1;
    firsttime=1;
  }
- 
-  samplespeedref=_speed*133.0f;
-  MAXED(samplespeedref, 127);
-  samplespeed=logpitch[samplespeedref];  
+
+ // _speed=0.8f;
+ samplespeedref=_speed*1028.0f;
+ MAXED(samplespeedref, 1023);
+ samplespeed=logspeed[samplespeedref];  
   
   for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
     sample_buffer[x]=*(src++); 
     src++;
   }
 
-  _intmode=8; // TESTY!
+  _intmode=1; // TESTY!
 
   static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer};
 
   // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer};
 
-  if (trigger==1) wormlist[_intmode]->newsay;   // first trigger from mode-change pulled out from below
+  if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
-  if (wormlist[_intmode]->xy==0) samplerate(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);
+  if (wormlist[_intmode]->xy==0) samplerate_simple(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);
   else
     samplerate_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
   if (_intmode!=4){// TODO - whatever is compost mode 64 or??? - at  moment test with 4
-  for (u8 x=0;x<sz/2;x++) {
+    for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc++]=mono_buffer[x];
     if (cc>AUDIO_BUFSZ) cc=0;
-  }
+    }
   }
   else
     {

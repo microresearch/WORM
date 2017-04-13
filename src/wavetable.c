@@ -21,9 +21,9 @@ Wavetable *wavetable;
 
 // TODO: FIR filter for above = use coeffs JUST for this!// and then delete doble to float etc
 
-float filtertaps[49]={ 0.00000001f,  0.00000007f,  0.00000021f, -0.00000007f, -0.00000243f, -0.00000627f,  0.00000224f,  0.00004326f,  0.00006970f, -0.00008697f, -0.00043244f, -0.00028644f,  0.00113161f,  0.00232968f, -0.00061607f, -0.00709116f, -0.00592280f,  0.01120457f,  0.02472395f, -0.00136324f, -0.05604421f, -0.05124764f,  0.08785309f,  0.29650419f,  0.39847428f,  0.29650419f,  0.08785309f, -0.05124764f, -0.05604421f, -0.00136324f,  0.02472395f,  0.01120457f, -0.00592280f, -0.00709116f, -0.00061607f,  0.00232968f,  0.00113161f, -0.00028644f, -0.00043244f, -0.00008697f,  0.00006970f,  0.00004326f,  0.00000224f, -0.00000627f, -0.00000243f, -0.00000007f,  0.00000021f,  0.00000007f,  0.00000001f}; // filter coeffs for above settings
+static const float filtertaps[49]={ 0.00000001f,  0.00000007f,  0.00000021f, -0.00000007f, -0.00000243f, -0.00000627f,  0.00000224f,  0.00004326f,  0.00006970f, -0.00008697f, -0.00043244f, -0.00028644f,  0.00113161f,  0.00232968f, -0.00061607f, -0.00709116f, -0.00592280f,  0.01120457f,  0.02472395f, -0.00136324f, -0.05604421f, -0.05124764f,  0.08785309f,  0.29650419f,  0.39847428f,  0.29650419f,  0.08785309f, -0.05124764f, -0.05604421f, -0.00136324f,  0.02472395f,  0.01120457f, -0.00592280f, -0.00709116f, -0.00061607f,  0.00232968f,  0.00113161f, -0.00028644f, -0.00043244f, -0.00008697f,  0.00006970f,  0.00004326f,  0.00000224f, -0.00000627f, -0.00000243f, -0.00000007f,  0.00000021f,  0.00000007f,  0.00000001f}; // filter coeffs for above settings
 
-extern __IO uint16_t adc_buffer[5];
+//extern __IO uint16_t adc_buffer[5];
 
 
 ////////////SNIPPED filtercalcs -> gentable.c
@@ -179,7 +179,7 @@ int16_t wave_get_sample(void) // what is the wavetable - newsay
 {
     int lowerPosition, upperPosition;
     // set frequency
-      uint16_t val=_selz*1030.0f; // how can we test all others????
+      uint16_t val=_selz*1028.0f; // how can we test all others????
       MAXED(val,1023);
       val=1023-val;
 
@@ -227,6 +227,7 @@ void wavetable_init(Wavetable* wavtable, const float *tableitself, int16_t lengt
   firfilt.FIRCoef=filtertaps;
   firfilt.numberTaps=49; firfilt.FIRPtr=0;
   wavtable->FIRFilter=&firfilt;
+  wave_newsay();
 }
 
 /*

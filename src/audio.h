@@ -25,7 +25,7 @@ enum adcchannel {
   SPEED_
 };
 
-#define THRESH 16000
+#define THRESH 16000 // wa 16000
 #define THRESHLOW 10000
 
 #define MAXED(var, max) \
