@@ -455,8 +455,7 @@ static float sampled_source(long nper)
     diff_value = diff_value * temp_diff;
 
     result = natural_samples[itemp] + diff_value;
-    //    result = result * globals->sample_factor;
-    //    result = result * 2.0f;
+    result = result * 0.00005f;
     //    printf("xxx %f",result);
   }
   else

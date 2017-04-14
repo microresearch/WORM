@@ -12,10 +12,14 @@
 #include "audio.h"
 extern u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
 extern char TTSinarray[17];
+
+extern __IO uint16_t adc_buffer[10];
+extern float smoothed_adc_value[5]; // SELX, Y, Z, SPEED
+
+
 #else
 #include "forlap.h"
 #include "resources.c"
-const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; // this is for klatt - where do we use it?
 u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
 char TTSinarray[17];
 
@@ -44,7 +48,9 @@ typedef struct {
 
 
 static u8 TTSoutarray[256];
-extern const u8 phoneme_prob_remap[64];
+
+const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; 
+
 
 //#if 0
 //	#define AMP_ADJ 14
@@ -805,6 +811,26 @@ top*=logpitch[val];
     nextelement=1;
 }
 
+static inline void doadc(){
+  float value;
+  
+  value =(float)adc_buffer[SELX]/65536.0f; 
+  smoothed_adc_value[2] += 0.1f * (value - smoothed_adc_value[2]);
+  _selx=smoothed_adc_value[2];
+  CONSTRAIN(_selx,0.0f,1.0f);
+
+  value =(float)adc_buffer[SELY]/65536.0f; 
+  smoothed_adc_value[3] += 0.1f * (value - smoothed_adc_value[3]);
+  _sely=smoothed_adc_value[3];
+  CONSTRAIN(_sely,0.0f,1.0f);
+
+  value =(float)adc_buffer[SELZ]/65536.0f; 
+  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
+  _selz=smoothed_adc_value[4];
+  CONSTRAIN(_selz,0.0f,1.0f);
+}
+
+
 int16_t klatt_get_sample(){
   static short samplenumber=0;
   static u8 newframe=0;
@@ -816,6 +842,19 @@ int16_t klatt_get_sample(){
   static u8 dur,first=0;
   static slope_t startyy[nEparm];
   static slope_t end[nEparm];
+
+  // elements in - x is axis, y is length, z is phoneme
+
+  doadc();
+  u8 xaxis=_selx*18.0f; // 18.0f
+  MAXED(xaxis,15); // 15*3=45 so we still leave the end
+  xaxis=15-xaxis;
+  u8 val=_selz*66.0f;
+  MAXED(val,63);
+  val=63-val;
+  test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
+  test_elm[(xaxis*3)+1]=((_sely)*32.0f)+1; // length say max 32
+
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
     klatt_newsay();
   }

@@ -1483,7 +1483,7 @@ child_params copied in to tubes.c from py-trm stuff
 
 ** 11/4+
 
-*** voices/bends in klatt/tbe modes
+*** voices/bends in klatt/tube modes
 
 only one with raw bending of voice is tubes - otherwise we will need seperate voices
 
@@ -1551,21 +1551,25 @@ or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and 
   delay length/width? - re-check now as delay_size was too low, try
   sinc table with say 8*8 - still no JOY so stay with LINEAR *DONE*
 
-*- need frozen compost mode where buffer stays the way it is*
-
 ** 13/4+ 
 
-- check voices on rsynth and nvpIN PROCESS, how to approach klatt voices?
+- check voices on rsynth and nvpIN PROCESS- leave as isX, how to approach klatt voices?
 
-- revert xy samplerate to simple linear interpolation which we will stick with!
+klatt we have:
 
-- for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?
+sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter,
+tilt, skew - leave this as IS... as they don;t change so much overall
+quality
+
+- revert xy samplerate to simple linear interpolation which we will stick with DONE - TO TEST-DONE
+
+*- for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?*
 
 - check and confirm last klatt modes and then start to add all modes 
 
 - test each, check extents (logpitch/speed), check adc filtering/smoothing
 
-- shifts in compost and new frozen compost!
+- shifts in compostDONE-TEST! and new frozen compost!DONE_TEST
 
 * FINAL/FURTHER TODO:
 
