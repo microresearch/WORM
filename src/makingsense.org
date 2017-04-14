@@ -1544,20 +1544,28 @@ or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and 
 
 - added basics of wavetables but need to fill these out. swap length also on bend and rawDONE-test all tube modes - bend one is somehow lacking
 
-- check voices on rsynth and nvpIN PROCESS, how to approach klatt voices?
-
-- straight nvp does crash/go into silence -> FIXED bug in NVP!
+- straight nvp does crash/go into silence -> FIXED bug in NVP! *DONE*
 
 - is raspiness at higher speeds property of sinc or overprocessing -
-  try with simple wavetable/singles-code is there, how to speed up - delay
-  length/width? - re-check now as delay_size was too low, try sinc table with say 8*8 - still no JOY!
+  try with simple wavetable/singles-code is there, how to speed up -
+  delay length/width? - re-check now as delay_size was too low, try
+  sinc table with say 8*8 - still no JOY so stay with LINEAR *DONE*
+
+*- need frozen compost mode where buffer stays the way it is*
+
+** 13/4+ 
+
+- check voices on rsynth and nvpIN PROCESS, how to approach klatt voices?
 
 - revert xy samplerate to simple linear interpolation which we will stick with!
 
 - for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?
 
-*- need frozen compost mode where buffer stays the way it is*
+- check and confirm last klatt modes and then start to add all modes 
 
+- test each, check extents (logpitch/speed), check adc filtering/smoothing
+
+- shifts in compost and new frozen compost!
 
 * FINAL/FURTHER TODO:
 
