@@ -2532,9 +2532,9 @@ void klatt(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){
    if (samplespeed<=1){ 
      while (xx<size){
        doadc();
-       u8 xaxis=_selx*nextent.maxplus;
-       MAXED(xaxis,nextent.max); // 15*3=45 so we still leave the end
-       xaxis=nextent.max-xaxis;
+       u8 xaxis=_selx*18.0f; // 18.0f
+       MAXED(xaxis,15); // 15*3=45 so we still leave the end
+       xaxis=15-xaxis;
        u8 val=_selz*66.0f;
        MAXED(val,63);
        val=63-val;

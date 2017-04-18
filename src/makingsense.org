@@ -1628,7 +1628,6 @@ runs:
 			if(Generate(phoneme_list,1)==0)
 				SpeakNextClause(NULL,NULL,1);
 
-
 Generate is all DoSpect etc...
 
 Generate works on phoneme list which is created in SpeakNextClause and translators:
@@ -1653,7 +1652,15 @@ wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
 
 *** approaches?
 
-- 
+- port including all TTS and with various files such as phon, dict and voice as const data
+
+- port synth, wavegen and have vocabulary as phoneme list (before or after speaknextclause)
+
+// where does dictionaries come in?
+
+** 18/4
+
+- how to make sp0256sing stay without variation
 
 * FINAL/FURTHER TODO:
 

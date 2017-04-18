@@ -215,6 +215,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
+		f->per_orig=0;
 		if (f->per_orig)
 		{
 		  f->per=f->per_orig+40;
@@ -249,9 +250,9 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 
 			bit = f->rng & 1;
 			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
-
 			if (bit) { samp =  f->amp; }
 			else     { samp = -f->amp; }
+			fprintf(stderr, "BIT %d %d \\", bit, samp);
 		}
 
 		/* ---------------------------------------------------------------- */
@@ -304,8 +305,8 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		for (j = 0; j < 6; j++)
 		{
-			samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-			samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
@@ -328,6 +329,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/*  the repeat count to "repeat + 1".                                   */
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+	fprintf(stderr, "AMP: %d\n", f->amp);
 	f->cnt = 0;
 	f->per_orig = f->r[1];
 		fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);

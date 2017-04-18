@@ -25,6 +25,10 @@ void sp0256_newsayvocabbankone(u8 reset);
 int16_t sp0256_get_samplevocabbanktwo(void);
 void sp0256_newsayvocabbanktwo(u8 reset);
 
+void sp0256_newsayvocabbankonea();
+void sp0256_newsayvocabbanktwoa();
+
+
 int16_t sp0256_get_sample1219(void);
 void sp0256_newsay1219(void);
 

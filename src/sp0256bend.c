@@ -202,9 +202,9 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		f->amp=f->amporig*logspeed[1023-val];
 		if (f->perorig)
 		{
-		  val=exy[0]*130.0f;
-		  MAXED(val,127);
-		  f->per=f->perorig*logpitch[val];
+		  val=exy[0]*1028.0f;
+		  MAXED(val,1023);
+		  f->per=f->perorig*logspeed[val];
 
 			if (f->cnt <= 0)
 			{
@@ -237,6 +237,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 
 			bit = f->rng & 1;
 			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
+			//			bit=rand()%2;
 
 			if (bit) { samp =  f->amp; }
 			else     { samp = -f->amp; }

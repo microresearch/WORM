@@ -231,8 +231,8 @@ for (j=left_limit;j<right_limit;j++)
 time_now += factor;
 last_time = int_time;
 int_time = time_now;
- doadc();
 while(last_time<int_time)      {
+ doadc();
   int16_t val=getsample();
   new_data(val);
 last_time += 1;
@@ -299,6 +299,7 @@ int_time = time_now;
  }
 
 while(last_time<int_time)      {
+ doadc();
   int16_t val=getsample();
   new_data(val);
 last_time += 1;

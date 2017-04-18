@@ -59,7 +59,7 @@ void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
 
 struct lpc12_t
 {
-	INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
+  INT16     rpt, cnt;       /* Repeat counter, Period down-counter.         */
   UINT32  per, per_orig, rng;       /* Period, Amplitude, Random Number Generator   */
 	INT16     amp;
 	INT16   f_coef[6];      /* F0 through F5.                               */
@@ -203,6 +203,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 	INT16 samp;
 	u8 do_int;
 	int16_t val;
+	static int count=128;
 	/* -------------------------------------------------------------------- */
 	/*  Iterate up to the desired number of samples.  We actually may       */
 	/*  break out early if our repeat count expires.                        */
@@ -212,13 +213,16 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
+		//		f->per_orig=0;
 		if (f->per_orig)
 		{
-		  val=_selx*130.0f;
-		  MAXED(val,127);
-		  if (modus==0)	f->per=f->per_orig*logpitch[val];
-		  else f->per=64.0f*logpitch[val];
-		  //	  f->per=f->per_orig;
+		  val=_selx*1029.0f;
+		  MAXED(val,1023);
+		  //		  if (modus==0)	f->per=f->per_orig*logspeed[val];
+		  //		  else f->per=64.0f*logspeed[val];
+		  
+		  f->per=count++;
+		  if (count>255) count=128;
 			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -227,7 +231,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 				do_int  = f->interp;
 
 				for (j = 0; j < 6; j++)
-					f->z_data[j][1] = f->z_data[j][0] = 0;
+				  f->z_data[j][1] = f->z_data[j][0] = 0;
 
 			} else
 			{
@@ -245,14 +249,15 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 				f->cnt = PER_NOISE;
 				f->rpt--;
 				for (j = 0; j < 6; j++)
-					f->z_data[j][0] = f->z_data[j][1] = 0;
+				  f->z_data[j][0] = f->z_data[j][1] = 0;
 			}
 
 			bit = f->rng & 1;
 			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
-
+			//bit=rand()%2;
 			if (bit) { samp =  f->amp; }
 			else     { samp = -f->amp; }
+			//			samp=0;
 		}
 
 		/* ---------------------------------------------------------------- */
@@ -264,6 +269,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->r[1] += f->r[15];
 
 			f->amp   = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+			//			f->amp=160;
 			f->per_orig   = f->r[1];
 
 			do_int   = 0;
@@ -305,8 +311,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		for (j = 0; j < 6; j++)
 		{
-			samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-			samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
@@ -330,6 +336,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/*  the repeat count to "repeat + 1".                                   */
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+	//	f->amp=160;			
 	f->cnt = 0;
 	f->per_orig = f->r[1];
 
@@ -823,7 +830,7 @@ void micro()
 	UINT8  opcode;
 	UINT16 cr;
 	u8 ctrl_xfer;
-	int8_t repeat;
+	int16_t repeat;
 	u8 i, idx0, idx1;
 	int16_t val;
 	/* -------------------------------------------------------------------- */
@@ -989,7 +996,7 @@ void micro()
 			    val = (_sely*130.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
 			    if (modus==0) repeat=((float)(repeat)*logpitch[val]);
-			    else repeat=8.0f*logpitch[val];
+			    else repeat=128.0f*logpitch[val]; // make much longer for singing
 			  }
 			  if (repeat<1) repeat=1;
 			  break;
@@ -1289,13 +1296,16 @@ static u8 TTSlength=0;
 
 void sp0256_newsay(void){
    u8 dada=0;
+
+   dada=_selz*65.0f; 
+   MAXED(dada,63);
+   dada=63-dada;
+
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
    
-   dada=_selz*65.0f; 
-   MAXED(dada,63);
-   dada=63-dada;
+   //   dada=13; // TODO!
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
@@ -1334,6 +1344,14 @@ void sp0256_retriggerTTS(void){// called on a trigger
      m_ald = ((dada&63) << 4); 
      m_lrq = 0; //from 8 bit write
  }
+
+void sp0256_newsayvocabbankonea(){
+  sp0256_newsayvocabbankone(1);
+}
+
+void sp0256_newsayvocabbanktwoa(){
+  sp0256_newsayvocabbanktwo(1);
+}
 
 
 void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme

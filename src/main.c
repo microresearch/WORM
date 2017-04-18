@@ -99,7 +99,7 @@ void main(void)
   }
 
   // all generator inits
-  /* sp0256_init(); */
+  sp0256_init(); 
   /* sp0256_initbend(); */
   /* votrax_init(); */
   //  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
