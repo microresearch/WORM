@@ -1558,7 +1558,7 @@ or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and 
 klatt we have:
 
 sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter,
-tilt, skew - leave this as IS... as they don;t change so much overall
+tilt, skew - *DONE* leave this as IS... as they don;t change so much overall
 quality
 
 - revert xy samplerate to simple linear interpolation which we will stick with DONE - TO TEST-DONE
@@ -1570,6 +1570,90 @@ quality
 - test each, check extents (logpitch/speed), check adc filtering/smoothing
 
 - shifts in compostDONE-TEST! and new frozen compost!DONE_TEST
+
+** 17/4
+
+- check extents, add/check all modes
+- tms vocabs to add/sort and check all TODO
+
+*** espeak -> dissection 1.48
+
+: make speak: and use as ./speak "help" -w test.wav (crashes on portaudio)
+
+speak.cpp -> 		InitText(0);
+		SpeakNextClause(f_text,p_text,0); // file
+		if(WavegenFile() != 0)
+
+--> synthesize.cpp: int SpeakNextClause(FILE *f_in, const void *text_in, int control)
+Generate(phoneme_list,&n_phoneme_list,0);
+
+
+--- where are frames stored?--
+
+wavegen --> 		Wavegen stuff/// synthesis
+
+[
+but it compiles espeak.cpp which has:
+
+espeak_Synth(p_text,max,0,POS_CHARACTER,0,synth_flags,NULL,NULL);
+]
+
+*** now 1.10
+
+: ./speak "help" -v english -w test.wav
+
+[after we copied cp -R ../espeak-data/* /usr/share/espeak-data ]
+
+- so use this as our model now - vocab only
+
+// the queue of operations passed to wavegen from sythesize
+long wcmdq[N_WCMDQ][4];
+int wcmdq_head=0;
+int wcmdq_tail=0;
+
+// dospect etc is in Generate
+
+wavegenfill???
+
+what we need is frames after all dictionaries/voice stuff????
+
+can we isolate parameters for wavegen ///???
+
+
+runs:
+
+			if(WavegenFile() != 0)
+				break;   // finished, wavegen command queue is empty
+
+			if(Generate(phoneme_list,1)==0)
+				SpeakNextClause(NULL,NULL,1);
+
+
+Generate is all DoSpect etc...
+
+Generate works on phoneme list which is created in SpeakNextClause and translators:
+
+typedef struct {
+	PHONEME_TAB *ph; -> phoneme.h [is this used for later?]
+	unsigned char env;    // pitch envelope number
+	unsigned char tone;
+	unsigned char type;
+	unsigned char prepause;
+	unsigned char amp;
+	unsigned char tone_ph;   // tone phoneme to use with this vowel
+	unsigned char newword;   // 1=start of word, 2=end of clause
+	unsigned char synthflags;
+	short length;  // length_mod
+	short pitch1;  // pitch, 0-4095 within the Voice's pitch range
+	short pitch2;
+	short sourceix;  // ix into the original source text string, only set at the start of a word
+} PHONEME_LIST;
+
+wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
+
+*** approaches?
+
+- 
 
 * FINAL/FURTHER TODO:
 
