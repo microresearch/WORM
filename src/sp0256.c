@@ -203,7 +203,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 	INT16 samp;
 	u8 do_int;
 	int16_t val;
-	static int count=128;
+	//	static int count=128;
 	/* -------------------------------------------------------------------- */
 	/*  Iterate up to the desired number of samples.  We actually may       */
 	/*  break out early if our repeat count expires.                        */
@@ -218,10 +218,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		{
 		  val=_selx*1029.0f;
 		  MAXED(val,1023);
-		  //		  if (modus==0)	f->per=f->per_orig*logspeed[val];
-		  //		  else f->per=64.0f*logspeed[val];
+		  if (modus==0)	f->per=f->per_orig*logspeed[val];
+		  else f->per=64.0f*logspeed[val];
 		  
-		  f->per=count++;
+		  //		  f->per=count++;
 		  if (count>255) count=128;
 			if (f->cnt <= 0)
 			{

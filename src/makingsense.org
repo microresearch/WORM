@@ -1633,7 +1633,7 @@ Generate is all DoSpect etc...
 Generate works on phoneme list which is created in SpeakNextClause and translators:
 
 typedef struct {
-	PHONEME_TAB *ph; -> phoneme.h [is this used for later?]
+	PHONEME_TAB *ph; -> phoneme.h [is this used? yes]
 	unsigned char env;    // pitch envelope number
 	unsigned char tone;
 	unsigned char type;
@@ -1650,6 +1650,25 @@ typedef struct {
 
 wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
 
+- we have long wcmdq[N_WCMDQ][4];
+
+where:
+
+[0] is CMD = 1, 2, 3, 5
+[1] is length
+[2] and [3] are pitch [2] as pointer (to a pitch env?) (if WCMD_PITCH is CMD = 2) or amplitude pointer (1) or peak_t pointer -> and then we need to record this as:
+
+so we can print/store all these values... TEST!
+
+typedef struct {
+   short pkfreq;
+   short pkheight;
+   short pkwidth;
+   short pkright;
+}  peak_t;
+
+
+
 *** approaches?
 
 - port including all TTS and with various files such as phon, dict and voice as const data
@@ -1658,9 +1677,15 @@ wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
 
 // where does dictionaries come in?
 
+- or just wavegen and list of wcmdq broken down which makes more sense for vocab - eg. list of frames
+
 ** 18/4
 
-- how to make sp0256sing stay without variation
+- how to make sp0256sing say stay without variation and why is so steppy
+  on CV - could just be as we have a limited range 8-255 for the
+  pitch? 
+
+- what causes the variation (other than amp and filter?)
 
 * FINAL/FURTHER TODO:
 

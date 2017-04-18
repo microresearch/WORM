@@ -403,7 +403,14 @@ int16_t maxs[40]= {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 499
 	else
 	  pitchmod=pitches[Y];
  */
-
+ printf("\n\n");
+ 
+ for (int u=0;u<128;u++){
+   //   	  else f->per=64.0f*logspeed[val];
+   int fper=64.0f*logpitch[u];
+   printf("%d   ",fper);
+ }
+ 
 static const int pitch_vals[32] = {
 	97, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63,
 	61, 60, 58, 56, 55, 53, 52, 50, 49, 48, 46, 45, 43, 42, 41, 40
