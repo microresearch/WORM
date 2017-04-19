@@ -261,7 +261,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		if (f->rpt <= 0) return 0; 
+		//		if (f->rpt <= 0) return 0; 
 
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
@@ -295,10 +295,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		{
 		  // intersperse
 		  //		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
-		  val=exy[2 + 2*j]*1026.0f;
+		  val=exy[2 + (2*j)]*1026.0f;
 		  MAXED(val,1023);
 		  f->b_coef[j]=f->b_coeforig[j]*logspeed[1023-val];
-		  val=exy[3 + 2*j]*1026.0f;
+		  val=exy[3 + (2*j)]*1026.0f;
 		  f->f_coef[j]=f->f_coeforig[j]*logspeed[1023-val];
 		  //		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
@@ -332,7 +332,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/*  the repeat count to "repeat + 1".                                   */
 	/* -------------------------------------------------------------------- */
 	f->amporig = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-	f->cnt = 0;
+	//	f->cnt = 0;
 	f->perorig = f->r[1];
 
 	/* -------------------------------------------------------------------- */
@@ -968,6 +968,11 @@ static void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
+				int val = (exy[14]*131.0f); // only if we are not in TTS mode
+				MAXED(val,127);
+				repeat=((float)(repeat)*logpitch[val]);
+
+
 				if (repeat<1) repeat=1;
 				break;
 			}
@@ -1141,15 +1146,16 @@ void sp0256_initbend(void){
 
 int16_t sp0256_get_samplebend(void){
   static int16_t output; 
-  u8 howmany=0;
-  while(howmany==0){ 
+  //  u8 howmany=0;
+  //  while(howmany==0){ 
+
+      micro();
+      lpc12_update(&m_filt, &output);
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      sp0256_newsaybend();
    }
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
+      //          }
    return output;
 }
 
@@ -1159,9 +1165,9 @@ void sp0256_newsaybend(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selz*87.0f; // total is 36+49=85
-  MAXED(selector,85);
-  selector=85-selector;
+  u8 selector=_selz*88.0f; // total is 36+49=85
+  MAXED(selector,84);
+  selector=84-selector;
   if (selector<37) { // so top is 36
     m_page=0x1000<<3;
    m_romm=m_rom12;

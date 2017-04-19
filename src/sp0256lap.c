@@ -215,11 +215,12 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		//		f->per_orig=0;
+		f->per_orig=128;
+		f->amp=512;
 		if (f->per_orig)
 		{
-		  f->per=f->per_orig+40;
-			if (f->cnt <= 0)
+		  f->per=f->per_orig;//+40;
+			if (--f->cnt <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
@@ -232,7 +233,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			} else
 			{
 				samp = 0;
-				f->cnt--;
+				//				f->cnt--;
 			}
 
 		} else
@@ -305,8 +306,8 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		for (j = 0; j < 6; j++)
 		{
-		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+		  //		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+		  //		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
@@ -330,9 +331,9 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	fprintf(stderr, "AMP: %d\n", f->amp);
-	f->cnt = 0;
 	f->per_orig = f->r[1];
 		fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
+	f->cnt = 128;
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -1005,6 +1006,9 @@ void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
+				repeat=32;
+				fprintf(stderr, "REP %d\n", repeat);
+				//				repeat=254;
 				break;
 			}
 		}
@@ -1041,7 +1045,7 @@ void micro()
 		}
 
 		/* ---------------------------------------------------------------- */
-		/*  Otherwise, if we have a repeat count, then go grab the data     */
+		/*  Otherwise, if we have a repea tcount, then go grab the data     */
 		/*  block and feed it to the filter.                                */
 		/* ---------------------------------------------------------------- */
 		if (!repeat) continue;
@@ -1181,7 +1185,7 @@ void micro()
    static u8 dadaa=0;
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
-     dada+=1;
+     //     dada+=1;
      //     fprintf(stderr,"NUM: %d\n", dada);
      m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO! 		
           m_lrq = 0; //from 8 bit write
@@ -1243,7 +1247,7 @@ void main(int argc, char *argv[]){
    //   u8 output=lpc12_update(&m_filt);
 
    if (m_silent && m_filt.rpt <= 0) {
-     // 	fprintf(stderr, "XXXXX");
+     	fprintf(stderr, "XXXXX");
      output=0;
    }
    else output=lpc12_update(&m_filt);
@@ -1251,7 +1255,9 @@ void main(int argc, char *argv[]){
      printf("%c",output);
 
      if (m_halted==1 && m_filt.rpt <= 0)     {
-	break;
+       // newsay...
+	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
+      m_lrq = 0; //from 8 bit write
             }
    }
 

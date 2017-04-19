@@ -69,8 +69,8 @@ we have either 4 bits or 1 or 7 so...
 //	emu_timer *m_timer;                             // General timer
 //	required_memory_region m_rom;                   // Internal ROM
 	u32 m_mainclock;                                // Current main clock
-	float m_sclock;                                // Stream sample clock (40KHz, main/18)
-	float m_cclock;                                // 20KHz capacitor switching clock (main/36)
+	myfloat m_sclock;                                // Stream sample clock (40KHz, main/18)
+	myfloat m_cclock;                                // 20KHz capacitor switching clock (main/36)
 	u32 m_sample_count;                             // Sample counter, to cadence chip updates
 
 	// Inputs
@@ -117,36 +117,36 @@ u8 m_cur_f1_orig, m_cur_f2_orig, m_cur_f2q_orig, m_cur_f3_orig;
 	bool m_cur_noise;                               // Current noise output
 
 	// Filter coefficients and level histories
-	float m_voice_1[4];
-	float m_voice_2[4];
-	float m_voice_3[4];
+	myfloat m_voice_1[4];
+	myfloat m_voice_2[4];
+	myfloat m_voice_3[4];
 
-	float m_noise_1[3];
-	float m_noise_2[3];
-	float m_noise_3[2];
-	float m_noise_4[2];
+	myfloat m_noise_1[3];
+	myfloat m_noise_2[3];
+	myfloat m_noise_3[2];
+	myfloat m_noise_4[2];
 
-	float m_vn_1[4];
-	float m_vn_2[4];
-	float m_vn_3[4];
-	float m_vn_4[4];
-	float m_vn_5[2];
-	float m_vn_6[2];
+	myfloat m_vn_1[4];
+	myfloat m_vn_2[4];
+	myfloat m_vn_3[4];
+	myfloat m_vn_4[4];
+	myfloat m_vn_5[2];
+	myfloat m_vn_6[2];
 
-	float m_f1_a[4],  m_f1_b[4];                   // F1 filtering
-	float m_f2v_a[4], m_f2v_b[4];                  // F2 voice filtering
-	float m_f2n_a[2], m_f2n_b[2];                  // F2 noise filtering
-	float m_f3_a[4],  m_f3_b[4];                   // F3 filtering
-	float m_f4_a[4],  m_f4_b[4];                   // F4 filtering
-	float m_fx_a[1],  m_fx_b[2];                   // Final filtering
-	float m_fn_a[3],  m_fn_b[3];                   // Noise shaping
+	myfloat m_f1_a[4],  m_f1_b[4];                   // F1 filtering
+	myfloat m_f2v_a[4], m_f2v_b[4];                  // F2 voice filtering
+	myfloat m_f2n_a[2], m_f2n_b[2];                  // F2 noise filtering
+	myfloat m_f3_a[4],  m_f3_b[4];                   // F3 filtering
+	myfloat m_f4_a[4],  m_f4_b[4];                   // F4 filtering
+	myfloat m_fx_a[1],  m_fx_b[2];                   // Final filtering
+	myfloat m_fn_a[3],  m_fn_b[3];                   // Noise shaping
 
 	// Compute a total capacitor value based on which bits are currently active
-static float bits_to_caps(u32 value, u32 *caps_values, u8 howm) {
-		float total = 0.0f;
-		float d;
+static myfloat bits_to_caps(u32 value, u32 *caps_values, u8 howm) {
+		myfloat total = 0.0f;
+		myfloat d;
 		u8 i;
-		/*		for(float d : caps_values) { // what is this doing?
+		/*		for(myfloat d : caps_values) { // what is this doing?
 			if(value & 1)
 				total += d;
 			value >>= 1;
@@ -161,7 +161,7 @@ static float bits_to_caps(u32 value, u32 *caps_values, u8 howm) {
 	}
 
 	// Shift a history of values by one and insert the new value at the front
-static void shift_hist(float val, float *hist_array, u8 N) {
+static void shift_hist(myfloat val, myfloat *hist_array, u8 N) {
   for(u8 i=N-1; i>0; i--)
   			hist_array[i] = hist_array[i-1];
   		hist_array[0] = val;
@@ -170,8 +170,8 @@ static void shift_hist(float val, float *hist_array, u8 N) {
 
 
 	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
-static float apply_filter(const float *x, const float *y, const float *a, const float *b, u8 Na, u8 Nb) {
-		float total = 0;
+static myfloat apply_filter(const myfloat *x, const myfloat *y, const myfloat *a, const myfloat *b, u8 Na, u8 Nb) {
+		myfloat total = 0;
 		for(u8 i=0; i<Na; i++)
 			total += x[i] * a[i];
 		for(u8 i=1; i<Nb; i++)
@@ -181,37 +181,37 @@ static float apply_filter(const float *x, const float *y, const float *a, const 
 
 /*older
 
-float apply_filter(const float *x, const float *y, const float *a, const float *b)
+myfloat apply_filter(const myfloat *x, const myfloat *y, const myfloat *a, const myfloat *b)
 {
   	return (x[0]*a[0] + x[1]*a[1] + x[2]*a[2] + x[3]*a[3] - y[0]*b[1] - y[1]*b[2] - y[2]*b[3]) / b[0];
 }
 */
 
-	void build_standard_filter(float *a, float *b,
-							   float c1t, // Unswitched cap, input, top
-							   float c1b, // Switched cap, input, bottom
-							   float c2t, // Unswitched cap, over first amp-op, top
-							   float c2b, // Switched cap, over first amp-op, bottom
-							   float c3,  // Cap between the two op-amps
-							   float c4); // Cap over second op-amp
+	void build_standard_filter(myfloat *a, myfloat *b,
+							   myfloat c1t, // Unswitched cap, input, top
+							   myfloat c1b, // Switched cap, input, bottom
+							   myfloat c2t, // Unswitched cap, over first amp-op, top
+							   myfloat c2b, // Switched cap, over first amp-op, bottom
+							   myfloat c3,  // Cap between the two op-amps
+							   myfloat c4); // Cap over second op-amp
 
-	void build_noise_shaper_filter(float *a, float *b,
-								   float c1,  // Cap over first amp-op
-								   float c2t, // Unswitched cap between amp-ops, input, top
-								   float c2b, // Switched cap between amp-ops, input, bottom
-								   float c3,  // Cap over second amp-op
-								   float c4); // Switched cap after second amp-op
+	void build_noise_shaper_filter(myfloat *a, myfloat *b,
+								   myfloat c1,  // Cap over first amp-op
+								   myfloat c2t, // Unswitched cap between amp-ops, input, top
+								   myfloat c2b, // Switched cap between amp-ops, input, bottom
+								   myfloat c3,  // Cap over second amp-op
+								   myfloat c4); // Switched cap after second amp-op
 
-	void build_lowpass_filter(float *a, float *b,
-							  float c1t,  // Unswitched cap, over amp-op, top
-							  float c1b); // Switched cap, over amp-op, bottom
+	void build_lowpass_filter(myfloat *a, myfloat *b,
+							  myfloat c1t,  // Unswitched cap, over amp-op, top
+							  myfloat c1b); // Switched cap, over amp-op, bottom
 
-	void build_injection_filter(float *a, float *b,
-								float c1b, // Switched cap, input, bottom
-								float c2t, // Unswitched cap, over first amp-op, top
-								float c2b, // Switched cap, over first amp-op, bottom
-								float c3,  // Cap between the two op-amps
-								float c4); // Cap over second op-amp
+	void build_injection_filter(myfloat *a, myfloat *b,
+								myfloat c1b, // Switched cap, input, bottom
+								myfloat c2t, // Unswitched cap, over first amp-op, top
+								myfloat c2b, // Switched cap, over first amp-op, bottom
+								myfloat c3,  // Cap between the two op-amps
+								myfloat c4); // Cap over second op-amp
 
 	static u8 interpolate(u8 reg, u8 target);    // Do one interpolation step
 	void chip_update();                             // Global update called at 20KHz (main/36)

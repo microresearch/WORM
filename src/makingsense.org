@@ -1683,9 +1683,26 @@ typedef struct {
 
 - how to make sp0256sing say stay without variation and why is so steppy
   on CV - could just be as we have a limited range 8-255 for the
-  pitch? 
+  pitch? DONE
 
-- what causes the variation (other than amp and filter?)
+- what causes the variation (other than amp and filter?)DONE
+
+** 19/4
+
+*REMEMBER TO ADD INIT IN MAIN ALWAYS*
+
+*** sp0256 final tests
+
+- we need to limit each sp0256 vocab to 75 odd - REDUCED to 88 and 90 each
+- fixed vocab bug and added cnt thing as modus 3
+
+- bend mode with trigger as re-trigger phrase (can do this in samplerate only) as replacing trigger modeDONE
+
+- 0-15 for TTS changed in audio.c (as 16 is always EOF)
+
+*** votrax 
+
+- compared float and double on lapSAME and on lap all works well - re-check any differences in generate there
 
 * FINAL/FURTHER TODO:
 

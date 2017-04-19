@@ -27,6 +27,7 @@ i2.o = white noise
 tp1 = phi clock (tied to f2q rom access)
 */
 #ifdef LAP
+typedef float myfloat;
 #include "votrax.h"
 #include <math.h>
 #include <stdio.h>
@@ -38,14 +39,15 @@ float exy[64];
 u8 TTS=1;
 FILE* fo;
 #else
+typedef float myfloat;
 #include "audio.h"
 #include "english2phoneme/TTS.h"
 #include <stdio.h>
 #include <ctype.h>
 #include "votrax.h"
 #include "resources.h"
-extern float exy[64];
-extern float _selx, _sely, _selz;
+extern myfloat exy[64];
+extern myfloat _selx, _sely, _selz;
 extern u8 TTS;
 #endif
 #include "vocab_votrax.h"
@@ -75,7 +77,7 @@ const u8 m_rom[512]          __attribute__ ((section (".flash")))  ={0xA4, 0x50,
 // the top at 1.  The final wave is very similar to the patent
 // drawing.
 
-const float s_glottal_wave[9] =
+const myfloat s_glottal_wave[9] =
 {
 	0.0f,
 	-4.0f/7.0f,
@@ -377,7 +379,7 @@ void chip_update_raw()
   m_pitch = (m_pitch + 1) & 0x7f;
   //  if (m_pitch == (0x7f ^  ((int)((1.0f-_selz)*64.0f)) + 1)) m_pitch = 0;
 
-	u8 val=_selz*130.0f;
+	u8 val=_selz*131.0f;
 	MAXED(val,127);
 	val=127-val;
 	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
@@ -470,7 +472,7 @@ void chip_update()
 #ifdef LAP
 	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
 #else
-	u8 val=_selx*130.0f;
+	u8 val=_selx*131.0f;
 	MAXED(val,127);
 	val=127-val;
 	if (modus==0){
@@ -565,7 +567,7 @@ void chip_updateTTS()
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0;
-	u8 val=_selx*130.0f;
+	u8 val=_selx*131.0f;
 	MAXED(val,127);
 	val=127-val;
 	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
@@ -667,7 +669,7 @@ u32 analog_calc()
 	// Voice-only path.
 	// 1. Pick up the pitch wave
 
-	float v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
+	myfloat v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
 
 	// 2. Multiply by the initial amplifier.  It's linear on the die,
 	// even if it's not in the patent.
@@ -685,7 +687,7 @@ u32 analog_calc()
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
 	// intensity should be checked w.r.t the voice.
-	float n = 10000.0f * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	myfloat n = 10000.0f * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
 	n = n * m_filt_fa / 15.0f;
 	shift_hist(n, m_noise_1, 3);
 
@@ -694,7 +696,7 @@ u32 analog_calc()
 	shift_hist(n, m_noise_2, 3);
 
 	// 7. Scale with the f2 noise input
-	float n2 = n * m_filt_fc / 15.0f;
+	myfloat n2 = n * m_filt_fc / 15.0f;
 	shift_hist(n2, m_noise_3, 2);
 
 	// 8. Apply the f2 filter, noise half,
@@ -703,7 +705,7 @@ u32 analog_calc()
 
 	// Mixed path
 	// 9. Add the f2 voice and f2 noise outputs
-	float vn = v + n2;
+	myfloat vn = v + n2;
 	shift_hist(vn, m_vn_1, 4);
 
 	// 10. Apply the f3 filter
@@ -724,10 +726,11 @@ u32 analog_calc()
 
 	// 13. Apply the final fixed filter
 	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b,1,2); // fx_a is array of 1
-	shift_hist(vn, m_vn_6, 2);
-	//	printf("%d\n",vn);
+	shift_hist(vn, m_vn_6, 2);  // 2 is length of array
+	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
-	return vn*50000.0f;
+	int avl=(int)(vn*50000.0f);
+	return avl;
 }
 
 /*
@@ -913,32 +916,33 @@ u32 analog_calc()
 
 */
 
-void build_standard_filter(float *a, float *b,
-			   float c1t, // Unswitched cap, input, top
-			   float c1b, // Switched cap, input, bottom
-			   float c2t, // Unswitched cap, over first amp-op, top
-			   float c2b, // Switched cap, over first amp-op, bottom
-			   float c3,  // Cap between the two op-amps
-			   float c4)  // Cap over second op-amp
+#ifdef LAP
+void build_standard_filter(myfloat *a, myfloat *b,
+			   myfloat c1t, // Unswitched cap, input, top
+			   myfloat c1b, // Switched cap, input, bottom
+			   myfloat c2t, // Unswitched cap, over first amp-op, top
+			   myfloat c2b, // Switched cap, over first amp-op, bottom
+			   myfloat c3,  // Cap between the two op-amps
+			   myfloat c4)  // Cap over second op-amp
 {
 	// First compute the three coefficients of H(s).  One can note
 	// that there is as many capacitor values on both sides of the
 	// division, which confirms that the capacity-per-surface-area
 	// is not needed.
-	float k0 = c1t / (m_cclock * c1b);
-	float k1 = c4 * c2t / (m_cclock * c1b * c3);
-	float k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
+	myfloat k0 = c1t / (m_cclock * c1b);
+	myfloat k1 = c4 * c2t / (m_cclock * c1b * c3);
+	myfloat k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
 
 	// Estimate the filter cutoff frequency
-	float fpeak = sqrtf(fabsf(k0*k1 - k2))/(2.0f*M_PI*k2);
+	myfloat fpeak = sqrtf(fabsf(k0*k1 - k2))/(2.0f*M_PI*k2);
 
 	// Turn that into a warp multiplier
-	float zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+	myfloat zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	float m0 = zc*k0;
-	float m1 = zc*k1;
-	float m2 = zc*zc*k2;
+	myfloat m0 = zc*k0;
+	myfloat m1 = zc*k1;
+	myfloat m2 = zc*zc*k2;
 
 
 	
@@ -950,11 +954,6 @@ void build_standard_filter(float *a, float *b,
 	b[1] = 3.0f+m1-m2;
 	b[2] = 3.0f-m1-m2;
 	b[3] = 1.0f-m1+m2;
-
-#ifdef LAP
-	printf("BUILD  %f clock %f\n",a[0], m_cclock); // this works
-#endif
-
 
 }
 
@@ -976,21 +975,22 @@ void build_standard_filter(float *a, float *b,
   H(s) = Vo/Vi = (R1/R0) * (1 / (1 + s.R1.C1))
 */
 
-void build_lowpass_filter(float *a, float *b,
-											  float c1t, // Unswitched cap, over amp-op, top
-											  float c1b) // Switched cap, over amp-op, bottom
+
+void build_lowpass_filter(myfloat *a, myfloat *b,
+											  myfloat c1t, // Unswitched cap, over amp-op, top
+											  myfloat c1b) // Switched cap, over amp-op, bottom
 {
 	// Compute the only coefficient we care about
-	float k = c1b / (m_cclock * c1t);
+	myfloat k = c1b / (m_cclock * c1t);
 
 	// Compute the filter cutoff frequency
-	float fpeak = 1/(2*M_PI*k);
+	myfloat fpeak = 1/(2*M_PI*k);
 
 	// Turn that into a warp multiplier
-	float zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+	myfloat zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	float m = zc*k;
+	myfloat m = zc*k;
 
 	a[0] = 1.0f;
 	b[0] = 1.0f+m;
@@ -1026,28 +1026,28 @@ void build_lowpass_filter(float *a, float *b,
   We assume r0 = r2
 */
 
-void build_noise_shaper_filter(float *a, float *b,
-												   float c1,  // Cap over first amp-op
-												   float c2t, // Unswitched cap between amp-ops, input, top
-												   float c2b, // Switched cap between amp-ops, input, bottom
-												   float c3,  // Cap over second amp-op
-												   float c4)  // Switched cap after second amp-op
+void build_noise_shaper_filter(myfloat *a, myfloat *b,
+												   myfloat c1,  // Cap over first amp-op
+												   myfloat c2t, // Unswitched cap between amp-ops, input, top
+												   myfloat c2b, // Switched cap between amp-ops, input, bottom
+												   myfloat c3,  // Cap over second amp-op
+												   myfloat c4)  // Switched cap after second amp-op
 {
 	// Coefficients of H(s) = k1*s / (1 + k2*s + k3*s^2)
-	float k0 = c2t*c3*c2b/c4;
-	float k1 = c2t*(m_cclock * c2b);
-	float k2 = c1*c2t*c3/(m_cclock * c4);
+	myfloat k0 = c2t*c3*c2b/c4;
+	myfloat k1 = c2t*(m_cclock * c2b);
+	myfloat k2 = c1*c2t*c3/(m_cclock * c4);
 
 	// Estimate the filter cutoff frequency
-	float fpeak = sqrtf(1.0f/k2)/(2.0f*M_PI);
+	myfloat fpeak = sqrtf(1.0f/k2)/(2.0f*M_PI);
 
 	// Turn that into a warp multiplier
-	float zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+	myfloat zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
-	float m0 = zc*k0;
-	float m1 = zc*k1;
-	float m2 = zc*zc*k2;
+	myfloat m0 = zc*k0;
+	myfloat m1 = zc*k1;
+	myfloat m2 = zc*zc*k2;
 
 	a[0] = m0;
 	a[1] = 0.0f;
@@ -1080,23 +1080,23 @@ void build_noise_shaper_filter(float *a, float *b,
   that H(infinity)=1.
 */
 
-void build_injection_filter(float *a, float *b,
-												float c1b, // Switched cap, input, bottom
-												float c2t, // Unswitched cap, over first amp-op, top
-												float c2b, // Switched cap, over first amp-op, bottom
-												float c3,  // Cap between the two op-amps
-												float c4)  // Cap over second op-amp
+void build_injection_filter(myfloat *a, myfloat *b,
+												myfloat c1b, // Switched cap, input, bottom
+												myfloat c2t, // Unswitched cap, over first amp-op, top
+												myfloat c2b, // Switched cap, over first amp-op, bottom
+												myfloat c3,  // Cap between the two op-amps
+												myfloat c4)  // Cap over second op-amp
 {
 	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
-	float k0 = m_cclock * c2t;
-	float k1 = m_cclock * (c1b * c3 / c2t - c2t);
-	float k2 = c2b;
+	myfloat k0 = m_cclock * c2t;
+	myfloat k1 = m_cclock * (c1b * c3 / c2t - c2t);
+	myfloat k2 = c2b;
 
 	// Don't pre-warp
-	float zc = 2.0f*m_sclock;
+	myfloat zc = 2.0f*m_sclock;
 
 	// Finally compute the result of the z-transform
-	float m = zc*k2;
+	myfloat m = zc*k2;
 
 	a[0] = k0 + m;
 	a[1] = k0 - m;
@@ -1110,6 +1110,201 @@ void build_injection_filter(float *a, float *b,
 	b[1] = 0.0f;
 }
 
+#else
+void build_standard_filter(myfloat *a, myfloat *b,
+			   myfloat c1t, // Unswitched cap, input, top
+			   myfloat c1b, // Switched cap, input, bottom
+			   myfloat c2t, // Unswitched cap, over first amp-op, top
+			   myfloat c2b, // Switched cap, over first amp-op, bottom
+			   myfloat c3,  // Cap between the two op-amps
+			   myfloat c4)  // Cap over second op-amp
+{
+	// First compute the three coefficients of H(s).  One can note
+	// that there is as many capacitor values on both sides of the
+	// division, which confirms that the capacity-per-surface-area
+	// is not needed.
+	myfloat k0 = c1t / (m_cclock * c1b);
+	myfloat k1 = c4 * c2t / (m_cclock * c1b * c3);
+	myfloat k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
+
+	// Estimate the filter cutoff frequency
+	myfloat fpeak = sqrtf(fabsf(k0*k1 - k2))/(2.0f*M_PI*k2);
+
+	// Turn that into a warp multiplier
+	myfloat zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+
+	// Finally compute the result of the z-transform
+	myfloat m0 = zc*k0;
+	myfloat m1 = zc*k1;
+	myfloat m2 = zc*zc*k2;
+
+
+	
+	a[0] = 1.0f+m0;
+	a[1] = 3.0f+m0;
+	a[2] = 3.0f-m0;
+	a[3] = 1.0f-m0;
+	b[0] = 1.0f+m1+m2;
+	b[1] = 3.0f+m1-m2;
+	b[2] = 3.0f-m1-m2;
+	b[3] = 1.0f-m1+m2;
+
+}
+
+/*
+  Second filter type used once at the end, much simpler:
+
+  |           +--[R1]--+
+  |           |        |
+  |           +--|C1|--+
+  |           |        |
+  |  Vi       |  |\    |
+  |  ---[R0]--+--+-\   |
+  |              |  >--+------ Vo
+  |            0-++/
+  |              |/
+
+
+  Vi/R0 = Vo / (1/(1/R1 + s.C1)) = Vo (1/R1 + s.C1)
+  H(s) = Vo/Vi = (R1/R0) * (1 / (1 + s.R1.C1))
+*/
+
+
+void build_lowpass_filter(myfloat *a, myfloat *b,
+											  myfloat c1t, // Unswitched cap, over amp-op, top
+											  myfloat c1b) // Switched cap, over amp-op, bottom
+{
+	// Compute the only coefficient we care about
+	myfloat k = c1b / (m_cclock * c1t);
+
+	// Compute the filter cutoff frequency
+	myfloat fpeak = 1/(2*M_PI*k);
+
+	// Turn that into a warp multiplier
+	myfloat zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+
+	// Finally compute the result of the z-transform
+	myfloat m = zc*k;
+
+	a[0] = 1.0f;
+	b[0] = 1.0f+m;
+	b[1] = 1.0f-m;
+}
+
+/*
+  Used to shape the white noise
+
+         +-------------------------------------------------------------------+
+         |                                                                   |
+         +--|C1|--+---------|C3|----------+--|C4|--+                         |
+         |        |      +        +       |        |                         |
+   Vi    |  |\    |     (1)      (1)      |        |       +        +        |
+   -|R0|-+--+-\   |      |        |       |  |\    |      (1)      (1)       |
+            |  >--+--(2)-+--|C2|--+---(2)-+--+-\   |       |        |        |
+          0-++/          |                   |  >--+--(2)--+--|C5|--+---(2)--+
+            |/          Vo                 0-++/
+                                             |/
+   Equivalent:
+
+         +------------------|R5|-------------------+
+         |                                         |
+         +--|C1|--+---------|C3|----------+--|C4|--+
+         |        |                       |        |
+   Vi    |  |\    |                       |        |
+   -|R0|-+--+-\   |                       |  |\    |
+            |  >--+---------|R2|----------+--+-\   |
+          0-++/   |                          |  >--+
+            |/   Vo                        0-++/
+                                             |/
+
+  We assume r0 = r2
+*/
+
+void build_noise_shaper_filter(myfloat *a, myfloat *b,
+												   myfloat c1,  // Cap over first amp-op
+												   myfloat c2t, // Unswitched cap between amp-ops, input, top
+												   myfloat c2b, // Switched cap between amp-ops, input, bottom
+												   myfloat c3,  // Cap over second amp-op
+												   myfloat c4)  // Switched cap after second amp-op
+{
+	// Coefficients of H(s) = k1*s / (1 + k2*s + k3*s^2)
+	myfloat k0 = c2t*c3*c2b/c4;
+	myfloat k1 = c2t*(m_cclock * c2b);
+	myfloat k2 = c1*c2t*c3/(m_cclock * c4);
+
+	// Estimate the filter cutoff frequency
+	myfloat fpeak = sqrtf(1.0f/k2)/(2.0f*M_PI);
+
+	// Turn that into a warp multiplier
+	myfloat zc = 2.0f*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
+
+	// Finally compute the result of the z-transform
+	myfloat m0 = zc*k0;
+	myfloat m1 = zc*k1;
+	myfloat m2 = zc*zc*k2;
+
+	a[0] = m0;
+	a[1] = 0.0f;
+	a[2] = -m0;
+	b[0] = 1.0f+m1+m2;
+	b[1] = 2.0f-2.0f*m2;
+	b[2] = 1.0f-m1+m2;
+}
+
+/*
+  Noise injection in f2
+
+  |                     +--[R2]--+        +--[R1]-------- Vi
+  |                     |        |        |
+  |                     +--|C2|--+<V1     +--|C3|--+
+  |                     |        |        |        |
+  |                     |  |\    |        |  |\    |
+  |                +----+--+-\   |        +--+-\   |
+  |                |       |  >--+--[Rx]--+  |  >--+----- Vo
+  |                |     0-++/             0-++/   |
+  |                |       |/    +--[R0]--+  |/    |
+  |                |             |        |        |
+  |                |             |    /|  |        |
+  |                |             |   /-+--+--[R0]--+
+  |                +--[R4]-------+--<  |
+  |                            V2^   \++-0
+  |                                   \|
+
+  We drop r0/r1 out of the equation (it factorizes), and we rescale so
+  that H(infinity)=1.
+*/
+
+void build_injection_filter(myfloat *a, myfloat *b,
+												myfloat c1b, // Switched cap, input, bottom
+												myfloat c2t, // Unswitched cap, over first amp-op, top
+												myfloat c2b, // Switched cap, over first amp-op, bottom
+												myfloat c3,  // Cap between the two op-amps
+												myfloat c4)  // Cap over second op-amp
+{
+	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
+	myfloat k0 = m_cclock * c2t;
+	myfloat k1 = m_cclock * (c1b * c3 / c2t - c2t);
+	myfloat k2 = c2b;
+
+	// Don't pre-warp
+	myfloat zc = 2.0f*m_sclock;
+
+	// Finally compute the result of the z-transform
+	myfloat m = zc*k2;
+
+	a[0] = k0 + m;
+	a[1] = k0 - m;
+	b[0] = k1 - m;
+	b[1] = k1 + m;
+
+	// That ends up in a numerically unstable filter.  Neutralize it for now.
+	a[0] = 1.0f;
+	a[1] = 0.0f;
+	b[0] = 1.0f;
+	b[1] = 0.0f;
+}
+
+#endif
 
 void generate_votrax_samples(int samples)
 {
@@ -1145,27 +1340,27 @@ void votrax_init(){
 ////[[[[[[[[[[[[[[[[[[[ audio functions:
 
 static int16_t sample_count=0;
-//static float intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
+//static myfloat intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
 
 void votrax_newsay(){
-  u8 sel=_selz*65.0f; 
+  u8 sel=_selz*68.0f; 
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 }
 
 void votrax_newsay_sing(){
-  u8 sel=_selz*65.0f; 
+  u8 sel=_selz*68.0f; 
   MAXED(sel,64);
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(2*4+1)*4*9+2)*logpitch[val]; 
@@ -1221,7 +1416,7 @@ void votrax_newsay_bend(u8 reset){
   vocabindex++;
   if (it==255  || reset==1){
     vocabindex=0;
-    whichone=_selz*117.0f; 
+    whichone=_selz*118.0f; 
     MAXED(whichone,114);
     whichone=114-whichone;
     it=*(vocablist_gorf[whichone]+vocabindex);
@@ -1258,7 +1453,7 @@ void votrax_newsaygorf(u8 reset){
    vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selz*116.0f; 
+     whichone=_selz*118.0f; 
      MAXED(whichone,114);
      whichone=114-whichone;
      it=*(vocablist_gorf[whichone]);
@@ -1267,7 +1462,7 @@ void votrax_newsaygorf(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); 
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
@@ -1280,7 +1475,7 @@ void votrax_newsaywow(u8 reset){
    vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selz*80.0f; 
+     whichone=_selz*82.0f; 
      MAXED(whichone,78);
      whichone=78-whichone;
      it=*(vocablist_wow[whichone]);
@@ -1288,7 +1483,7 @@ void votrax_newsaywow(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
@@ -1306,7 +1501,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
    vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
-     whichone=_selz*80.0f; 
+     whichone=_selz*82.0f; 
      MAXED(whichone,78);
      whichone=78-whichone;
      it=*(vocablist_wow[whichone]);
@@ -1314,7 +1509,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
@@ -1375,7 +1570,7 @@ void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
@@ -1407,7 +1602,7 @@ void votrax_retriggerTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[0]>>6); // how many bits?
-  u8 val=_sely*130.0f;
+  u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 

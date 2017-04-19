@@ -182,9 +182,13 @@ static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_new
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
 static const wormer sp02561219er={0, 0.3125f, sp0256_get_sample1219, sp0256_newsay1219, 0, 0};
-static const wormer sp0256bender={13, 0.3125f, sp0256_get_sample, sp0256_newsay, 1, 0};
+static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 2, 0}; // as extra smaplrate mode with trigger as newsay
 
-// start to add for testings:
+// 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
+
+static const wormer votraxer={0, 1.25f, votrax_get_sample, votrax_newsay, 0, 0};
+
+// start to add for testings BELOW:
 
 static const wormer digitalker={0, 1.0f, digitalk_get_sample, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
 static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // klatt has its own xy form
@@ -204,9 +208,9 @@ static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
 
-static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender};
+static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender 17&votraxer
 
 static int16_t comp_counter=0;
 static u16 cc=0;
@@ -341,13 +345,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=12; // TESTY!
+  _intmode=17; // TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);
-  else
-    samplerate_simple_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
+  else if (wormlist[_intmode]->xy==1)
+    samplerate_simple_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
+  else 
+    samplerate_simple_exy_trigger(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
   if (_intmode!=4 || _intmode!=66){// TODO - whatever is compost modes 64 or??? - at  moment test with 4
@@ -359,11 +365,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   
   if (wormlist[_intmode]->TTS){ // so this doesn't change as fast as generators
     doadc();
-    u8 xax=_sely*18.0f; 
-    u8 selz=_selz*65.0f; 
-    MAXED(xax,16);
+    u8 xax=_sely*19.0f; 
+    u8 selz=_selz*68.0f; 
+    MAXED(xax,15);
     MAXED(selz,63);
-    xax=16-xax; // inverted
+    xax=15-xax; // inverted
     selz=63-selz;
     TTSinarray[xax]=mapytoascii[selz];
     }

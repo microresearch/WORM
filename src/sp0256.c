@@ -44,7 +44,7 @@
 #include "sp0256vocab.h"
 #include "resources.h"
 extern float _selx, _sely, _selz, _mode, _speed;
-extern u8 TTS;
+//extern u8 TTS;
 const unsigned char *m_romm;
 static u8 modus=0;
 
@@ -212,18 +212,20 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Generate a series of periodic impulses, or random noise.        */
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
-		samp   = 0;
+		//		samp   = 0;
 		//		f->per_orig=0;
+		//		f->amp=512;
+		//		f->per_orig=128;
 		if (f->per_orig)
 		{
 		  val=_selx*1029.0f;
 		  MAXED(val,1023);
-		  if (modus==0)	f->per=f->per_orig*logspeed[val];
+		  if (modus!=1)	f->per=f->per_orig*logspeed[val];
 		  else f->per=64.0f*logspeed[val];
-		  
+		  //		  f->per=128;
 		  //		  f->per=count++;
-		  if (count>255) count=128;
-			if (f->cnt <= 0)
+		  //		  if (count>255) count=128;
+			if (f->cnt-- <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
@@ -236,7 +238,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			} else
 			{
 				samp = 0;
-				f->cnt--;
+				//				f->cnt--;
 			}
 
 		} else
@@ -279,8 +281,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		if (f->rpt <= 0) return 0; 
-
+		//		if (f->rpt <= 0) {
+		  //		  *out=0;
+		  //		  return 0; 
+		//		}
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
 		/*  gives the first form, the patent gives the second form.         */
@@ -337,7 +341,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	//	f->amp=160;			
-	f->cnt = 0;
+	if (modus==3 || modus==4) f->cnt = 0;
 	f->per_orig = f->r[1];
 
 	/* -------------------------------------------------------------------- */
@@ -992,11 +996,11 @@ void micro()
 			default:
 			{			  
 			  repeat = immed4 | (m_mode & 0x30);
-			  if (TTS==0) {
+			  if (modus!=4) {// TTS mode
 			    val = (_sely*130.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
-			    if (modus==0) repeat=((float)(repeat)*logpitch[val]);
-			    else repeat=128.0f*logpitch[val]; // make much longer for singing
+			    if (modus!=1) repeat=((float)(repeat)*logpitch[val]);
+			    else repeat=64.0f*logpitch[val]; // make much longer for singing
 			  }
 			  if (repeat<1) repeat=1;
 			  break;
@@ -1167,15 +1171,13 @@ void micro()
 
 int16_t sp0256_get_sample1219(void){
   static int16_t output; 
-  u8 howmany=0;
-  while(howmany==0){ 
+  modus=3;
+      micro();
+lpc12_update(&m_filt, &output);
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
      sp0256_newsay1219();
    }
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
    return output;
 }
 
@@ -1185,7 +1187,7 @@ void sp0256_newsay1219(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selz*86.0f; // total is 36+49=85
+  u8 selector=_selz*88.0f; // total is 36+49=85
   MAXED(selector, 84); //0-84
   selector=84-selector;
   
@@ -1209,83 +1211,71 @@ void sp0256_newsay1219(void){
 int16_t sp0256_get_sample(void){
   static int16_t output; 
   modus=0;
-      u8 howmany=0;
-            while(howmany==0){ 
-   
+  micro();
+  lpc12_update(&m_filt, &output);
+
    if (m_halted==1 && m_filt.rpt <= 0)     {
      sp0256_newsay();
    }
 
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
+
    return output;
  }
 
 int16_t sp0256_get_sample_sing(void){
   static int16_t output; 
   modus=1; // singing
-   
-      u8 howmany=0;
-      while(howmany==0){ 
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay();
+      micro();
+      lpc12_update(&m_filt, &output);
+
+      if (m_halted==1 && m_filt.rpt <= 0)     {
+	sp0256_newsay();
    }
 
-      micro();
-      howmany=lpc12_update(&m_filt, &output);
-          }
    return output;
  }
 
 
  int16_t sp0256_get_sampleTTS(void){
   static int16_t output; 
-   u8 howmany=0;   modus=0;
+  modus=4;
 
-   while(howmany==0){
+   micro();
+   lpc12_update(&m_filt, &output);
+
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
           sp0256_newsayTTS();
    }
 
-   micro();
-   howmany=lpc12_update(&m_filt, &output);
-   }
    return output;
  }
 
 
  int16_t sp0256_get_samplevocabbankone(void){
   static int16_t output; 
-   u8 howmany=0;  
-modus=0;
+  modus=3;
+   micro();
+   lpc12_update(&m_filt, &output);
 
-   while(howmany==0){
-   
    if (m_halted==1 && m_filt.rpt <= 0)     {
           sp0256_newsayvocabbankone(0);
    }
 
-   micro();
-   howmany=lpc12_update(&m_filt, &output);
-   }
-   return output;
+   
+return output;
  }
 
  int16_t sp0256_get_samplevocabbanktwo(void){
   static int16_t output;   
   modus=0;
-   u8 howmany=0;
-   while(howmany==0){
+   micro();
+lpc12_update(&m_filt, &output);
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
           sp0256_newsayvocabbanktwo(0);
    }
 
-   micro();
-     howmany=lpc12_update(&m_filt, &output);
-   }
    return output;
  }
 
@@ -1294,18 +1284,14 @@ static u8 TTSoutarray[256];
 static u8 TTSindex=0;
 static u8 TTSlength=0;
 
-void sp0256_newsay(void){
-   u8 dada=0;
-
+inline void sp0256_newsay(void){
+   u8 dada;
    dada=_selz*65.0f; 
    MAXED(dada,63);
    dada=63-dada;
-
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
-   
-   //   dada=13; // TODO!
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }
@@ -1362,15 +1348,16 @@ void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
-   vocabindex++;
    if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
-     whichone=_selz*153.0f; // split vocab into banks - on this one we need 0-150 values 
-     MAXED(whichone,150);
-     whichone=150-whichone;
-     dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
+     whichone=_selz*92.0f; // split vocab into banks - on this one we need 0-150 values 
+     MAXED(whichone,87);
+     whichone=87-whichone;
    }   
+
+   dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
+   vocabindex++;
+
    m_ald = ((dada&63) << 4); 		
    m_lrq = 0; //from 8 bit write
  }
@@ -1384,15 +1371,15 @@ void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
-   vocabindex++;
    if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255 || reset==1){
      vocabindex=0;
-     whichone=_selz*169.0f;
-     MAXED(whichone,166);
-     whichone=166-whichone;
+     whichone=_selz*94.0f;
+     MAXED(whichone,89);
+     whichone=89-whichone;
      dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    }
+   dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
+   vocabindex++;
    m_ald = ((dada&63) << 4);  		
    m_lrq = 0; //from 8 bit write
  }

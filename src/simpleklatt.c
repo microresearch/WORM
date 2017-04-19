@@ -1,5 +1,7 @@
 /* from docs/klatt simple klatt */
 
+// also uses parwave.c
+
 #include "audio.h"
 #include "stdlib.h"
 #include "stdint.h"
