@@ -215,7 +215,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		f->per_orig=0;
+		//		f->per_orig=0;
 		if (f->per_orig)
 		{
 		  f->per=f->per_orig+40;
@@ -252,7 +252,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			f->rng = (f->rng >> 1) ^ (bit ? 0x4001 : 0);
 			if (bit) { samp =  f->amp; }
 			else     { samp = -f->amp; }
-			fprintf(stderr, "BIT %d %d \\", bit, samp);
+			//			fprintf(stderr, "BIT %d %d \\", bit, samp);
 		}
 
 		/* ---------------------------------------------------------------- */
