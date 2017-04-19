@@ -1648,6 +1648,28 @@ typedef struct {
 	short sourceix;  // ix into the original source text string, only set at the start of a word
 } PHONEME_LIST;
 
+typedef struct {
+	unsigned int mnemonic;      /* 1st char in l.s.byte */
+	unsigned int flags;
+
+	unsigned short std_length;              // for vowels, in mS
+	unsigned short  spect;
+	unsigned short  before;
+	unsigned short  after;
+
+	unsigned char  code;
+	unsigned char  type;          /* vowel, etc */
+	unsigned char  start_type;
+	unsigned char  end_type;
+	
+	unsigned char  length_mod;
+	unsigned char  reduce_to;
+	unsigned char  vowel_follows;  // change to this if a vowel follows
+	unsigned char  link_out;       // insert linking phoneme if a vowel follows
+	
+} PHONEME_TAB;
+
+
 wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
 
 - we have long wcmdq[N_WCMDQ][4];
@@ -1656,9 +1678,11 @@ where:
 
 [0] is CMD = 1, 2, 3, 5
 [1] is length
-[2] and [3] are pitch [2] as pointer (to a pitch env?) (if WCMD_PITCH is CMD = 2) or amplitude pointer (1) or peak_t pointer -> and then we need to record this as:
+[2] and [3] are pitch [2] as pointer (to a pitch env?) (if WCMD_PITCH
+is CMD = 2) or amplitude pointer (1) or peak_t pointer -> array of
+these peaks and then we need to record this as:
 
-so we can print/store all these values... TEST!
+so we can print/store all these values... TEST! but there are more cmds: 6 and 8
 
 typedef struct {
    short pkfreq;
@@ -1667,7 +1691,37 @@ typedef struct {
    short pkright;
 }  peak_t;
 
+so we have for each frame:
 
+u8 CMD, short length, 
+pitch1, pitch2,  (pitchenv)? 
+ampenv, amp value --> both of these envelopes are pointers into phondata which is largish file (char) - could be converted to const and then we have index in 
+and peak_ts above --->>>> #define N_PEAKS   9
+
+each vocab is list of these frames and how many frames...
+
+**** TODO for this frame list
+
+- phondata as const - nearly DONE
+
+- struct for each frame and how we can fill out list of frames
+
+typedef struct {
+  unsigned char CMD;
+  short length;
+  long value;
+  long index;
+  peak_t peak_ts[9];
+} speaker;
+
+
+- how to print each frame for a specific vocab
+
+playwave????
+
+- test singular set of frames and how we init - wavegen and this list
+
+- full test and strip down on lap -> wavegen, synthesize? and phondata->data!
 
 *** approaches?
 
@@ -1694,6 +1748,7 @@ typedef struct {
 *** sp0256 final tests
 
 - we need to limit each sp0256 vocab to 75 odd - REDUCED to 88 and 90 each
+
 - fixed vocab bug and added cnt thing as modus 3
 
 - bend mode with trigger as re-trigger phrase (can do this in samplerate only) as replacing trigger modeDONE
