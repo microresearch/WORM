@@ -29,6 +29,7 @@ tp1 = phi clock (tied to f2q rom access)
 #ifdef LAP
 typedef float myfloat;
 #include "votrax.h"
+#include "resources.h"
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
@@ -368,13 +369,13 @@ void chip_update_bend()
 
 void chip_update_raw()
 {
-  m_cur_f1=exy[1]*255.0f;
-  m_cur_f2=exy[2]*255.0f;
-  m_cur_f3=exy[3]*255.0f;
-  m_cur_f2q=exy[4]*255.0f;
-  m_cur_fc=exy[5]*255.0f;
-  m_cur_fa=exy[6]*255.0f;
-  m_cur_va=exy[0]*255.0f;
+  m_cur_f1=(1.0f-exy[1])*255.0f;
+  m_cur_f2=(1.0f-exy[2])*255.0f;
+  m_cur_f3=(1.0f-exy[3])*255.0f;
+  m_cur_f2q=(1.0f-exy[4])*255.0f;
+  m_cur_fc=(1.0f-exy[5])*255.0f;
+  m_cur_fa=(1.0f-exy[6])*255.0f;
+  m_cur_va=(1.0f-exy[0])*255.0f;
 
   m_pitch = (m_pitch + 1) & 0x7f;
   //  if (m_pitch == (0x7f ^  ((int)((1.0f-_selz)*64.0f)) + 1)) m_pitch = 0;
@@ -382,7 +383,7 @@ void chip_update_raw()
 	u8 val=_selz*131.0f;
 	MAXED(val,127);
 	val=127-val;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 		
 
 
@@ -476,11 +477,11 @@ void chip_update()
 	MAXED(val,127);
 	val=127-val;
 	if (modus==0){
-		if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+		if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 	}
 	else
 	  {
-	    if(m_pitch == (int)(0x7f ^ ((int)(64.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
+	    if(m_pitch == (int)(0x7f ^ ((int)(12.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 	  }
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
 #endif
@@ -570,7 +571,7 @@ void chip_updateTTS()
 	u8 val=_selx*131.0f;
 	MAXED(val,127);
 	val=127-val;
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // maintain as ==
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 
 
 	// Filters are updated in index 1 of the pitch wave, which does
@@ -652,7 +653,7 @@ void filters_commit(bool force)
 							  7289);
 
 		build_lowpass_filter(m_fx_a, m_fx_b,
-							 1122,
+				     412, // 1122
 							 23131);
 
 		build_noise_shaper_filter(m_fn_a, m_fn_b,
@@ -725,9 +726,9 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_5, 2);
 
 	// 13. Apply the final fixed filter
-	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b,1,2); // fx_a is array of 1
+	vn = apply_filter(m_vn_5, m_vn_6, m_fx_a, m_fx_b,1,2); // fx_a is array of 1 fx_b is 2 but...
 	shift_hist(vn, m_vn_6, 2);  // 2 is length of array
-	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
+		//	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
 	int avl=(int)(vn*50000.0f);
 	return avl;
@@ -985,6 +986,7 @@ void build_lowpass_filter(myfloat *a, myfloat *b,
 
 	// Compute the filter cutoff frequency
 	myfloat fpeak = 1/(2*M_PI*k);
+	fprintf(stderr, "FPEAK: %f\n", fpeak);
 
 	// Turn that into a warp multiplier
 	myfloat zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
@@ -1363,7 +1365,10 @@ void votrax_newsay_sing(){
   u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(2*4+1)*4*9+2)*logpitch[val]; 
+  //  lenny=(16*(32*logpitch[val]*4+1) *4*9+2)/32; 
+  //  lenny=410;
+  lenny=(2*(58*4+1)*4*9+2)*logpitch[val]; 
+//(16*(m_rom_duration*4+1)*4*9+2)/32; 
 }
 
 int16_t votrax_get_sample(){ 
@@ -1389,7 +1394,7 @@ int16_t votrax_get_sample_sing(){
   sample=analog_calc();
   if (sample_count++>=lenny){
     sample_count=0;
-    votrax_newsay();
+    votrax_newsay_sing();
   }
   return sample;
 }
@@ -1413,7 +1418,6 @@ void votrax_newsay_bend(u8 reset){
   // do bend now for GORF:
   static u8 vocabindex=0, whichone=0;
   it=*(vocablist_gorf[whichone]+vocabindex);
-  vocabindex++;
   if (it==255  || reset==1){
     vocabindex=0;
     whichone=_selz*118.0f; 
@@ -1421,11 +1425,20 @@ void votrax_newsay_bend(u8 reset){
     whichone=114-whichone;
     it=*(vocablist_gorf[whichone]+vocabindex);
   }   
-
+  vocabindex++;
   writer(it); 
-  phone_commit();
-  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
+  phone_commit(); 
+  u8 val=exy[8]*132.0f;
+  MAXED(val,127);
+  //  val=127-val;
+  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  //  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32;  // we should bend length too as last exy-> exy[8]DONE
 }
+
+void votrax_newsay_bendr(u8 reset){
+  votrax_newsay_bend(1);
+}
+
 
 int16_t votrax_get_sample_bend(){ 
   uint16_t sample; u8 x;
@@ -1450,15 +1463,14 @@ void votrax_newsaygorf(u8 reset){
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_gorf[whichone]+vocabindex);
-   vocabindex++;
-   if (it==255 || reset==1){
+     if (it==255 || reset==1){
      vocabindex=0;
      whichone=_selz*118.0f; 
      MAXED(whichone,114);
      whichone=114-whichone;
      it=*(vocablist_gorf[whichone]);
    }   
-
+   vocabindex++;
    writer(it); 
   phone_commit();
   inflection_w(it>>6); 
@@ -1468,11 +1480,14 @@ void votrax_newsaygorf(u8 reset){
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   }
   
+void votrax_newsaygorfr(){
+  votrax_newsaygorf(1);
+}
+
 void votrax_newsaywow(u8 reset){
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_wow[whichone]+vocabindex);
-   vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
      whichone=_selz*82.0f; 
@@ -1480,6 +1495,7 @@ void votrax_newsaywow(u8 reset){
      whichone=78-whichone;
      it=*(vocablist_wow[whichone]);
    }   
+   vocabindex++;
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
@@ -1494,11 +1510,14 @@ void votrax_newsaywow(u8 reset){
 
 }
 
+void votrax_newsaywowr(){
+  votrax_newsaywow(1);
+}
+
 void votrax_newsaywow_bendfilter(u8 reset){
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_wow[whichone]+vocabindex);
-   vocabindex++;
    if (it==255 || reset==1){
      vocabindex=0;
      whichone=_selz*82.0f; 
@@ -1506,16 +1525,21 @@ void votrax_newsaywow_bendfilter(u8 reset){
      whichone=78-whichone;
      it=*(vocablist_wow[whichone]);
    }   
+   vocabindex++;
    writer(it); 
   phone_commit();
   inflection_w(it>>6); // how many bits?
   u8 val=_sely*132.0f;
   MAXED(val,127);
-  //  val=127-val;
+  val=127-val; // we invert it
   lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
   m_cclock = m_mainclock / 36.0f * logpitch[val]; 
 
 }
+
+void votrax_newsaywow_bendfilterr(){
+votrax_newsaywow_bendfilter(1);
+  }
 
 int16_t votrax_get_samplegorf(){ 
   int16_t sample; u8 x;
@@ -1570,10 +1594,11 @@ void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
-  u8 val=_sely*132.0f;
-  MAXED(val,127);
+  //  u8 val=_selx*132.0f;
+  //  MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  //  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
 
   TTSindex++;
    if (TTSindex>=TTSlength) {
@@ -1602,10 +1627,11 @@ void votrax_retriggerTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[0]>>6); // how many bits?
-  u8 val=_sely*132.0f;
-  MAXED(val,127);
+  //  u8 val=_sely*132.0f;
+  //  MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  //  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
   TTSindex=1;
 }
 
@@ -1646,7 +1672,7 @@ void main(void){
   //  phone_commit();
   //  generate_votrax_samples(lenny);
   //  }
-  //  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d\n",m_rom_duration);
-
+  lenny=(16*(32*logpitch[127]*4+1) *4*9+2)/32; 
+  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d %d\n", m_rom_duration, (16*(m_rom_duration*4+1)*4*9+2)/32);
 }
 #endif

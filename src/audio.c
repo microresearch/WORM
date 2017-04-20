@@ -182,11 +182,27 @@ static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_new
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
 static const wormer sp02561219er={0, 0.3125f, sp0256_get_sample1219, sp0256_newsay1219, 0, 0};
-static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 2, 0}; // as extra smaplrate mode with trigger as newsay
+static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 2, 0}; // as extra samplerate mode with trigger as newsay
 
 // 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
 
 static const wormer votraxer={0, 1.25f, votrax_get_sample, votrax_newsay, 0, 0};
+static const wormer votraxTTSer={0, 1.25f, votrax_get_sampleTTS, votrax_retriggerTTS, 0, 1};
+static const wormer votraxgorfer={0, 1.25f, votrax_get_samplegorf, votrax_newsaygorfr, 0, 0}; 
+static const wormer votraxwower={0, 1.25f, votrax_get_samplewow, votrax_newsaywowr, 0, 0};
+static const wormer votraxwowfilterbender={0, 1.25f, votrax_get_samplewow_bendfilter, votrax_newsaywow_bendfilterr, 0, 0}; 
+static const wormer votraxbender={8, 1.25f, votrax_get_sample_bend, votrax_newsay_bendr, 2, 0}; // as extra samplerate mode with trigger as newsay
+
+static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, votrax_newsay_bendr, 1, 0}; // exy-raw .. newsay is never used here
+static const wormer votraxsinger={0, 1.25f, votrax_get_sample_sing, votrax_newsay_sing, 0, 0};
+
+// 18 tms modes: tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend,  tmssing, tmsphonsing, 
+
+static const wormer tmser={0, 0.25f, tms_get_sample, tms_newsay, 0, 0};
+
+// 10 sam modes: sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend
+
+
 
 // start to add for testings BELOW:
 
@@ -208,9 +224,9 @@ static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
 
-static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer};
+static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &tmser};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender 17&votraxer
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender 17&votraxer, 18&votraxTTSer, 19&votraxgorfer, 20&votraxwower, 21&votraxwowfilterbender, 22&votraxbender, 23&votraxparamer, 24&votraxsinger, 25&tmser
 
 static int16_t comp_counter=0;
 static u16 cc=0;
@@ -345,7 +361,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=17; // TESTY!
+  _intmode=25; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 

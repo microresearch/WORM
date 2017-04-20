@@ -103,7 +103,7 @@ void main(void)
   sp0256_initbend();
   votrax_init();
   //  wavetable_init(&wavtable, plaguetable_simplesir, 328); // now last arg as length of table=less than 512
-  //  tms_init();
+  tms_init();
   //  sam_init();
   //  sam_newsay_banks0(); // TEST!
   digitalk_init();

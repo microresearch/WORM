@@ -1741,7 +1741,7 @@ playwave????
 
 - what causes the variation (other than amp and filter?)DONE
 
-** 19/4
+** 19/4/++++21
 
 *REMEMBER TO ADD INIT IN MAIN ALWAYS*
 
@@ -1758,6 +1758,17 @@ playwave????
 *** votrax 
 
 - compared float and double on lapSAME and on lap all works well - re-check any differences in generate there
+- why sounds worse at higher speeds? interpol - tried decreasing final low pass
+- wrappings and fixing nearly all newsaysDONE-TO TEST-DONE and fix in TTS
+- gorf vocab is maybe too long?? slips a bit but...
+- lots of fixes DONE
+
+*** TMS modes
+
+*- maybe leave till last as needs vocab expansion and we will also need to break down vocabs into smaller ones!*
+
+
+
 
 * FINAL/FURTHER TODO:
 
