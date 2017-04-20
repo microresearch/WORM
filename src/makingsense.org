@@ -1769,7 +1769,7 @@ playwave????
 
 ** 20/4
 
-- flash overflow with digitalk and all TMS vocabs so no room for espeak... and need to fix this - TRIM TMS data and maybe digitalk
+- flash overflow with digitalk and all TMS vocabs so no room for espeak... 
 - got rid of extra unused roms in sp0256 TEST - now doesn't overflow but must be close and we leave espeak OUT!
 
 
