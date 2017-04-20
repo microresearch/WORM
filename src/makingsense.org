@@ -1741,7 +1741,7 @@ playwave????
 
 - what causes the variation (other than amp and filter?)DONE
 
-** 19/4/++++21
+** 19/4/++++
 
 *REMEMBER TO ADD INIT IN MAIN ALWAYS*
 
@@ -1766,6 +1766,11 @@ playwave????
 *** TMS modes
 
 *- maybe leave till last as needs vocab expansion and we will also need to break down vocabs into smaller ones!*
+
+** 20/4
+
+- flash overflow with digitalk and all TMS vocabs so no room for espeak... and need to fix this - TRIM TMS data and maybe digitalk
+- got rid of extra unused roms in sp0256 TEST - now doesn't overflow but must be close and we leave espeak OUT!
 
 
 

@@ -777,23 +777,13 @@ UINT32 getb( int len )
 	  data=1; minus=0x1000; // default
 	  if (idx0>=0x1800 || idx0<0x1000) data=0;
 
-	  if (m_romm==m_rom19 || m_romm==m_rom003 || m_romm==m_rom004){ // we need to choose roms
+	  if (m_romm==m_rom19){ // we need to choose roms
 
 	    if (idx0>=0x1000 && idx0<0x1800) {
 	      m_romm=m_rom19; // 003 has phonemes as AL2 and some phrases but not so many WHY?
 	      minus=0x1000;
 	      data=1;
 	  }
-	    else if (idx0>=0x4000 && idx0<0x8000) {
-	      m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
-	      minus=0x4000;
-	      data=1;
-	  }
-	    else if (idx0>=0x8000 && idx0<0xC000) {
-	    m_romm=m_rom004; 
-	    minus=0x8000;
-	    data=1;
-	    }
 	  else {data=0;}
 	  }
 	  
