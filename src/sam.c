@@ -128,6 +128,7 @@ void sam_init(){
   Init();
 }
 
+
 void sam_newsay_banks0(void){
   singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
@@ -580,13 +581,93 @@ u8 sam_get_sample_phonsing(int16_t* newsample){
 }
 
 
+int16_t sam_get_sample_banks0a(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_banks0(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_banks1a(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_banks1(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_TTSa(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_TTS(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_TTSsa(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_TTS(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_xya(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_xy(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_benda(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_bend(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_parama(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_param(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_phona(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_phon(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_phonsa(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_phons(&samplel)); 
+howmany--;
+return samplel;
+}
+
+int16_t sam_get_sample_phonsinga(){
+static u8 howmany=0;
+static int16_t samplel;
+while (howmany==0) howmany=(sam_get_sample_phonsing(&samplel)); 
+howmany--;
+return samplel;
+}
+
 u8 sam_get_sample_banks0(int16_t* newsample){
   static int16_t lastsample;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=1;
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_banks0();
   *newsample=lastsample;
   lastsample=swopsample;

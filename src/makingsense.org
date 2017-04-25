@@ -1772,7 +1772,9 @@ playwave????
 - flash overflow with digitalk and all TMS vocabs so no room for espeak... 
 - got rid of extra unused roms in sp0256 TEST - now doesn't overflow but must be close and we leave espeak OUT!
 
+** 25/4
 
+- wrapping sam generators - test one by one and figure out pitch/speed log stuff! TODO!
 
 
 * FINAL/FURTHER TODO:

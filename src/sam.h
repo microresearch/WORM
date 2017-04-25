@@ -29,5 +29,16 @@ u8 sam_get_sample_xy(int16_t *newsample);
 u8 sam_get_sample_param(int16_t *newsample);
 u8 sam_get_sample_bend(int16_t *newsample);
 
+int16_t sam_get_sample_banks0a(); // wrappingS below!!!!
+int16_t sam_get_sample_banks1a();
+int16_t sam_get_sample_TTSa();
+int16_t sam_get_sample_TTSsa();
+int16_t sam_get_sample_phona();
+int16_t sam_get_sample_phonsa();
+int16_t sam_get_sample_phonsinga();
+int16_t sam_get_sample_xya();
+int16_t sam_get_sample_parama();
+int16_t sam_get_sample_benda();
+
 #endif
 
