@@ -969,7 +969,6 @@ DIGI:
 
 // so 3 roms with x/y bend as is, 3 roms with straightest, 1 rom with each set of bends on xy = 9 modes
 
-
 ** 15/3 +
 
 - if other modes table bends should be with pitchlog (try in digitalker)DONE
@@ -1349,7 +1348,6 @@ for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2
 
 for rsynth: 2005 - python speakyr.py using vocab in /root/test -> rsynthy_vocab.hREDONE-TESTDONE
 
-
 ** 31/3+
 
 - still check all length long->short (fixed for all klatts and few others) *DONE*
@@ -1430,7 +1428,6 @@ start with just one list = input_frame and do without interpolation, then implem
 
 - also more tests as a few at slow speeds seem to drop audio altogether - maybe fixedFIXED
 
-
 ** 5/4++
 
 - tubes.c is close but could break further into frames so less interpolation _ LEAVE AS IS
@@ -1479,7 +1476,6 @@ child_params copied in to tubes.c from py-trm stuff
 - ditch klattTTS with reduced set problem
 
 - test all modes as we add them
-
 
 ** 11/4+
 
@@ -1772,9 +1768,11 @@ playwave????
 - flash overflow with digitalk and all TMS vocabs so no room for espeak... 
 - got rid of extra unused roms in sp0256 TEST - now doesn't overflow but must be close and we leave espeak OUT!
 
-** 25/4
+** 25/4 +
 
 - wrapping sam generators - test one by one and figure out pitch/speed log stuff! TODO!
+
+- TMS= wrapping of selection, divide up vocabs say > 128, check exy on each bend/param
 
 
 * FINAL/FURTHER TODO:
