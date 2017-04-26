@@ -237,12 +237,12 @@ static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend,
 static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
 static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
 static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
-static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
+//static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
 static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
 
-static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &waveer, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &tmser, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender};
+static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &tmser, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender};
 
   // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender 17&votraxer, 18&votraxTTSer, 19&votraxgorfer, 20&votraxwower, 21&votraxwowfilterbender, 22&votraxbender, 23&votraxparamer, 24&votraxsinger, 25&tmser, 26&sambanks0er, 27&sambanks1er, 28&samTTSer, 29&samTTSser, 30&samphoner, 31&samphonser, 32&samphonsinger, 33&samxyer, 34&samparamer, 35&sambender
 

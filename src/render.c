@@ -12,7 +12,7 @@ extern float exy[64];
 extern u8 modus;
 
 //timetable for more accurate c64 simulation
-u8 timetable[5][5] =
+static const u8 timetable[5][5] =
 {
 	{162, 167, 167, 127, 128},
 	{226, 60, 60, 0, 0},
@@ -400,11 +400,6 @@ pos48296:
 
 }
 
-void renderupdate(){
-
-  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d mem66 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48,mem66);
-
-}
 
 void    sam_frame_rerun() {
      signed int pitchmod;

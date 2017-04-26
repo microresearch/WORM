@@ -29,6 +29,7 @@
 #include "parwave.h"
 
 #define getrandom(min,max) ((rand()%(int)(((max)+1)-(min)))+(min))
+//#define getrandom(min,max) 0
 
 void flutter(klatt_global_ptrr,int16_t*);
 static float sampled_source(klatt_global_ptrr);
@@ -857,7 +858,7 @@ static void setabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr globals)
 
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * arm_cos_f32(2.0f * M_PI / globals->samrate * f) * 2.0f;
+ rp->b = r * cosf(2.0f * M_PI / globals->samrate * f) * 2.0f;
  rp->a = 1.0 - rp->b - rp->c;
 }
 
@@ -873,7 +874,7 @@ static void setzeroabc(u16 f, u16 bw, resonator_ptr rp, klatt_global_ptrr global
  /* First compute ordinary resonator coefficients */
  r = expf(-M_PI / globals->samrate * bw);
  rp->c = -(r * r);
- rp->b = r * arm_cos_f32(2.0 * M_PI / globals->samrate * -f) * 2.0f;
+ rp->b = r * cosf(2.0 * M_PI / globals->samrate * -f) * 2.0f;
  rp->a = 1.0 - rp->b - rp->c;
 
  if (f != 0) /* prevent a', b' and c' going to INF! */

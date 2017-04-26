@@ -1770,10 +1770,18 @@ playwave????
 
 ** 25/4 +
 
-- wrapping sam generators - test one by one and figure out pitch/speed log stuff! TODO!
+- wrapped sam generators - test one by one and figure out pitch/speed log stuff! TODO!
 
 - TMS= wrapping of selection, divide up vocabs say > 128, check exy on each bend/param
 
+** 26/4
+
+- split/added all vocabs DONE - TEST
+
+- with -O2 we overflow flash by 10260 bytes, with -0s is fine... TEST
+  with -Os // trimmed all so far (printf and CMSIS-in tube removed) - one TMS vocab is enough to solve overflow...
+
+  
 
 * FINAL/FURTHER TODO:
 

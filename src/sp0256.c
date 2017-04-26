@@ -101,7 +101,7 @@ UINT16         m_fifo[64];        /* The 64-decle FIFO.                         
 /*  qtbl  -- Coefficient Quantization Table.  This comes from a             */
 /*              SP0250 data sheet, and should be correct for SP0256.        */
 /* ======================================================================== */
-static const INT16 qtbl[128]   __attribute__ ((section (".flash")))  =
+const INT16 qtbl[128]   __attribute__ ((section (".flash")))  =
 {
 	0,      9,      17,     25,     33,     41,     49,     57,
 	65,     73,     81,     89,     97,     105,    113,    121,
@@ -396,7 +396,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 enum { AM = 0, PR, B0, F0, B1, F1, B2, F2, B3, F3, B4, F4, B5, F5, IA, IP };
 
-static const UINT16 sp0256_datafmt[]   __attribute__ ((section (".flash")))  =
+const UINT16 sp0256_datafmt[]   __attribute__ ((section (".flash")))  =
 {
 	/* -------------------------------------------------------------------- */
 	/*  OPCODE 1111: PAUSE                                                  */
@@ -670,7 +670,7 @@ static const UINT16 sp0256_datafmt[]   __attribute__ ((section (".flash")))  =
 	/*  176 */  CR( 5,  0,  IP, 0,  0,  0,  0),     /*  Per. Intr.  */
 };
 
-static const INT16 sp0256_df_idx[16 * 8]   __attribute__ ((section (".flash"))) =
+const INT16 sp0256_df_idx[16 * 8]   __attribute__ ((section (".flash"))) =
 {
 	/*  OPCODE 0000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
 	/*  OPCODE 1000 */      -1, -1,     -1, -1,     -1, -1,     -1, -1,
@@ -1171,7 +1171,7 @@ lpc12_update(&m_filt, &output);
    return output;
 }
 
-static const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
+const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
 
 void sp0256_newsay1219(void){
   u8 dada, indexy;

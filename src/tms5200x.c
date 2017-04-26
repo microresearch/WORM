@@ -34,11 +34,11 @@ typedef int32_t INT32;
 
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
-/*
+#include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
+
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
 #include "LPC/roms/vocab_2322.h" // wordlist_spell2322[127]
-#include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2352.h" // wordlist_spell2352[144]
 #include "LPC/roms/vocab_spkspellone.h" // wordlist_spell1[154] 0use -> 153today
 #include "LPC/roms/vocab_spkspelltwo.h" // wordlist_spell2[124]
@@ -80,7 +80,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 #include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
-*/
+
 
 // list of which_coeff:
 
@@ -95,65 +95,113 @@ typedef struct TMS_vocab__ {
   float extentplus;
 } TMS_vocab;
 
-const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 104.0f};
-const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 129.0f};
-/*
+const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
+const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
+
+const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
+const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
+
+
 const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f};
-const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 100.0f};
-const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 129.0f};
-const TMS_vocab vocab_2350={wordlist_spell2350, &T0280B_0281A_coeff, 151, 155.0f}; 
-const TMS_vocab vocab_2352={wordlist_spell2352, &T0280B_0281A_coeff, 143, 147.0f};
-const TMS_vocab vocab_spkspellone={wordlist_spell1, &T0280B_0281A_coeff, 153, 157.0f};
-const TMS_vocab vocab_spkspelltwo={wordlist_spell2, &T0280B_0281A_coeff, 123, 126.0f};
+const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 101.0f};
+const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 130.0f};
+
+const TMS_vocab vocab_2352_1={wordlist_spell2352_1, &T0280B_0281A_coeff, 71, 75.0f}; 
+const TMS_vocab vocab_2352_2={wordlist_spell2352_2, &T0280B_0281A_coeff, 71, 75.0f}; 
+
+const TMS_vocab vocab_spkspellone_1={wordlist_spell1_1, &T0280B_0281A_coeff, 74, 78.0f}; 
+const TMS_vocab vocab_spkspellone_2={wordlist_spell1_2, &T0280B_0281A_coeff, 75, 79.0f}; 
+
+const TMS_vocab vocab_spkspelltwo_1={wordlist_spell2_1, &T0280B_0281A_coeff, 61, 65.0f};
+const TMS_vocab vocab_spkspelltwo_2={wordlist_spell2_2, &T0280B_0281A_coeff, 61, 65.0f};
 
 // 5200
 
-const TMS_vocab vocab_D000={wordlist_ffD000, &T0285_2501E_coeff, 198, 203.0f};
-const TMS_vocab vocab_D001={wordlist_ffD001, &T0285_2501E_coeff, 193, 198.0f};
-const TMS_vocab vocab_D002={wordlist_ffD002, &T0285_2501E_coeff, 197, 203.0f};
-const TMS_vocab vocab_D003={wordlist_ffD003, &T0285_2501E_coeff, 95, 97.0f};
-const TMS_vocab vocab_D004={wordlist_ffD004, &T0285_2501E_coeff, 198, 203.0f};
-const TMS_vocab vocab_D005={wordlist_ffD005, &T0285_2501E_coeff, 198, 203.0f};
-const TMS_vocab vocab_D006={wordlist_ffD006, &T0285_2501E_coeff, 141, 145.0f};
-const TMS_vocab vocab_D007={wordlist_ffD007, &T0285_2501E_coeff, 178, 183.0f};
+const TMS_vocab vocab_D000_1={wordlist_ffD000_1, &T0285_2501E_coeff, 99, 103.0f}; 
+const TMS_vocab vocab_D000_2={wordlist_ffD000_2, &T0285_2501E_coeff, 98, 102.0f}; 
+
+const TMS_vocab vocab_D001_1={wordlist_ffD001_1, &T0285_2501E_coeff, 96, 100.0f}; 
+const TMS_vocab vocab_D001_2={wordlist_ffD001_2, &T0285_2501E_coeff, 96, 100.0f}; 
+
+const TMS_vocab vocab_D002_1={wordlist_ffD002_1, &T0285_2501E_coeff, 98, 102.0f};
+const TMS_vocab vocab_D002_2={wordlist_ffD002_2, &T0285_2501E_coeff, 98, 102.0f};
+
+const TMS_vocab vocab_D003={wordlist_ffD003, &T0285_2501E_coeff, 95, 99.0f};
+
+const TMS_vocab vocab_D004_1={wordlist_ffD004_1, &T0285_2501E_coeff, 99, 103.0f};
+const TMS_vocab vocab_D004_2={wordlist_ffD004_2, &T0285_2501E_coeff, 98, 102.0f};
+
+const TMS_vocab vocab_D005_1={wordlist_ffD005_1, &T0285_2501E_coeff, 99, 103.0f};
+const TMS_vocab vocab_D005_2={wordlist_ffD005_2, &T0285_2501E_coeff, 98, 102.0f};
+
+const TMS_vocab vocab_D006_1={wordlist_ffD006_1, &T0285_2501E_coeff, 69, 73.0f};
+const TMS_vocab vocab_D006_2={wordlist_ffD006_2, &T0285_2501E_coeff, 69, 73.0f};
+
+const TMS_vocab vocab_D007_1={wordlist_ffD007_1, &T0285_2501E_coeff, 88, 92.0f};
+const TMS_vocab vocab_D007_2={wordlist_ffD007_2, &T0285_2501E_coeff, 88, 92.0f};
+
 const TMS_vocab vocab_D008={wordlist_ffD008, &T0285_2501E_coeff, 111, 115.0f};
-const TMS_vocab vocab_D009={wordlist_ffD009, &T0285_2501E_coeff, 179, 184.0f};
-const TMS_vocab vocab_D010={wordlist_ffD010, &T0285_2501E_coeff, 173, 177.0f};
+
+const TMS_vocab vocab_D009_1={wordlist_ffD009_1, &T0285_2501E_coeff, 89, 93.0f};
+const TMS_vocab vocab_D009_2={wordlist_ffD009_2, &T0285_2501E_coeff, 89, 93.0f};
+
+const TMS_vocab vocab_D010_1={wordlist_ffD010_1, &T0285_2501E_coeff, 86, 90.0f};
+const TMS_vocab vocab_D010_2={wordlist_ffD010_2, &T0285_2501E_coeff, 86, 90.0f};
+
 const TMS_vocab vocab_D011={wordlist_ffD011, &T0285_2501E_coeff, 90, 94.0f};
-const TMS_vocab vocab_D012={wordlist_ffD012, &T0285_2501E_coeff, 182, 187.0f};
-const TMS_vocab vocab_D013={wordlist_ffD013, &T0285_2501E_coeff, 62, 65.0f};
-const TMS_vocab vocab_D014={wordlist_ffD014, &T0285_2501E_coeff, 82, 85.0f};
-const TMS_vocab vocab_D015={wordlist_ffD015, &T0285_2501E_coeff, 160, 165.0f};
-const TMS_vocab vocab_D016={wordlist_ffD016, &T0285_2501E_coeff, 38, 40.0f};
-const TMS_vocab vocab_D017={wordlist_ffD017, &T0285_2501E_coeff, 50, 53.0f};
-const TMS_vocab vocab_D018={wordlist_ffD018, &T0285_2501E_coeff, 64, 67.0f};
+
+const TMS_vocab vocab_D012_1={wordlist_ffD012_1, &T0285_2501E_coeff, 90, 94.0f};
+const TMS_vocab vocab_D012_2={wordlist_ffD012_2, &T0285_2501E_coeff, 91, 95.0f};
+
+const TMS_vocab vocab_D013={wordlist_ffD013, &T0285_2501E_coeff, 62, 66.0f};
+const TMS_vocab vocab_D014={wordlist_ffD014, &T0285_2501E_coeff, 82, 86.0f};
+
+const TMS_vocab vocab_D015_1={wordlist_ffD015_1, &T0285_2501E_coeff, 79, 84.0f};
+const TMS_vocab vocab_D015_2={wordlist_ffD015_2, &T0285_2501E_coeff, 80, 85.0f};
+
+const TMS_vocab vocab_D016={wordlist_ffD016, &T0285_2501E_coeff, 38, 42.0f};
+const TMS_vocab vocab_D017={wordlist_ffD017, &T0285_2501E_coeff, 50, 54.0f};
+const TMS_vocab vocab_D018={wordlist_ffD018, &T0285_2501E_coeff, 64, 68.0f};
 const TMS_vocab vocab_D019={wordlist_ffD019, &T0285_2501E_coeff, 69, 73.0f};
 const TMS_vocab vocab_D020_21={wordlist_ffD021, &T0285_2501E_coeff, 69, 73.0f};
-const TMS_vocab vocab_D022={wordlist_ffD022, &T0285_2501E_coeff, 46, 49.0f};
-const TMS_vocab vocab_D023={wordlist_ffD023, &T0285_2501E_coeff, 55, 57.0f};
-const TMS_vocab vocab_D024_25={wordlist_ffD025, &T0285_2501E_coeff, 75, 78.0f};
-const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 40.0f};
-const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 63.0f};
-const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 33.0f};
-const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 32.0f}; // if this should be 5220 - leave as
-const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 76.0f};
-const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 69.0f};
-const TMS_vocab vocab_ti99_one={wordlist_ti99_one, &T0285_2501E_coeff, 179, 183.0f};
-const TMS_vocab vocab_ti99_two={wordlist_ti99_two, &T0285_2501E_coeff, 179, 183.0f};
+const TMS_vocab vocab_D022={wordlist_ffD022, &T0285_2501E_coeff, 46, 50.0f};
+const TMS_vocab vocab_D023={wordlist_ffD023, &T0285_2501E_coeff, 55, 59.0f};
+const TMS_vocab vocab_D024_25={wordlist_ffD025, &T0285_2501E_coeff, 75, 79.0f};
+const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 42.0f};
+const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 64.0f};
+const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 34.0f};
+const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
+const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 79.0f};
+const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 70.0f};
+
+const TMS_vocab vocab_ti99_one_1={wordlist_ti99_one_1, &T0285_2501E_coeff, 89, 93.0f};
+const TMS_vocab vocab_ti99_one_2={wordlist_ti99_one_2, &T0285_2501E_coeff, 89, 93.0f};
+
+const TMS_vocab vocab_ti99_two_1={wordlist_ti99_two_1, &T0285_2501E_coeff, 89, 93.0f};
+const TMS_vocab vocab_ti99_two_2={wordlist_ti99_two_2, &T0285_2501E_coeff, 89, 93.0f};
 
 // 5220
-const TMS_vocab vocab_echofemale={wordlist_testroms, &tms5220_coeff, 196, 200.0f}; // shifted from 5200
-const TMS_vocab vocab_acorn={wordlist_acorn, &tms5220_coeff, 164, 168.0f};
-const TMS_vocab vocab_large_male_one={wordlist_largemale_one, &tms5220_coeff, 197, 202.0f};
-const TMS_vocab vocab_large_male_two={wordlist_largemale_two, &tms5220_coeff, 197, 202.0f};
-const TMS_vocab vocab_male={wordlist_male, &tms5220_coeff, 205, 210.0f};
+const TMS_vocab vocab_echofemale_1={wordlist_testroms_1, &tms5220_coeff, 97, 101.0f}; // shifted from 5200 
+const TMS_vocab vocab_echofemale_2={wordlist_testroms_2, &tms5220_coeff, 98, 102.0f}; // shifted from 5200 
+
+const TMS_vocab vocab_acorn_1={wordlist_acorn_1, &tms5220_coeff, 81, 85.0f}; 
+const TMS_vocab vocab_acorn_2={wordlist_acorn_2, &tms5220_coeff, 82, 86.0f}; 
+
+const TMS_vocab vocab_large_male_one_1={wordlist_largemale_one_1, &tms5220_coeff, 97, 101.0f};
+const TMS_vocab vocab_large_male_one_2={wordlist_largemale_one_2, &tms5220_coeff, 98, 102.0f};
+
+const TMS_vocab vocab_large_male_two_1={wordlist_largemale_two_1, &tms5220_coeff, 97, 101.0f};
+const TMS_vocab vocab_large_male_two_2={wordlist_largemale_two_2, &tms5220_coeff, 98, 102.0f};
+
+const TMS_vocab vocab_male_1={wordlist_male_1, &tms5220_coeff, 102, 106.0f};
+const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
  
 
-// how many are there = 46 - check each TODO
-const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350, &vocab_2352, &vocab_spkspellone, &vocab_spkspelltwo, &vocab_D000, &vocab_D001, &vocab_D002, &vocab_D003, &vocab_D004, &vocab_D005, &vocab_D006, &vocab_D007, &vocab_D008, &vocab_D009, &vocab_D010, &vocab_D011, &vocab_D012, &vocab_D013, &vocab_D014, &vocab_D015, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale, &vocab_mpf, &vocab_talko_not, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one, &vocab_ti99_two, &vocab_acorn, &vocab_large_male_one, &vocab_large_male_two, &vocab_male};
-*/
+// how many are there = 46 - check each TODO +22 divided = 68 
+const TMS_vocab *allTMSvocabs[68]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_talko_not, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_1};
 
-const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
+
+//const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
 // TEST: above commented out to speed up
 
@@ -3067,9 +3115,9 @@ void tms_newsay(){
   u8 whichbank;
   
   // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
-  whichbank=_sely*47.0f; 
-  MAXED(whichbank, 45);
-  whichbank=45-whichbank; // inversion
+  whichbank=_sely*71.0f; 
+  MAXED(whichbank, 67);
+  whichbank=67-whichbank; // inversion
   whichbank=0; /// TEST for speedups // test for 5200 echofemale
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
@@ -3089,9 +3137,9 @@ void tms_newsay_lowbit(){
   u8 whichbank;
   
   // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
-  whichbank=_sely*47.0f; 
-  MAXED(whichbank, 45);
-  whichbank=45-whichbank; // inversion
+  whichbank=_sely*71.0f; 
+  MAXED(whichbank, 67);
+  whichbank=67-whichbank; // inversion
   whichbank=0; /// TEST for speedups
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   

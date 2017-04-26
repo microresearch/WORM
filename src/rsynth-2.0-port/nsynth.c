@@ -310,25 +310,6 @@ static int16_t clip (klatt_global_ptr globals, float input);
 static void pitch_synch_par_reset (klatt_global_ptr globals,
                                          klatt_frame_ptr frame, long ns);
 static void frame_init (klatt_global_ptr globals, klatt_frame_ptr frame);
-void show_parms (klatt_global_ptr globals, int *pars);
-
-
-void show_parms(klatt_global_ptr globals, int *pars)
-{
-	int i;
-	static int names;
-	if ((names++ % 64) == 0)
-	{
-		for (i = 0; i < NPAR; i++)
-			printf("%s ", par_name[i]);
-		printf("\n");
-	}
-	for (i = 0; i < NPAR; i++)
-	{
-		printf("%*d ", (int) strlen(par_name[i]), pars[i]);
-	}
-	printf("\n");
-}
 
 /*
    function FLUTTER
@@ -521,8 +502,6 @@ static float DBtoLIN(klatt_global_ptr globals, long dB)
 		dB = 0;
 	else if (dB >= 88)
 	{
-		if (!globals->quiet_flag)
-			printf("Try to compute amptable[%ld]\n", dB);
 		dB = 87;
 	}
 	return amptable[dB] * 0.001f;
@@ -574,20 +553,11 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 		if (nopen >= (T0 - 1))
 		{
 			nopen = T0 - 2;
-			if (!globals->quiet_flag)
-			{
-				printf("Warning: glottal open period cannot exceed T0, truncated\n");
-			}
 		}
 
 		if (nopen < 40)
 		{
 			nopen = 40;                  /* F0 max = 1000 Hz */
-			if (!globals->quiet_flag)
-			{
-				printf("Warning: minimum glottal open period is 10 samples.\n");
-				printf("truncated, nopen = %ld\n", nopen);
-			}
 		}
 
 		/* Reset a & b, which determine shape of "natural" glottal waveform */
@@ -626,11 +596,6 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 		temp = T0 - nopen;
 		if (Kskew > temp)
 		{
-			if (!globals->quiet_flag)
-			{
-				printf("Kskew duration=%ld > glottal closed period=%ld, truncate\n",
-				Kskew, T0 - nopen);
-			}
 			Kskew = temp;
 		}
 		
@@ -691,7 +656,7 @@ static void frame_init(klatt_global_ptr globals, klatt_frame_ptr frame)
 	float amp_parF6;                 /* A6 converted to linear gain  */
 
 	#if 0
-	show_parms(globals, (int *) frame);
+	//	show_parms(globals, (int *) frame);
 	#endif
 
 	/*

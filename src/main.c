@@ -39,8 +39,8 @@
 #include "digitalker.h"
 #include "nvp.h"
 #include "ntube.h"
-#include "wavetable.h"
-#include "wavetables.h"
+//#include "wavetable.h"
+//#include "wavetables.h"
 #include "worming.h"
 #include "vot.h"
 #include "parwave.h"
@@ -79,7 +79,7 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
 
-extern Wavetable wavtable;
+//extern Wavetable wavtable;
 #ifndef TESTING
 wormy myworm;
 #endif
