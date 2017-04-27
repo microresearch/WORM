@@ -216,9 +216,12 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	//	pitchmod+=pitches[mem49];
 
 	if (modus&1) {
-	  u8 val=_selx*130.0f;
-	  MAXED(val,127);
-	  pitchmod=pitches[mem49]*logpitch[val];
+	  	  u8 val=_selx*130.0f;
+	  	  MAXED(val,127);
+	  	  pitchmod=pitches[mem49]*logpitch[val];
+		  //	  int val=_selx*1027.0f;
+		  //	  	  MAXED(val,1023);
+		  //	  	  pitchmod=pitches[mem49]*logspeed[val];
 	}
 	else if (modus&8) {
 	  u8 val=exy[0]*130.0f;
@@ -445,10 +448,14 @@ void    sam_frame_rerun() {
 
 	Y = 0;
 	//	pitchmod+=pitches[0];
-		  if (modus&1) {
-		    u8 val=_selx*130.0f;
-		    MAXED(val,127);
-		    pitchmod=pitches[0]*logpitch[val];
+	if (modus&1) {
+	  u8 val=_selx*130.0f;
+	  MAXED(val,127);
+	  pitchmod=pitches[0]*logpitch[val];
+	  //int val=_selx*1027.0f;
+	  //	  MAXED(val,1023);
+	  //	  pitchmod=pitches[0]*logspeed[val];
+
 		  }
 		  else if (modus&8) {
 		    u8 val=exy[0]*130.0f;
@@ -620,9 +627,13 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    //			pitchmod+=pitches[Y];
 
 		    if (modus&1) {
-		    u8 val=_selx*130.0f;
-		    MAXED(val,127);
-		    pitchmod=pitches[Y]*logpitch[val];
+		      		      u8 val=_selx*130.0f;
+		      		      MAXED(val,127);
+		      		      pitchmod=pitches[Y]*logpitch[val];
+				      //		      int val=_selx*1027.0f;
+				      //		      		      MAXED(val,1023);
+				      //		      		      pitchmod=pitches[Y]*logspeed[val];
+
 		  }
 		  else if (modus&8) {
 		    u8 val=exy[0]*130.0f;
@@ -677,6 +688,10 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[Y]*logpitch[val];
+	  //	  int val=_selx*1027.0f;
+	  //	  MAXED(val,1023);
+	  //	  pitchmod=pitches[Y]*logspeed[val];
+
 	}
 	else if (modus&8) {
 	  u8 val=exy[0]*130.0f;
@@ -745,8 +760,12 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 
 	if (modus&1) {
 	  u8 val=_selx*130.0f;
-	  MAXED(val,127);
-	  pitchmod=pitches[Y]*logpitch[val];
+	  	  MAXED(val,127);
+	  	  pitchmod=pitches[Y]*logpitch[val];
+	  //	  	  int val=_selx*1027.0f;
+	  //	  	  MAXED(val,1023);
+	  //	  pitchmod=pitches[Y]*logspeed[val];
+
 	}
 	else if (modus&8) {
 	  u8 val=exy[0]*130.0f;

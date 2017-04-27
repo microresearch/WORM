@@ -1791,6 +1791,8 @@ playwave????
 - fixed new modus for extra phon modes - still somehow croaky on pitch ???, also some bugs fixed DONE
 - fixed TTS by adding new SAM mode as it didn't like spaces...
 
+- what should pitch/speed logs be? - leave as is...
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f
