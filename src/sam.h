@@ -15,6 +15,7 @@ void sam_init();
 void sam_newsay_banks0();
 void sam_newsay_TTS();
 void sam_newsay_phon();
+void sam_newsay_phonsing();
 void sam_newsay_xy();
 void sam_newsay_param();
 

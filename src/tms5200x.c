@@ -30,12 +30,18 @@ typedef int32_t INT32;
 //** 5200- early echo II, disks of TRON????, TI99/4 
 //** 5220- later echo II, BBC MICRO
 
+#define TMS_VOCAB 67
+#define TMS_VOCAB_TOP 66
+#define TMS_VOCAB_F 70.0f
+#define ALLPHON_BANK 52 // CHECK THIS!
+
 // group first 5100:
 
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
-#include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 
+/*
+#include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
 #include "LPC/roms/vocab_2322.h" // wordlist_spell2322[127]
@@ -73,14 +79,14 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_D027-34.h" // wordlist_ffD027to34[61]
 #include "LPC/roms/vocab_echofemale.h" // wordlist_testroms[200] // is this 5220?
 #include "LPC/roms/vocab_mpf.h" // wordlist_mpf[32]
-#include "LPC/roms/vocab_talko_notelsewhere.h" // wordlist_talko[31] TODO- also can add misc and own vocabs here
+//#include "LPC/roms/vocab_talko_notelsewhere.h" // wordlist_talko[31] TODO- also can add misc and own vocabs here
 #include "LPC/roms/vocab_ti99.h" // wordlist_ti99_one[180] // and // wordlist_ti99_two[180]
 
 // then 5220 - all BBC micro
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 #include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
-
+*/
 
 // list of which_coeff:
 
@@ -98,9 +104,9 @@ typedef struct TMS_vocab__ {
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
 
+/*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
-
 
 const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f};
 const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 101.0f};
@@ -170,7 +176,7 @@ const TMS_vocab vocab_D024_25={wordlist_ffD025, &T0285_2501E_coeff, 75, 79.0f};
 const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 42.0f};
 const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 64.0f};
 const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 34.0f};
-const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
+//const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
 const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 79.0f};
 const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 70.0f};
 
@@ -198,10 +204,11 @@ const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
  
 
 // how many are there = 46 - check each TODO +22 divided = 68 
-const TMS_vocab *allTMSvocabs[68]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_talko_not, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_1};
 
+const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_1}; // now 67 minus talko
+*/
 
-//const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
+const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
 // TEST: above commented out to speed up
 
@@ -3115,9 +3122,9 @@ void tms_newsay(){
   u8 whichbank;
   
   // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
-  whichbank=_sely*71.0f; 
-  MAXED(whichbank, 67);
-  whichbank=67-whichbank; // inversion
+  whichbank=_sely*TMS_VOCAB_F; 
+  MAXED(whichbank, TMS_VOCAB_TOP);
+  whichbank=TMS_VOCAB_TOP-whichbank; // inversion
   whichbank=0; /// TEST for speedups // test for 5200 echofemale
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
@@ -3137,9 +3144,9 @@ void tms_newsay_lowbit(){
   u8 whichbank;
   
   // selx is pitch bend, sely is bank, selz is phrase - trigger re_inits this
-  whichbank=_sely*71.0f; 
-  MAXED(whichbank, 67);
-  whichbank=67-whichbank; // inversion
+  whichbank=_sely*TMS_VOCAB_F; 
+  MAXED(whichbank, TMS_VOCAB_TOP);
+  whichbank=TMS_VOCAB_TOP-whichbank; // inversion
   whichbank=0; /// TEST for speedups
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   

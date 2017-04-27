@@ -1771,18 +1771,25 @@ playwave????
 ** 25/4 +/26.4
 
 - wrapped sam generators - test one by one and figure out pitch/speed log stuff! TODO!
+/////
 
-- TMS - divide up vocabs say > 128, 
+- TMS - divide up vocabs say > 128, DONE - TEST
 
-- TMS - check exy on each bend/param ???
-
-- split/added all vocabs DONE - TEST
+- TMS - check exy on each bend/param ??????
 
 - with -O2 we overflow flash by 3716 bytes, with -0s is fine... TEST
-  with -Os // trimmed all so far (printf and CMSIS-in tube removed, klattTTS removed) - one TMS vocab is enough to solve overflow...
+  with -Os // trimmed all so far (printf and CMSIS-in tube removed,
+  klattTTS removed) - one TMS vocab is enough to solve overflow... - removed TALKO and fits with -O2 on T60 (test on x220)
 
-- TMS= wrapping of selection = keyword fix
-  
+- TMS= wrapping of selection = keyword "fix" // allphon would be bank=52
+
+** 27/4
+
+*** SAM
+
+- sam_phon, sam_phons and sam_phonsing have exy as y and z->sel so we need to fix new pitch mode for those on z instead!
+- fixed new modus for extra phon modes - still somehow croaky on pitch ???, also some bugs fixed DONE
+- fixed TTS by adding new SAM mode as it didn't like spaces...
 
 * FINAL/FURTHER TODO:
 

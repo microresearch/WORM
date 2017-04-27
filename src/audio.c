@@ -170,7 +170,15 @@ typedef struct wormer_ {
   u8 TTS;
 } wormer;
 
+#define NUM_MODES 65
+#define NUM_MODES_TOP 64
+#define NUM_MODES_F 68.0f
+
 // from oldaudio:
+
+
+//((((((((((((((((((
+  //OLD INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 42sp0256sing, 43votraxsing, 44tmssing, 45tmsphonsing, /// 46simpleklatt, 47nvp, 48klatt, 49klattTTS, 50nvpvocab, 51klattsingle, 52klattvocab, 53rsynthy, 54rsynthelm, 55rsynthsingle, 56nvpvocabsing, 57rsynthsing, 58klattsinglesing, 59klattvocabsing, 60tubes=tube.c
 
 ////7 sp0256 modes: sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, sp0256sing
 
@@ -193,7 +201,7 @@ static const wormer votraxwower={0, 1.25f, votrax_get_samplewow, votrax_newsaywo
 static const wormer votraxwowfilterbender={0, 1.25f, votrax_get_samplewow_bendfilter, votrax_newsaywow_bendfilterr, 0, 0}; 
 static const wormer votraxbender={8, 1.25f, votrax_get_sample_bend, votrax_newsay_bendr, 2, 0}; // as extra samplerate mode with trigger as newsay
 
-static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, votrax_newsay_bendr, 1, 0}; // exy-raw .. newsay is never used here
+static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, votrax_newsay_bendr, 1, 0}; // exy-raw .. newsay is not used
 static const wormer votraxsinger={0, 1.25f, votrax_get_sample_sing, votrax_newsay_sing, 0, 0};
 
 // 18 tms modes: tms, tmsphon, tmsTTS, tmsbendlength, tmslowbit, tmsraw5100, tmsraw5200, tmsraw5220, tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend,  tmssing, tmsphonsing, 
@@ -202,25 +210,20 @@ static const wormer tmser={0, 0.25f, tms_get_sample, tms_newsay, 0, 0};
 
 // 10 sam modes: sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend
 
-static const wormer sambanks0er={0, 1.0f, sam_get_sample_banks0a, sam_newsay_banks0, 0, 0}; 
-static const wormer sambanks1er={0, 1.0f, sam_get_sample_banks1a, sam_newsay_banks0, 0, 0}; //???
+static const wormer sambanks0er={0, 1.0f, sam_get_sample_banks0a, sam_newsay_banks0, 0, 0}; // pitch on x, sel phrase on y/z
+static const wormer sambanks1er={0, 1.0f, sam_get_sample_banks1a, sam_newsay_banks0, 0, 0}; // speed on x, sel phrase on y/z
 
-static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 1}; 
-static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 1}; 
+static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 2}; // pitch on x
+static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 2}; // speed on x
 
-static const wormer samphoner={15, 1.0f, sam_get_sample_phona, sam_newsay_banks0, 1, 0};  // newsay is not called
-static const wormer samphonser={15, 1.0f, sam_get_sample_phonsa, sam_newsay_banks0, 1, 0};  // newsay is not called
-static const wormer samphonsinger={15, 1.0f, sam_get_sample_phonsinga, sam_newsay_banks0, 1, 0};  // newsay is not called
+static const wormer samphoner={15, 1.0f, sam_get_sample_phona, sam_newsay_phon, 2, 0};  // try with newsay trigger
+static const wormer samphonser={15, 1.0f, sam_get_sample_phonsa, sam_newsay_phon, 2, 0};  // this one is with speed of phoneme
+static const wormer samphonsinger={15, 1.0f, sam_get_sample_phonsinga, sam_newsay_phonsing, 2, 0}; // and - constant pitch on z
 
 static const wormer samxyer={0, 1.0f, sam_get_sample_xya, sam_newsay_banks0, 0, 0};  // pitch on x speed on y
 
-static const wormer samparamer={3, 1.0f, sam_get_sample_parama, sam_newsay_banks0, 1, 0};  // newsay is not called
-static const wormer sambender={239, 1.0f, sam_get_sample_benda, sam_newsay_banks0, 1, 0};  // newsay is not called
-
-//((((((((((((((((((
-  //OLD INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 42sp0256sing, 43votraxsing, 44tmssing, 45tmsphonsing, /// 46simpleklatt, 47nvp, 48klatt, 49klattTTS, 50nvpvocab, 51klattsingle, 52klattvocab, 53rsynthy, 54rsynthelm, 55rsynthsingle, 56nvpvocabsing, 57rsynthsing, 58klattsinglesing, 59klattvocabsing, 60tubes=tube.c
-
-
+static const wormer samparamer={3, 1.0f, sam_get_sample_parama, sam_newsay_param, 2, 0}; // all x params as x/y axis with z as selected vocab
+static const wormer sambender={239, 1.0f, sam_get_sample_benda, sam_newsay_xy, 2, 0};  // x/y bends freq data, z as selected
 
 // start to add for testings BELOW:
 
@@ -244,7 +247,7 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_new
 
 static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &tmser, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&waveer, 9&klatter, 10sp0256er, 11&sp0256TTSer, 12&sp0256singer, 13&sp0256vocaboneer, 14&sp0256vocabtwoer, 15&sp02561219er, 16&sp0256bender 17&votraxer, 18&votraxTTSer, 19&votraxgorfer, 20&votraxwower, 21&votraxwowfilterbender, 22&votraxbender, 23&votraxparamer, 24&votraxsinger, 25&tmser, 26&sambanks0er, 27&sambanks1er, 28&samTTSer, 29&samTTSser, 30&samphoner, 31&samphonser, 32&samphonsinger, 33&samxyer, 34&samparamer, 35&sambender
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&klatter, 9sp0256er, 10&sp0256TTSer, 11&sp0256singer, 12&sp0256vocaboneer, 13&sp0256vocabtwoer, 14&sp02561219er, 15&sp0256bender 16&votraxer, 17&votraxTTSer, 18&votraxgorfer, 19&votraxwower, 20&votraxwowfilterbender, 21&votraxbender, 22&votraxparamer, 23&votraxsinger, 24&tmser, 25&sambanks0er, 26&sambanks1er, 27&samTTSer, 28&samTTSser, 29&samphoner, 30&samphonser, 31&samphonsinger, 32&samxyer, 33&samparamer, 34&sambender
 
 static int16_t comp_counter=0;
 static u16 cc=0;
@@ -379,7 +382,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=27; //TESTY!
+  _intmode=28; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
@@ -397,7 +400,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     }
   }
   
-  if (wormlist[_intmode]->TTS){ // so this doesn't change as fast as generators
+  if (wormlist[_intmode]->TTS==1){ 
     doadc();
     u8 xax=_sely*19.0f; 
     u8 selz=_selz*68.0f; 
@@ -407,6 +410,18 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     selz=63-selz;
     TTSinarray[xax]=mapytoascii[selz];
     }
+
+  else if (wormlist[_intmode]->TTS==2){ // for SAM TTS which doesn't like spaces 
+    doadc();
+    u8 xax=_sely*19.0f; 
+    u8 selz=_selz*64.0f; 
+    MAXED(xax,15);
+    MAXED(selz,61);
+    xax=15-xax; // inverted
+    selz=61-selz;
+    TTSinarray[xax]=mapytoascii[selz+2];
+    }
+
 
   audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
 }

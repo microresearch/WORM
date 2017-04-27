@@ -126,6 +126,7 @@ void Init()
 
 void sam_init(){
   Init();
+  sam_newsay_banks0(); // so we always have something parsed
 }
 
 
@@ -257,7 +258,7 @@ void sam_newsay_phon(void){
   teststring[0] = '\0';
 
   for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
-      u8 val=exy[x]*57.0f;
+      u8 val=exy[x]*59.0f;
       MAXED(val,55);
       val=55-val;
       strcat(teststring,phoneme_list[val]);
@@ -429,9 +430,9 @@ void sam_newsay_phonsing(void){
   u8 beginning=0;
   singmode=1; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
-  u8 val=_selx*130.0f;
-  MAXED(val,127);
-  pitch=64.0f*logpitch[val];
+  //  u8 val=_selz*130.0f; // pitch now on selz
+  //  MAXED(val,127);
+  //  pitch=64.0f*logpitch[val];
 
   char teststring[256];
   teststring[0] = '\0';
@@ -543,7 +544,7 @@ u8 sam_get_sample_phon(int16_t* newsample){
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=1;
+  modus=32;
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
@@ -557,7 +558,7 @@ u8 sam_get_sample_phons(int16_t* newsample){
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=4; // now with speed on selx
+  modus=64; // now with speed on selz FIX-DONE
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
@@ -566,12 +567,12 @@ u8 sam_get_sample_phons(int16_t* newsample){
   return howmany;
 }
 
-u8 sam_get_sample_phonsing(int16_t* newsample){
+u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 for extra pitch mode
   static int16_t lastsample;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=0; 
+  modus=128; 
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phonsing();
   *newsample=lastsample;
@@ -608,7 +609,7 @@ return samplel;
 int16_t sam_get_sample_TTSsa(){
 static u8 howmany=0;
 static int16_t samplel;
-while (howmany==0) howmany=(sam_get_sample_TTS(&samplel)); 
+while (howmany==0) howmany=(sam_get_sample_TTSs(&samplel)); 
 howmany--;
 return samplel;
 }
