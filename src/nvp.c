@@ -152,7 +152,7 @@ float lastValueOne= 0.0f;
 float lastValueTwo= 0.0f;
 
 float getNextNOISE(float* lastValue) {
-  *lastValue=((float)rand()/RAND_MAX)+0.75f* *lastValue;
+    *lastValue=((float)rand()/RAND_MAX)+0.75f* *lastValue;
   return *lastValue;
 };
 
