@@ -1783,7 +1783,17 @@ playwave????
 
 - TMS= wrapping of selection = keyword "fix" // allphon would be bank=52
 
-** 27/4
+** 01/06 + re-appraisal
+
+- what modes do we still need to test/refine? -> *wrapping of lots of TMS see above*
+
+- what needs to be cleaned/changed for full vocabs (TMS, triggers in audio.c for changes etc.)
+
+- order all modes in audio.c test all modes without compost
+
+- test and finish compost
+
+- full tests and manual 
 
 *** SAM
 
