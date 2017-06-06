@@ -79,8 +79,10 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f};
 
-//extern Wavetable wavtable;
-#ifndef TESTING
+
+#ifdef TESTING
+extern Wavetable wavtable;
+#else
 wormy myworm;
 #endif
 extern char TTSinarray[17];

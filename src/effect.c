@@ -360,7 +360,7 @@ void accumbuffer(float *tmpotherbuffer,float *tmpotherotherbuffer,u8 howmany){
     tmpotherotherbuffer[x]+=(tmpotherbuffer[x]*2.0f);
   }
 }
-
+/*
 void doformantfilter(int16_t *inbuffer, int16_t *outbuffer, u8 howmany, u8 vowel){
   float tmpbuffer[BUFF_LEN/4];
   float tmpotherbuffer[BUFF_LEN/4];
@@ -401,7 +401,7 @@ void doformantfilterf(float *inbuffer, float *outbuffer, u8 howmany, u8 vowel){/
   //  floot_to_int(outbuffer,tmpotherotherbuffer,howmany);
   memcpy(outbuffer,tmpotherotherbuffer,howmany*4);//dest,src,howmany//4bytes
   }
-
+*/
 /*void do_effect(villager_effect* vill_eff){
   int32_t tmp;float tmpp; 
   float freq;

@@ -47,8 +47,8 @@ int16_t samplel;//=genstruct->lastsample;
 int16_t lastval;//=genstruct->prevsample;
 
 #ifdef TESTING
-Wavetable wavtable;
-wormy myworm;
+extern Wavetable wavtable;
+//wormy myworm;
 #endif
 
 char TTSinarray[17];
@@ -86,6 +86,16 @@ static inline void doadc(){
 ////////////////////////////////////////////// TESTING!
 
 #ifdef TESTING
+
+void floot_to_int(int16_t* outbuffer, float* inbuffer,u16 howmany){
+  int32_t tmp;
+
+  for (int n = 0; n < howmany; n++) {
+    tmp = inbuffer[n] * 32768.0f;
+    tmp = (tmp <= -32768) ? -32768 : (tmp >= 32767) ? 32767 : tmp;
+    outbuffer[n] = (int16_t)tmp;
+		}
+}
 
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
