@@ -1,0 +1,256 @@
+* newer notes/plan
+
+** 0-intro
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
+
+All technology that is derived of earth, must be decomposed and again
+reduced to earth... [Valentine]
+
+software worming of emulated worm code speech cores (from 70s and 80s of the last century)
+
+- how we call the x worm modes?
+
+- what are the modes? 6 major speech synthesis worm voices
+
+1TMS, 2SP0256, 3VOT, 4SAM, 5DIGI, 6KLATT/NVP variants, 7COMPOST
+
+** 1-basic operations/modes
+
+- what are the modes? 6 major speech synthesis worm voices
+
+1TMS, 2SP0256, 3VOT, 4SAM, 5DIGI, 6KLATT/NVP variants, 7COMPOST
+
+eg. It is a software implementation of the Texas Instruments speech
+synthesis architecture (Linear Predictive Coding) from the late 1970s
+/ early 1980s, as used on several popular applications:
+
+- what each mode does and basic theory of operation - eg. knobs,
+  trigger, bendings, compost, vocab selection (banks?)
+
+- layout speed, XYZ and triggerIN, OUT!
+
+and how CVs are arranged - as above so below.... mirroring...
+
+** 2-table for each mode - submodes
+
+| X | Y | Z | TRIGGER |
+
+** 3- tech notes/details
+
+*** specs:
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1 audio/trigger input, 1 audio output, 20mm deep. 
+
+
+** 4- credits
+
+Without the excellent archival and reverse engineering work of the
+MAME and MESS developers (and associated emulation communities) this
+release would not have been in any way possible. From this community
+we would like to thank Lord Nightmare, Kevtris, Olivier Galibert,
+Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet,
+Couriersud, Michael Zapf, Joseph Zbiciak, and Tim Lindner (who are in
+no way affiliated with this project). The work of Dennis Klatt,
+Foreest S. Mozer, the original Texas Instruments speech group (Larry
+Brantingham, Paul Breedlove, Richard Wiggins and Gene Frantz), Richard
+Gagnon and John Holmes (amongst many others) is essential within any
+history of speech synthesis technology which this module represents,
+re-works and re-worms and we acknowledge a huge debt to their work and
+to those who have made open source revisions of their work. Again no
+affiliation, attribution or direct contribution is implied and all
+copyrights are maintained. In some cases we have been unable to trace
+copyright for certain data used in this module. We would also like to
+thank Peter Knight for his work on the Talkie library which was a
+major inspiration.
+
+** 5- Licensing
+
+* early notes
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
+
+http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
+
+also beddoes worm text. crow eats worm logo
+
+for cv and knobs - as above so below.... mirroring...
+
+for software see README.org in src
+
+* 
+
+- manual with worm insignia at top
+
+- collate worm quotes - Blake, alchemical - below
+
+- image K worm scansDONE
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out thus... [Maier]
+
+http://quod.lib.umich.edu/e/eebo/A51439.0001.001/1:3.6?rgn=div2;view=fulltext
+
+//CUT:In contrast to other speech modules which make use of a single speech
+chip or algorithm, ERD/WORM implements multiple speech codecs...
+
+softwares, worms, bends, twists and break an unspecified total of more
+than six well-known and media-historical speech codecs
+
+wormtable synthesis
+
+*** diagram from image - follow other formats
+
+for cv and knobs - as above so below.... mirroring...
+
+*** further worm quotes and worm poetry
+
+Blake/notes from Jung/Beddoes and other paris_worm texts->conqueror worm/anguish poems
+
+Technology buries us alive in order to re-place the site of execution
+which is the skin, under the earth. We are un-earth-worms.
+
+Basil Valentine: 4th key (p331 hermetic musuem): All technology that is
+derived of earth, must be decomposed and again reduced to earth...
+
+I am your Rational Power O Albion & that Human Form
+You call Divine, is but a Worm seventy inches long
+That creeps forth in a night & is dried in the morning sun
+In fortuitous concourse of memorys accumulated & lost
+It plows the Earth in its own conceit, it overwhelms the Hills
+Beneath its winding labyrinths, till a stone of the brook
+Stops it in midst of its pride among its hills & rivers
+[William Blake. Jerusalem The Emanation of The Giant Albion]
+
+*** worm terms
+
+- compost as audio_buffer - also toggle writes to this on/off
+
+- inter-worming, cross-worming interbreedings of speech synthesis technologies
+
+
+* mode notes
+
+** template
+
+X-
+Y-
+Z-
+TRIGGER-
+
+** TMS
+
+*** basic TMS synth
+
+X- pitch bend
+Y- bank
+Z- select phrase
+TRIGGER- phrase start
+
+*** phonemes
+
+X- period/pitch
+Y- repeat/length?
+Z- select phoneme
+TRIGGER- phoneme start
+
+*** bend length
+
+X- length bend
+Y- bank
+Z- select phrase
+TRIGGER- phrase start
+
+*** TTS
+
+X- period/pitch
+Y- text xaxis
+Z-  select ascii character for TTS
+TRIGGER- rephrase TTS
+
+*** raw - 5100, 5200 and 5220
+
+X- param xaxis
+Y- param value
+Z- bend pitch
+TRIGGER- new phrase err?
+
+** SP0256
+
+*** phonemes
+
+X- period/pitch
+Y- repeat/length?
+Z- select phoneme
+TRIGGER- phoneme start
+
+*** TTS
+
+X- period/pitch
+Y- text xaxis
+Z-  select ascii character for TTS
+TRIGGER- rephrase TTS
+
+*** sp0256vocabone
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256vocabtwo 
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256_1219
+
+X- period/pitch
+Y- repeat/length?
+Z- select phrase
+TRIGGER- phrase start
+
+*** sp0256bend
+
+X- param xaxis
+Y- param value
+Z- select phrase to bend - rom12+19
+TRIGGER- new phrase
+
+** VOTRAX
+
+*** straight mode / wow / gorf
+
+X- pitch bend
+Y- length of phoneme/phrase
+Z- select phoneme/phrase
+TRIGGER-reset to start of phoneme/phrase
+
+*** rawparam mode
+
+X- param xaxis
+Y- param value
+Z- pitch
+TRIGGER-freeze/unfreeze setting of parameters
+
+*** bend mode
+
+X- param xaxis
+Y- param value
+Z- select phrase to bend
+TRIGGER-reset to start of phrase
+
+*** TTS mode - changed
+
+X- pitch bend
+Y- text xaxis
+Z-  select ascii character for TTS
+TRIGGER- rephrase TTS
+

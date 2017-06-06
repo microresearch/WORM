@@ -1,5 +1,3 @@
-* for april xx release 
-
 * general TODO/notes
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but
