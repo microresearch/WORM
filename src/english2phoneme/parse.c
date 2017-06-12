@@ -256,7 +256,7 @@ void main(argc, argv)
 /*
 ** Transforms text to integer code phonemes.
 */
-unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output){
+/*unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -267,9 +267,9 @@ unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigne
     output[i]=output_array[i]; 
   }
   return output_count;
-}
+  }*/
 
-unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
+/*unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -284,7 +284,7 @@ unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input,
     else return (countme-strlen(NRL_list[output_array[i]]));
   }
   return countme;
-}
+  }*/
 
 
 

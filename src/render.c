@@ -228,13 +228,13 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
 	}	
-	else if (modus&32) {
+	/*	else if (modus&32) {
 	  u8 val=_selz*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
-	}	
+	  }*/	
 	else if (modus&128) {
-	  u8 val=_selz*130.0f;
+	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=64.0f*logpitch[val];
 	}	
@@ -431,11 +431,11 @@ void    sam_frame_rerun() {
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
 		  }	
-		  else if (modus&64) {
+		  /*		  else if (modus&64) {
 		    u8 val=_selz*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
-		  }	
+		    }*/	
 		  else if (modus&8) {
 		    u8 val=exy[1]*130.0f;
 		    MAXED(val,127);
@@ -462,13 +462,13 @@ void    sam_frame_rerun() {
 		    MAXED(val,127);
 		    pitchmod=pitches[0]*logpitch[val];
 		  }	
-		  else if (modus&32) {
+	/*		  else if (modus&32) {
 		    u8 val=_selz*130.0f;
 		    MAXED(val,127);
 		    pitchmod=pitches[mem49]*logpitch[val];
-		  }
+		    }*/
 	else if (modus&128) {
-	  u8 val=_selz*130.0f;
+	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=64.0f*logpitch[val];
 	}	
@@ -525,11 +525,11 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
 		  }	
-		  else if (modus&64) {
+		  /*		  else if (modus&64) {
 		    u8 val=_selz*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
-		  }	
+		    }*/	
 		  else if (modus&8) {
 		    u8 val=exy[1]*130.0f;
 		    MAXED(val,127);
@@ -599,11 +599,11 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
 		  }	
-		  else if (modus&64) {
+		  /*		  else if (modus&64) {
 		    u8 val=_selz*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
-		  }	
+		    }*/	
 
 		  else if (modus&8) {
 		    u8 val=exy[1]*130.0f;
@@ -640,13 +640,13 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    MAXED(val,127);
 		    pitchmod=pitches[Y]*logpitch[val];
 		  }	
-	else if (modus&32) {
+		    /*	else if (modus&32) {
 	  u8 val=_selz*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
-	}	
+	  }	*/
 	else if (modus&128) {
-	  u8 val=_selz*130.0f;
+	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=64.0f*logpitch[val];
 	}	
@@ -698,13 +698,13 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 	  MAXED(val,127);
 	  pitchmod=pitches[Y]*logpitch[val];
 	}	
-	else if (modus&32) {
+	/*	else if (modus&32) {
 	  u8 val=_selz*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
-	}	
+	  }*/	
 	else if (modus&128) {
-	  u8 val=_selz*130.0f;
+	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=64.0f*logpitch[val];
 	}	
@@ -772,13 +772,13 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 	  MAXED(val,127);
 	  pitchmod=pitches[Y]*logpitch[val];
 	}	
-	else if (modus&32) {
+	/*	else if (modus&32) {
 	  u8 val=_selz*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
-	}	
+	  }*/	
 	else if (modus&128) {
-	  u8 val=_selz*130.0f;
+	  u8 val=_selx*130.0f;
 	  MAXED(val,127);
 	  pitchmod=64.0f*logpitch[val];
 	}	

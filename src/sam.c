@@ -319,7 +319,7 @@ void sam_newsay_xy(void){
   u8 vocab=_selz*136.0f;
   MAXED(vocab,130);
   vocab=130-vocab;
-  strcpy(input,  sam_vocab_custom[vocab]); // TODO -replace with custom selected vocab!
+  strcpy(input,  sam_vocab_custom[vocab]); 
 
   if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
   Parser2();
@@ -365,15 +365,22 @@ void sam_newsay_xy(void){
 	}	
 }
 
-void sam_newsay_param(void){ // TODO for extended Vocab - is just basic select now
+void sam_newsay_param(void){ 
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
-  u8 vocab=_selz*43.0f;
-  MAXED(vocab,41);
-  vocab=41-vocab;
-  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replace with custom selected vocab!
+
+  u8 vocab=_selz*136.0f;
+  MAXED(vocab,130);
+  vocab=130-vocab;
+  strcpy(input,  sam_vocab_custom[vocab]); 
+
+//  u8 vocab=_selz*43.0f;
+//  MAXED(vocab,41);
+//  vocab=41-vocab;
+//  strcpy(input,  vocablist_sam[0][vocab]); // TODO -replace with custom selected vocab!
+
 
   u8 mouth=exy[2]*255.0;
   MAXED(mouth,254);
@@ -539,12 +546,18 @@ u8 sam_get_sample_param(int16_t* newsample){
 }
 
 
-u8 sam_get_sample_phon(int16_t* newsample){
+u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
   static int16_t lastsample;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=32;
+
+  u8 xaxis=_sely*19.0f;  // for 0-15 positions
+  MAXED(xaxis,19.0f);
+  xaxis=19.0f-xaxis;
+  exy[xaxis]=_selz;
+
+  modus=1; // was 32 but now we want z
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
@@ -558,7 +571,13 @@ u8 sam_get_sample_phons(int16_t* newsample){
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=64; // now with speed on selz FIX-DONE
+  modus=4; // was 64 mode
+
+  u8 xaxis=_sely*19.0f;  // for 0-15 positions
+  MAXED(xaxis,19.0f);
+  xaxis=19.0f-xaxis;
+  exy[xaxis]=_selz;
+
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
@@ -572,7 +591,13 @@ u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 fo
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
-  modus=128; 
+  modus=128; // changed 128 so is selx
+
+  u8 xaxis=_sely*19.0f;  // for 0-15 positions
+  MAXED(xaxis,19.0f);
+  xaxis=19.0f-xaxis;
+  exy[xaxis]=_selz;
+
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phonsing();
   *newsample=lastsample;
@@ -638,12 +663,13 @@ howmany--;
 return samplel;
 }
 
-int16_t sam_get_sample_phona(){
+int16_t sam_get_sample_phona(){ // wrapper...
 static u8 howmany=0;
 static int16_t samplel;
-while (howmany==0) howmany=(sam_get_sample_phon(&samplel)); 
-howmany--;
-return samplel;
+
+ while (howmany==0) howmany=(sam_get_sample_phon(&samplel)); 
+ howmany--;
+ return samplel;
 }
 
 int16_t sam_get_sample_phonsa(){

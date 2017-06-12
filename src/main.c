@@ -26,7 +26,7 @@
 #include "i2s.h"
 #include "adc.h"
 #include "audio.h"
-#include "effect.h"
+//#include "effect.h"
 #include "say.h"
 #include "klatt_phoneme.h"
 #include "nsynth.h"
@@ -112,7 +112,7 @@ void main(void)
     simpleklatt_init();
     simpleklatt_newsay();
   //  nvp_init();
-  //  klatt_init(); 
+    klatt_init(); 
   //  rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
   //  tube_init(); // tube.c
   //  NTube_init(&tuber);

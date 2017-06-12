@@ -30,9 +30,9 @@ typedef int32_t INT32;
 //** 5200- early echo II, disks of TRON????, TI99/4 
 //** 5220- later echo II, BBC MICRO
 
-#define TMS_VOCAB 67
-#define TMS_VOCAB_TOP 66
-#define TMS_VOCAB_F 70.0f
+#define TMS_VOCAB 61
+#define TMS_VOCAB_TOP 60
+#define TMS_VOCAB_F 65.0f
 #define ALLPHON_BANK 52 // CHECK THIS!
 
 // group first 5100:
@@ -40,7 +40,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
 
-/*
+
 #include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
@@ -84,9 +84,9 @@ typedef int32_t INT32;
 
 // then 5220 - all BBC micro
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
-#include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
-#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
-*/
+//#include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
+//#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
+
 
 // list of which_coeff:
 
@@ -104,7 +104,6 @@ typedef struct TMS_vocab__ {
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
 
-/*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -193,22 +192,22 @@ const TMS_vocab vocab_echofemale_2={wordlist_testroms_2, &tms5220_coeff, 98, 102
 const TMS_vocab vocab_acorn_1={wordlist_acorn_1, &tms5220_coeff, 81, 85.0f}; 
 const TMS_vocab vocab_acorn_2={wordlist_acorn_2, &tms5220_coeff, 82, 86.0f}; 
 
-const TMS_vocab vocab_large_male_one_1={wordlist_largemale_one_1, &tms5220_coeff, 97, 101.0f};
-const TMS_vocab vocab_large_male_one_2={wordlist_largemale_one_2, &tms5220_coeff, 98, 102.0f};
+//const TMS_vocab vocab_large_male_one_1={wordlist_largemale_one_1, &tms5220_coeff, 97, 101.0f};
+//const TMS_vocab vocab_large_male_one_2={wordlist_largemale_one_2, &tms5220_coeff, 98, 102.0f};
 
-const TMS_vocab vocab_large_male_two_1={wordlist_largemale_two_1, &tms5220_coeff, 97, 101.0f};
-const TMS_vocab vocab_large_male_two_2={wordlist_largemale_two_2, &tms5220_coeff, 98, 102.0f};
+//const TMS_vocab vocab_large_male_two_1={wordlist_largemale_two_1, &tms5220_coeff, 97, 101.0f};
+//const TMS_vocab vocab_large_male_two_2={wordlist_largemale_two_2, &tms5220_coeff, 98, 102.0f};
 
-const TMS_vocab vocab_male_1={wordlist_male_1, &tms5220_coeff, 102, 106.0f};
-const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
+//const TMS_vocab vocab_male_1={wordlist_male_1, &tms5220_coeff, 102, 106.0f};
+//const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
  
 
 // how many are there = 46 - check each TODO +22 divided = 68 
 
-const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_1}; // now 67 minus talko
-*/
+const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2};// &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, vocab_male_1, vocab_male_2}; // now 65 minus talko and minus male1, male2 minus 4=61
 
-const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
+
+//const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
 // TEST: above commented out to speed up
 
@@ -2826,7 +2825,7 @@ int16_t processbendlength(u8 *ending)
 		else if (m_subcycle == 3)
 		{
 			m_subcycle = m_subc_reload;
-			if (counter++>(10-(_selx*10.0f))){ // TEST - bend of length but doesn't make faster
+			if (counter++>(16-((1.0f-_selx)*16.0f))){ // TEST - bend of length but doesn't make faster
 			m_PC++;
 			counter=0;
 			}
@@ -3125,7 +3124,7 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F; 
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  whichbank=0; /// TEST for speedups // test for 5200 echofemale
+  //  whichbank=0; /// TEST for speedups // test for 5200 echofemale
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -3147,7 +3146,7 @@ void tms_newsay_lowbit(){
   whichbank=_sely*TMS_VOCAB_F; 
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  whichbank=0; /// TEST for speedups
+  //  whichbank=0; /// TEST for speedups
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -3163,8 +3162,7 @@ void tms_newsay_lowbit(){
 
 void tms_newsay_allphon(){
   m_digital_select=1;
-  //  u8 whichbank=37; // to check
-  u8 whichbank=1; // WAS 37 but for testcode is 1
+  u8 whichbank=ALLPHON_BANK; // for testcode is 1
 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   m_new_frame_energy_idx = 0;
@@ -3181,7 +3179,7 @@ void tms_newsay_allphon(){
 void tms_newsay_TTS(){
   // this is our allphon code
   m_digital_select=1;
-  u8 whichbank=1; // WAS 37 but for testcode is 1
+  u8 whichbank=ALLPHON_BANK; // WAS 37 but for testcode is 1
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
@@ -3237,8 +3235,6 @@ void tms_newsay_raw5220(){
   m_talk_status = 1;
 };
 
-/// newsays for specific vocabs/chipsets
-
 void tms_newsay_specific(u8 whichbank){
   m_digital_select=1;
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
@@ -3253,6 +3249,16 @@ void tms_newsay_specific(u8 whichbank){
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
   ptrBit = 0;
 };
+
+/// newsays for specific vocabs/chipsets
+
+void tms_newsay_specifica(){
+  tms_newsay_specific(ALLPHON_BANK);
+}
+
+void tms_newsay_specific5100(){ // add vocabs
+  tms_newsay_specific(0);
+}
 
 ///// get_samples
 
@@ -3354,7 +3360,7 @@ int16_t tms_get_sample_raw5220(){
 
 //// bends and vocab selection
 
-int16_t tms_get_sample_bend5100(u8 fix){// for a 5100 vocab such as 0 to begin with
+int16_t tms_get_sample_bend5100(u8 fix){
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
@@ -3363,21 +3369,28 @@ int16_t tms_get_sample_bend5100(u8 fix){// for a 5100 vocab such as 0 to begin w
     tms_newsay_specific(fix);
   }
   return sample;
-
 }
 
-int16_t tms_get_sample_bend5200(u8 fix){ // for allphons - TODO - other fixed vocabs
+int16_t tms_get_sample_bend5100w(){// for a 5100 vocab such as 0 to begin with
+  tms_get_sample_bend5100(0);
+}
+
+int16_t tms_get_sample_bend5200(u8 fix){ 
   modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample=processbend5200(&ending);
   if (ending==1){
-    tms_newsay_specific(fix); // TODO this will change with full vocab!
+    tms_newsay_specific(fix); 
   }
   return sample;
 }
 
-int16_t tms_get_sample_5100pitchtable(u8 fix){  /// additional vocabs as extra functions - which ones?
+int16_t tms_get_sample_bend5200a(){ // for allphons - TODO - other fixed vocabs
+  tms_get_sample_bend5200(ALLPHON_BANK);
+}
+
+int16_t tms_get_sample_5100pitchtable(u8 fix){ 
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
@@ -3388,18 +3401,26 @@ int16_t tms_get_sample_5100pitchtable(u8 fix){  /// additional vocabs as extra f
   return sample;
 }
 
-int16_t tms_get_sample_5200pitchtable(u8 fix){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c
+int16_t tms_get_sample_5100pitchtablew(){  /// additional vocabs as extra functions - which ones?
+  tms_get_sample_5100pitchtable(0);
+}
+
+int16_t tms_get_sample_5200pitchtable(u8 fix){ 
   modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitch_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(fix); // TODO this will change with full vocab! 
+    tms_newsay_specific(fix);
   }
   return sample;
+}
+
+int16_t tms_get_sample_5200pitchtablea(){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c ?? IS IT TODO?
+  tms_get_sample_5200pitchtable(ALLPHON_BANK);
 }
   
-int16_t tms_get_sample_5100ktable(u8 fix){  /// additional vocabs as extra functions - which ones?
+int16_t tms_get_sample_5100ktable(u8 fix){
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
@@ -3410,18 +3431,26 @@ int16_t tms_get_sample_5100ktable(u8 fix){  /// additional vocabs as extra funct
   return sample;
 }
 
-int16_t tms_get_sample_5200ktable(u8 fix){ // for allphons and also one more - is just a coeff change
+int16_t tms_get_sample_5100ktablew(){  /// additional vocabs as extra functions - which ones?
+  tms_get_sample_5100ktable(0);
+}
+
+int16_t tms_get_sample_5200ktable(u8 fix){
   modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
   if (ending==1){
-    tms_newsay_specific(fix); // TODO this will change with full vocab!
+    tms_newsay_specific(fix);
   }
   return sample;
 }
 
-int16_t tms_get_sample_5100kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
+int16_t tms_get_sample_5200ktablea(){ // for allphons and also one more - is just a coeff change
+tms_get_sample_5200ktable(ALLPHON_BANK);
+}
+
+int16_t tms_get_sample_5100kandpitchtable(u8 fix){
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
   int16_t sample; u8 ending=0;
@@ -3432,14 +3461,21 @@ int16_t tms_get_sample_5100kandpitchtable(u8 fix){ //bend pitchtable AND ktable 
   return sample;
 }
 
-int16_t tms_get_sample_5200kandpitchtable(u8 fix){ //bend pitchtable AND ktable at same time
+int16_t tms_get_sample_5100kandpitchtablew(u8 fix){ //bend pitchtable AND ktable at same time - add vocabs
+  tms_get_sample_5100kandpitchtable(0);
+}
+
+int16_t tms_get_sample_5200kandpitchtable(u8 fix){
   modus=0;
   m_coeff=&T0285_2501E_coeff;
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5200(&ending);
   if (ending==1){
-    tms_newsay_specific(fix); // TODO this will change with full vocab!
+    tms_newsay_specific(fix); 
   }
   return sample;
+}
 
+int16_t tms_get_sample_5200kandpitchtablea(u8 fix){ //bend pitchtable AND ktable at same time - add vocabs
+  tms_get_sample_5200kandpitchtable(ALLPHON_BANK);
 }

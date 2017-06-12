@@ -1759,8 +1759,6 @@ playwave????
 
 *** TMS modes
 
-*- maybe leave till last as needs vocab expansion and we will also need to break down vocabs into smaller ones!*
-
 ** 20/4
 
 - flash overflow with digitalk and all TMS vocabs so no room for espeak... 
@@ -1795,11 +1793,43 @@ playwave????
 
 *** SAM
 
-- sam_phon, sam_phons and sam_phonsing have exy as y and z->sel so we need to fix new pitch mode for those on z instead!
+- sam_phon, sam_phons and sam_phonsing have exy as y and z->sel so we need to fix new pitch mode for those on x instead! was this DONE?
+
 - fixed new modus for extra phon modes - still somehow croaky on pitch ???, also some bugs fixed DONE
 - fixed TTS by adding new SAM mode as it didn't like spaces...
 
 - what should pitch/speed logs be? - leave as is...
+
+** 12/6 - what needs to be done...
+
+- we have on t60 makefile for testcode only -> Makefile.test - sync up Makefiles across t60 and x220
+
+*DONE:*
+
+- started testing sam modes and manual modes format work 
+- sam_newsay_param fixed for custom vocab, changed exy scheme for phoneme code so pitch etc. changes are on X!
+
+- TMS trimmed out male1 and male 2 so 65 banks as overflowed flash on
+  T60 and we need space for extra code... but still too large - test
+  all with -Os or with x220 - maybe we can add vocabs back in if we can...
+
+- started wrapping TMS modes and add to header - DONE - TO TEST!
+
+*TODO:*
+
+- check sam modes - start model for modes documentationX
+
+- clean and figure out all TMS modes: additional wrapped tms modes for other vocabs (see how many modes we have)
+
+- check later Klatt modes - what are klatt modes we still need to add and test in audio.c (from old_audio.c)?
+- check all TODO and mark as done in files... cleaning up in general
+
+FINAL:
+- changes in audio.c for triggers
+- compost
+- document each mode for the manual BELOW as we test
+- re-test everything again
+- more release recordings
 
 * FINAL/FURTHER TODO:
 
@@ -1810,18 +1840,10 @@ playwave????
 - Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!
 - put back in missing TMS vocabs+ new modes=newsay_specific, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
 - test/document each mode
-- manual outline
 
 - HW tests: test programmingDONE, finish build, test all = maybe code one
   test mode for quick upload: TESTING: ADC extents, CV ins, trigger in
   with say wavetable code
-
-** manual
-
-- all licensing in place and acknowledgments
-
-
-
 
 * KLATT/rsynth notes
 
@@ -2123,20 +2145,61 @@ m_rom (rename!)?
 
 - one rom with lots of vocab
 
-* questions:
+* new mode notes for manual
 
-** all roms/dumps
+MAJOR MODE
 
-MPF - TMS- http://electrickery.xs4all.nl/comp/mpf1/doc/index.html where are extended speech roms?
+| MODE # | TYPE    | TITLE          | X           | Y              | Z       | TRIGGER       | NOTES                   |
+|--------+---------+----------------+-------------+----------------+---------+---------------+-------------------------|
 
-** control
+how modes are numbered
 
-** glottal sources
+** model for now - SAM
 
-** vocoding
+- 25&sambanks0er, 26&sambanks1er, 27&samTTSer, 28&samTTSser, 29&samphoner, 30&samphonser, 31&samphonsinger, 32&samxyer, 33&samparamer, 34&sambender
 
-** data sources/wavetables to generate
-* mode notes for manual - see now manual.org
+explain types of each sub-mode
+
+own notes = T tested
+
+| MODE # | TYPE    | TITLE          | X      | Y              | Z       | TRIGGER       | NOTES                   |
+|--------+---------+----------------+--------+----------------+---------+---------------+-------------------------|
+|        | vocab   | sambanks0er    | pitch  | bank           | phrase  | phrase start  | T                       |
+|        | vocab   | sambanks1er    | length | bank           | phrase  | phrase start  | T                       |
+|        | TTS     | samTTSer       | pitch  | position       | letter  | re-phrase TTS | T                       |
+|        | TTS     | samTTSser      | length | position       | letter  | re-phrase TTS | T                       |
+|        | phoneme | samphoner      | pitch  | position       | phoneme | phrase start  | T start is phoneme list |
+|        | phoneme | samphonser     | length | position       | phoneme | phrase start  | T start is phoneme list |
+|        | phoneme | sampphonsinger | pitch  | position       | phoneme | phrase start  | T pitch is absolute     |
+|        | vocab   | samxyer        | pitch  | length         | phrase  | phrase start  | T selected vocab        |
+|        | worm/xy | samparamer     | x-axis | param          | phrase  | phrase start  | T selected vocab        |
+|        | worm    | sambender      | x-axis | frequency data | phrase  | phrase start  | T selected vocab        |
+  
+** DIGITALKER
+
+** TMS
+
+| MODE # | TYPE    | TITLE         | X      | Y        | Z       | TRIGGER       | NOTES                   |
+|--------+---------+---------------+--------+----------+---------+---------------+-------------------------|
+|        | vocab   | tmser         | pitch  | bank     | phrase  | phrase start  | T                       |
+|        | vocab   | tmslowbiter   | pitch  | bank     | phrase  | phrase start  | T low bitrate           |
+|        | vocab   | tmssinger     | pitch  | bank     | phrase  | phrase start  | T pitch is absolute     |
+|        | phoneme | tmsphoner     | pitch  | length   | phoneme | phoneme start | T                       |
+|        | phoneme | tmsphonsinger | pitch  | length   | phoneme | phoneme start | T pitch is absolute     |
+|        | TTS     | tmsTTSer      | pitch  | position | letter  | re-phrase TTS | T                       |
+|        | vocab   | tmsbendlength | length | bank     | phrase  | phrase start  | T length starts at true |
+|        |         |               |        |          |         |               |                         |
+
+
+** SP0256
+
+** VOTRAX
+
+** KLATT
+
+** COMPOST/ANY ADD MODES
+
+* older mode notes
 
 ** template
 

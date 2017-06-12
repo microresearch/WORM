@@ -50,7 +50,7 @@ synthesis architecture (Linear Predictive Coding) from the late 1970s
 
 - what each mode does and basic theory of operation - eg. knobs,
   trigger, bendings, compost, vocab selection (banks?), text to
-  speech, allophones
+  speech(TTS) allophones
 
 - layout speed, XYZ and triggerIN, OUT!
 
@@ -58,7 +58,7 @@ and how CVs are arranged - as above so below.... mirroring...
 
 ** 2-table for each mode - submodes
 
-| X | Y | Z | TRIGGER |
+| TITLE  | X | Y | Z | TRIGGER |
 
 ** 3- tech notes/details
 
