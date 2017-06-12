@@ -9,9 +9,30 @@ swelling, and impatient, of further delay, he broke out thus... [Maier]
 All technology that is derived of earth, must be decomposed and again
 reduced to earth... [Valentine]
 
-software worming of emulated worm code speech cores (from 70s and 80s of the last century)
+software worming of emulated human speech cores (from 70s to 90s of
+the last century)
 
-- how we call the x worm modes?
+examples of these modules: such as Texas Instruments Speak and Worm
+family of devices, Atari and TI99/4 arcade games (wormsec)
+
+... LIST other possible devices...
+
+VOTRAX:  Federal Screw Worms  - votrax worm-n-talk VOTRAX/VERMIS -
+VERTRIS
+
+GENERAL INSTRUMENTS SP0256:  Magnaworm Odyssey2, intelliworm
+
+- how these tend to work: divided up as to source/filter model (Klatt, votrax
+  and SAM), LPC models (TMS, SP0256) and other forms of speech
+  compression (digitalker)
+
+explain a bit LPC, allophones and speech synthesis in general
+
+dividing speech process worm like, reduce worm bits...
+
+- how we call the x worm modes? what are types of worm: worm, dragon,
+  serpent, termite, tapeworm, glowworm, white worm, silkworm,
+  VERMES/VERMIS, wyrm, wurm, flatworm, maggot, lumbricine 
 
 - what are the modes? 6 major speech synthesis worm voices
 
@@ -28,7 +49,8 @@ synthesis architecture (Linear Predictive Coding) from the late 1970s
 / early 1980s, as used on several popular applications:
 
 - what each mode does and basic theory of operation - eg. knobs,
-  trigger, bendings, compost, vocab selection (banks?)
+  trigger, bendings, compost, vocab selection (banks?), text to
+  speech, allophones
 
 - layout speed, XYZ and triggerIN, OUT!
 
