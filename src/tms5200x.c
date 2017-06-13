@@ -40,7 +40,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
 
-
+/*
 #include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
@@ -87,6 +87,7 @@ typedef int32_t INT32;
 //#include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 //#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
 
+*/
 
 // list of which_coeff:
 
@@ -104,6 +105,7 @@ typedef struct TMS_vocab__ {
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
 
+/*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -205,9 +207,9 @@ const TMS_vocab vocab_acorn_2={wordlist_acorn_2, &tms5220_coeff, 82, 86.0f};
 // how many are there = 46 - check each TODO +22 divided = 68 
 
 const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2};// &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, vocab_male_1, vocab_male_2}; // now 65 minus talko and minus male1, male2 minus 4=61
+*/
 
-
-//const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
+const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
 // TEST: above commented out to speed up
 
@@ -3124,7 +3126,7 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F; 
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //  whichbank=0; /// TEST for speedups // test for 5200 echofemale
+  whichbank=1; /// TEST for speedups // test for 5200 echofemale
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -3212,7 +3214,7 @@ void tms_newsay_raw5100(){
   m_digital_select=1;
   u8 whichbank;
   
-  whichbank=0; // 51000
+  whichbank=0; // 5100 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
     m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;

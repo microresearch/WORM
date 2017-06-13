@@ -118,7 +118,8 @@ float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRati
 
 typedef float speechPlayer_frameParam_t;
 
-typedef struct  __attribute__((packed)) values  {
+//typedef struct  __attribute__((packed)) values  {
+typedef struct  values  {
 	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
 	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
 	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
@@ -359,7 +360,7 @@ void nvp_newsay(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-        int val=_sely*1027.0f;
+    int val=_sely*1027.0f;
     MAXED(val,1023);
     this_frame_length=(int)(1024.0f*logspeed[val])<<2; // sely
   this_interpol=this_frame_length/2;
@@ -457,7 +458,8 @@ int16_t nvp_get_sample(){
   //  static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
-    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    oldframer=framer;
     nvp_newsay();
     count=0;
     //        memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
@@ -498,7 +500,8 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
   //  static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
-    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    oldframer=framer;
     nvp_newsay_vocab();
     count=0;
     //      memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
@@ -537,7 +540,8 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
   //  static u16 count=0;
   if (count>this_frame_length){
   // is this a new frame?
-    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    oldframer=framer;
     nvp_newsay_vocab();
     count=0;
     //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol

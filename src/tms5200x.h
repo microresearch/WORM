@@ -27,9 +27,7 @@ int16_t tms_get_sample_raw5220();
 void tms_newsay_raw5220();
 
 int16_t tms_get_sample_5100pitchtablew();  // vocab=0 ADD VOCABS
-
 int16_t tms_get_sample_5100ktablew();  // vocab=0 ADD VOCABS
-
 int16_t tms_get_sample_5200ktablea();// allphon ADD
 
 void tms_newsay_specific(u8 whichbank);

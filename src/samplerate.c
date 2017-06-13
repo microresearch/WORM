@@ -30,7 +30,7 @@ static inline void doadc(){
   CONSTRAIN(_sely,0.0f,1.0f);
 
   value =(float)adc_buffer[SELZ]/65536.0f; 
-  smoothed_adc_value[4] += 0.1f * (value - smoothed_adc_value[4]); // 
+  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // 
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
 }

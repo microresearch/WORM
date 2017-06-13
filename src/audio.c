@@ -222,7 +222,7 @@ static const wormer sambanks1er={0, 1.0f, sam_get_sample_banks1a, sam_newsay_ban
 static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 2}; // pitch on x
 static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 2}; // speed on x
 
-// TODO: re-doing for own XY - DONE/TESTED!
+// DONE: re-done for own XY - DONE/TESTED!
 
 static const wormer samphoner={15, 1.0f, sam_get_sample_phona, sam_newsay_phon, 0, 0};  // try with newsay trigger - was exy but now has own exy
 static const wormer samphonser={15, 1.0f, sam_get_sample_phonsa, sam_newsay_phon, 0, 0};  // this one is with speed of phoneme
@@ -233,28 +233,11 @@ static const wormer samxyer={0, 1.0f, sam_get_sample_xya, sam_newsay_banks0, 0, 
 static const wormer samparamer={3, 1.0f, sam_get_sample_parama, sam_newsay_param, 2, 0}; // all x params as x/y axis with z as selected vocab 2=exy_trigger
 static const wormer sambender={239, 1.0f, sam_get_sample_benda, sam_newsay_xy, 2, 0};  // x/y bends freq data, z as selected
 
-// start to add for testings BELOW:
+//39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 
 
 static const wormer digitalker={0, 1.0f, digitalk_get_sample, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
-
-///
-
-static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // klatt has its own xy form
-
-///
-
-static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0};
-
-// these are extra tubes modes not in oldaudio+sing, bend, raw(TEST!)
-static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
-static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
-static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
-static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
-static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
-//static const wormer waveer={0, 1.0f, wave_get_sample, wave_newsay, 0, 0};
-
-static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
-static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
+static const wormer digitalker_sing={0, 1.0f, digitalk_get_sample_sing, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
+static const wormer digitalker_bendpitchvals={31, 1.0f, digitalk_get_sample_bendpitchvals, digitalk_newsay, 2, 0}; // digitalker now has resampling inside say
 
 // 18 tms modes: 
 
@@ -268,15 +251,63 @@ static const wormer tmsbendlengther={0, 0.25f, tms_get_sample_bendlength, tms_ne
 
 // tmsraw5100, tmsraw5200, tmsraw5220, 
 
-// tmsbend5100, tmsbend5200, tms5100pitchtablebend, tms5200pitchtablebend, tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend
+static const wormer tmsraw5100er={10, 0.25f, tms_get_sample_raw5100, tms_newsay_raw5100, 2, 0}; // maxextent=10, triggerxymode
+static const wormer tmsraw5200er={10, 0.25f, tms_get_sample_raw5200, tms_newsay_raw5200, 2, 0}; // maxextent=10, triggerxymode
+static const wormer tmsraw5220er={10, 0.25f, tms_get_sample_raw5220, tms_newsay_raw5220, 2, 0}; // maxextent=10, triggerxymode
 
+// tms5100ktablebend, tms5200ktablebend, tms5100kandpitchtablebend, tms5200kandpitchtablebend
 // bends -> we need to add vocabs for each case +1 - how to choose?
+
+static const wormer tmsbend5100er={11, 0.25f, tms_get_sample_bend5100w, tms_newsay_specific5100, 2, 0}; // maxextent=11, triggerxymode
+static const wormer tmsbend5200er={11, 0.25f, tms_get_sample_bend5200a, tms_newsay_specifica, 2, 0}; // maxextent=11, triggerxymode - allphons 
+
+static const wormer tms5100pitchtablebender={31, 0.25f, tms_get_sample_5100pitchtablew, tms_newsay_specific5100, 2, 0}; // maxextent=31, triggerxymode
+static const wormer tms5200pitchtablebender={63, 0.25f, tms_get_sample_5200pitchtablea, tms_newsay_specifica, 2, 0}; // maxextent=63, triggerxymode - allphons 
+
+static const wormer tms5100ktablebender={167, 0.25f, tms_get_sample_5100ktablew, tms_newsay_specific5100, 2, 0}; // maxextent=167, triggerxymode
+static const wormer tms5200ktablebender={167, 0.25f, tms_get_sample_5200ktablea, tms_newsay_specifica, 2, 0}; // maxextent=167, triggerxymode - allphons
+
+static const wormer tms5100kandpitchtablebender={199, 0.25f, tms_get_sample_5100kandpitchtablew, tms_newsay_specific5100, 2, 0}; // maxextent=199, triggerxymode
+static const wormer tms5200kandpitchtablebender={231, 0.25f, tms_get_sample_5200kandpitchtablea, tms_newsay_specifica, 2, 0}; // maxextent=231, triggerxymode - allphons
+
+// TODO: we need an order for these which makes sense
+// from old_audio: TO TEST and document 14/6+
+
+static const wormer simpleklatter={39, 1.0f, simpleklatt_get_sample, simpleklatt_newsay, 2, 0};
+static const wormer nvpvocaber={0, 1.0f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
+
+static const wormer rsynthy={0, 1.0f, rsynth_get_sample, rsynth_newsay, 0, 0};
+static const wormer rsynthelm={0, 1.0f, rsynth_get_sample, rsynth_newsay_elm, 0, 0}; // TODO port own version of exy for elmDONE-TEST!
+static const wormer rsynthsingle={0, 1.0f, rsynth_get_sample_single, rsynth_newsay_single, 0, 0};
+static const wormer rsynthysing={0, 1.0f, rsynth_get_sample_sing, rsynth_newsay, 0, 0};
+
+static const wormer klattsingle={0, 1.0f, klatt_get_sample_single, klatt_newsay_single, 0, 0};
+static const wormer klattvocab={0, 1.0f, klatt_get_sample_vocab, klatt_newsay_vocab, 0, 0};
+static const wormer klattsinglesing={0, 1.0f, klatt_get_sample_single_sing, klatt_newsay_single, 0, 0};
+static const wormer klattvocabsing={0, 1.0f, klatt_get_sample_vocab_sing, klatt_newsay_vocab, 0, 0};
+
+static const wormer nvpvocabsing={0, 1.0f, nvp_get_sample_vocab_sing, nvp_newsay_vocab_trigger, 0, 0};
+
+// newer and tested...
+
+static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
+static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // klatt has its own xy form - what is selz doing - check?
+static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0}; // //60tubes=tube.c=tube_get_sample
+
+// these are extra tubes modes not in oldaudio+sing, bend, raw(TEST!)
+static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
+static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
+static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
+
+static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
+static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
 
 /// TODO - these will be re-arranged in order that makes sense: klatt, tubes and compost last:
 
-static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &digitalker, &tubxyer, &nvper, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther};
+static const wormer *wormlist[]={&tuber, &tubsinger, &tubbender, &tubrawer, &composter, &tubxyer, &nvper, &klatter, &sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &simpleklatter, &nvpvocaber};
 
-  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&digitalker, 6&tubxyer, 7&nvper, 8&klatter, 9sp0256er, 10&sp0256TTSer, 11&sp0256singer, 12&sp0256vocaboneer, 13&sp0256vocabtwoer, 14&sp02561219er, 15&sp0256bender 16&votraxer, 17&votraxTTSer, 18&votraxgorfer, 19&votraxwower, 20&votraxwowfilterbender, 21&votraxbender, 22&votraxparamer, 23&votraxsinger, 24&sambanks0er, 25&sambanks1er, 26&samTTSer, 27&samTTSser, 28&samphoner, 29&samphonser, 30&samphonsinger, 31&samxyer, 32&samparamer, 33&sambender, 34tmser, 35tmslowbiter, 36tmssinger, 37&tmsphoner, 38&tmsphonsinger, 39tmsttser, 40tmsbendlengther
+  // list: 0&tuber, 1&tubsinger, 2&tubbender, 3&tubrawer, 4&composter, 5&tubxyer, &nvper, 8&klatter, 9sp0256er, 10&sp0256TTSer, 11&sp0256singer, 12&sp0256vocaboneer, 13&sp0256vocabtwoer, 14&sp02561219er, 15&sp0256bender 16&votraxer, 17&votraxTTSer, 18&votraxgorfer, 19&votraxwower, 20&votraxwowfilterbender, 21&votraxbender, 22&votraxparamer, 23&votraxsinger, 24&sambanks0er, 25&sambanks1er, 26&samTTSer, 27&samTTSser, 28&samphoner, 29&samphonser, 30&samphonsinger, 31&samxyer, 32&samparamer, 33&sambender, 34tmser, 35tmslowbiter, 36tmssinger, 37&tmsphoner, 38&tmsphonsinger, 39tmsttser, 40tmsbendlengther, 41&tmsraw5100er, 42&tmsraw5200er, 43&tmsraw5220er, 44&tmsbend5100er, 45&tmsbend5200er, 46=tms5100pitchtablebender, 47=, &tms5200pitchtablebender, 48&tms5100ktablebender, 49&tms5200ktablebender, 50&tms5100kandpitchtablebender, 51&tms5200kandpitchtablebender//-1 51=digitalker, 52=&digitalker_sing, 53=&digitalker_bendpitchvals, 54-simpleklatter, 55&nvpvocaber +9=64
 
 static int16_t comp_counter=0;
 static u16 cc=0;
@@ -411,9 +442,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  //25&sambanks0er, 26&sambanks1er, 27&samTTSer, 28&samTTSser, 29&samphoner, 30&samphonser, 31&samphonsinger, 32&samxyer, 33&samparamer, 34&sambender
-
-  _intmode=40; //TESTY!
+  _intmode=55; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 

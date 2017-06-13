@@ -643,6 +643,17 @@ int16_t rsynth_get_sample_elm(){
   static slope_t start[nEparm];
   static slope_t end[nEparm];
   static unsigned t=0;
+  //  extent nextent={51,53.0f};
+
+  u8 xaxis=_selx*55.0f;
+  MAXED(xaxis,51); 
+  xaxis=51-xaxis;
+  u8 val=_selz*87.0f;
+  MAXED(val,83);
+  val=83-val;
+  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
+  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
+
   
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
     rsynth_newsay_elm();

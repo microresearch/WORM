@@ -1831,6 +1831,20 @@ FINAL:
 - re-test everything again
 - more release recordings
 
+** 13/6
+
+- Z ->ADC filter (in samplerate.c) as 0.01f - seems ok for stability and max extent of say 128
+
+- TMS: on RAW if we need to invert certain parameters or keep all consistent?
+
+- digitalker_sing - fixed length sely bug +1
+
+- nvp - removed packed attribute as this means it fails work under -Os but may be inverse in -O2???
+
+- porting in from oldaudio all klatt/nvp/rsynth and still needs to be checked
+
+- rsynthelm={0, 1.0f, rsynth_get_sample, rsynth_newsay_elm, 0, 0}; // TODO port own version of exy for elmDONE - TO TEST!
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f
@@ -2156,8 +2170,6 @@ how modes are numbered
 
 ** model for now - SAM
 
-- 25&sambanks0er, 26&sambanks1er, 27&samTTSer, 28&samTTSser, 29&samphoner, 30&samphonser, 31&samphonsinger, 32&samxyer, 33&samparamer, 34&sambender
-
 explain types of each sub-mode
 
 own notes = T tested
@@ -2177,23 +2189,43 @@ own notes = T tested
   
 ** DIGITALKER
 
+| MODE # | TYPE  | TITLE                    | X      | Y      | Z      | TRIGGER      | NOTES               |
+|--------+-------+--------------------------+--------+--------+--------+--------------+---------------------|
+|        | vocab | digitalker               | pitch  | length | phrase | phrase start | T                   |
+|        | vocab | digitalkersing           | pitch  | length | phrase | phrase start | T pitch is absolute |
+|        | bend  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T bend pitchtable   |
+
+
 ** TMS
 
-| MODE # | TYPE    | TITLE         | X      | Y        | Z       | TRIGGER       | NOTES                   |
-|--------+---------+---------------+--------+----------+---------+---------------+-------------------------|
-|        | vocab   | tmser         | pitch  | bank     | phrase  | phrase start  | T                       |
-|        | vocab   | tmslowbiter   | pitch  | bank     | phrase  | phrase start  | T low bitrate           |
-|        | vocab   | tmssinger     | pitch  | bank     | phrase  | phrase start  | T pitch is absolute     |
-|        | phoneme | tmsphoner     | pitch  | length   | phoneme | phoneme start | T                       |
-|        | phoneme | tmsphonsinger | pitch  | length   | phoneme | phoneme start | T pitch is absolute     |
-|        | TTS     | tmsTTSer      | pitch  | position | letter  | re-phrase TTS | T                       |
-|        | vocab   | tmsbendlength | length | bank     | phrase  | phrase start  | T length starts at true |
-|        |         |               |        |          |         |               |                         |
+| MODE # | TYPE    | TITLE                 | X      | Y        | Z       | TRIGGER       | NOTES                               |
+|--------+---------+-----------------------+--------+----------+---------+---------------+-------------------------------------|
+|        | vocab   | tmser                 | pitch  | bank     | phrase  | phrase start  | T                                   |
+|        | vocab   | tmslowbiter           | pitch  | bank     | phrase  | phrase start  | T low bitrate                       |
+|        | vocab   | tmssinger             | pitch  | bank     | phrase  | phrase start  | T pitch is absolute                 |
+|        | phoneme | tmsphoner             | pitch  | length   | phoneme | phoneme start | T                                   |
+|        | phoneme | tmsphonsinger         | pitch  | length   | phoneme | phoneme start | T pitch is absolute                 |
+|        | TTS     | tmsTTSer              | pitch  | position | letter  | re-phrase TTS | T                                   |
+|        | vocab   | tmsbendlength         | length | bank     | phrase  | phrase start  | T length starts at true             |
+|        | raw     | tmsraw5100            | x-axis | param    | pitch   | retrigger     | T 5100 chipset raw codes            |
+|        | raw     | tmsraw5200            | x-axis | param    | pitch   | retrigger     | T 5200 chipset raw codes            |
+|        | raw     | tmsraw5220            | x-axis | param    | pitch   | retrigger     | T 5220 chipset raw codes            |
+|        | bend    | tmsbend5100           | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend                 |
+|        | bend    | tmsbend5200           | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend                 |
+|        | bend    | tms5100pitchtable     | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of pitchtable   |
+|        | bend    | tms5200pitchtable     | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of pitchtable   |
+|        | bend    | tms5100ktable         | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of ktable       |
+|        | bend    | tms5200ktable         | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of ktable       |
+|        | bend    | tms5100kandpitchtable | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of k/pitchtable |
+|        | bend    | tms5200kandpitchtable | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of k/pitchtable |
 
+NOTES: on RAW if we need to invert certain parameters or keep all consistent, also where we bend volume as can be wierd
 
 ** SP0256
 
 ** VOTRAX
+
+/////////////////
 
 ** KLATT
 

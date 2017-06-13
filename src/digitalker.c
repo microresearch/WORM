@@ -880,7 +880,7 @@ void digitalker_step()
 			if (modus==0){
 			m_repeats+=val;
 			}
-			else if (modus==1) m_repeats=val; // modus is neither for any xy action such as table bends
+			else if (modus==1) m_repeats=val+1; // modus is neither for any xy action such as table bends
 #else
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 #endif
