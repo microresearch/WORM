@@ -1849,6 +1849,8 @@ FINAL:
 
 - fixed bug (int/char) in rsynthelm - and we could also do more singing elm with absolute pitch!
 
+- drop some modes and check extents - even 64 modes is maybe too much (32?)
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f
@@ -2264,8 +2266,8 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 |        | phoneme | tuber           | pitch  | length | phoneme | phoneme start   | T                   |
 |        | phoneme | tubsinger       | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
 |        | bend    | tubbender       | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
-|        |         | tubrawer        | x-axis | param  | pitch   | freeze/unfreeze | wierd???keep or???  |
-|        |         | tubxyer         | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
+|        | raw     | tubrawer        | x-axis | param  | pitch   | freeze/unfreeze | wierd???keep or???  |
+|        | raw     | tubxyer         | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
 
 ** COMPOST
 

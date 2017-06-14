@@ -19,21 +19,23 @@ Instruments Intelliworm. ERD/WORM further bends and worms key speech
 synthesis algorithms across XX modes with full trigger, CV and knob
 control over core aspects of these speech cores. 
 
-ERD/WORM functions best the more it deviates serpentinely from
-recognizable speech simulation (as if it would) towards the stammered,
-a/rhythmic and timbral, producing new sounds through the use of fast
-re-triggering of phrases and phonemes, and exploring multiple bends by
-CV.
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
+*** background
 
 Human speech synthesis originates in desires both spectacular and
 utilitarian. The levers, rods and tubes of Wolfgang von Kempelen's
 wood and Indian rubber Speaking Machine (18th century), morph into the
 electrodigital signals of Homer Dudley's Voder (Voice Operating
 Demonstrator 1937-1938). The basic principle of simulating the vocal
-tract through electrophysical means is submitted to the military
-demands of compression and encryption, segmenting out parts of the
-speech process and reducing redundancy through schemes such as LPC
-(Linear Predictive Coding) encoding. In the process communication
+tract through electronic and physical means is submitted to the
+military demands of compression and encryption, segmenting out parts
+of the speech process and reducing redundancy through schemes such as
+LPC (Linear Predictive Coding) encoding. In the process communication
 becomes the business of circuit-bent human-worms, opening human and
 animal speech to the cut-up, to stammerings, stutterings and tics; to
 an extra-human, outer-word terrain of numbers burrowed and nibbled by
@@ -42,23 +44,22 @@ the earth worms. ERD/WORM feasts on this electronic legacy.
 ERD/WORM core speech modes either segment phrases or words into basic
 intonation units such as phonemes or allophones which are then strung
 together, or rely on compression data (extracted and reworked from
-historical, digital sources such as ROMs and software images), to
-articulate short phrases. We can choose to work with basic phoneme
+historical, digital sources such as ROMs and software images) to
+articulate short phrases. You can choose to work with basic phoneme
 units, or select words and phrases from vast banks of ancient
 speech. Note that as some of this speech data was extracted from a
-compost of decaying MEMORY, that some speech cores may contain
-hard coded glitches. 
+compost of decaying MEMORY, some speech cores may contain
+surprising hard-coded glitches. 
 
 Text To Speech (TTS) algorithms are also used in certain modes to
-convert any text to artificial speech. All of these modes are open to
-slips, glids and mis-use; raw or live raw coding modes take the module
-far from any recognisable, worldy speech.
+convert any given text to artificial speech. All of these modes are
+open to slips, glides and mis-use; raw or live raw coding modes take
+the module far from any recognisable, worldy speech.
 
-Most of our WORMed modes make use of a physical model, either
-dividing up human vocal production into source (glottal oscillation
-and noise) and filter (the vocal tract), or using an articulatory
-model to simulate the changes over time bending and warping the vocal
-tract.
+Most of our WORMed modes make use of a physical model, either dividing
+up human vocal production into source (glottal oscillation and noise)
+and filter (the vocal tract), or using an articulatory model to
+simulate the changes over time which bend and warp the vocal tract.
 
 ** 1-basic operations/modes
 
@@ -77,28 +78,28 @@ to manipulate a stored buffer of spoken samples as follows:
   are available.
 
 - 2 Intelliworm: Here we have various bends and worms for the General
-  Instruments, again using LPC derived data from human subjects. We
-  have allophones and phrases, worming out of ROM images.
+  Instruments range of chips, again using LPC derived data from human
+  subjects. We have allophones and phrases, worming out of ROM images.
 
 - 3 VERMIS: Emulates an historic design by Richard T. Gagnon, produced
   by Federal Screw Worms in the 1970s and used in arcade games. Here
-  are also some derived and bent vocabularies and phonemes.
+  you can find derived and bent vocabularies and phonemes.
 
 - 4 SAW: Software Automatic Worm: A rare software ported from the
-  Commodore C64 with many bends and parameter shifts and slips.
+  Commodore C64 with many bends and parameter shifts.
 
 - 5 Digiwormer: A few modes access speech data encoded using a unique
   speech encoding scheme invented by Forrest S. Mozer.
 
 - 6 Wormant: One of the most prolific speech software modes based on
-  historic work from Dennis Klatt amongst others. We can manipulate
-  basic phonemes, access a simple vocabulary and bend Klatt
+  historic work from Dennis Klatt amongst others. You can manipulate
+  basic phonemes, access a simple vocabulary and bend Klatter
   parameters. A simple articulatory synth is also included. 
 
 - 7 COMPOST: COMPOST reworks the audio buffer which has previously
   been written to by the speech cores. There are two modes - in the
-  first we continue to write to this buffer according to selected mode
-  and previous settings. In the other, the compost is frozen.
+  first you continue to write to this buffer according to selected mode
+  and previous settings. In the second mode, compost access is frozen.
 
 ** 1.5 LAYOUT image
 
@@ -120,33 +121,38 @@ modes, reflecting the differing worm-bends and speech encoding methods
 which have been applied to each major algorithm. These mode types are
 as follows:
 
-- vocab: controls choose from banks and/or phrases (Y and/or Z), and subject these
-  in general to pitch (X) and length bends (Y). Pitch can be
-  controlled absolutely (no intonation), or bends the phrase pitch.
+- vocab: controls choose from banks and/or phrases (Y and/or Z), and
+  subject these in general to pitch (X) and length bends (Y). Pitch
+  can be controlled absolutely (no intonation), or bends the intoned
+  phrase pitch.
 
-- phoneme: controls choose a basic speech unit (phoneme or allophone),
-  and subject these in general to pitch and length bends. In some
-  modes, allophones are strung together in a list.
+- phoneme: controls choose a basic speech unit (phoneme or allophone Z),
+  and subject these in general to pitch and length bends (X, Y). In some
+  modes, allophones are strung together in a list (XY).
 
 - TTS: Text to speech. X and Y select position (in a text list-X) and
   letter (Y) within that text list.
 
 - worm: worming is bending of advanced interior speech algorithm
-  parameters again using X and Y to access parameter (which one is X)
-  and applied bend (Y) as we select a phrase or phoneme (Z). In some 
+  parameters again using X and Y to access parameter. Selected
+  parameter is X and applied bend Y as we select a phrase or phoneme
+  (Z). 
 
 - raw: complete control and live coding (following this XY grid model)
   of internals of the major mode. Z is used for pitch or phoneme
-  length. Note that this mode can result in serious glitch, volume
-  shifts.
+  length. Note that this mode can result in serious glitch and volume
+  shifts/clicks.
 
 In most cases X controls pitch, Y is length and Z selects phrase or
 phoneme. In some cases, length will only become apparent as the phrase
 of phoneme is changed - in that case you hear the length of the part
-of speechj transition. 
+of speech transition. 
 
 Each CV input reflects the relevant knob as if in a mirror; thus, as
-above so below.
+above so below. CV is additive to knob setting.
+
+Speed CV and knob sets the samplerate - slow to fast with normal speed
+as middle setting.
 
 Output is audio level output. Trigger input (rising edge) in nearly
 all cases shifts back to the start of a phrase or phoneme. In some
