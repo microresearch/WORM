@@ -2178,6 +2178,8 @@ explain types of each sub-mode
 
 own notes = T tested
 
+types of mode: vocab, TTS, phoneme, worm=bend, raw
+
 | MODE # | TYPE    | TITLE          | X      | Y              | Z       | TRIGGER       | NOTES                   |
 |--------+---------+----------------+--------+----------------+---------+---------------+-------------------------|
 |        | vocab   | sambanks0er    | pitch  | bank           | phrase  | phrase start  | T                       |
@@ -2188,7 +2190,7 @@ own notes = T tested
 |        | phoneme | samphonser     | length | position       | phoneme | phrase start  | T start is phoneme list |
 |        | phoneme | sampphonsinger | pitch  | position       | phoneme | phrase start  | T pitch is absolute     |
 |        | vocab   | samxyer        | pitch  | length         | phrase  | phrase start  | T selected vocab        |
-|        | worm/xy | samparamer     | x-axis | param          | phrase  | phrase start  | T selected vocab        |
+|        | worm    | samparamer     | x-axis | param          | phrase  | phrase start  | T selected vocab        |
 |        | worm    | sambender      | x-axis | frequency data | phrase  | phrase start  | T selected vocab        |
   
 ** DIGITALKER
@@ -2197,7 +2199,7 @@ own notes = T tested
 |--------+-------+--------------------------+--------+--------+--------+--------------+---------------------|
 |        | vocab | digitalker               | pitch  | length | phrase | phrase start | T                   |
 |        | vocab | digitalkersing           | pitch  | length | phrase | phrase start | T pitch is absolute |
-|        | bend  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T bend pitchtable   |
+|        | worm  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T worm pitchtable   |
 
 
 ** TMS
@@ -2214,14 +2216,14 @@ own notes = T tested
 |        | raw     | tmsraw5100            | x-axis | param    | pitch   | retrigger     | T 5100 chipset raw codes            |
 |        | raw     | tmsraw5200            | x-axis | param    | pitch   | retrigger     | T 5200 chipset raw codes            |
 |        | raw     | tmsraw5220            | x-axis | param    | pitch   | retrigger     | T 5220 chipset raw codes            |
-|        | bend    | tmsbend5100           | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend                 |
-|        | bend    | tmsbend5200           | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend                 |
-|        | bend    | tms5100pitchtable     | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of pitchtable   |
-|        | bend    | tms5200pitchtable     | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of pitchtable   |
-|        | bend    | tms5100ktable         | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of ktable       |
-|        | bend    | tms5200ktable         | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of ktable       |
-|        | bend    | tms5100kandpitchtable | x-axis | bend     | phrase  | retrigger     | T 5100 chipset bend of k/pitchtable |
-|        | bend    | tms5200kandpitchtable | x-axis | bend     | phoneme | retrigger     | T 5200 chipset bend of k/pitchtable |
+|        | worm    | tmsbend5100           | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm                 |
+|        | worm    | tmsbend5200           | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm                 |
+|        | worm    | tms5100pitchtable     | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of pitchtable   |
+|        | worm    | tms5200pitchtable     | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of pitchtable   |
+|        | worm    | tms5100ktable         | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of ktable       |
+|        | worm    | tms5200ktable         | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of ktable       |
+|        | worm    | tms5100kandpitchtable | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of k/pitchtable |
+|        | worm    | tms5200kandpitchtable | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of k/pitchtable |
 
 NOTES: on RAW if we need to invert certain parameters or keep all consistent, also where we bend volume as can be wierd
 
