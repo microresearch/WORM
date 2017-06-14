@@ -1845,6 +1845,10 @@ FINAL:
 
 - rsynthelm={0, 1.0f, rsynth_get_sample, rsynth_newsay_elm, 0, 0}; // TODO port own version of exy for elmDONE - TO TEST!
 
+** 14/6
+
+- fixed bug (int/char) in rsynthelm - and we could also do more singing elm with absolute pitch!
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f
@@ -2223,13 +2227,51 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 
 ** SP0256
 
+| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER       | NOTES                       |
+|--------+---------+-----------------+--------+--------+---------+---------------+-----------------------------|
+
+
+
+0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 
+
+
 ** VOTRAX
 
-/////////////////
+| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER       | NOTES                       |
+|--------+---------+-----------------+--------+--------+---------+---------------+-----------------------------|
+
+7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 
 
 ** KLATT
 
-** COMPOST/ANY ADD MODES
+| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER         | NOTES               |
+|--------+---------+-----------------+--------+--------+---------+-----------------+---------------------|
+|        | vocab   | rsynthy         | pitch  | length | phrase  | phrase start    | T                   |
+|        | phoneme | rsynthelm       | x-axis | length | phoneme | start of list   | T                   |
+|        | phoneme | rsynthsingle    | pitch  | length | phoneme | phoneme start   | T                   |
+|        | vocab   | rsynthysing     | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+|        | phoneme | klatter         | x-axis | length | phoneme | start of list   | T                   |
+|        | phoneme | klattsingle     | pitch  | length | phoneme | phoneme start   | T                   |
+|        | phoneme | klattsinglesing | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
+|        | vocab   | klattvocab      | pitch  | length | phrase  | phrase start    | T                   |
+|        | vocab   | klattvocabsing  | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+|        | raw     | simpleklatt     | x-axis | param  | length  | retrigger       | T                   |
+|        | phoneme | nvper           | pitch  | length | phoneme | retrigger       | T                   |
+|        | vocab   | nvpvocaber      | pitch  | length | phrase  | phrase start    | T                   |
+|        | vocab   | nvpvocabsing    | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+|        | phoneme | tuber           | pitch  | length | phoneme | phoneme start   | T                   |
+|        | phoneme | tubsinger       | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
+|        | bend    | tubbender       | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
+|        |         | tubrawer        | x-axis | param  | pitch   | freeze/unfreeze | wierd???keep or???  |
+|        |         | tubxyer         | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
+
+** COMPOST
+
+| MODE # | TYPE    | TITLE       | X | Y | Z | TRIGGER | NOTES  |
+|--------+---------+-------------+---+---+---+---------+--------|
+|        | compost | composter   |   |   |   |         |        |
+|        | compost | compostfrer |   |   |   |         | frozen |
+
 
 * older mode notes
 

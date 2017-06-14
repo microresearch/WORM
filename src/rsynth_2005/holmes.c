@@ -22,9 +22,6 @@
 #include "stm32f4xx.h"
 
 #include "config.h"
-/* $Id: //depot/rsynth/holmes.c#39 $
- */
-char *holmes_id = "$Id: //depot/rsynth/holmes.c#39 $";
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
@@ -137,12 +134,11 @@ extern rsynth_t rsynthi;
 static rsynth_t * rsynth=&rsynthi; // where do we fix this
 static float const *f0; // >>>???
 static float *ff0;
-static unsigned char nf0; // >>>???
+//static unsigned char nf0; // >>>???
 static filter_t flt[nEparm];
 static float f0s, f0e;
-static float contour[3];
-static unsigned tf0 = 0;
-static unsigned ntf0 = 0;
+static unsigned int tf0 = 0;
+static unsigned int ntf0 = 0;
 static unsigned char i = 0;
 static unsigned char nextelement=1;
 
@@ -241,18 +237,21 @@ void rsynth_newsay()
     nextelement=1;
 }
 
+float contour[3];//={146.300003, 108.000000, 133.339996};
+
+
 void rsynth_newsay_elm() 
 {
 
   nelm=106; // length
 
   // do f0 contour?
-  unsigned ii;
+  unsigned char ii;
   ff0 = contour;
-  nf0 = 3;
+  //  nf0 = 3;
   ff0[1]=0;
   for (ii = 0; ii < nelm; ii += 2) {
-    ff0[1] += test_elm_rsynthy[ii + 1];
+    ff0[1] += test_elm_rsynthy[ii + 1]; // length in frames
   }
   ff0[0] = 1.1f * rsynth->speaker->F0Hz;	/* top */
   ff0[2] = 0.6f * ff0[0];	/* bottom */
@@ -266,7 +265,7 @@ void rsynth_newsay_elm()
     for (j = 0; j < nEparm; j++) {
 	flt[j].v = le->p[j].stdy;
 	flt[j].a = rsynth->smooth;
-	flt[j].b = 1.0F - rsynth->smooth;
+	flt[j].b = 1.0f - rsynth->smooth;
     }
 
     i=0; // start of new elements
@@ -345,7 +344,7 @@ int16_t rsynth_get_sample(){
 
     if (t<dur){ //
       int j;
-      float peak = 0.25f;
+      //      float peak = 0.25f;
 
 		for (j = 0; j < nEparm; j++) {
 		    ep[j] =
@@ -468,7 +467,7 @@ int16_t rsynth_get_sample_sing(){
 
     if (t<dur){ //
       int j;
-      float peak = 0.25f;
+      //      float peak = 0.25f;
 
 		for (j = 0; j < nEparm; j++) {
 		    ep[j] =
@@ -478,17 +477,17 @@ int16_t rsynth_get_sample_sing(){
 					   t, dur));
 		}
 
-		while (tf0 == ntf0) {
+		/*		while (tf0 == ntf0) { // unused for singing
 		  tf0 = 0;
 		  f0s = f0e;
 		  ntf0 = (unsigned) *f0++;
 		  f0e = *f0++;
 		  }
 
-		/* interpolate the f0 value */
+		// interpolate the f0 value 
 		F0Hz = linear(f0s, f0e, tf0, ntf0);
 		nextelement=0;
-		t++; tf0++;
+		t++; tf0++;*/
     } //dur
 
     else { // hit end of DUR number of frames...
@@ -591,7 +590,7 @@ int16_t rsynth_get_sample_single(){
 
     if (t<dur){ //
       int j;
-      float peak = 0.25f;
+      //      float peak = 0.25f;
 
 		for (j = 0; j < nEparm; j++) {
 		    ep[j] =
@@ -645,14 +644,14 @@ int16_t rsynth_get_sample_elm(){
   static unsigned t=0;
   //  extent nextent={51,53.0f};
 
-  u8 xaxis=_selx*55.0f;
-  MAXED(xaxis,51); 
-  xaxis=51-xaxis;
+  u8 xaxis=_selx*35.0f;
+  MAXED(xaxis,31); 
+  xaxis=31-xaxis;
   u8 val=_selz*87.0f;
   MAXED(val,83);
   val=83-val;
-  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
-  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
+  //  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
+  //  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
 
   
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
@@ -710,7 +709,7 @@ int16_t rsynth_get_sample_elm(){
 
     if (t<dur){ //
       int j;
-      float peak = 0.25f;
+      //      float peak = 0.25f;
 
 		for (j = 0; j < nEparm; j++) {
 		    ep[j] =
@@ -720,10 +719,10 @@ int16_t rsynth_get_sample_elm(){
 					   t, dur));
 		}
 
-		while (tf0 == ntf0) {
+		while (tf0 == ntf0) { // first time?
 		  tf0 = 0;
 		  f0s = f0e;
-		  ntf0 = (unsigned) *ff0++;
+		  ntf0 = (unsigned int) *ff0++;
 		  f0e = *ff0++;
 		  }
 
