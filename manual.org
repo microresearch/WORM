@@ -19,9 +19,11 @@ Instruments Intelliworm. ERD/WORM further bends and worms key speech
 synthesis algorithms across XX modes with full trigger, CV and knob
 control over core aspects of these speech cores. 
 
-ERD/WORM is at its best, the more it deviates serpentinely from
+ERD/WORM functions best the more it deviates serpentinely from
 recognizable speech simulation (as if it would) towards the stammered,
-a/rhythmic and timbral. Use of fast re-triggering of 
+a/rhythmic and timbral, producing new sounds through the use of fast
+re-triggering of phrases and phonemes, and exploring multiple bends by
+CV.
 
 Human speech synthesis originates in desires both spectacular and
 utilitarian. The levers, rods and tubes of Wolfgang von Kempelen's
@@ -156,7 +158,7 @@ cases it toggles between freezing and unfreezing settings for XY modes
 He worshipped the worm and prayed to the wormy grave.
 [Beddoes]
 
-[from makingsense.org]
+[modes from makingsense.org]
 
 ** 3- use/tech notes
 
