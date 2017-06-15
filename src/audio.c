@@ -180,9 +180,6 @@ typedef struct wormer_ {
   u8 TTS;
 } wormer;
 
-#define NUM_MODES 65
-#define NUM_MODES_TOP 64
-#define NUM_MODES_F 68.0f
 
 // from oldaudio:
 
@@ -300,10 +297,17 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_new
 
 /// TODO - these will be re-arranged in order that makes sense: klatt, tubes and compost last:
 
-static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &tuber, &tubsinger, &tubbender, &tubrawer, &tubxyer, &composter, &compostfrer};
+//static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &tuber, &tubsinger, &composter, &compostfrer};
+
+// removed: &tubbender, &tubrawer, &tubxyer, 
+
+// this is the shorter list of 43 modes 0-42 with composter as 42
+
+static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,
+&samxyer, &samparamer, &sambender, &tmser, &tmsphoner, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab, &nvper, &nvpvocaber, &composter};
 
   // list: 
-//0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 15&sambanks0er, 16&sambanks1er, 17&samTTSer, 18&samTTSser, 19&samphoner, 20&samphonser, 21&samphonsinger, 22&samxyer, 23&samparamer, 24&sambender, 25&tmser, 26&tmslowbiter, 27&tmssinger, 28&tmsphoner, 29&tmsphonsinger, 30&tmsttser, 31&tmsbendlengther, 32&tmsraw5100er, 33&tmsraw5200er, 34&tmsraw5220er, 35&tmsbend5100er, 36&tmsbend5200er, 37&tms5100pitchtablebender, 38&tms5200pitchtablebender, 39&tms5100ktablebender, 40&tms5200ktablebender, 41&tms5100kandpitchtablebender, 42&tms5200kandpitchtablebender, 43&digitalker, 44&digitalker_sing, 45&digitalker_bendpitchvals, 46&rsynthy 47&rsynthelm, 48&rsynthsingle, 49&rsynthysing, 50&klatter,51&klattsingle, 52&klattsinglesing, 53&klattvocab, 54&klattvocabsing, 55&simpleklatter, 56&nvper, 57&nvpvocaber, 58&nvpvocabsing, 59&tuber, 60&tubsinger, 61&tubbender, 62&tubrawer, 63&tubxyer, 64&composter, 65&compostfrer};
+//0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 15&sambanks0er, 16&sambanks1er, 17&samTTSer, 18&samTTSser, 19&samphoner, 20&samphonser, 21&samphonsinger, 22&samxyer, 23&samparamer, 24&sambender, 25&tmser, 26&tmslowbiter, 27&tmssinger, 28&tmsphoner, 29&tmsphonsinger, 30&tmsttser, 31&tmsbendlengther, 32&tmsraw5100er, 33&tmsraw5200er, 34&tmsraw5220er, 35&tmsbend5100er, 36&tmsbend5200er, 37&tms5100pitchtablebender, 38&tms5200pitchtablebender, 39&tms5100ktablebender, 40&tms5200ktablebender, 41&tms5100kandpitchtablebender, 42&tms5200kandpitchtablebender, 43&digitalker, 44&digitalker_sing, 45&digitalker_bendpitchvals, 46&rsynthy 47&rsynthelm, 48&rsynthsingle, 49&rsynthysing, 50&klatter,51&klattsingle, 52&klattsinglesing, 53&klattvocab, 54&klattvocabsing, 55&simpleklatter, 56&nvper, 57&nvpvocaber, 58&nvpvocabsing, 59&tuber, 60&tubsinger, 61&composter, 62&compostfrer};
 
 
 static int16_t comp_counter=0;
@@ -329,18 +333,24 @@ int16_t compost_get_sample(){
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
   oldcompost=compostmode;
-  compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
+  compostmode= _selz*45.0f; // as mode - adapt for excluding compost_mode TODO!
+  MAXED(compostmode, 41); // NUMMODES!!!
   //if mode change do a newsay or not?
-  compostmode=5; // testy - here we just fix
+  //  compostmode=5; // testy - here we just fix
   doadc_compost();
   if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
+
+  // TODO: we need to re-sample so is not so fast in some cases
+  //wormlist[compostmode]->sampleratio <= 1.0f
+
   audio_buffer[cc++]=wormlist[compostmode]->getsample();
+
   if (cc>AUDIO_BUFSZ) cc=0;
 
   // resets at start or end - newsay will reset in full
   if (startx>endy){
     dir=-1;
-    if (comp_counter<=startx) comp_counter=startx;
+    if (comp_counter<=endy) comp_counter=startx; // swopped round
   }
   else {
     dir=1;
@@ -408,26 +418,26 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _speed=1.0f-_speed;
 
   value =(float)adc_buffer[MODE]/65536.0f; 
-  smoothed_adc_value[1] += 0.05f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
+  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
   _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
 
   oldmode=_intmode;
-  _intmode=_mode*65.0f;
-  MAXED(_intmode, 63);
+  _intmode=_mode*47.0f;
+  MAXED(_intmode, 42); //TODO: there are 0-42 = 43 modes now
   trigger=0; 
-  /* if (oldmode!=_intmode) {// IF there is a modechange!
+  if (oldmode!=_intmode) {// IF there is a modechange!
   trigger=1; // for now this is never/always called TEST
   doadc();
   oldselx=_selx;
   oldsely=_sely;
   oldselz=_selz;
-  }*/
+  }
   
- if (firsttime==0){// TEST CODE - for fake trigger - replace with above
+  /* if (firsttime==0){// TEST CODE - for fake trigger - replace with above
    trigger=1;
    firsttime=1;
- }
+   }*/
 
  // _speed=0.8f;
  samplespeedref=_speed*1028.0f;
@@ -439,7 +449,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=63; //TESTY!
+  //  _intmode=63; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
@@ -450,7 +460,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     samplerate_simple_exy_trigger(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
-  if (_intmode!=4 || _intmode!=66){// TODO - whatever is compost modes 64 or??? - at  moment test with 4
+  //  if (_intmode!=61 || _intmode!=62){// TODO - whatever is compost modes 64 or??? 
+  if (_intmode!=42){// TODO - whatever is compost modes 64 or??? 
     for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc++]=mono_buffer[x];
     if (cc>AUDIO_BUFSZ) cc=0;
