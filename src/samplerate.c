@@ -35,14 +35,14 @@ static inline void doadc(){
   CONSTRAIN(_selz,0.0f,1.0f);
 }
 
-static int16_t delay_buffer[3*WIDTH] = { 0 }; // 48
+static int16_t delay_buffer[8] = { 0 }; // was 48 but it doesn't need to be so big
 
 static inline int16_t gimme_data(int16_t j)
 {
      return delay_buffer[(int) j + WIDTH];
 }
 
-void new_data(int16_t data)
+static void new_data(int16_t data)
 {
     for (u8 ii=0;ii<DELAY_SIZE-5;ii++)	delay_buffer[ii] = delay_buffer[ii+1];
     delay_buffer[DELAY_SIZE-5] = data;
@@ -111,7 +111,6 @@ for (u8 ii=0;ii<size;ii++){
     //    }
      out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
     //out[ii] = delay_buffer[DELAY_SIZE-5];
-
 
 
   time_now += factor;

@@ -320,7 +320,24 @@ static inline void doadc_compost(){
   _selz=oldselz;
 }
 
+static int16_t delay_buffer[8] = { 0 }; 
+#define DELAY_SIZE 6
+
+static void new_data(int16_t data)
+{
+    for (u8 ii=0;ii<DELAY_SIZE-5;ii++)	delay_buffer[ii] = delay_buffer[ii+1];
+    delay_buffer[DELAY_SIZE-5] = data;
+}
+
+
 int16_t compost_get_sample(){
+
+  float alpha;
+  static float time_now=0.0f;
+  long last_time;
+  static long int_time=0;
+  static u8 triggered=0;
+  
  static u8 oldcompost=255, compostmode=255;
  doadc();
   u16 startx=(1.0f-_selx)*32768.0f;
@@ -342,9 +359,28 @@ int16_t compost_get_sample(){
 
   // TODO: we need to re-sample so is not so fast in some cases
   //wormlist[compostmode]->sampleratio <= 1.0f
+  float factor=0.5f*wormlist[compostmode]->sampleratio;
 
-  audio_buffer[cc++]=wormlist[compostmode]->getsample();
+  if (time_now>32768){
+    int_time=0; // preserve???
+    time_now-=32768.0f;
+  }
 
+    alpha = time_now - (float)int_time;
+    audio_buffer[cc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    //audio_buffer[cc++]=wormlist[compostmode]->getsample();
+
+  time_now += factor;
+  last_time = int_time;
+  int_time = time_now;
+  while(last_time<int_time)      {
+    //    doadc();
+    int16_t val=wormlist[compostmode]->getsample();
+    new_data(val);
+    last_time += 1;
+  }
+
+    
   if (cc>AUDIO_BUFSZ) cc=0;
 
   // resets at start or end - newsay will reset in full

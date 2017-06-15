@@ -1855,7 +1855,7 @@ FINAL:
 
 - fixed compost bugs for reversing 
 
-- TODO:  add interpolation on compost writing based on samplerate.c so is not so fast
+- TODO:  add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST
 
 - TODO: see how much we need to trim from TMS vocabs to make it fit with full list of say 64 modes
 
@@ -1869,7 +1869,7 @@ FINAL:
 cut modes to::::
 
 1-&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer,
-&sp02561219er, &sp0256bender, =6
+&sp02561219er, &sp0256bender????, =6
 
 2-&votraxer, &votraxTTSer, &votraxgorfer,
 &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, = 7
@@ -1888,7 +1888,6 @@ cut modes to::::
 &nvper, &nvpvocaber, = 8
 
 &composter, 1
->>>>>>> 0217a3c28b988934879aa68523798633086fc8a6
 
 * FINAL/FURTHER TODO:
 
