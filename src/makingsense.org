@@ -1851,6 +1851,45 @@ FINAL:
 
 - drop some modes and check extents - even 64 modes is maybe too much (32?)
 
+** 15/6
+
+- fixed compost bugs for reversing 
+
+- TODO:  add interpolation on compost writing based on samplerate.c so is not so fast
+
+- TODO: see how much we need to trim from TMS vocabs to make it fit with full list of say 64 modes
+
+*** added to makefile for discard of unused code:
+
+-fsingle-precision-constant -fsigned-char -Wdouble-promotion -ffunction-sections -fdata-sections
+
+
+*** question of cutting modes - also as we have NO FLASH
+
+cut modes to::::
+
+1-&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer,
+&sp02561219er, &sp0256bender, =6
+
+2-&votraxer, &votraxTTSer, &votraxgorfer,
+&votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, = 7
+
+3-&sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,
+&samxyer, &samparamer, &sambender, = 8
+
+4-&tmser, &tmsphoner,
+&tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er,
+&tmsraw5220er, &tmsbend5100er, &tmsbend5200er,
+&tms5100kandpitchtablebender, &tms5200kandpitchtablebender, = 11
+
+5-&digitalker, &digitalker_bendpitchvals, = 2
+
+6-&rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab,
+&nvper, &nvpvocaber, = 8
+
+&composter, 1
+>>>>>>> 0217a3c28b988934879aa68523798633086fc8a6
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f
