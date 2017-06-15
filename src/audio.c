@@ -297,14 +297,13 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_new
 
 /// TODO - these will be re-arranged in order that makes sense: klatt, tubes and compost last:
 
-//static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &tuber, &tubsinger, &composter, &compostfrer};
+static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &tuber, &tubsinger, &composter, &compostfrer};
 
 // removed: &tubbender, &tubrawer, &tubxyer, 
 
 // this is the shorter list of 43 modes 0-42 with composter as 42
 
-static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,
-&samxyer, &samparamer, &sambender, &tmser, &tmsphoner, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab, &nvper, &nvpvocaber, &composter};
+//static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,&samxyer, &samparamer, &sambender, &tmser, &tmsphoner, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab, &nvper, &nvpvocaber, &composter};
 
   // list: 
 //0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 15&sambanks0er, 16&sambanks1er, 17&samTTSer, 18&samTTSser, 19&samphoner, 20&samphonser, 21&samphonsinger, 22&samxyer, 23&samparamer, 24&sambender, 25&tmser, 26&tmslowbiter, 27&tmssinger, 28&tmsphoner, 29&tmsphonsinger, 30&tmsttser, 31&tmsbendlengther, 32&tmsraw5100er, 33&tmsraw5200er, 34&tmsraw5220er, 35&tmsbend5100er, 36&tmsbend5200er, 37&tms5100pitchtablebender, 38&tms5200pitchtablebender, 39&tms5100ktablebender, 40&tms5200ktablebender, 41&tms5100kandpitchtablebender, 42&tms5200kandpitchtablebender, 43&digitalker, 44&digitalker_sing, 45&digitalker_bendpitchvals, 46&rsynthy 47&rsynthelm, 48&rsynthsingle, 49&rsynthysing, 50&klatter,51&klattsingle, 52&klattsinglesing, 53&klattvocab, 54&klattvocabsing, 55&simpleklatter, 56&nvper, 57&nvpvocaber, 58&nvpvocabsing, 59&tuber, 60&tubsinger, 61&composter, 62&compostfrer};
@@ -350,6 +349,7 @@ int16_t compost_get_sample(){
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
   oldcompost=compostmode;
+  _selz=1.0f-_selz; // invert
   compostmode= _selz*45.0f; // as mode - adapt for excluding compost_mode TODO!
   MAXED(compostmode, 41); // NUMMODES!!!
   //if mode change do a newsay or not?
@@ -457,8 +457,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // TESTY! 0.01f for SMOOTHER mode locking
   _mode=smoothed_adc_value[1];
   CONSTRAIN(_mode,0.0f,1.0f);
-
-  oldmode=_intmode;
+  _mode=1.0f-_mode; // invert
+    oldmode=_intmode;
   _intmode=_mode*47.0f;
   MAXED(_intmode, 42); //TODO: there are 0-42 = 43 modes now
   trigger=0; 

@@ -1853,7 +1853,9 @@ FINAL:
 
 ** 15/6
 
-- fixed compost bugs for reversing 
+- fixed compost bugs for reversing, added inversion in modes and compost mode selection
+
+- TODO: check number of modes and simplify defines for this including compost modes
 
 - TODO:  add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST
 
