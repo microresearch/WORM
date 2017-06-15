@@ -319,7 +319,7 @@ static inline void doadc_compost(){
 int16_t compost_get_sample(){
  static u8 oldcompost=255, compostmode=255;
  doadc();
-  u16 startx=(1.0f-_selx)*32768.0f, diff;
+  u16 startx=(1.0f-_selx)*32768.0f;
   u16 endy=(1.0f-_sely)*32768.0f;
   signed char dir=1;
 
@@ -331,7 +331,7 @@ int16_t compost_get_sample(){
   oldcompost=compostmode;
   compostmode= _selz*65.0f; // as mode - adapt for one less excluding compost_mode TODO!
   //if mode change do a newsay or not?
-  compostmode=5; // testy - here we just fix
+  //  compostmode=5; // testy - here we just fix
   doadc_compost();
   if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
   audio_buffer[cc++]=wormlist[compostmode]->getsample();
@@ -356,7 +356,7 @@ int16_t compost_get_sample(){
 int16_t compost_get_sample_frozen(){
  static u8 oldcompost=255, compostmode=255;
  doadc();
-  u16 startx=(1.0f-_selx)*32768.0f, diff;
+  u16 startx=(1.0f-_selx)*32768.0f;
   u16 endy=(1.0f-_sely)*32768.0f;
   signed char dir=1;
 

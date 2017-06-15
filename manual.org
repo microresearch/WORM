@@ -114,7 +114,9 @@ Stops it in midst of its pride among its hills & rivers
 [William Blake. Jerusalem The Emanation of The Giant Albion]
 
 
-[DIAGRAM- layout speed, XYZ and triggerIN, OUT]
+[DIAGRAM- layout mode, speed, XYZ and triggerIN, OUT]
+
+There are 64 modes - X major modes subdivided on mode knob and CV.
 
 Each of the major modes outlined above is further segmented into minor
 modes, reflecting the differing worm-bends and speech encoding methods
