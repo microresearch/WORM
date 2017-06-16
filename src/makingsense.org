@@ -402,7 +402,7 @@ Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
 
 m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank?
 m_rom12 - phrases are at 6->42 - total 36
-m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 46
+m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 46 - NOTE: these rely on the other 2 roms 003 and 004
 
 ///
 
@@ -1841,7 +1841,7 @@ FINAL:
 
 - nvp - removed packed attribute as this means it fails work under -Os but may be inverse in -O2???
 
-- porting in from oldaudio all klatt/nvp/rsynth and still needs to be checked
+- porting in from oldaudio all klatt/nvp/rsynth and still needs to be checked DONE
 
 - rsynthelm={0, 1.0f, rsynth_get_sample, rsynth_newsay_elm, 0, 0}; // TODO port own version of exy for elmDONE - TO TEST!
 
@@ -1851,15 +1851,19 @@ FINAL:
 
 - drop some modes and check extents - even 64 modes is maybe too much (32?)
 
-** 15/6
+** 15/6 
 
-- fixed compost bugs for reversing, added inversion in modes and compost mode selection
+- modes test and doku - sp0256 019 rom has blanks as we need other roms - 003 and 004 DONE
+
+- fixed compost bugs for reversing, added inversion in modes and compost mode selectionTO TEST
 
 - TODO: check number of modes and simplify defines for this including compost modes
 
-- TODO:  add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST
+- TODO: add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST
 
-- TODO: see how much we need to trim from TMS vocabs to make it fit with full list of say 64 modes
+- TODO: what to trim -> remove tube.c as also bad on volume changes -
+  but also we realize that all of the audio_buffer was in flash too - still now we are at the limit with all in DONE
+
 
 *** added to makefile for discard of unused code:
 
@@ -1890,6 +1894,31 @@ cut modes to::::
 &nvper, &nvpvocaber, = 8
 
 &composter, 1
+
+** 16/6+
+
+- sp0256 roms added, fixed and also in sp0256bend - TEST THAT ONE-DONE
+
+- all tests, compost bugs further fixed, new toggle freeze compost mode
+
+- more fixes in compost
+
+- removed extra TTS mode for SAM and placed change for spaces in parse.c RE_CHECK thisDONE
+
+- shifted multiple klatt inits to main.c
+
+////
+- fix modes at 61 as in audio.c but we have a *CRASH* under certain circumstances - not sure if is in single mode or transition across...
+
+- moved audio_buffer to ccmdata and still crash
+
+seems to relate to compost???? (tests fine without compost - but test
+again to rule out any connection TESTED- now also crashes without
+compost)
+
+re-TESTING so far modes: 5X, all TTS modes=8X, 17X, 30X, 25X
+
+raw and bend/xy modes:
 
 * FINAL/FURTHER TODO:
 
@@ -2271,20 +2300,28 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 
 ** SP0256
 
-| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER       | NOTES                       |
-|--------+---------+-----------------+--------+--------+---------+---------------+-----------------------------|
-
-
-
-0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 
-
+| MODE # | TYPE    | TITLE            | X     | Y        | Z       | TRIGGER       | NOTES                            |
+|--------+---------+------------------+-------+----------+---------+---------------+----------------------------------|
+|        | phoneme | sp0256er         | pitch | length   | phoneme | phoneme start | T                                |
+|        | TTS     | sp0256TTSer      | pitch | position | letter  | re-phrase TTS | T                                |
+|        | phoneme | sp0256singer     | pitch | length   | phoneme | phoneme start | T pitch/length is absolute       |
+|        | vocab   | sp0256vocaboneer | pitch | length   | phrase  | phrase start  | T                                |
+|        | vocab   | sp0256vocabtwoer | pitch | length   | phrase  | phrase start  | T                                |
+|        |         | sp02561219er     |       |          |         |               | gaps in vocab                    |
+|        |         | sp0256bender     |       |          |         |               | noisy at first and gaps in vocab |
 
 ** VOTRAX
 
-| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER       | NOTES                       |
-|--------+---------+-----------------+--------+--------+---------+---------------+-----------------------------|
-
-7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 
+| MODE # | TYPE    | TITLE               | X      | Y        | Z       | TRIGGER         | NOTES               |
+|--------+---------+---------------------+--------+----------+---------+-----------------+---------------------|
+|        | phoneme | votraxer            | pitch  | length   | phoneme | phoneme start   | T                   |
+|        | TTS     | votraxTTSer         | pitch  | position | letter  | re-phrase TTS   | T                   |
+|        | vocab   | votraxgorfer        | pitch  | length   | phrase  | phrase start    | T gorf              |
+|        | vocab   | votraxwow           | pitch  | length   | phrase  | phrase start    | T wow               |
+|        | bend    | votraxwowfilterbend | pitch  | bend     | phrase  | phrase start    | T wow               |
+|        | bend    | votraxbender        | x-axis | bend     | phrase  | phrase start    | T gorf              |
+|        | raw     | votraxparamer       | x-axis | value    | pitch   | freeze unfreeze | T                   |
+|        | phoneme | votraxsinger        | pitch  | length   | phoneme | phoneme start   | T pitch is absolute |
 
 ** KLATT
 
@@ -2303,6 +2340,9 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 |        | phoneme | nvper           | pitch  | length | phoneme | retrigger       | T                   |
 |        | vocab   | nvpvocaber      | pitch  | length | phrase  | phrase start    | T                   |
 |        | vocab   | nvpvocabsing    | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+
+// cut tubes...
+
 |        | phoneme | tuber           | pitch  | length | phoneme | phoneme start   | T                   |
 |        | phoneme | tubsinger       | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
 |        | bend    | tubbender       | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |

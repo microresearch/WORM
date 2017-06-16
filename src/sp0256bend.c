@@ -42,6 +42,8 @@
 
 extern const unsigned char m_rom12[] __attribute__ ((section (".flash")));
 extern const unsigned char m_rom19[] __attribute__ ((section (".flash")));
+extern const unsigned char m_rom003[] __attribute__ ((section (".flash")));
+extern const unsigned char m_rom004[] __attribute__ ((section (".flash")));
 extern float exy[64];
 extern float _selx, _sely, _selz;
 
@@ -439,18 +441,29 @@ static UINT32 getb( int len )
 	  int32_t idx0 = (m_pc    ) >> 3, d0; //???
 	  int32_t idx1 = (m_pc + 8) >> 3, d1;
 
-	  data=1; minus=0x1000; // default
-	  if (idx0>=0x1800 || idx0<0x1000) data=0;
+	  data=0;
 
-	  if (m_romm==m_rom19 ){ // we need to choose roms
+	  if (idx0<0x1800 && idx0>0x1000) {
+	  data=1; //
+	  minus=0x1000; // default
+	}
 
-	    if (idx0>=0x1000 && idx0<0x1800) {
-	      m_romm=m_rom19; // 003 has phonemes as AL2 and some phrases but not so many WHY?
-	      minus=0x1000;
-	      data=1;
+	  else if (idx0>=0x1800 && idx0<0x4000){
+	    //  fprintf(stderr, "fifo?????? 0x%X\n", idx0);
+	    data=0;
 	  }
-	  else {data=0;}
+	  else if (idx0>=0x4000 && idx0<0x8000) {
+		    m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+		    minus=0x4000;
+		    data=1;
 	  }
+	  else if (idx0>=0x8000 && idx0<0xC000) {
+	    m_romm=m_rom004; 
+	    minus=0x8000;
+	    data=1;
+	    }
+
+
 	  
 	  if (data!=0){
 	  int32_t firstadd=(idx0 & 0xffff)-minus;
@@ -826,8 +839,6 @@ void sp0256_initbend(void){
 
 int16_t sp0256_get_samplebend(void){
   static int16_t output; 
-  //  u8 howmany=0;
-  //  while(howmany==0){ 
 
       micro();
       lpc12_update(&m_filt, &output);

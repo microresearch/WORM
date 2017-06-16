@@ -16,7 +16,7 @@
 #define BUFF_LEN 128 // was 128
 //#define AUDIO_BUFSZ 58870 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 #define AUDIO_BUFSZ 32768 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
-
+//#define AUDIO_BUFSZ 32 // 59392 // was 32768- now 58k samples (x2) // adapted to log_gen.py
 enum adcchannel {
   MODE_,
   SELX_,

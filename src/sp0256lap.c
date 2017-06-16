@@ -214,12 +214,12 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/*  Generate a series of periodic impulses, or random noise.        */
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
-		samp   = 0;
-		f->per_orig=128;
-		f->amp=512;
+		//		samp   = 0;
+		//		f->per_orig=32;
+		//		f->amp=512;
 		if (f->per_orig)
 		{
-		  f->per=f->per_orig;//+40;
+		  f->per=f->per_orig;//*0.5f;//+40;
 			if (--f->cnt <= 0)
 			{
 				f->cnt += f->per;
@@ -274,7 +274,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		//		if (f->rpt <= 0) break; // HOWTO break out of single loop and signal this! TODO!
+		//if (f->rpt <= 0) break; // HOWTO break out of single loop and signal this! TODO!
 
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
@@ -306,11 +306,11 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		/* ---------------------------------------------------------------- */
 		for (j = 0; j < 6; j++)
 		{
-		  //		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
-		  //		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
+		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
+		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
 
-			f->z_data[j][1] = f->z_data[j][0];
-			f->z_data[j][0] = samp;
+		  f->z_data[j][1] = f->z_data[j][0];
+		  f->z_data[j][0] = samp;
 		}
 		return (samp>>2)+128;
 }
@@ -330,10 +330,10 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/*  the repeat count to "repeat + 1".                                   */
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
-	fprintf(stderr, "AMP: %d\n", f->amp);
+	//	fprintf(stderr, "AMP: %d\n", f->amp);
 	f->per_orig = f->r[1];
-		fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
-	f->cnt = 128;
+	//		fprintf(stderr, "PER: %d AMP %d\n",f->per, f->amp);
+	//	f->cnt = 128;
 
 	/* -------------------------------------------------------------------- */
 	/*  Decode the filter coefficients from the quant table.                */
@@ -344,7 +344,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 
 		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
 		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
-		fprintf(stderr, "i %d f_coeff: %d b_coeff %d\n",i, f->b_coef[stage_map[i]], f->f_coef[stage_map[i]]);
+		//		fprintf(stderr, "i %d f_coeff: %d b_coeff %d\n",i, f->b_coef[stage_map[i]], f->f_coef[stage_map[i]]);
 
 	}
 
@@ -770,16 +770,17 @@ UINT32 getb( int len )
 	  // we have added 0x1000
 	  int32_t idx0 = (m_pc    ) >> 3;
 	  int32_t idx1 = (m_pc + 8) >> 3;
+	  whichrom=m_rom19;
 
-	  //	  fprintf(stderr,"m_pc %d idx0: %d idx1: %d\n", m_pc, idx0, idx1);
+	  fprintf(stderr,"m_pc %X idx0: %X idx1: %X\n", m_pc, idx0, idx1);
 
 	  data=1;
 	  if (idx0<0x1800 && idx0>=0x1000) {
-	    whichrom=m_romAL2;
 	    minus=0x1000;
 	  }
 
-	  /*else if (idx0>=0x1800 && idx0<0x4000){
+
+	  else if (idx0>=0x1800 && idx0<0x4000){
 	    fprintf(stderr, "fifo?????? 0x%X\n", idx0);
 	    data=0;
 	  }
@@ -790,9 +791,10 @@ UINT32 getb( int len )
 	  	  else if (idx0>=0x8000 && idx0<0xC000) {
 	    whichrom=m_rom004; 
 	    minus=0x8000;
-	    }*/
-	  else {data=0;}
+	    }
+	  
 
+	  	  else {data=0;}
 
 	  //	  int32_t d0,d1;
 	  
@@ -915,7 +917,7 @@ void micro()
 				{
 				  
 					m_page = bitrev32(immed4) >> 13;
-					printf("PAGE CHANGE %d\n", m_page);
+										printf("PAGE CHANGE %d\n", m_page);
 				} else
 				/* -------------------------------------------------------- */
 				/*  Otherwise, this is an RTS / HLT.                        */
@@ -1006,8 +1008,8 @@ void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
-				repeat=32;
-				fprintf(stderr, "REP %d\n", repeat);
+				//				repeat=32;
+				//				fprintf(stderr, "REP %d\n", repeat);
 				//				repeat=254;
 				break;
 			}
@@ -1051,7 +1053,7 @@ void micro()
 		if (!repeat) continue;
 
 		m_filt.rpt = repeat + 1;
-		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
+		//		fprintf(stderr, "RPT: %d \n", m_filt.rpt);
 
 		
 		i = (opcode << 3) | (m_mode & 6);
@@ -1216,7 +1218,9 @@ void main(int argc, char *argv[]){
 
   //		  m_pc       = m_ald | (0x1000  << 3); // OR with 0x8000 this adds 0x1000 which we subtract later when shifts back
   u8 output,x;
+  //	  m_page=0x8000<<3;
    sp0256_init();
+  //	  m_page=0x8000<<3;
 
    //   for (x=0;x<6;x++){
           int dada=atoi(argv[1]);
@@ -1236,30 +1240,30 @@ void main(int argc, char *argv[]){
       //m_halted=1;
       */
       //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
-  //  	m_page     = 0x8000 << 3; // was 0x1000 // this works!
+	  m_page     = 0x1000 << 3; // was 0x1000 // this works!
 
 	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
       m_lrq = 0; //from 8 bit write
-      m_halted=1;
+      m_halted=0;
       	  
-   while(1){
+   while(m_halted==0){
    micro();
    //   u8 output=lpc12_update(&m_filt);
 
    if (m_silent && m_filt.rpt <= 0) {
-     	fprintf(stderr, "XXXXX");
+     //     	fprintf(stderr, "XXXXX");
      output=0;
    }
    else output=lpc12_update(&m_filt);
 
      printf("%c",output);
 
-     if (m_halted==1 && m_filt.rpt <= 0)     {
+     /*     if (m_halted==1 && m_filt.rpt <= 0)     {
        // newsay...
 	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
       m_lrq = 0; //from 8 bit write
-            }
-   }
+      }*/
+	    }
 
    //	    }
      //        }

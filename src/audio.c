@@ -8,28 +8,25 @@
 #include "resources.h"
 #else
 #include "audio.h"
-#include "effect.h"
 #include "klatt_phoneme.h"
 #include "parwave.h"
 #include "sam.h"
 #include "holmes.h"
 #include "sp0256.h"
 #include "tms5200x.h"
-#include "tube.h"
 #include "digitalker.h"
 #include "nvp.h"
-#include "ntube.h"
-#include "wavetable.h"
-#include "worming.h"
 #include "vot.h"
 #include "resources.h"
 #include "rs.h"
-#include "raven.h"
 #include "samplerate.h"
 #endif
 
 extern __IO uint16_t adc_buffer[10];
-int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
+//int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".data"))); // TESTY!
+//int16_t audio_buffer[AUDIO_BUFSZ]; 
+int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
+
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
 float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
@@ -38,13 +35,9 @@ extern float exy[64];
 float _mode, _speed, _selx, _sely, _selz;
 static float oldselx=0.5f, oldsely=0.5f, oldselz=1.0f;
 static u8 _intspeed, _intmode=0, trigger=0;
-u8 TTS=0;
+static u8 TTS=0;
 
 #define float float32_t
-
-float samplepos=0;//=genstruct->samplepos;
-int16_t samplel;//=genstruct->lastsample;
-int16_t lastval;//=genstruct->prevsample;
 
 #ifdef TESTING
 extern Wavetable wavtable;
@@ -170,6 +163,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 int16_t compost_get_sample();
 int16_t compost_get_sample_frozen();
 void compost_newsay();
+void compost_newsay_frozen();
 
 typedef struct wormer_ {
   u8 maxextent;
@@ -179,13 +173,6 @@ typedef struct wormer_ {
   u8 xy;
   u8 TTS;
 } wormer;
-
-
-// from oldaudio:
-
-
-//((((((((((((((((((
-  //OLD INDEX//0sp0256, 1sp0256TTS, 2sp0256vocabone, 3sp0256vocabtwo, 4sp0256_1219, 5sp0256bend, /// 6votrax, 7votraxTTS, 8votraxgorf, 9votraxwow, 10votraxwowfilterbend, 11votrax_param, 12votrax_bend, // 13tms, 14tmsphone, 15tmsTTS, 16tmsbendlength, 17tmslowbit, 18tmsraw5100, 19tmsraw5200, 20tmsraw5220, 21tmsbend5100, 22tmsbend5200, 23tms5100pitchtablebend, 24tms5200pitchtablebend, 25tms5100ktablebend, 26tms5200ktablebend, 27tms5100kandpitchtablebend, 28tms5200kandpitchtablebend, 29sam_banks0, 30sam_banks1, 31sam_TTS, 32sam_TTSs, 33sam_phon, 34,sam_phons, 35sam_phonsing, 36sam_xy, 37sam_param, 38sam_bend, 39digitalker, 40digitalker_sing, 41digitalker_bendpitchvals, 42sp0256sing, 43votraxsing, 44tmssing, 45tmsphonsing, /// 46simpleklatt, 47nvp, 48klatt, 49klattTTS, 50nvpvocab, 51klattsingle, 52klattvocab, 53rsynthy, 54rsynthelm, 55rsynthsingle, 56nvpvocabsing, 57rsynthsing, 58klattsinglesing, 59klattvocabsing, 60tubes=tube.c
 
 ////7 sp0256 modes: sp0256, sp0256TTS, sp0256vocabone, sp0256vocabtwo, sp0256_1219, sp0256bend, sp0256sing
 
@@ -216,8 +203,8 @@ static const wormer votraxsinger={0, 1.25f, votrax_get_sample_sing, votrax_newsa
 static const wormer sambanks0er={0, 1.0f, sam_get_sample_banks0a, sam_newsay_banks0, 0, 0}; // pitch on x, sel phrase on y/z
 static const wormer sambanks1er={0, 1.0f, sam_get_sample_banks1a, sam_newsay_banks0, 0, 0}; // speed on x, sel phrase on y/z
 
-static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 2}; // pitch on x
-static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 2}; // speed on x
+static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 1}; // pitch on x
+static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 1}; // speed on x
 
 // DONE: re-done for own XY - DONE/TESTED!
 
@@ -286,31 +273,39 @@ static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
 static const wormer nvpvocabsing={0, 1.0f, nvp_get_sample_vocab_sing, nvp_newsay_vocab_trigger, 0, 0};
 static const wormer nvpvocaber={0, 1.0f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
 
-static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0}; // //60tubes=tube.c=tube_get_sample
-static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
-static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
-static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
-static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
+//static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0}; // //60tubes=tube.c=tube_get_sample
+//static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
+//static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
+//static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+//static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
-static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay, 0, 0};
+static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay_frozen, 0, 0};
 
 /// TODO - these will be re-arranged in order that makes sense: klatt, tubes and compost last:
 
-static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &tuber, &tubsinger, &composter, &compostfrer};
+static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256singer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &tmser, &tmslowbiter, &tmssinger, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &composter, &compostfrer}; // 61 modes
 
-// removed: &tubbender, &tubrawer, &tubxyer, 
+#define MODEF 64.0f // float 64.0f
+#define MODET 60 // mode top 60 // 58 for no COMPOST
+#define COMPOST 59
+#define COMPOSTF 60
+
+// removed: &tuber, &tubsinger, &tubbender, &tubrawer, &tubxyer, 
 
 // this is the shorter list of 43 modes 0-42 with composter as 42
 
 //static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,&samxyer, &samparamer, &sambender, &tmser, &tmsphoner, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab, &nvper, &nvpvocaber, &composter};
 
   // list: 
-//0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 15&sambanks0er, 16&sambanks1er, 17&samTTSer, 18&samTTSser, 19&samphoner, 20&samphonser, 21&samphonsinger, 22&samxyer, 23&samparamer, 24&sambender, 25&tmser, 26&tmslowbiter, 27&tmssinger, 28&tmsphoner, 29&tmsphonsinger, 30&tmsttser, 31&tmsbendlengther, 32&tmsraw5100er, 33&tmsraw5200er, 34&tmsraw5220er, 35&tmsbend5100er, 36&tmsbend5200er, 37&tms5100pitchtablebender, 38&tms5200pitchtablebender, 39&tms5100ktablebender, 40&tms5200ktablebender, 41&tms5100kandpitchtablebender, 42&tms5200kandpitchtablebender, 43&digitalker, 44&digitalker_sing, 45&digitalker_bendpitchvals, 46&rsynthy 47&rsynthelm, 48&rsynthsingle, 49&rsynthysing, 50&klatter,51&klattsingle, 52&klattsinglesing, 53&klattvocab, 54&klattvocabsing, 55&simpleklatter, 56&nvper, 57&nvpvocaber, 58&nvpvocabsing, 59&tuber, 60&tubsinger, 61&composter, 62&compostfrer};
+//0&sp0256er, 1&sp0256TTSer, 2&sp0256singer, 3&sp0256vocaboneer, 4&sp0256vocabtwoer, 5&sp02561219er, 6&sp0256bender, 7&votraxer, 8&votraxTTSer, 9&votraxgorfer, 10&votraxwower, 11&votraxwowfilterbender, 12&votraxbender, 13&votraxparamer, 14&votraxsinger, 15&sambanks0er, 16&sambanks1er, 17&samTTSer, 18&samTTSser, 19&samphoner, 20&samphonser, 21&samphonsinger, 22&samxyer, 23&samparamer, 24&sambender, 25&tmser, 26&tmslowbiter, 27&tmssinger, 28&tmsphoner, 29&tmsphonsinger, 30&tmsttser, 31&tmsbendlengther, 32&tmsraw5100er, 33&tmsraw5200er, 34&tmsraw5220er, 35&tmsbend5100er, 36&tmsbend5200er, 37&tms5100pitchtablebender, 38&tms5200pitchtablebender, 39&tms5100ktablebender, 40&tms5200ktablebender, 41&tms5100kandpitchtablebender, 42&tms5200kandpitchtablebender, 43&digitalker, 44&digitalker_sing, 45&digitalker_bendpitchvals, 46&rsynthy 47&rsynthelm, 48&rsynthsingle, 49&rsynthysing, 50&klatter,51&klattsingle, 52&klattsinglesing, 53&klattvocab, 54&klattvocabsing, 55&simpleklatter, 56&nvper, 57&nvpvocaber, 58&nvpvocabsing, 59&composter, 60&compostfrer};
 
+// compost
 
-static int16_t comp_counter=0;
-static u16 cc=0;
+static u16 comp_counter=0;
+static u16 ccc=0;
+static u8 freezer=0;
+static u8 recomposter=0;
 
 static inline void doadc_compost(){
   // exy stays anyway as it is or?
@@ -319,12 +314,13 @@ static inline void doadc_compost(){
   _selz=oldselz;
 }
 
-static int16_t delay_buffer[8] = { 0 }; 
+static int16_t delay_buffer[2] = { 0 }; 
 #define DELAY_SIZE 6
 
 static void new_data(int16_t data)
 {
-    for (u8 ii=0;ii<DELAY_SIZE-5;ii++)	delay_buffer[ii] = delay_buffer[ii+1];
+  //    for (u8 ii=0;ii<DELAY_SIZE-5;ii++)	
+  delay_buffer[0] = delay_buffer[1];
     delay_buffer[DELAY_SIZE-5] = data;
 }
 
@@ -336,12 +332,11 @@ int16_t compost_get_sample(){
   long last_time;
   static long int_time=0;
   static u8 triggered=0;
-  
- static u8 oldcompost=255, compostmode=255;
- doadc();
-  u16 startx=(1.0f-_selx)*32768.0f;
-  u16 endy=(1.0f-_sely)*32768.0f;
-  signed char dir=1;
+  static u8 oldcompost=255, compostmode=255;
+  doadc();
+  u16 startx=(1.0f-_selx)*32767.0f;
+  u16 endy=(1.0f-_sely)*32767.0f;
+  signed char dir;
 
   // generate into audio_buffer based on selz mode and struct list
   float value =(float)adc_buffer[SELZ]/65536.0f; 
@@ -350,16 +345,21 @@ int16_t compost_get_sample(){
   CONSTRAIN(_selz,0.0f,1.0f);
   oldcompost=compostmode;
   _selz=1.0f-_selz; // invert
-  compostmode= _selz*45.0f; // as mode - adapt for excluding compost_mode TODO!
-  MAXED(compostmode, 41); // NUMMODES!!!
+  compostmode= _selz*MODEF; // as mode - adapt for excluding compost_mode TODO!
+  MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
   //if mode change do a newsay or not?
   //  compostmode=5; // testy - here we just fix
   doadc_compost();
-  if (oldcompost!=compostmode ) wormlist[compostmode]->newsay();
+
+  if (oldcompost!=compostmode || recomposter==1 ) // as soon as we enter compost do newsay
+    {
+      wormlist[compostmode]->newsay();
+      recomposter=0;
+    }
 
   // TODO: we need to re-sample so is not so fast in some cases
   //wormlist[compostmode]->sampleratio <= 1.0f
-  float factor=0.5f*wormlist[compostmode]->sampleratio;
+  float factor=wormlist[compostmode]->sampleratio;
 
   if (time_now>32768){
     int_time=0; // preserve???
@@ -367,8 +367,9 @@ int16_t compost_get_sample(){
   }
 
     alpha = time_now - (float)int_time;
-    audio_buffer[cc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    audio_buffer[ccc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
     //audio_buffer[cc++]=wormlist[compostmode]->getsample();
+    if (ccc>AUDIO_BUFSZ-1) ccc=0;
 
   time_now += factor;
   last_time = int_time;
@@ -376,13 +377,11 @@ int16_t compost_get_sample(){
   while(last_time<int_time)      {
     //    doadc();
     int16_t val=wormlist[compostmode]->getsample();
+    //        int16_t val=rand()%32768;
     new_data(val);
     last_time += 1;
   }
-
     
-  if (cc>AUDIO_BUFSZ) cc=0;
-
   // resets at start or end - newsay will reset in full
   if (startx>endy){
     dir=-1;
@@ -393,47 +392,101 @@ int16_t compost_get_sample(){
     if (comp_counter>=endy) comp_counter=startx;
   }
 
-  int16_t pos=comp_counter; // restricted to 32768
-  int16_t sample=audio_buffer[pos];
+  int16_t sample=audio_buffer[comp_counter%32768];
   comp_counter+=dir;
   return sample;
 }
 
 int16_t compost_get_sample_frozen(){
- static u8 oldcompost=255, compostmode=255;
- doadc();
-  u16 startx=(1.0f-_selx)*32768.0f;
-  u16 endy=(1.0f-_sely)*32768.0f;
-  signed char dir=1;
 
-  // resets at start or end - newsay will reset in full
+  float alpha;
+  static float time_now=0.0f;
+  long last_time;
+  static long int_time=0;
+  static u8 triggered=0;
+  
+ static u8 oldcompost=255, compostmode=0;
+ doadc();
+  u16 startx=(1.0f-_selx)*32767.0f;
+  u16 endy=(1.0f-_sely)*32767.0f;
+  signed char dir;
+
+  if (freezer==1){
+  // generate into audio_buffer based on selz mode and struct list
+  float value =(float)adc_buffer[SELZ]/65536.0f; 
+  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
+  _selz=smoothed_adc_value[4];
+  CONSTRAIN(_selz,0.0f,1.0f);
+  oldcompost=compostmode;
+  _selz=1.0f-_selz; // invert
+  compostmode= _selz*MODEF; // as mode - adapt for excluding compost_mode TODO!
+  MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
+  //if mode change do a newsay or not?
+  //  compostmode=5; // testy - here we just fix
+  doadc_compost();
+  if (oldcompost!=compostmode || recomposter==1 ) // as soon as we enter compost do newsay
+    {
+      wormlist[compostmode]->newsay();
+      recomposter=0;
+    }
+
+  // TODO: we need to re-sample so is not so fast in some cases
+  //wormlist[compostmode]->sampleratio <= 1.0f
+  float factor=wormlist[compostmode]->sampleratio;
+
+  if (time_now>32768){
+    int_time=0; // preserve???
+    time_now-=32768.0f;
+  }
+
+    alpha = time_now - (float)int_time;
+    audio_buffer[ccc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    //audio_buffer[cc++]=wormlist[compostmode]->getsample();
+    if (ccc>AUDIO_BUFSZ-1) ccc=0;
+
+  time_now += factor;
+  last_time = int_time;
+  int_time = time_now;
+  while(last_time<int_time)      {
+    //    doadc();
+    int16_t val=wormlist[compostmode]->getsample();
+    new_data(val);
+    last_time += 1;
+  } 
+  } // end of freezer
+
   if (startx>endy){
     dir=-1;
-    if (comp_counter<=startx) comp_counter=startx;
+    if (comp_counter<=endy) comp_counter=startx; // swopped round
   }
   else {
     dir=1;
     if (comp_counter>=endy) comp_counter=startx;
   }
 
-  int16_t pos=comp_counter; // restricted to 32768
-  int16_t sample=audio_buffer[pos];
+  int16_t sample=audio_buffer[comp_counter%32768];
   comp_counter+=dir;
   return sample;
+}
+
+
+
+void compost_newsay_frozen(){ 
+  freezer^=1; // toggles freezer
 }
 
 
 void compost_newsay(){ 
   // just reset counter to start 
   doadc();
-  u16 startx=_selx*32768.0f;
-  u16 endy=_sely*32768.0f;
+  u16 startx=_selx*32767.0f;
+  u16 endy=_sely*32767.0f;
 
   if (startx>endy){
-    comp_counter=endy;
+    comp_counter=startx; // backwards
   }
   else if (startx<=endy){
-    comp_counter=startx;
+    comp_counter=startx;//
   }  
 }
 
@@ -445,7 +498,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   float samplespeed;
   float value;
   u16 samplespeedref;
-  static u8 oldmode=255; 
+  static u16 cc;
+  u8 oldmode; 
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]); // smooth
@@ -459,21 +513,23 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   CONSTRAIN(_mode,0.0f,1.0f);
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
-  _intmode=_mode*47.0f;
-  MAXED(_intmode, 42); //TODO: there are 0-42 = 43 modes now
+  _intmode=_mode*MODEF;
+  MAXED(_intmode, MODET); 
   trigger=0; 
+
   if (oldmode!=_intmode) {// IF there is a modechange!
-  trigger=1; // for now this is never/always called TEST
-  doadc();
-  oldselx=_selx;
-  oldsely=_sely;
-  oldselz=_selz;
-  }
+    trigger=1; // for now this is never/always called TEST
+    doadc();
+    oldselx=_selx;
+    oldsely=_sely;
+    oldselz=_selz;
+    recomposter=1;
+    }
   
-  /* if (firsttime==0){// TEST CODE - for fake trigger - replace with above
-   trigger=1;
-   firsttime=1;
-   }*/
+    if (firsttime==0){ // we can leave this so is always called first
+      trigger=1;
+      firsttime=1;
+      }
 
  // _speed=0.8f;
  samplespeedref=_speed*1028.0f;
@@ -485,7 +541,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  //  _intmode=63; //TESTY!
+  //  _intmode=50; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
@@ -497,10 +553,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   // copy sample buffer into audio_buffer as COMPOST as long as we are NOT COMPOSTING!
   //  if (_intmode!=61 || _intmode!=62){// TODO - whatever is compost modes 64 or??? 
-  if (_intmode!=42){// TODO - whatever is compost modes 64 or??? 
+
+  if (_intmode!=COMPOST && _intmode!=COMPOSTF){// TODO - whatever is compost modes 64 or??? 
     for (u8 x=0;x<sz/2;x++) {
     audio_buffer[cc++]=mono_buffer[x];
-    if (cc>AUDIO_BUFSZ) cc=0;
+    if (cc>AUDIO_BUFSZ-1) cc=0;
     }
   }
   
@@ -514,18 +571,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     selz=63-selz;
     TTSinarray[xax]=mapytoascii[selz];
     }
-
-  else if (wormlist[_intmode]->TTS==2){ // for SAM TTS which doesn't like spaces 
-    doadc();
-    u8 xax=_sely*19.0f; 
-    u8 selz=_selz*64.0f; 
-    MAXED(xax,15);
-    MAXED(selz,61);
-    xax=15-xax; // inverted
-    selz=61-selz;
-    TTSinarray[xax]=mapytoascii[selz+2];
-    }
-
 
   audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
 }

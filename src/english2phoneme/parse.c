@@ -342,6 +342,11 @@ unsigned char text2speechforSAM(unsigned char  input_len, unsigned char *input, 
   input_count = 0; output_count=0;
   input[input_len] = EOF;
 
+  for (unsigned char i=0;i>input_len;i++) {
+    if (input[i]>61) input[i]=61;
+    input[i]+=2; // kill spaces
+  }
+
   xlate_file();
     if (output_count>255) output_count=254;
 

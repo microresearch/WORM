@@ -1020,7 +1020,7 @@ void digitalker_step_bendd()
 
 
 void digitalk_init(void){
-  m_rom=m_rom_SSR1; // TODO: where we set our m_rom
+  m_rom=m_rom_SSR1; 
 
   // SSR1=0-64
   // SSR2=WRONG!
@@ -1033,14 +1033,13 @@ void digitalk_init(void){
 //static u8 alwayswhich;
 
 
-// start this as basic model and test bends here...
 void digitalk_newsay(){
 #ifndef LAP
   // say 44+64=108
 
   u8 val=_selz*112.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
   MAXED(val,107);
-  val=107-val;
+  val=107-val; // invert
   if (val>63){
     val=val-64;
     m_rom=m_rom_scorpion;

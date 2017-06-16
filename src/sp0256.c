@@ -774,22 +774,40 @@ UINT32 getb( int len )
 				else
 				{*/
 
-	  data=1; minus=0x1000; // default
-	  if (idx0>=0x1800 || idx0<0x1000) data=0;
+	  data=0; 
 
-	  if (m_romm==m_rom19){ // we need to choose roms
-
-	    if (idx0>=0x1000 && idx0<0x1800) {
-	      m_romm=m_rom19; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+	  /*	  if (idx0>=0x1000 && idx0<0x1800) {// this works but not for further roms
 	      minus=0x1000;
 	      data=1;
+	    }
+	    else data=0;*/
+
+	  if (idx0<0x1800 && idx0>=0x1000) {
+	  data=1; //
+	  minus=0x1000; // default
+	}
+
+	  else if (idx0>=0x1800 && idx0<0x4000){
+	    //  fprintf(stderr, "fifo?????? 0x%X\n", idx0);
+	    data=0;
 	  }
-	  else {data=0;}
+	  else if (idx0>=0x4000 && idx0<0x8000) {
+		    m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
+		    minus=0x4000;
+		    data=1;
 	  }
-	  
+	  else if (idx0>=0x8000 && idx0<0xC000) {
+	    m_romm=m_rom004; 
+	    minus=0x8000;
+	    data=1;
+	    }
+
+
+
 	  if (data!=0){
 	  int32_t firstadd=(idx0 & 0xffff)-minus;
 	  int32_t secondadd=(idx1 & 0xffff)-minus;
+	  
 
 		d0 = m_romm[firstadd];
 		d1 = m_romm[secondadd]; // was 0xffff
@@ -989,8 +1007,8 @@ void micro()
 			  if (modus!=4) {// TTS mode
 			    val = (_sely*130.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
-			    if (modus!=1) repeat=((float)(repeat)*logpitch[val]);
-			    else repeat=64.0f*logpitch[val]; // make much longer for singing
+			    if (modus==1) repeat=64.0f*logpitch[val]; // make much longer for singing 
+			    else repeat=((float)(repeat)*logpitch[val]);
 			  }
 			  if (repeat<1) repeat=1;
 			  break;
@@ -1171,7 +1189,7 @@ lpc12_update(&m_filt, &output);
    return output;
 }
 
-const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28};
+const unsigned char remap19[]  __attribute__ ((section (".flash"))) ={64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 115, 116, 117, 118, 119, 120, 121, 122, 123, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28}; // there are 49
 
 void sp0256_newsay1219(void){
   u8 dada, indexy;
@@ -1179,8 +1197,10 @@ void sp0256_newsay1219(void){
 
   u8 selector=_selz*88.0f; // total is 36+49=85
   MAXED(selector, 84); //0-84
-  selector=84-selector;
+  selector=84-selector; // inverted
   
+  //  selector=34;
+
   if (selector<37) { // so top is 36
     m_page=0x1000<<3;
    m_romm=m_rom12;
@@ -1215,13 +1235,13 @@ int16_t sp0256_get_sample(void){
 int16_t sp0256_get_sample_sing(void){
   static int16_t output; 
   modus=1; // singing
-      micro();
-      lpc12_update(&m_filt, &output);
-
-      if (m_halted==1 && m_filt.rpt <= 0)     {
-	sp0256_newsay();
+  micro();
+  lpc12_update(&m_filt, &output);
+  
+  if (m_halted==1 && m_filt.rpt <= 0)     {
+    sp0256_newsay();
    }
-
+  
    return output;
  }
 

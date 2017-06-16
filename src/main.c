@@ -26,25 +26,19 @@
 #include "i2s.h"
 #include "adc.h"
 #include "audio.h"
-//#include "effect.h"
 #include "say.h"
 #include "klatt_phoneme.h"
 #include "nsynth.h"
 #include "elements.h"
 #include "holmes.h"
 #include "sam.h"
-#include "tube.h"
+//#include "tube.h"
 #include "sp0256.h"
 #include "tms5200x.h"
 #include "digitalker.h"
 #include "nvp.h"
-#include "ntube.h"
-//#include "wavetable.h"
-//#include "wavetables.h"
-#include "worming.h"
 #include "vot.h"
 #include "parwave.h"
-#include "raven.h"
 #include "samplerate.h"
 #endif
 
@@ -82,7 +76,6 @@ float exy[64]={0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
 
 #ifdef TESTING
 extern Wavetable wavtable;
-#else
 wormy myworm;
 #endif
 extern char TTSinarray[17];
@@ -112,8 +105,9 @@ void main(void)
     simpleklatt_newsay();
     nvp_init();
     klatt_init(); 
+    parwave_init(&klatt_global);
     rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
-    tube_init(); // tube.c
+    //    tube_init(); // tube.c
 #endif
 
  ////////

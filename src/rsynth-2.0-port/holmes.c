@@ -362,7 +362,6 @@ static klatt_frame_t pars;
 static u8 elm_single[6]={28, 10, 0, 47, 6, 0};
 
 void klatt_newsay_single(){ /// elm_single is our list selx is pitch // sely is len // selz is next phoneme
-static u8 furst=0;
 i=0; 
 //le = &Elements[0];// but what do we do with le?
 top = 1.1 * def_pars.F0hz10;
@@ -400,10 +399,6 @@ elm_single[5]=0; // always
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
 
-    if (furst==0){
-      parwave_init(&klatt_global);
-      furst=1;
-    }
     /* Set stress attack/decay slope */
     stress_s.t = 40;
     stress_e.t = 40;
@@ -768,7 +763,6 @@ int16_t klatt_get_sample_single_sing(){
 
 
 void klatt_newsay(){ /// elm is our list
-  static u8 furst=0;
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
@@ -790,10 +784,6 @@ top*=logpitch[val];
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
 
-        if (furst==0){
-      parwave_init(&klatt_global);
-      furst=1;
-          }
 
 
     //    parwave_init(&klatt_global);
@@ -1008,7 +998,6 @@ static unsigned int elm_plen;
 static u8 const *vocab_elm;
 
 void klatt_newsay_vocab(){ /// elm is our list
-  static u8 furst=0;
 
 i=0; 
 le = &Elements[0];
@@ -1030,10 +1019,6 @@ top = 1.1 * def_pars.F0hz10;
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
 
-    if (furst==0){
-      parwave_init(&klatt_global);
-      furst=1;
-    }
 
     //    parwave_init(&klatt_global);
     /* Set stress attack/decay slope */

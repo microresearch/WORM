@@ -900,7 +900,6 @@ static float gen_noise(klatt_global_ptrr globals)
 
   temp = (u16) getrandom(-8191,8191);
   globals->nrand = (u16) temp;
-
   nlast = globals->nrand + (0.75f * nlast);
 
   return(nlast);
