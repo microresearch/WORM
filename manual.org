@@ -1,8 +1,8 @@
-* newer notes/plan
+* ERD/WORM  manual 2017
 
 ** 0-intro
 
-[MAIN SCANNED IMAGE]
+[MAIN SCANNED IMAGE OF WORMS: 03EARTHSYMBOLworms.tiff]
 
 The WORM was for a long time desirous to speake, but the rule and
 or∣der of the Court enjoyned him silence, but now strutting and
@@ -101,7 +101,7 @@ to manipulate a stored buffer of spoken samples as follows:
   first you continue to write to this buffer according to selected mode
   and previous settings. In the second mode, compost access is frozen.
 
-** 1.5 LAYOUT image
+** 1.5 LAYOUT
 
 I am your Rational Power O Albion & that Human Form
 You call Divine, is but a Worm seventy inches long
@@ -114,7 +114,7 @@ Stops it in midst of its pride among its hills & rivers
 [William Blake. Jerusalem The Emanation of The Giant Albion]
 
 
-[DIAGRAM- layout mode, speed, XYZ and triggerIN, OUT]
+[LAYOUT DIAGRAM- layout mode, speed, XYZ and triggerIN, OUT]
 
 There are 64 modes - X major modes subdivided on mode knob and CV.
 
@@ -166,11 +166,17 @@ cases it toggles between freezing and unfreezing settings for XY modes
 He worshipped the worm and prayed to the wormy grave.
 [Beddoes]
 
-[modes from makingsense.org]
+Suggested format for table example:
+
+| MODE # | TYPE  | TITLE                    | X      | Y      | Z      | TRIGGER      | NOTES               |
+|--------+-------+--------------------------+--------+--------+--------+--------------+---------------------|
+|        | vocab | digitalker               | pitch  | length | phrase | phrase start | T                   |
+|        | vocab | digitalkersing           | pitch  | length | phrase | phrase start | T pitch is absolute |
+|        | worm  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T worm pitchtable   |
 
 ** 3- use/tech notes
 
-[back image]
+[back cable image - we still need to take]
 
 Serpent Lucifer, how do you do?  Of your worms and your snakes I’d be
 one or two; For in this dear planet of wool and of leather ‘Tis
