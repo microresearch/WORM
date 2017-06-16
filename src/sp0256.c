@@ -1296,7 +1296,7 @@ static u8 TTSlength=0;
 
 inline void sp0256_newsay(void){
    u8 dada;
-   dada=_selz*65.0f; 
+   dada=_selz*66.0f; 
    MAXED(dada,63);
    dada=63-dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
