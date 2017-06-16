@@ -62,10 +62,10 @@ const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30,
 
 extern float _selx, _sely, _selz;
 
-int speed = 1;			//normal
+//int speed = 1;			//normal
 // int speed = 2; 		//slow
 
-float frac = 1.0f;
+static float frac = 1.0f;
 
 typedef struct
  {
@@ -109,7 +109,7 @@ static void set_trans(slope_t *t, Elm_ptr a, Elm_ptr b, int ext, int e)
 	
 	for (i = 0; i < nEparm; i++)
 	{
-		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id) * speed;
+		t[i].t = ((ext) ? a->p[i].ed : a->p[i].id);
 	
 		if (t[i].t)
 			t[i].v = a->p[i].fixd + (a->p[i].prop * b->p[i].stdy) * (float) 0.01f;
@@ -363,7 +363,7 @@ static u8 elm_single[6]={28, 10, 0, 47, 6, 0};
 
 void klatt_newsay_single(){ /// elm_single is our list selx is pitch // sely is len // selz is next phoneme
 i=0; 
-//le = &Elements[0];// but what do we do with le?
+le = &Elements[0];// but what do we do with le?
 top = 1.1 * def_pars.F0hz10;
 
 // TODO break out so works a bit faster
@@ -374,7 +374,7 @@ top = 1.1 * def_pars.F0hz10;
 // selz selects phoneme (set standard lengthy for each phoneme) - there are 64 phonemes also:
 // test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
 
-u8 val=_selz*65.0f;
+u8 val=_selz*67.0f;
 MAXED(val,63);
 val=63-val;
 val=phoneme_prob_remap[val];
@@ -547,7 +547,7 @@ int16_t klatt_get_sample_single(){
       pars.A4 = AMP_ADJ + tp[a4];
 
 #ifndef LAP
-      u8 val=_selx*130.0f;
+      u8 val=_selx*131.0f;
   MAXED(val,127);
   val=127-val;
   pars.F0hz10*=logpitch[val];
@@ -572,7 +572,7 @@ int16_t klatt_get_sample_single(){
     samplenumber++;
 
   // TEST duration bend = sely
-      u8 val=_sely*130.0f;
+      u8 val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
       //      if (samplenumber>=klatt_global.nspfr) {
@@ -720,7 +720,7 @@ int16_t klatt_get_sample_single_sing(){
       pars.A4 = AMP_ADJ + tp[a4];
 
 #ifndef LAP
-      u8 val=_selx*130.0f;
+      u8 val=_selx*131.0f;
   MAXED(val,127);
   val=127-val;
   //  pars.F0hz10*=logpitch[val];
@@ -747,7 +747,7 @@ int16_t klatt_get_sample_single_sing(){
     samplenumber++;
 
   // TEST duration bend = sely
-      u8 val=_sely*130.0f;
+      u8 val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
       //      if (samplenumber>=klatt_global.nspfr) {
@@ -839,7 +839,7 @@ int16_t klatt_get_sample(){
   u8 xaxis=_selx*18.0f; // 18.0f
   MAXED(xaxis,15); // 15*3=45 so we still leave the end
   xaxis=15-xaxis;
-  u8 val=_selz*66.0f;
+  u8 val=_selz*67.0f;
   MAXED(val,63);
   val=63-val;
   test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
@@ -1004,7 +1004,7 @@ le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
  
 //u8 val=1;
-  u8 val=_selz*132.0f;
+  u8 val=_selz*131.0f;
   MAXED(val,127);
   val=127-val;
 
@@ -1171,7 +1171,7 @@ int16_t klatt_get_sample_vocab(){
       pars.A4 = AMP_ADJ + tp[a4];
 
 #ifndef LAP
-  u8 val=_selx*130.0f;
+  u8 val=_selx*131.0f;
   MAXED(val,127);
   val=127-val;
   pars.F0hz10*=logpitch[val];
@@ -1191,7 +1191,7 @@ int16_t klatt_get_sample_vocab(){
     samplenumber++;
 
   // TEST duration bend = sely
-      u8 val=_sely*130.0f;
+      u8 val=_sely*131.0f;
       MAXED(val,127);
       if (samplenumber>=klatt_global.nspfr*logpitch[val]) {
       // end of frame so...????
@@ -1340,7 +1340,7 @@ int16_t klatt_get_sample_vocab_sing(){
       pars.A4 = AMP_ADJ + tp[a4];
 
 #ifndef LAP
-  u8 val=_selx*130.0f;
+  u8 val=_selx*131.0f;
   MAXED(val,127);
   val=127-val;
   pars.F0hz10=def_pars.F0hz10*logpitch[val];
@@ -1360,7 +1360,7 @@ int16_t klatt_get_sample_vocab_sing(){
     samplenumber++;
 
   // TEST duration bend = sely
-      u8 val=_sely*130.0f;
+      u8 val=_sely*131.0f;
       MAXED(val,127);
       if (samplenumber>=klatt_global.nspfr*logpitch[val]) {
       // end of frame so...????

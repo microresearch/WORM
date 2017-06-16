@@ -1066,7 +1066,7 @@ int16_t process(u8 *ending)
 			m_PC++;
 		}
 		m_pitch_count++;
-		val=_selx*130.0f;
+		val=_selx*131.0f;
 		MAXED(val,127);
 		//		val=127-val;
 		if (modus==0){
@@ -1213,7 +1213,7 @@ int16_t process_k_tabled5100(u8 *ending)
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
 	return sample;
 }
@@ -1256,19 +1256,18 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
 			// TODO as LOG
 			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK
-			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			u8 val=exy[m_new_frame_pitch_idx]*131.0f;
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
 
-			// LOGGY - TEST!
 			for (i = 0; i < 4; i++) {
-			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*130.0f;
+			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
 			MAXED(val,127);
 			//			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
 			m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*logpitch[val];
 			}
 			for (i = 4; i < m_coeff->num_k; i++){
-			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*130.0f;
+			  val=exy[32+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
 			  MAXED(val,127);
 			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(1-zpar) * logpitch[val];
 
@@ -1408,7 +1407,7 @@ int16_t process_pitchk_tabled5200(u8 *ending) // for 5100 we have 32+168 in exy=
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
 			// TODO: loggy
 
-			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			u8 val=exy[m_new_frame_pitch_idx]*131.0f;
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
 
@@ -1552,7 +1551,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
 			// TODO: loggy
 			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never zero
-			u8 val=exy[m_new_frame_pitch_idx]*130.0f;
+			u8 val=exy[m_new_frame_pitch_idx]*131.0f;
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
 
@@ -3072,7 +3071,7 @@ int16_t process2bends(u8 *ending)
 		}
 		m_pitch_count++;
 		//		if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
-		val=_selx*130.0f;
+		val=_selx*131.0f;
 		MAXED(val,127);
 		if (modus==0){
 		  if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; // - pitch bend
@@ -3122,7 +3121,6 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F; 
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //  whichbank=1; /// TEST for speedups // test for 5200 echofemale
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -3132,7 +3130,7 @@ void tms_newsay(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 };
 
@@ -3144,7 +3142,6 @@ void tms_newsay_lowbit(){
   whichbank=_sely*TMS_VOCAB_F; 
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //  whichbank=0; /// TEST for speedups
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -3154,13 +3151,13 @@ void tms_newsay_lowbit(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 };
 
 void tms_newsay_allphon(){
   m_digital_select=1;
-  u8 whichbank=ALLPHON_BANK; // for testcode is 1
+  u8 whichbank=ALLPHON_BANK; 
 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   m_new_frame_energy_idx = 0;
@@ -3170,20 +3167,20 @@ void tms_newsay_allphon(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 };
 
 void tms_newsay_TTS(){
   // this is our allphon code
   m_digital_select=1;
-  u8 whichbank=ALLPHON_BANK; // WAS 37 but for testcode is 1
+  u8 whichbank=ALLPHON_BANK; 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
 
-    ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[TTSindex]]; // TESTING 
+    ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[TTSindex]]; 
     ptrBit = 0;
 
     TTSindex++;
@@ -3194,23 +3191,22 @@ void tms_newsay_TTS(){
 };
 
 void tms_retriggerTTS(){
-  u8 whichbank=1; // WAS 37 but for testcode is 1
+  m_digital_select=1;
+  u8 whichbank=ALLPHON_BANK; 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
 
   TTSlength= text2speechforTMS(16,TTSinarray,TTSoutarray); 
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[0]]; // TESTING 
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[0]]; 
   ptrBit = 0;
-  TTSindex=1;
+  TTSindex=1; // for next round
 }
 
 void tms_newsay_raw5100(){
   m_digital_select=1;
-  u8 whichbank;
-  
-  whichbank=0; // 5100 
+  u8 whichbank=0; // 5100 
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
     m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
@@ -3228,7 +3224,7 @@ void tms_newsay_raw5200(){
 void tms_newsay_raw5220(){
   m_digital_select=1;
   m_coeff=&tms5220_coeff;
-    m_new_frame_energy_idx = 0;
+  m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
 };

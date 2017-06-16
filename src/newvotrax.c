@@ -349,7 +349,7 @@ void chip_update_bend()
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-exy[0])*64.0f)-8)) + 1)) m_pitch = 0;
-	u8 val=exy[0]*130.0f;
+	u8 val=exy[0]*131.0f;
 	MAXED(val,127);
 	val=127-val;
 
@@ -1350,7 +1350,7 @@ void votrax_newsay(){
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  u8 val=_sely*132.0f;
+  u8 val=_sely*131.0f;
   MAXED(val,127);
   //  val=127-val;
   lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
@@ -1362,7 +1362,7 @@ void votrax_newsay_sing(){
   sel=64-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
-  u8 val=_sely*132.0f;
+  u8 val=_sely*131.0f;
   MAXED(val,127);
   //  val=127-val;
   //  lenny=(16*(32*logpitch[val]*4+1) *4*9+2)/32; 

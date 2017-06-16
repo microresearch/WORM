@@ -20,6 +20,7 @@ Based on klsyn-88, found at http://linguistics.berkeley.edu/phonlab/resources/
 
 #ifdef LAP
 #include "forlap.h"
+#include "resources.h"
 #define M_PI 3.14
 #else
 #include "stm32f4xx.h"
@@ -50,7 +51,7 @@ print str(frameDuration)+",",
 print str(fadeDuration)+" },"
  */
 
-const float data[48][39]  __attribute__ ((section (".flash"))) ={
+static const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 220.0f , 75.0f , 225.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 300.0f, 1840.0f, 2750.0f, 3300.0f, 3750.0f, 4900.0f, 200.0f, 100.0f, 300.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.466666666667f, 0.4f, 0.4f, 0.383333333333 , 0.0f , 1.0f , 0.0f, 0.0f },
 { 290.0f, 610.0f, 2150.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 55.0f , 60.0f , 45.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 290.0f, 610.0f, 2150.0f, 3300.0f, 3750.0f, 4900.0f, 50.0f, 80.0f, 60.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 0.0f, 0.75 },
 { 650.0f , 1430.0f , 2500.0f , 3300.0f , 3750.0f , 4900.0f , 250.0f , 200.0f , 116.6f, 76.5f , 178.0f , 250.0f , 200.0f , 1000.0f , 100.0f , 100.0f , 0.0f, 700.0f, 1220.0f, 2600.0f, 3300.0f, 3750.0f, 4900.0f, 130.0f, 70.0f, 160.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f },
@@ -149,16 +150,16 @@ static speechPlayer_frame_t framer, oldframer, tempframe;
 
 const float PITWO=M_PI*2.0f;
 
-float lastValueOne= 0.0f;
-float lastValueTwo= 0.0f;
+static float lastValueOne= 0.0f;
+static float lastValueTwo= 0.0f;
 
 float getNextNOISE(float* lastValue) {
   *lastValue=((float)rand()/RAND_MAX)+0.75f* *lastValue;
   return *lastValue;
 };
 
-float lastCyclePosOne=0.0f;
-float lastCyclePosTwo=0.0f;
+static float lastCyclePosOne=0.0f;
+static float lastCyclePosTwo=0.0f;
 
 float getNextFREQ(float* lastCyclePos, float frequency) {
   float cyclePos=fmodf((frequency/sampleRRate)+*lastCyclePos,1);
@@ -166,7 +167,7 @@ float getNextFREQ(float* lastCyclePos, float frequency) {
   return cyclePos;
 };
 
-bool glottisOpen;
+static bool glottisOpen;
 
 float getNextVOICE(const speechPlayer_frame_t* frame) {
   float vibrato=(sinf(getNextFREQ(&lastCyclePosOne,frame->vibratoSpeed)*PITWO)*0.06f*frame->vibratoPitchOffset)+1.0f; // but we need diff instances of getNExtFREQ - DONE
@@ -195,8 +196,8 @@ float a, b, c;
 }reson;
 
 
-reson r1,r2,r3,r4,r5,r6,rN0,rNP;
-reson rr1,rr2,rr3,rr4,rr5,rr6;
+static reson r1,r2,r3,r4,r5,r6,rN0,rNP;
+static reson rr1,rr2,rr3,rr4,rr5,rr6;
 
 void INITRES(reson *res, bool anti) {
 		res->anti=anti;
@@ -259,7 +260,7 @@ float resonateRES(reson *res, float in, float frequency, float bandwidth) {
 
 void change_nvpparams(speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-float* indexy[39];
+static float* indexy[39];
 
 void init_nvp(void){
 
@@ -346,7 +347,7 @@ void nvp_newsay(){
   static u8 oldframe=0, nextframe=0;
   count=0;
   oldframe=nextframe;
-  nextframe=_selz*50.0f;
+  nextframe=_selz*51.0f;
   MAXED(nextframe,47);
   nextframe=47-nextframe;
   
@@ -360,7 +361,7 @@ void nvp_newsay(){
   }
   }
   // frame length, interpol sets to half that and pitch = SELY, SELZ,
-    int val=_sely*1027.0f;
+    int val=_sely*1028.0f;
     MAXED(val,1023);
     this_frame_length=(int)(1024.0f*logspeed[val])<<2; // sely
   this_interpol=this_frame_length/2;
@@ -379,7 +380,7 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
   nextframe=ourvocab[counter].phon;
 
   if (nextframe==255) { // end of frame!
-    value=_selz*132.0f;
+    value=_selz*131.0f;
     MAXED(value,127);
     value=127-value;
     counter=0;
@@ -403,7 +404,7 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
   }
   }
 
-    int val=_sely*1027.0f;
+    int val=_sely*1028.0f;
     MAXED(val,1023);
     this_frame_length=ourvocab[counter].frameDuration*(64.0f*logspeed[val]);
     this_interpol=ourvocab[counter].fadeDuration*(64.0f*logspeed[val]);
@@ -418,7 +419,7 @@ void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
   static u8 nextframe=0;
   u8 silence=0;
   count=0;
-  u8 value=_selz*132.0f;
+  u8 value=_selz*131.0f;
   MAXED(value,127);
   value=127-value;
   ourvocab=nvp_vocab[value];
@@ -440,7 +441,7 @@ void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
     *indexy[i]=data[nextframe][i];
   }
   }
-    int val=_sely*1027.0f;
+    int val=_sely*1028.0f;
     MAXED(val,1023);
     this_frame_length=ourvocab[0].frameDuration*(64.0f*logspeed[val]);
     this_interpol=ourvocab[0].fadeDuration*(64.0f*logspeed[val]);;
@@ -575,15 +576,26 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
 #ifdef LAP
 void main(){
   nvp_init();
-  nvp_newsay();
   while(1){
-    //    _selx=(float)(rand()%32768)/32768.0f;
-    //    _sely=(float)(rand()%32768)/32768.0f;
-    //    _selz=(float)(rand()%32768)/32768.0f;
+
+    int mode=rand()%10;
+    if (mode==0)   nvp_newsay_vocab();
+    else nvp_newsay;
+    
+
+    for (int x=0;x<1024;x++){
+            _selx=(float)(rand()%32768)/32768.0f;
+        _sely=(float)(rand()%32768)/32768.0f;
+        _selz=(float)(rand()%32768)/32768.0f;
     //    _selz=1.0f;
 
-    int16_t smaple=nvp_get_sample();
+	int16_t smaple;
+
+	    if (mode==0)   smaple =nvp_get_sample();
+	    else smaple=nvp_get_sample_vocab();
+
     printf("%c", (smaple+32768)>>4);
+    }
     //    printf("%f\n",     framer.voicePitch);
   }
 }

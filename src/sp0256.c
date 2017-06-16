@@ -45,7 +45,7 @@
 #include "resources.h"
 extern float _selx, _sely, _selz, _mode, _speed;
 //extern u8 TTS;
-const unsigned char *m_romm;
+static const unsigned char *m_romm;
 static u8 modus=0;
 
 typedef unsigned char UINT8;
@@ -72,20 +72,20 @@ struct lpc12_t
 u8           m_silent;          /* Flag: SP0256 is silent.                      */
 
 
-struct lpc12_t m_filt;            /* 12-pole filter                               */
-uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
-int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
-int32_t            m_pc;              /* Microcontroller's PC value.                  */
-uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
-u8            m_fifo_sel;        /* True when executing from FIFO.               */
-u8            m_halted;          /* True when CPU is halted.                     */
-UINT32         m_mode;            /* Mode register.                               */
-UINT32         m_page;            /* Page set by SETPAGE                          */
+static struct lpc12_t m_filt;            /* 12-pole filter                               */
+static uint16_t            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
+static int32_t            m_ald;             /* Address LoaD.  < 0 if no command pending.    */
+static int32_t            m_pc;              /* Microcontroller's PC value.                  */
+static uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
+static u8            m_fifo_sel;        /* True when executing from FIFO.               */
+static u8            m_halted;          /* True when CPU is halted.                     */
+static UINT32         m_mode;            /* Mode register.                               */
+static UINT32         m_page;            /* Page set by SETPAGE                          */
 
-UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
-UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
-UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
-UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
+static UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
+static UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
+static UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
+static UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
 
 
 #define CLOCK_DIVIDER (7*6*8)
@@ -787,10 +787,10 @@ UINT32 getb( int len )
 	  minus=0x1000; // default
 	}
 
-	  else if (idx0>=0x1800 && idx0<0x4000){
+	  //else if (idx0>=0x1800 && idx0<0x4000){
 	    //  fprintf(stderr, "fifo?????? 0x%X\n", idx0);
-	    data=0;
-	  }
+	  //	    data=0;
+	  //	  }
 	  else if (idx0>=0x4000 && idx0<0x8000) {
 		    m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
 		    minus=0x4000;
@@ -1005,7 +1005,7 @@ void micro()
 			{			  
 			  repeat = immed4 | (m_mode & 0x30);
 			  if (modus!=4) {// TTS mode
-			    val = (_sely*130.0f); // only if we are not in TTS mode
+			    val = (_sely*131.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
 			    if (modus==1) repeat=64.0f*logpitch[val]; // make much longer for singing 
 			    else repeat=((float)(repeat)*logpitch[val]);
@@ -1210,6 +1210,7 @@ void sp0256_newsay1219(void){
       m_romm=m_rom19;
       indexy=selector-37;
       dada=remap19[indexy];
+      
       if (indexy>19) m_page=0x8000<<3;
       else m_page=0x1000<<3;
     }
@@ -1296,7 +1297,7 @@ static u8 TTSlength=0;
 
 inline void sp0256_newsay(void){
    u8 dada;
-   dada=_selz*66.0f; 
+   dada=_selz*67.0f; 
    MAXED(dada,63);
    dada=63-dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;

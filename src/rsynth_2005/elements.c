@@ -18,9 +18,6 @@
 
 */
 #include <config.h>
-/* $Id: //depot/rsynth/elements.c#11 $
- */
-char *elements_id = "$Id: //depot/rsynth/elements.c#11 $";
 #include "stm32f4xx.h"
 #include <stdio.h>
 #include <math.h>

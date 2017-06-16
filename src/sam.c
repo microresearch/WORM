@@ -16,7 +16,7 @@ u8 modus;
 
 static char input[512];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 static char tmpinput[257];
-static const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements
+static const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements!
 
 
 /*	DESCRIPTION          SPEED     PITCH     THROAT    MOUTH
@@ -28,15 +28,14 @@ static const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "
 	SAM                   72        64        128       128
 */
 
-int32_t bufferpos=0;
+//shared with render.c
 
+int32_t bufferpos=0;
 unsigned char speedd = 72;
 unsigned char pitch = 64;
 unsigned char mouth = 128;
 unsigned char throat = 128;
 u8 singmode = 0; 
-
-
 
 unsigned char mem39;
 unsigned char mem44;
@@ -136,11 +135,11 @@ void sam_newsay_banks0(void){
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
   // FOR banks selection
-  u8 bank=_sely*33.0f;
+  u8 bank=_sely*34.0f;
   MAXED(bank,31);
   bank=31-bank;
 
-  u8 vocab=_selz*43.0f;
+  u8 vocab=_selz*44.0f;
   MAXED(vocab,41);
   vocab=41-vocab;
   strcpy(input,  vocablist_sam[bank][vocab]); // there are 32 banks of 42 vocab each ends with .\x9b 
@@ -445,7 +444,7 @@ void sam_newsay_phonsing(void){
   teststring[0] = '\0';
 
   for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
-      u8 val=exy[x]*57.0f;
+      u8 val=exy[x]*58.0f;
       MAXED(val,55);
       val=55-val;
       strcat(teststring,phoneme_list[val]);
@@ -552,9 +551,9 @@ u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
 
-  u8 xaxis=_sely*19.0f;  // for 0-15 positions
-  MAXED(xaxis,19.0f);
-  xaxis=19.0f-xaxis;
+  u8 xaxis=_sely*18.0f;  // for 0-15 positions
+  MAXED(xaxis,15);
+  xaxis=15-xaxis;
   exy[xaxis]=_selz;
 
   modus=1; // was 32 but now we want z
@@ -573,9 +572,9 @@ u8 sam_get_sample_phons(int16_t* newsample){
   int32_t oldbufferpos=bufferpos;
   modus=4; // was 64 mode
 
-  u8 xaxis=_sely*19.0f;  // for 0-15 positions
-  MAXED(xaxis,19.0f);
-  xaxis=19.0f-xaxis;
+  u8 xaxis=_sely*18.0f;  // for 0-15 positions
+  MAXED(xaxis,15);
+  xaxis=15-xaxis;
   exy[xaxis]=_selz;
 
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
@@ -593,9 +592,9 @@ u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 fo
   int32_t oldbufferpos=bufferpos;
   modus=128; // changed 128 so is selx
 
-  u8 xaxis=_sely*19.0f;  // for 0-15 positions
-  MAXED(xaxis,19.0f);
-  xaxis=19.0f-xaxis;
+  u8 xaxis=_sely*18.0f;  // for 0-15 positions
+  MAXED(xaxis,15);
+  xaxis=15-xaxis;
   exy[xaxis]=_selz;
 
   howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end

@@ -413,7 +413,7 @@ void digitalker_step_mode_0p()
 #ifdef LAP
 	m_pitch = pitch_vals[pitch_id];
 #else	
-	u8 val=exy[pitch_id]*130.0f;
+	u8 val=exy[pitch_id]*131.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[pitch_id]*logpitch[val];
 #endif
@@ -471,7 +471,7 @@ void digitalker_step_mode_0d()
 		  #ifdef LAP
 		  dac += delta1[(bits >> (6+2*l)) & 15];
 		#else	
-		  	u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  	u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 			MAXED(val,127);
 			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 			#endif
@@ -486,7 +486,7 @@ void digitalker_step_mode_0d()
 		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
 #ifndef LAP
-		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 		  #else
@@ -591,7 +591,7 @@ void digitalker_step_mode_2p()
 #ifdef LAP
 	m_pitch = pitch_vals[pitch_id];
 	#else
-	u8 val=exy[pitch_id]*130.0f;
+	u8 val=exy[pitch_id]*131.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[pitch_id]*logpitch[val];
 #endif
@@ -665,7 +665,7 @@ void digitalker_step_mode_2d()
 #ifdef LAP
 			dac += delta1[(bits >> (6+2*l)) & 15];
 #else
-			u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+			u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 			MAXED(val,127);
 			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 			#endif
@@ -684,7 +684,7 @@ void digitalker_step_mode_2d()
 		  dac -= delta1[(bits >> (6+2*l)) & 15];
 		  
 		  #else
-		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 		  #endif
@@ -701,7 +701,7 @@ void digitalker_step_mode_2d()
 		  #ifdef LAP
 		  dac += delta1[(bits >> (6+2*l)) & 15];
 		  #else
-		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 		  MAXED(val,127);
 		  dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 		  #endif
@@ -719,7 +719,7 @@ void digitalker_step_mode_2d()
 		  #ifdef LAP
 		  dac -= delta1[(bits >> (6+2*l)) & 15];
 		  #else
-		  u8 val=exy[(bits >> (6+2*l)) & 15]*130.0f;
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
 		  MAXED(val,127);
 		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
 		  #endif
@@ -784,7 +784,7 @@ void digitalker_step_mode_3p()
 	#ifdef LAP
 	m_pitch = pitch_vals[h & 0x1f];
 	#else
-	u8 val=exy[h & 0x1f]*130.0f;
+	u8 val=exy[h & 0x1f]*131.0f;
 	MAXED(val,127);
 	m_pitch = pitch_vals[h & 0x1f]*logpitch[val];
 	#endif
@@ -841,7 +841,7 @@ void digitalker_step_mode_3d()
 		  #ifdef LAP
 		  dac += delta2[(bits >> (6+2*l)) & 15];
 		  #else
-		  u8 val=exy[16+((bits >> (6+2*l)) & 15)]*130.0f;
+		  u8 val=exy[16+((bits >> (6+2*l)) & 15)]*131.0f;
 		  MAXED(val,127);
 		  dac += delta2[(bits >> (6+2*l)) & 15]*logpitch[val];
 		  #endif
@@ -874,7 +874,7 @@ void digitalker_step()
 			m_segments = (v1 & 15) + 1;
 			// try bend of m_repeats
 #ifndef LAP
-			u8 val=_sely*66.0f;
+			u8 val=_sely*67.0f;
 			MAXED(val,63);
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 			if (modus==0){
@@ -1116,7 +1116,7 @@ int16_t digitalk_get_sample_sing(){
 	else if(m_dac_index != 128) {
 	    short v = m_dac[m_dac_index];
 
-	    u8 val=_selx*130.0f;
+	    u8 val=_selx*131.0f;
 	    MAXED(val,127);
 	    if (pp>=(64.0f*logpitch[val]))
 	      {
@@ -1154,7 +1154,7 @@ int16_t digitalk_get_sample(){
 	else if(m_dac_index != 128) {
 	    short v = m_dac[m_dac_index];
 
-	    u8 val=_selx*130.0f;
+	    u8 val=_selx*131.0f;
 	    MAXED(val,127);
 	    if (pp>=(m_pitch*logpitch[val]))
 	      {
@@ -1250,7 +1250,8 @@ int16_t digitalk_get_sample_bendpitchvals(){
    u8 x; int xx, xxx, w=atoi(argv[1]);
    digitalk_init();
      while(1){
-   digitalk_newsayarg(w);
+       w++;
+       digitalk_newsayarg(w);
    for (xx=0;xx<64000;xx++){
      for (x=0;x<32;x++) {
        xxx=digitalk_get_sample_arg(w);

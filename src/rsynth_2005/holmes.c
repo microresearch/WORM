@@ -174,7 +174,7 @@ void rsynth_newsay_single()
   static u8 once=1;
   nelm=4; //0123
 
-  u8 val=_selz*86.0f;
+  u8 val=_selz*87.0f;
   MAXED(val,83);
   val=83-val;
 
@@ -186,7 +186,7 @@ void rsynth_newsay_single()
   //  unsigned i = 0;
   int j;
 
-  if (once==1){
+  if (once==1){ // question of this ONCE?
     once=0;
   Elm_ptr le = &Elementz[0]; 
   
@@ -207,7 +207,7 @@ void rsynth_newsay_single()
 void rsynth_newsay()
 {
   //  u8 selected=1;
-  u8 selected=_selz*132.0f;
+  u8 selected=_selz*131.0f;
   MAXED(selected,127);
   selected=127-selected;
   nelm=rsynth_vocab[selected]->length;
@@ -376,7 +376,7 @@ int16_t rsynth_get_sample(){
 
   // TEST frequency bend = selx
 
-  int val=_selx*1027.0f;
+  int val=_selx*1028.0f;
   MAXED(val,1023);
   val=1023-val;
   float newfreq=F0Hz* logspeed[val] * 0.5f;
@@ -385,7 +385,7 @@ int16_t rsynth_get_sample(){
       samplenumber++;
 
   // TEST duration bend = sely
-      val=_sely*130.0f;
+      val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
       
@@ -499,7 +499,7 @@ int16_t rsynth_get_sample_sing(){
 
   // TEST frequency bend = selx
 
-  int val=_selx*1027.0f;
+  int val=_selx*1028.0f;
   MAXED(val,1023);
   val=1023-val;
   //   float newfreq=F0Hz* logspeed[val] * 0.5f;
@@ -509,7 +509,7 @@ int16_t rsynth_get_sample_sing(){
       samplenumber++;
 
   // TEST duration bend = sely
-      val=_sely*130.0f;
+      val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
       

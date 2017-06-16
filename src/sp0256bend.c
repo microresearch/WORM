@@ -180,7 +180,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		/* ---------------------------------------------------------------- */
 		do_int = 0;
 		samp   = 0;
-		val=exy[1]*1026.0f;
+		val=exy[1]*1028.0f;
 		MAXED(val,1023);
 		f->amp=f->amporig*logspeed[1023-val];
 		if (f->perorig)
@@ -278,10 +278,10 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		{
 		  // intersperse
 		  //		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
-		  val=exy[2 + (2*j)]*1026.0f;
+		  val=exy[2 + (2*j)]*1028.0f;
 		  MAXED(val,1023);
 		  f->b_coef[j]=f->b_coeforig[j]*logspeed[1023-val];
-		  val=exy[3 + (2*j)]*1026.0f;
+		  val=exy[3 + (2*j)]*1028.0f;
 		  f->f_coef[j]=f->f_coeforig[j]*logspeed[1023-val];
 		  //		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
@@ -443,15 +443,15 @@ static UINT32 getb( int len )
 
 	  data=0;
 
-	  if (idx0<0x1800 && idx0>0x1000) {
+	  if (idx0<0x1800 && idx0>=0x1000) {
 	  data=1; //
 	  minus=0x1000; // default
 	}
 
-	  else if (idx0>=0x1800 && idx0<0x4000){
+	  //	  else if (idx0>=0x1800 && idx0<0x4000){// we don't need this
 	    //  fprintf(stderr, "fifo?????? 0x%X\n", idx0);
-	    data=0;
-	  }
+	  //	    data=0;
+	  //	  }
 	  else if (idx0>=0x4000 && idx0<0x8000) {
 		    m_romm=m_rom003; // 003 has phonemes as AL2 and some phrases but not so many WHY?
 		    minus=0x4000;

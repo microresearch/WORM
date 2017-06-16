@@ -99,7 +99,6 @@ void main(void)
   votrax_init();
   tms_init();
   sam_init();
-  //  sam_newsay_banks0(); // TEST!
     digitalk_init();
     simpleklatt_init();
     simpleklatt_newsay();
@@ -107,7 +106,6 @@ void main(void)
     klatt_init(); 
     parwave_init(&klatt_global);
     rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
-    //    tube_init(); // tube.c
 #endif
 
  ////////

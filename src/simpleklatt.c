@@ -15,16 +15,16 @@
 #define NUMBER_OF_SAMPLES 100
 //#define SAMPLE_FACTOR 0.00001 // this is too low - hardcoded in parwave
 
-  int16_t *iwave;
-  int16_t isam;
-  int16_t icount;
-  int16_t nmspf_def;
-  klatt_global_ptrr globals;
+static   int16_t *iwave;
+static   int16_t isam;
+static   int16_t icount;
+static   int16_t nmspf_def;
+static   klatt_global_ptrr globals;
 //  klatt_frame_ptrr frame;
-  unsigned char high_byte;
-  unsigned char low_byte;
-  flag raw_flag;
-  flag raw_type;
+static   unsigned char high_byte;
+static   unsigned char low_byte;
+static   flag raw_flag;
+static   flag raw_type;
 
 static int16_t frame[40];
 extern float exy[64];
@@ -52,7 +52,7 @@ static const int16_t mins[40] __attribute__ ((section (".flash"))) = {200,  0, 2
 
 static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
 
-klatt_global_tt globale;
+static klatt_global_tt globale;
 
 
 void simpleklatt_init(void){
