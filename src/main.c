@@ -99,13 +99,13 @@ void main(void)
   votrax_init();
   tms_init();
   sam_init();
-    digitalk_init();
-    simpleklatt_init();
-    simpleklatt_newsay();
-    nvp_init();
-    klatt_init(); 
-    parwave_init(&klatt_global);
-    rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
+  digitalk_init();
+  simpleklatt_init();
+  simpleklatt_newsay();
+  nvp_init();
+  klatt_init(); 
+  parwave_init(&klatt_global); // klatt_global is in def_pars //parwave_init in nsynth.c
+  rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
 #endif
 
  ////////

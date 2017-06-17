@@ -8,7 +8,7 @@
 klatt_global_t klatt_global;
 
 /* default values for pars array from .doc file */
-klatt_frame_t def_pars =
+klatt_frame_t def_pars = // noyt a const
 {
 #include "pars.def"
 };

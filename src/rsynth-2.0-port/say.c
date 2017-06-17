@@ -73,6 +73,8 @@ unsigned short wav_len;
 
 //	PhonemeToWaveData(eng2phonemeOUT-array from xlate, eng2phonemeOUT_ptr=length, 0);
 
+// UNUSED?
+
 void PhonemeToWaveData(char *phone, int len)
 {
 	unsigned frames;

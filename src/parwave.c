@@ -709,7 +709,7 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
    *
    *     B0[nopen - 40] = 1920000 / (nopen * nopen)
    */
-  static short B0[224] = 
+  static const short B0[224] = 
   {
     1200,1142,1088,1038, 991, 948, 907, 869, 833, 799, 768, 738, 710, 683, 658,
     634, 612, 590, 570, 551, 533, 515, 499, 483, 468, 454, 440, 427, 415, 403,

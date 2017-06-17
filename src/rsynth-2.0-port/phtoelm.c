@@ -118,7 +118,7 @@ unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
 	
 	
 	if (!phtoelm)
-	  enter_phonemes();
+	  enter_phonemes(); // TODO: init elsewhere?
 	
 	while (s < limit && *s)
 	{

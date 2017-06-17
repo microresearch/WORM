@@ -21,7 +21,7 @@ void darray_free(darray_t *a)
 	a->items = a->alloc = 0;
 }
 
-void *Darray_find(darray_t *a, unsigned int n)
+/*void *Darray_find(darray_t *a, unsigned int n)
 {
 	if (n >= a->alloc || n >= a->items)
 	{
@@ -58,7 +58,7 @@ void *Darray_find(darray_t *a, unsigned int n)
 	}
 	return (void *) (a->data + n * a->esize);
 }
-
+*/
 int darray_delete(darray_t *a, unsigned int n)
 {
 	char *p = (char *) darray_find(a, n);

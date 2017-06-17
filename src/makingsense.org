@@ -1929,11 +1929,19 @@ TODO:
 
 - re-test klatt single mode
 
-- test each mode individually and transition between modes in one group (also between all TTS - what might they share?)
+- test each mode individually and transition between modes in one
+  group (also between all TTS - what might they share?- inarray is
+  just ascii, rest is not shared I think)
 
-sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rsynth-2005, compost in principle::: sam and klatt group as probable,
+sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rsynth-2005, compost in principle
 
-- where the problem might be: what leaks between modes (newsay setup-rom stuff,
+::: sam,, nvp and klatt group as probable problems - and maybe in INIT as we had before:
+
+- note that in klatt we don't init the mallocy element stuff any more so that is not an issue//get rid of all we don't use in makefile
+
+- nvp has funny passing around/packed business so is also most suspect _ TRY again with packed
+
+- where the problem might be: what leaks between modes (newsay setup-rom stuff),
   variables which should not be shared (static), memory leakage
 
 // tested all nvp and transitions on lap, also sp0256 (not bends - but most fits), digitalker (no bend)

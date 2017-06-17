@@ -58,7 +58,7 @@
 
 #define ONE 1.0F
 
-static int natural_samples[100]= // where is this from? - from earlier rsynth
+static const int natural_samples[100]= // where is this from? - from earlier rsynth
   {
     -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
     605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,

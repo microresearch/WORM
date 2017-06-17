@@ -47,18 +47,19 @@ float fastsqrt3( float x ) {
   return v;
 }
 
+biquad bbb;
 
 /* sets up a BiQuad Filter */
 biquad *BiQuad_new(int type, smp_type dbGain, smp_type freq,
 smp_type srate, smp_type bandwidth)
 {
-    biquad *b;
+    biquad *b=&bbb;
     smp_type A, omega, sn, cs, alpha, beta;
     smp_type a0, a1, a2, b0, b1, b2;
 
-    b = malloc(sizeof(biquad));
-    if (b == NULL)
-        return NULL;
+    //    b = malloc(sizeof(biquad));
+    //    if (b == NULL)
+    //        return NULL;
 
     /* setup variables */
     A = powf(10, dbGain /40);
@@ -126,7 +127,7 @@ smp_type srate, smp_type bandwidth)
         a2 = (A + 1) - (A - 1) * cs - beta * sn;
         break;
     default:
-        free(b);
+      //        free(b);
         return NULL;
     }
 
