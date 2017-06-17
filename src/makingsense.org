@@ -1918,7 +1918,6 @@ cut modes to::::
 
 - re-TESTING so far modes: 5X, all TTS modes=8X, 17X, 30X, 25X
 
-
 TODO:
 
 - fixed bug in tms/tts retrigger tms5200.c TO TEST
@@ -1945,6 +1944,31 @@ sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rs
   variables which should not be shared (static), memory leakage
 
 // tested all nvp and transitions on lap, also sp0256 (not bends - but most fits), digitalker (no bend)
+
+** 17/6
+
+- do individual tests for new code above: tmsttsX, nvpX, klatt single modeX, 21-24sam modes21X, 
+
+- tests removal of all sections of each init/generate code in
+  main/audio.c and still crashes each time...// but didn't do make
+  clean between so maybe...
+
+- tests removal of all TTS code, test no audio_buffer access, stack
+  increase to 0x1000 - nothing helps
+
+- 0-15 runs fine, 0-45crash, 0-20finesofar (make clean always)
+
+- changes in sam AND larger stack - re-test 0-24 CRASH!, 0-21 seems ok, try 0-23 CRASH
+
+tried all stack changes but could just be out of memory... wordlists all stay in RAM...
+
+
+
+for stack we need 0x1000
+
+....
+
+- gdb: http://fab.cba.mit.edu/classes/863.13/tutorials/EmbeddedProgramming/stm32.html (but maybe too slow)
 
 * FINAL/FURTHER TODO:
 

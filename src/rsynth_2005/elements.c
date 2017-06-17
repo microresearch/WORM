@@ -25,7 +25,7 @@
 #include "phfeat.h"
 
 
-Elm_t Elementz[] = {
+const Elm_t Elementz[]  __attribute__ ((section (".flash"))) = {
 #include "Elements.def"
 };
 

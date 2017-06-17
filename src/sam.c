@@ -51,9 +51,9 @@ unsigned char mem59=0;
 
 unsigned char A, X, Y;
 
-unsigned char stress[256]; //numbers from 0 to 8
-unsigned char phonemeLength[256]; //tab40160
-unsigned char phonemeindex[256];
+static unsigned char stress[256]; //numbers from 0 to 8
+static unsigned char phonemeLength[256]; //tab40160
+static unsigned char phonemeindex[256];
 unsigned char phonemeIndexOutput[60]; //tab47296
 unsigned char stressOutput[60]; //tab47365
 unsigned char phonemeLengthOutput[60]; //tab47416
@@ -133,6 +133,7 @@ void sam_newsay_banks0(void){
   singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  X=Y=0;
 
   // FOR banks selection
   u8 bank=_sely*34.0f;
@@ -144,7 +145,7 @@ void sam_newsay_banks0(void){
   vocab=41-vocab;
   strcpy(input,  vocablist_sam[bank][vocab]); // there are 32 banks of 42 vocab each ends with .\x9b 
 
-        if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
+  if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
   Parser2();
   CopyStress();
   SetPhonemeLength();
@@ -189,6 +190,8 @@ void sam_newsay_banks0(void){
 }
 
 void sam_newsay_TTS(void){
+  X=Y=0;
+
   u8 beginning=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
@@ -248,6 +251,8 @@ void sam_newsay_TTS(void){
 }
 
 void sam_newsay_phon(void){
+  X=Y=0;
+
   u8 beginning=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
     phonemeindex[255] = 32; //to prevent buffer overflow or 255
@@ -311,6 +316,8 @@ void sam_newsay_phon(void){
 }
 
 void sam_newsay_xy(void){ 
+  X=Y=0;
+
   u8 beginning=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
@@ -365,6 +372,8 @@ void sam_newsay_xy(void){
 }
 
 void sam_newsay_param(void){ 
+  X=Y=0;
+
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
@@ -433,6 +442,8 @@ void sam_newsay_param(void){
 
 
 void sam_newsay_phonsing(void){
+  X=Y=0;
+
   u8 beginning=0;
   singmode=1; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255

@@ -1,4 +1,4 @@
-/// ARM revert
+/// ARM revert - 
 
 /*
 This file is a part of the NV Speech Player project. 
@@ -119,32 +119,32 @@ float calculateValueAtFadePosition(float oldVal, float newVal, float curFadeRati
 
 typedef float speechPlayer_frameParam_t;
 
-//typedef struct  __attribute__((packed)) values  {
-typedef struct  values  {
-	speechPlayer_frameParam_t voicePitch; //  fundermental frequency of voice (phonation) in hz
-	speechPlayer_frameParam_t vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
-	speechPlayer_frameParam_t vibratoSpeed; // Speed of vibrato in hz
-	speechPlayer_frameParam_t voiceTurbulenceAmplitude; // amplitude of voice breathiness from 0 to 1 
-	speechPlayer_frameParam_t glottalOpenQuotient; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+typedef struct  __attribute__((packed)) values  {
+  //typedef struct  values  {
+	float voicePitch; //  fundermental frequency of voice (phonation) in hz
+	float vibratoPitchOffset; // pitch is offset up or down in fraction of a semitone
+	float vibratoSpeed; // Speed of vibrato in hz
+	float voiceTurbulenceAmplitude; // amplitude of voice breathiness from 0 to 1 
+	float glottalOpenQuotient; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
   ////// here on is in phonem params:
-	speechPlayer_frameParam_t voiceAmplitude; // amplitude of voice (phonation) source between 0 and 1.
-	speechPlayer_frameParam_t aspirationAmplitude; // amplitude of aspiration (voiceless h, whisper) source between 0 and 1.
-	speechPlayer_frameParam_t cf1, cf2, cf3, cf4, cf5, cf6, cfN0, cfNP; // frequencies of standard cascaide formants, nasal (anti) 0 and nasal pole in hz
-	speechPlayer_frameParam_t cb1, cb2, cb3, cb4, cb5, cb6, cbN0, cbNP; // bandwidths of standard cascaide formants, nasal (anti) 0 and nasal pole in hz
-	speechPlayer_frameParam_t caNP; // amplitude from 0 to 1 of cascade nasal pole formant
+	float voiceAmplitude; // amplitude of voice (phonation) source between 0 and 1.
+	float aspirationAmplitude; // amplitude of aspiration (voiceless h, whisper) source between 0 and 1.
+	float cf1, cf2, cf3, cf4, cf5, cf6, cfN0, cfNP; // frequencies of standard cascaide formants, nasal (anti) 0 and nasal pole in hz
+	float cb1, cb2, cb3, cb4, cb5, cb6, cbN0, cbNP; // bandwidths of standard cascaide formants, nasal (anti) 0 and nasal pole in hz
+	float caNP; // amplitude from 0 to 1 of cascade nasal pole formant
 	// fricatives and parallel
-	speechPlayer_frameParam_t fricationAmplitude; // amplitude of frication noise from 0 to 1.
-	speechPlayer_frameParam_t pf1, pf2, pf3, pf4, pf5, pf6; // parallel formants in hz
-	speechPlayer_frameParam_t pb1, pb2, pb3, pb4, pb5, pb6; // parallel formant bandwidths in hz
-	speechPlayer_frameParam_t pa1, pa2, pa3, pa4, pa5, pa6; // amplitude of parallel formants between 0 and 1
-	speechPlayer_frameParam_t parallelBypass; // amount of signal which should bypass parallel resonators from 0 to 1 - what is/where?
+	float fricationAmplitude; // amplitude of frication noise from 0 to 1.
+	float pf1, pf2, pf3, pf4, pf5, pf6; // parallel formants in hz
+	float pb1, pb2, pb3, pb4, pb5, pb6; // parallel formant bandwidths in hz
+	float pa1, pa2, pa3, pa4, pa5, pa6; // amplitude of parallel formants between 0 and 1
+	float parallelBypass; // amount of signal which should bypass parallel resonators from 0 to 1 - what is/where?
   /// here
-	speechPlayer_frameParam_t preFormantGain; // amplitude from 0 to 1 of all vocal tract sound (voicing, frication) before entering formant resonators. Useful for stopping/starting speech
-	speechPlayer_frameParam_t outputGain; // amplitude from 0 to 1 of final output (master volume) 
-	speechPlayer_frameParam_t endVoicePitch; //  pitch of voice at the end of the frame length  - see ipa.py
+	float preFormantGain; // amplitude from 0 to 1 of all vocal tract sound (voicing, frication) before entering formant resonators. Useful for stopping/starting speech
+	float outputGain; // amplitude from 0 to 1 of final output (master volume) 
+	float endVoicePitch; //  pitch of voice at the end of the frame length  - see ipa.py
 } speechPlayer_frame_t;
 
-static const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(speechPlayer_frameParam_t);
+static const int speechPlayer_frame_numParams=sizeof(speechPlayer_frame_t)/sizeof(float);
 
 static speechPlayer_frame_t framer, oldframer, tempframe;
 

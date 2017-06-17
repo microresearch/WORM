@@ -1,3 +1,16 @@
+// removed: &tuber, &tubsinger, &tubbender, &tubrawer, &tubxyer, 
+
+// this is the shorter list of 43 modes 0-42 with composter as 42
+
+//static const wormer *wormlist[]={&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,&samxyer, &samparamer, &sambender, &tmser, &tmsphoner, &tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &digitalker, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab, &nvper, &nvpvocaber, &composter};
+
+
+
+//static const wormer tuber={0, 1.0f, tube_get_sample, tube_newsay, 0, 0}; // //60tubes=tube.c=tube_get_sample
+//static const wormer tubsinger={0, 1.0f, tube_get_sample_sing, tube_newsay_sing, 0, 0};
+//static const wormer tubbender={19, 1.0f, tube_get_sample_bend, tube_newsay_bend, 1, 0}; // now we add extra parameters 
+//static const wormer tubrawer={19, 1.0f, tube_get_sample_raw, tube_newsay_raw, 1, 0};
+//static const wormer tubxyer={4, 1.0f, tube_get_sample_xy, tube_newsay_xy, 1, 0};
 
 
 /*int16_t compost_get_sample_frozen(){ // do we have a function for Z? - redo with toggle of freeze/unfreeze

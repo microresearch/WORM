@@ -78,6 +78,8 @@ unsigned char amplitude1[256];
 unsigned char amplitude2[256];
 unsigned char amplitude3[256];
 
+// we manipulate all of these so no const = 7x256=1792 bytes
+
 unsigned char sampledConsonantFlag[256]; // tab44800
 
 
