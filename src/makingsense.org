@@ -1945,9 +1945,9 @@ sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rs
 
 // tested all nvp and transitions on lap, also sp0256 (not bends - but most fits), digitalker (no bend)
 
-** 17/6
+** 17/6 +
 
-- do individual tests for new code above: tmsttsX, nvpX, klatt single modeX, 21-24sam modes21X, 
+- do individual tests for new code above: tmsttsX, nvpX, klatt single modeX, 21-24sam modes21X, DONE
 
 - tests removal of all sections of each init/generate code in
   main/audio.c and still crashes each time...// but didn't do make
@@ -1962,13 +1962,30 @@ sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rs
 
 tried all stack changes but could just be out of memory... wordlists all stay in RAM...
 
-
-
 for stack we need 0x1000
+
+- TODO: try and put fixed RAM like wordlists in CCM - but not so easy as we need to init from flash...: http://www.openstm32.org/Using+CCM+Memory
+
+so maybe for uninitialised arrays  - we cannot do this in flash as we do not know the address until linking...
+
+*and/or place stack in CCM*
+
+- confusion over elm_ptr and const in rsynth 2005 error - fix/does it still work?
+
+- make more global buffers to reduce stack eg. for tts stuff
 
 ....
 
 - gdb: http://fab.cba.mit.edu/classes/863.13/tutorials/EmbeddedProgramming/stm32.html (but maybe too slow)
+
+- figure out from test code how text, data, bss work for flash etc...
+
+** 18/6
+
+- fixed as was size of exy array in main (but we also made changes
+  across both x220 (here) and t60 versions (archived)
+
+- now TODO: further tests of each mode, extents in manual, code trims
 
 * FINAL/FURTHER TODO:
 

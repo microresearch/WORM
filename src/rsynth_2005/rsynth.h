@@ -62,7 +62,7 @@ enum Eparm_e
   nEparm
  };
 
-extern char *Ep_namez[nEparm];
+extern const char *Ep_namez[nEparm];
 
 typedef struct Elm_s
  {
@@ -76,7 +76,7 @@ typedef struct Elm_s
   interp_t p[nEparm];       /* Table of parameter values */
  } Elm_t, *Elm_ptr;
 
-extern Elm_t Elementz[];
+extern const Elm_t Elementz[];
 extern unsigned num_Elementz;
 
 typedef struct

@@ -31,7 +31,7 @@ const Elm_t Elementz[]  __attribute__ ((section (".flash"))) = {
 
 unsigned num_Elementz = (sizeof(Elementz) / sizeof(Elm_t));
 
-char *Ep_namez[nEparm] = {
+const char *Ep_namez[nEparm] = {
     "fn", "f1", "f2", "f3",
     "b1", "b2", "b3", "pn",
     "a2", "a3", "a4",

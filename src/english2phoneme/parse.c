@@ -6,7 +6,7 @@
 #ifdef LAP
 #define MAX_LENGTH 10240
 #else
-#define MAX_LENGTH 1024
+#define MAX_LENGTH 256 // was 1024 but input is now only 16
 #endif
 
 //  gcc parse.c newenglish.c saynum.c spellwor.c phoneme.c -DLAP -std=c99 -o ttts
@@ -122,7 +122,7 @@ void outnum(const char* ooo);
 void have_number();
 
 
-const char* NRL_list[43]={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "HH", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
+const char* NRL_list[43] ={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "HH", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
 
 #ifdef LAP
 

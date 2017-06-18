@@ -222,7 +222,7 @@ void rsynth_newsay()
   f0s = rsynth->speaker->F0Hz;
   f0e = f0s;
   int j;
-  Elm_ptr le = &Elementz[0]; 
+  const Elm_ptr le = &Elementz[0]; 
   
   f0e = f0s = *f0++;
     for (j = 0; j < nEparm; j++) {
@@ -259,7 +259,7 @@ void rsynth_newsay_elm()
   f0s = rsynth->speaker->F0Hz;
   f0e = f0s;
   int j;
-  Elm_ptr le = &Elementz[0];
+  const Elm_ptr le = &Elementz[0];
   
   f0e = f0s = *ff0++;
     for (j = 0; j < nEparm; j++) {
@@ -405,7 +405,7 @@ int16_t rsynth_get_sample_sing(){
   static unsigned char newframe=0, dur;
   int16_t sample;
   static float ep[nEparm];
-  static Elm_ptr le = &Elementz[0];
+  Elm_ptr le = &Elementz[0];
   float speed = rsynth->speed;
   static float F0Hz;
   static Elm_ptr ce;
@@ -528,7 +528,7 @@ int16_t rsynth_get_sample_single(){
   static unsigned char newframe=0, dur;
   int16_t sample;
   static float ep[nEparm];
-  static Elm_ptr le = &Elementz[0];
+  Elm_ptr le = &Elementz[0];
   float speed = rsynth->speed;
   static float F0Hz;
   static Elm_ptr ce;
@@ -635,7 +635,7 @@ int16_t rsynth_get_sample_elm(){
   static unsigned char newframe=0, dur;
   int16_t sample;
   static float ep[nEparm];
-  static Elm_ptr le = &Elementz[0];
+  Elm_ptr le = &Elementz[0];
   float speed = rsynth->speed;
   static float F0Hz;
   static Elm_ptr ce;

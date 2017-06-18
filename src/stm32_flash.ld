@@ -162,10 +162,11 @@ SECTIONS
 
   .ccm_data (NOLOAD) :
   { 	    
-  . = ALIGN(4);
+    _sccmram = .;       /* create a global symbol at ccmram start */	  . = ALIGN(4);
   *(.ccmdata   )
   . = ALIGN(4);
-  } >CCM
+_eccmram = .;       /* create a global symbol at ccmram end */
+} >CCM
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
