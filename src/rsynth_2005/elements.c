@@ -24,14 +24,13 @@
 #include "rsynth.h"
 #include "phfeat.h"
 
-
-const Elm_t Elementz[]  __attribute__ ((section (".flash"))) = {
+Elm_t Elementz[]  __attribute__ ((section (".flash"))) = {
 #include "Elements.def"
 };
 
 unsigned num_Elementz = (sizeof(Elementz) / sizeof(Elm_t));
 
-const char *Ep_namez[nEparm] = {
+char *Ep_namez[nEparm] = {
     "fn", "f1", "f2", "f3",
     "b1", "b2", "b3", "pn",
     "a2", "a3", "a4",

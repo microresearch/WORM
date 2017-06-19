@@ -58,7 +58,7 @@
 
 #define ONE 1.0F
 
-static const int natural_samples[100]= // where is this from? - from earlier rsynth
+/*static const int natural_samples[100]= // where is this from? - from earlier rsynth
   {
     -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
     605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,
@@ -68,6 +68,7 @@ static const int natural_samples[100]= // where is this from? - from earlier rsy
     203,230,-235,-286,23,107,92,-91,38,464,443,176,98,-784,-2449,
     -1891,-1045,-1600,-1462,-1384,-1261,-949,-730
   };
+*/
 
 static float slopet1,slopet2,Afinal,maxt1,maxt2;        /* For triangle */
 static int nfirsthalf,nsecondhalf,assym,as;   /* For triangle */
@@ -410,7 +411,7 @@ static float natural_source(long nper)
 
 // from klatt in docs
 
-static float sampled_source(long nper)
+/*static float sampled_source(long nper)
 {
   int itemp;
   float ftemp;
@@ -445,7 +446,7 @@ static float sampled_source(long nper)
   }
   return(result);
 }
-
+*
 
 
 /*----------------------------------------------------------------------------*/
@@ -545,10 +546,10 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 
 		nopen = 4 * frame->Kopen; // KLSYN->             nopen = T0*((float)Kopen/100) ;  /* Was   nopen = 4 * Kopen; */
 
-		if ((globals->glsource == IMPULSIVE) && (nopen > 263))
+		/*		if ((globals->glsource == IMPULSIVE) && (nopen > 263))
 		{
 			nopen = 263;
-		}
+			}*/
 
 		if (nopen >= (T0 - 1))
 		{
@@ -576,8 +577,8 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
 		rgl.a *= (temp1 * temp1);
 	
 /*        Reset legs of triangular glottal pulse */
-            if (globals->glsource == TRIANGULAR) {
-                assym = (nopen*(as-50))/100;  /* as=50 is symmetrical  CHECK */
+/*            if (globals->glsource == TRIANGULAR) {
+                assym = (nopen*(as-50))/100;  // as=50 is symmetrical  CHECK 
                 nfirsthalf = (nopen>>1) + assym;
                 if (nfirsthalf >= nopen)    nfirsthalf = nopen -1;
                 if (nfirsthalf <= 0)            nfirsthalf = 1;
@@ -585,10 +586,10 @@ static void pitch_synch_par_reset(klatt_global_ptr globals, klatt_frame_ptr fram
                 Afinal = -7000.;
                 maxt2 = Afinal * 0.25f;
                 slopet2 = Afinal / nsecondhalf;
-                vwave = -(Afinal * nsecondhalf) / nfirsthalf;   /* CHECK */
+                vwave = -(Afinal * nsecondhalf) / nfirsthalf;  
                 maxt1 = vwave * 0.25f;
                 slopet1 = - vwave / nfirsthalf;
-	    }
+		}*/
 
 		/* Truncate skewness so as not to exceed duration of closed phase
 		of glottal period */
@@ -866,22 +867,9 @@ void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
 
 		for (n4 = 0; n4 < 4; n4++) // TODO ALL SOURCES as below
 		{
-			if (globals->glsource == IMPULSIVE)
-			{
-				/* Use impulsive glottal source */
-				voice = impulsive_source(nper);
-			}
-			else if (globals->glsource == NATURAL)
-			{
-				/* Or use a more-natural-shaped source waveform with excitation
-				occurring both upon opening and upon closure, stronest at closure */
+		  //				voice = impulsive_source(nper);
 				voice = natural_source(nper);
-			}
-			else
-			  {
-				voice = sampled_source(nper);
-			}
-
+		
 
 /*            Modify F1 and BW1 pitch synchrounously - from parwv.c */
 /*
@@ -1084,15 +1072,15 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 
 		for (n4 = 0; n4 < 4; n4++)
 		{
-		        switch(globals->glsource)
+
+		  voice = natural_source(nper);
+
+		  /*		        switch(globals->glsource)
 			  {
 			  case IMPULSIVE:
-			    /* Use impulsive glottal source */
 			    voice = impulsive_source(nper);
 			    break;
 			  case NATURAL:
-			    /* Or use a more-natural-shaped source waveform with excitation
-			       occurring both upon opening and upon closure, stronest at closure */
 			    voice = natural_source(nper);
 			    break;
 			  case SAMPLE:
@@ -1103,7 +1091,7 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 			    break;
 			  case WAVETABLE:
 			    voice = wave_source(nper);
-			  }
+			  }*/
 
 /*            Modify F1 and BW1 pitch synchrounously - from parwv.c */
 /*
@@ -1295,17 +1283,12 @@ void parwavesample(klatt_global_ptr globals, klatt_frame_ptr frame, short* jwave
 
 		for (n4 = 0; n4 < 4; n4++)
 		{
-			if (globals->glsource == IMPULSIVE)
+		  /*			if (globals->glsource == IMPULSIVE)
 			{
-				/* Use impulsive glottal source */
 				voice = impulsive_source(nper);
 			}
-			else
-			{
-				/* Or use a more-natural-shaped source waveform with excitation
-				occurring both upon opening and upon closure, stronest at closure */
+			else*/
 				voice = natural_source(nper);
-			}
 
 			/* Reset period when counter 'nper' reaches T0 */
 			if (nper >= T0)
@@ -1493,17 +1476,7 @@ unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short 
 
 		for (n4 = 0; n4 < 4; n4++)
 		{
-			if (globals->glsource == IMPULSIVE)
-			{
-				/* Use impulsive glottal source */
-				voice = impulsive_source(nper);
-			}
-			else
-			{
-				/* Or use a more-natural-shaped source waveform with excitation
-				occurring both upon opening and upon closure, stronest at closure */
 				voice = natural_source(nper);
-			}
 
 			/* Reset period when counter 'nper' reaches T0 */
 			if (nper >= T0)

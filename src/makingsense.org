@@ -1987,6 +1987,21 @@ so maybe for uninitialised arrays  - we cannot do this in flash as we do not kno
 
 - now TODO: further tests of each mode, extents in manual, code trims
 
+** 19/6
+
+- cutting down on x220 code base so compiles with full tms vocab --- still overflow...
+- cut duplicate code for compost and cutting in tms - in progress and test: kandpitchbends, raw, bend, and modus renewed
+
+addr is still too high
+
+- testing TMS vocabs from 0->37 49,51,55,59,61 all fine
+
+question if each bank should be same size?
+
+now we compile on x220 with -Os and all fits on
+
+TODO: re-test all modes and changes above
+
 * FINAL/FURTHER TODO:
 
 - ADCs for 0-127 we need to max/multiply 132.0f

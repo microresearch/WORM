@@ -161,7 +161,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 ////////--->>> list of modes
 
 int16_t compost_get_sample();
-int16_t compost_get_sample_frozen();
 void compost_newsay();
 void compost_newsay_frozen();
 
@@ -286,7 +285,7 @@ static const wormer nvpvocabsing={0, 1.0f, nvp_get_sample_vocab_sing, nvp_newsay
 static const wormer nvpvocaber={0, 1.0f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
 
 static const wormer composter={0, 1.0f, compost_get_sample, compost_newsay, 0, 0};
-static const wormer compostfrer={0, 1.0f, compost_get_sample_frozen, compost_newsay_frozen, 0, 0};
+static const wormer compostfrer={0, 1.0f, compost_get_sample, compost_newsay_frozen, 0, 0};
 
 /// TODO - these will be re-arranged in order that makes sense: klatt, tubes and compost last:
 
@@ -338,6 +337,7 @@ int16_t compost_get_sample(){
   u16 endy=(1.0f-_sely)*32767.0f;
   signed char dir;
 
+  if (freezer==1){
   // generate into audio_buffer based on selz mode and struct list
   float value =(float)adc_buffer[SELZ]/65536.0f; 
   smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
@@ -381,7 +381,7 @@ int16_t compost_get_sample(){
     new_data(val);
     last_time += 1;
   }
-    
+  } // end of freezer  
   // resets at start or end - newsay will reset in full
   if (startx>endy){
     dir=-1;
@@ -397,86 +397,13 @@ int16_t compost_get_sample(){
   return sample;
 }
 
-int16_t compost_get_sample_frozen(){
-
-  float alpha;
-  static float time_now=0.0f;
-  long last_time;
-  static long int_time=0;
-  static u8 triggered=0;
-  
- static u8 oldcompost=255, compostmode=0;
- doadc();
-  u16 startx=(1.0f-_selx)*32767.0f;
-  u16 endy=(1.0f-_sely)*32767.0f;
-  signed char dir;
-
-  if (freezer==1){
-  // generate into audio_buffer based on selz mode and struct list
-  float value =(float)adc_buffer[SELZ]/65536.0f; 
-  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
-  _selz=smoothed_adc_value[4];
-  CONSTRAIN(_selz,0.0f,1.0f);
-  oldcompost=compostmode;
-  _selz=1.0f-_selz; // invert
-  compostmode= _selz*MODEF; // as mode - adapt for excluding compost_mode TODO!
-  MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
-  //if mode change do a newsay or not?
-  //  compostmode=5; // testy - here we just fix
-  doadc_compost();
-  if (oldcompost!=compostmode || recomposter==1 ) // as soon as we enter compost do newsay
-    {
-      wormlist[compostmode]->newsay();
-      recomposter=0;
-    }
-
-  // TODO: we need to re-sample so is not so fast in some cases
-  //wormlist[compostmode]->sampleratio <= 1.0f
-  float factor=wormlist[compostmode]->sampleratio;
-
-  if (time_now>32768){
-    int_time=0; // preserve???
-    time_now-=32768.0f;
-  }
-
-    alpha = time_now - (float)int_time;
-    audio_buffer[ccc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
-    //audio_buffer[cc++]=wormlist[compostmode]->getsample();
-    if (ccc>AUDIO_BUFSZ-1) ccc=0;
-
-  time_now += factor;
-  last_time = int_time;
-  int_time = time_now;
-  while(last_time<int_time)      {
-    //    doadc();
-    int16_t val=wormlist[compostmode]->getsample();
-    new_data(val);
-    last_time += 1;
-  } 
-  } // end of freezer
-
-  if (startx>endy){
-    dir=-1;
-    if (comp_counter<=endy) comp_counter=startx; // swopped round
-  }
-  else {
-    dir=1;
-    if (comp_counter>=endy) comp_counter=startx;
-  }
-
-  int16_t sample=audio_buffer[comp_counter%32768];
-  comp_counter+=dir;
-  return sample;
-}
-
-
-
 void compost_newsay_frozen(){ 
   freezer^=1; // toggles freezer
 }
 
 
 void compost_newsay(){ 
+  freezer=1; // always unfrozen
   // just reset counter to start 
   doadc();
   u16 startx=_selx*32767.0f;
@@ -517,7 +444,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   MAXED(_intmode, MODET); 
   trigger=0; 
 
-  if (oldmode!=_intmode) {// IF there is a modechange!
+    if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     doadc();
     oldselx=_selx;
@@ -541,7 +468,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  //  _intmode=24; //TESTY!
+  //    _intmode=25; //TESTY!
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 

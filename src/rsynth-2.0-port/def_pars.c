@@ -27,8 +27,8 @@ void klatt_init(void)
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
 
-	klatt_global.glsource = NATURAL;/// SAMPLE=fixed, NATURAL seems same as IMPULSIVE, TRIANGULAR-loud-leave, WAVETABLE - not implemented?
-	//
+	//	klatt_global.glsource = NATURAL;/// SAMPLE=fixed, NATURAL seems same as IMPULSIVE, TRIANGULAR-loud-leave, WAVETABLE - not implemented?
+	// we fix this as NATURAL
 	klatt_global.f0_flutter = 0.0f;
 	def_pars.TLTdb=0;
 	def_pars.Kskew=10;

@@ -74,7 +74,7 @@ void simpleklatt_init(void){
 //  globals->sample_factor = (float) SAMPLE_FACTOR;
  nmspf_def = 10;
   globals->nfcascade = 0;
-  globals->f0_flutter = 0;
+  globals->f0_flutter = 0; // fix this!
 
 unsigned char y;
 
@@ -112,8 +112,8 @@ void simpleklatt_newsay(){
   // generate the frame from our exy -> frame
   generate_exy_frame(frame);
   frame_init(globals,frame); 
-    if (globals->f0_flutter != 0)
-      flutter(globals,frame);  
+  //    if (globals->f0_flutter != 0)
+  //      flutter(globals,frame);  
     globals->ns=0;
 }
 

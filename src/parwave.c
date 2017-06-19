@@ -31,7 +31,7 @@
 #define getrandom(min,max) ((rand()%(int)(((max)+1)-(min)))+(min))
 //#define getrandom(min,max) 0
 
-void flutter(klatt_global_ptrr,int16_t*);
+//void flutter(klatt_global_ptrr,int16_t*);
 static float sampled_source(klatt_global_ptrr);
 static float impulsive_source(klatt_global_ptrr);
 static float natural_source(klatt_global_ptrr);
@@ -79,6 +79,7 @@ static float antiresonator(resonator_ptr r, float input)
   * slowly varying sine waves.
   */
 
+/*
 void flutter(klatt_global_ptrr globals, int16_t* frame)
 {
   static int time_count;
@@ -93,7 +94,7 @@ void flutter(klatt_global_ptrr globals, int16_t* frame)
   delta_f0 =  fla * flb * (flc + fld + fle) * 10;
   frame[0] = frame[0] + (u16) delta_f0;
   time_count++;
-}
+  }*/
 
 /** @brief Allows the use of a glottal excitation waveform sampled from a real voice.
   */
@@ -151,8 +152,8 @@ void single_parwave(klatt_global_ptrr globals, int16_t *frame, u8 newframe, u16 
     
     if (newframe==1){
       frame_init(globals,frame); 
-    if (globals->f0_flutter != 0)
-      flutter(globals,frame);  
+      //    if (globals->f0_flutter != 0)
+      //      flutter(globals,frame);  
     globals->ns=0;
     }
 

@@ -19,12 +19,12 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_tim.o adc.o stm32f4xx_pwr.o\
 			stm32f4xx_gpio.o stm32f4xx_i2c.o stm32f4xx_rcc.o \
 			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
-			syscalls.o resources.o audio.o effect.o biquad.o \
-			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o tube.o  \
+			syscalls.o resources.o audio.o \
+			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o  \
 			digitalker.o nvp.o samplerate.o \
-			ntube.o worming.o wavetable.o newvotrax.o sp0256bend.o\
+			newvotrax.o sp0256bend.o\
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
-			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o raven.o
+			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o
 #			lpcanalysis.o 
 #			ownvocoder.o
 
@@ -33,10 +33,10 @@ OBJECTS += \
  $(rsynth-portDIR)/elements.o				\
  $(rsynth-portDIR)/nsynth.o					\
  $(rsynth-portDIR)/say.o					\
- $(rsynth-portDIR)/darray.o					\
- $(rsynth-portDIR)/phtoelm.o				\
  $(rsynth-portDIR)/def_pars.o				\
- $(rsynth-portDIR)/trie.o					
+# $(rsynth-portDIR)/darray.o					\
+# $(rsynth-portDIR)/trie.o					
+# $(rsynth-portDIR)/phtoelm.o				\
 
 
 # Linker script
@@ -49,14 +49,14 @@ LDSCRIPT = stm32_flash.ld
 
 # LACH is -DTEST option!
 
-CFLAGS  =  -I. -IInclude -I/~/ARM/CMSIS_5 -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
-	-DARM_MATH_CM4 -D'__FPU_PRESENT=1' \
+CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
+	 -D'__FPU_PRESENT=1' -DARM_MATH_CM4 \
 	-mthumb \
 	-mfpu=fpv4-sp-d16 \
-	-c -lm -lc -fno-common -O2 \
+	-c -lm -lc -fno-common -Os \
 	-mcpu=cortex-m4 \
 	-mfloat-abi=hard \
-	-fsingle-precision-constant -fsigned-char -Wdouble-promotion
+	-fsingle-precision-constant -fsigned-char -Wdouble-promotion -ffunction-sections -fdata-sections
 
 
 AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard
@@ -67,9 +67,9 @@ AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfl
 #LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16  -L$(LIB_PREFIX) 
 #LFLAGS_END = -lm -lc -Wl,--gc-sections,-Map=myfile.map
 
-LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -L/root/ARM/CMSIS_5/CMSIS/Lib -L/root/ARM/CMSIS_5/CMSIS/Lib/GCC
+LFLAGS  = -T $(LDSCRIPT) -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 
 #LFLAGS_END = -larm_cortexM4lf_math -ldsplib_lm4f -Wl,--gc-sections,-Map=myfile.map -lm -lc
-LFLAGS_END = -larm_cortexM4lf_math -Wl,--gc-sections,-Map=myfile.map -lm -lc
+LFLAGS_END =  -Wl,--gc-sections,-Map=myfile.map -lm -lc
 
 # Executables
 ARCH = arm-none-eabi

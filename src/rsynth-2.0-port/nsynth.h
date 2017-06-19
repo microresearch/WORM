@@ -75,7 +75,6 @@ typedef struct
   int  outsl;
   long samrate;
   long nfcascade;
-  long glsource;
   long nspfr;
  } klatt_global_t, *klatt_global_ptr;
 
