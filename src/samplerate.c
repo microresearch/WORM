@@ -13,7 +13,7 @@
 
 extern __IO uint16_t adc_buffer[10];
 extern float _selx, _sely, _selz;
-extern float exy[64];
+extern float exy[240];
 extern float smoothed_adc_value[5];
 
 static inline void doadc(){
@@ -93,7 +93,7 @@ for (u8 ii=0;ii<size;ii++){
 }
 
 void samplerate_simple_exy(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsample)(void), float sampleratio, u8 extent){
-  static u8 parammode=0;
+  static u8 parammode=1;
   float alpha;
   static float time_now=0.0f;
   long last_time;
@@ -173,7 +173,7 @@ for (u8 ii=0;ii<size;ii++){
    MAXED(xaxis,extent);
    xaxis=extent-xaxis;
    //   exy[xaxis]=1.0f-_sely; // invert or?
-   exy[xaxis]=_sely;
+   exy[xaxis]=_sely; 
 
   while(last_time<int_time)      {
     doadc();

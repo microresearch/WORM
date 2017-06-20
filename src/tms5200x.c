@@ -10,7 +10,7 @@
 #include "time.h"
 
 extern float _selx, _sely, _selz;
-extern float exy[64];
+extern float exy[240];
 static u8 modus=0;
 
 const u8 koffset[10]={0, 32, 64, 80, 96, 112, 128, 144, 152, 160};
@@ -34,6 +34,7 @@ typedef int32_t INT32;
 #define TMS_VOCAB_TOP 66 // 0-
 #define TMS_VOCAB_F 71.0f 
 #define ALLPHON_BANK 52 // CHECKed
+#define EXTRAX 53 // this is the extra vocab
 
 // group first 5100:
 
@@ -1455,7 +1456,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
 	return sample;
 }
@@ -1693,7 +1694,7 @@ int16_t processbend5100(u8 *ending)
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
 	return sample;
 }
@@ -1934,7 +1935,7 @@ int16_t process5100raw()
 			m_PC++;
 		}
 		m_pitch_count++;
-		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
+		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 
 		m_pitch_count &= 0x1FF;
 		//		buf_count++;
@@ -1982,7 +1983,7 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F;
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //  whichbank=62;
+  //  whichbank=12;
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -2102,7 +2103,7 @@ void tms_newsay_specific(u8 whichbank){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; // TESTING 
+  ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 };
 
@@ -2111,6 +2112,11 @@ void tms_newsay_specific(u8 whichbank){
 void tms_newsay_specifica(){
   tms_newsay_specific(ALLPHON_BANK);
 }
+
+void tms_newsay_specificx(){
+  tms_newsay_specific(EXTRAX);  //
+}
+
 
 void tms_newsay_specific5100(){ // add vocabs
   tms_newsay_specific(0);
@@ -2245,6 +2251,11 @@ int16_t tms_get_sample_bend5200a(){ // for allphons - TODO - other fixed vocabs
   tms_get_sample_bend5200(ALLPHON_BANK);
 }
 
+int16_t tms_get_sample_bend5200x(){ // for allphons - TODO - other fixed vocabs
+  tms_get_sample_bend5200(EXTRAX);
+}
+
+
 int16_t tms_get_sample_5100pitchtable(u8 fix){ 
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
@@ -2271,10 +2282,15 @@ int16_t tms_get_sample_5200pitchtable(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_5200pitchtablea(){ // for allphons and also one more - we have more pitches = 64 - reflect this in audio.c ?? IS IT TODO?
+int16_t tms_get_sample_5200pitchtablea(){
   tms_get_sample_5200pitchtable(ALLPHON_BANK);
 }
-  
+
+int16_t tms_get_sample_5200pitchtablex(){
+  tms_get_sample_5200pitchtable(EXTRAX);
+}
+
+
 int16_t tms_get_sample_5100ktable(u8 fix){
   modus=0;
   m_coeff=&T0280B_0281A_coeff;
@@ -2301,7 +2317,7 @@ int16_t tms_get_sample_5200ktable(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_5200ktablea(){ // for allphons and also one more - is just a coeff change
+int16_t tms_get_sample_5200ktablea(){ 
 tms_get_sample_5200ktable(ALLPHON_BANK);
 }
 
@@ -2316,7 +2332,7 @@ int16_t tms_get_sample_5100kandpitchtable(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_5100kandpitchtablew(u8 fix){ //bend pitchtable AND ktable at same time - add vocabs
+int16_t tms_get_sample_5100kandpitchtablew(){ 
   tms_get_sample_5100kandpitchtable(0);
 }
 
@@ -2331,6 +2347,10 @@ int16_t tms_get_sample_5200kandpitchtable(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_5200kandpitchtablea(u8 fix){ //bend pitchtable AND ktable at same time - add vocabs
+int16_t tms_get_sample_5200kandpitchtablea(){ 
   tms_get_sample_5200kandpitchtable(ALLPHON_BANK);
+}
+
+int16_t tms_get_sample_5200kandpitchtablex(){ 
+  tms_get_sample_5200kandpitchtable(EXTRAX);
 }

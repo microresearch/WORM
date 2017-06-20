@@ -2000,7 +2000,54 @@ question if each bank should be same size?
 
 now we compile on x220 with -Os and all fits on
 
-TODO: re-test all modes and changes above
+TODO: 
+
+- re-test all modes and changes above
+
+** 20/6
+
+- added extra tms bend vocab on 5200 so now we have 64 modes. 0-63
+
+TODO:
+
+- check modes as above - all tms first=0->20:DONE , check rsynth elm -- fixed length of elm bug there...
+
+- check logic of tms mode and all mode changes
+- check logspeed/pitch for each mode
+- start testing individual modes and whole thing
+- check testy comments etc.
+
+* announcement: 
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
+
+
+ERD finally releases the eurorack-based ERD/WORM synth featuring
+software worming of emulated artificial human speech cores from the
+70s to the 90s of the last century. Six key speech cores are simulated
+with a vocabulary of over 4000 words and phrases, including basic
+allophones or phonemes which can be used to build new phrases as well
+as a Text to Speech engine for advanced textual constructions. A
+further set of COMPOST modes allows for sample-based re-working of
+constructed and wormed words and phrases.
+
+Emulated speech cores include Texas Instruments' famous Speak and Worm
+family of devices (and subsequent circuit-wormed modifications), Atari
+and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
+worm-n-talk and General Instruments Intelliworm. ERD/WORM further
+bends and worms these key speech synthesis algorithms across 61 modes
+with full trigger, CV and knob control over nearly all aspects of these
+speech cores.
+
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
 
 * FINAL/FURTHER TODO:
 
@@ -2151,7 +2198,6 @@ phons = {'AA': "0x0E", 'AE': "0x2E", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "
          'V': '0x33', 'W': '0x23', 'Y': '0x04', 'Z': '0x2F', 'ZH': '0x2F', 'SIL': '0'}
 
 
-
 * phonemes probability map high->low ABANDON
 
 ** TMS
@@ -2202,7 +2248,6 @@ wavetable, inverse filtered audio buffer, audio buffer (and toggle off
 write on use of audio buffer), physical glottal model, stored
 wavetable as in raven, generators eg. pulse, square, and original
 (eg. TMS, Klatt)
-
 
 * main modes overview - otherwise see modes.org
 

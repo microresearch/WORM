@@ -44,7 +44,7 @@ extern const unsigned char m_rom12[] __attribute__ ((section (".flash")));
 extern const unsigned char m_rom19[] __attribute__ ((section (".flash")));
 extern const unsigned char m_rom003[] __attribute__ ((section (".flash")));
 extern const unsigned char m_rom004[] __attribute__ ((section (".flash")));
-extern float exy[64];
+extern float exy[240];
 extern float _selx, _sely, _selz;
 
 static const unsigned char *m_romm;
@@ -282,6 +282,8 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		  MAXED(val,1023);
 		  f->b_coef[j]=f->b_coeforig[j]*logspeed[1023-val];
 		  val=exy[3 + (2*j)]*1028.0f;
+		  MAXED(val,1023);
+		  //		  val=411;
 		  f->f_coef[j]=f->f_coeforig[j]*logspeed[1023-val];
 		  //		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);

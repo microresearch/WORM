@@ -8,7 +8,7 @@
 
 
 extern float _selx, _sely, _selz;
-extern float exy[64];
+extern float exy[240];
 extern u8 modus;
 
 //timetable for more accurate c64 simulation

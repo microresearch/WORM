@@ -1,0 +1,68 @@
+|       MODE | TYPE    | X      | Y         | Z       | TRIGGER       | NOTES            |
+|------------+---------+--------+-----------+---------+---------------+------------------|
+|      1 S&W | vocab   | pitch  | bank      | phrase  | phrase start  |                  |
+|          2 | vocab   | pitch  | bank      | phrase  | phrase start  | low bitrate      |
+|          3 | vocab   | pitch  | bank      | phrase  | phrase start  | pitch absolute   |
+|          4 | vocab   | length | bank      | phrase  | phrase start  | length inc       |
+|          5 | phoneme | pitch  | length    | phoneme | phoneme start |                  |
+|          6 | phoneme | pitch  | length    | phoneme | phoneme start | pitch absolute   |
+|          7 | TTS     | pitch  | position  | letter  | re-phrase TTS |                  |
+|          8 | raw     | x-axis | param     | pitch   | retrigger     | 5100 codes       |
+|          9 | raw     | x-axis | param     | pitch   | retrigger     | 5200 codes       |
+|         10 | raw     | x-axis | param     | pitch   | retrigger     | 5220 codes       |
+|         11 | worm    | x-axis | worm      | phrase  | retrigger     | 5100             |
+|         12 | worm    | x-axis | worm      | phoneme | retrigger     | 5200             |
+|         13 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 vocab       |
+|         14 | worm    | x-axis | worm      | phrase  | retrigger     | 5100 pitchtable  |
+|         15 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 pitchtable  |
+|         16 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 p + vocab   |
+|         17 | worm    | x-axis | worm      | phrase  | retrigger     | 5100 ktable      |
+|         18 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 ktable      |
+|         19 | worm    | x-axis | worm      | phrase  | retrigger     | 5100 k/pitch     |
+|         20 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 k/pitch     |
+|         21 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 k/p +vocab  |
+|   22 INTEL | phoneme | pitch  | length    | phoneme | phoneme start |                  |
+|         23 | phoneme | pitch  | length    | phoneme | phoneme start | pitch/l absolute |
+|         24 | TTS     | pitch  | position  | letter  | re-phrase TTS |                  |
+|         25 | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         26 | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         27 | vocab   | pitch  | length    | phrase  | phrase start  | built in vocab   |
+|         28 | worm    | x-axis | bend      | phrase  | freeze/un     |                  |
+|  29 VERMIS | phoneme | pitch  | length    | phoneme | phoneme start |                  |
+|         30 | TTS     | pitch  | position  | letter  | re-phrase TTS |                  |
+|         31 | vocab   | pitch  | length    | phrase  | phrase start  | gorf             |
+|         32 | vocab   | pitch  | length    | phrase  | phrase start  | wow              |
+|         33 | bend    | pitch  | bend      | phrase  | phrase start  | wow              |
+|         34 | bend    | x-axis | bend      | phrase  | phrase start  | gorf             |
+|         35 | raw     | x-axis | value     | pitch   | freeze/un     |                  |
+|         36 | phoneme | pitch  | length    | phoneme | phoneme start | pitch absolute   |
+|     37 SAW | vocab   | pitch  | bank      | phrase  | phrase start  | bank 0           |
+|         38 | vocab   | length | bank      | phrase  | phrase start  | bank 1           |
+|         39 | TTS     | pitch  | position  | letter  | re-phrase TTS |                  |
+|         40 | TTS     | length | position  | letter  | re-phrase TTS |                  |
+|         41 | phoneme | pitch  | position  | phoneme | phrase start  | start phon list  |
+|         42 | phoneme | length | position  | phoneme | phrase start  | start phon list  |
+|         43 | phoneme | pitch  | position  | phoneme | phrase start  | pitch absolute   |
+|         44 | vocab   | pitch  | length    | phrase  | phrase start  | selected vocab   |
+|         45 | raw     | x-axis | param     | phrase  | phrase start  | selected vocab   |
+|         46 | worm    | x-axis | freq data | phrase  | phrase start  | selected vocab   |
+|    47 DIGI | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         48 | vocab   | pitch  | length    | phrase  | phrase start  | pitch absolute   |
+|         49 | worm    | x-axis | param     | phrase  | phrase start  | pitchtable       |
+| 50 WORMANT | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         51 | phoneme | x-axis | length    | phoneme | start of list | list phonemes    |
+|         52 | phoneme | pitch  | length    | phoneme | phoneme start | single phoneme   |
+|         53 | vocab   | pitch  | length    | phrase  | phrase start  | pitch absolute   |
+|         54 | phoneme | x-axis | length    | phoneme | start of list | list phonemes    |
+|         55 | phoneme | pitch  | length    | phoneme | phoneme start | single phoneme   |
+|         56 | phoneme | pitch  | length    | phoneme | phoneme start | pitch absolute   |
+|         57 | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         58 | vocab   | pitch  | length    | phrase  | phrase start  | pitch absolute   |
+|         59 | raw     | x-axis | param     | length  | retrigger     |                  |
+|         60 | phoneme | pitch  | length    | phoneme | retrigger     |                  |
+|         61 | vocab   | pitch  | length    | phrase  | phrase start  |                  |
+|         62 | vocab   | pitch  | length    | phrase  | phrase start  | pitch absolute   |
+| 63 COMPOST | compost | start  | end       | mode    | restart mode  |                  |
+|         64 | compost | start  | end       | mode    | toggle freeze |                  |
+|------------+---------+--------+-----------+---------+---------------+------------------|
+

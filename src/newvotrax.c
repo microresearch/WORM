@@ -47,7 +47,7 @@ typedef float myfloat;
 #include <ctype.h>
 #include "votrax.h"
 #include "resources.h"
-extern myfloat exy[64];
+extern myfloat exy[240];
 extern myfloat _selx, _sely, _selz;
 extern u8 TTS;
 #endif

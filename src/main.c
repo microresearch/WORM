@@ -66,7 +66,7 @@ u8 test_elm_rsynthy[106]={30, 4, 72, 4, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6, 41, 8,
 
 // ELM_LEN is 48 = 16 phonemes
 
-float exy[240]={0.1f};
+float exy[240]; 
 
 #ifdef TESTING
 extern Wavetable wavtable;
@@ -87,6 +87,11 @@ void main(void)
     TTSinarray[x]=TTStester[x];
   }
 
+  for (x=0;x<240;x++){
+    exy[x]=0.4f; // this is midway when we do invert it.. = 1.0f approx
+  }
+
+  
   // all generator inits
   sp0256_init(); 
   sp0256_initbend();

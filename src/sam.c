@@ -10,7 +10,7 @@
 #include "resources.h"
 
 extern float _selx, _sely, _selz;
-extern float exy[64];
+extern float exy[240];
 extern char TTSinarray[17];
 u8 modus;
 

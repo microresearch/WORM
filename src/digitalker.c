@@ -6,7 +6,7 @@
 #ifndef LAP
 #include "audio.h"
 extern float _selx, _sely, _selz;
-extern float exy[64];
+extern float exy[240];
 #else
 #include "forlap.h"
 #endif

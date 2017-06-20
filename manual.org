@@ -4,38 +4,87 @@
 
 [MAIN SCANNED IMAGE OF WORMS: 03EARTHSYMBOLworms.tiff]
 
-The WORM was for a long time desirous to speake, but the rule and or∣der of the Court enjoyned him silence, but now strutting and swelling, and impatient, of further delay, he broke out thus... [Maier]
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
 
 
-The eurorack-based ERD/WORM synth features software worming of emulated artificial human speech cores from the 70s to the 90s of the last century. Examples of such popular speech cores include Texas Instruments' famous Speak and Worm family of devices (and subsequent circuit-wormed modifications), Atari and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS worm-n-talk and General Instruments Intelliworm. ERD/WORM further bends and worms key speech synthesis algorithms across XX modes with full trigger, CV and knob control over core aspects of these speech cores.
+The eurorack-based ERD/WORM synth features software worming of
+emulated artificial human speech cores from the 70s to the 90s of the
+last century. Examples of such popular speech cores include Texas
+Instruments' famous Speak and Worm family of devices (and subsequent
+circuit-wormed modifications), Atari and TI99/4 arcade games such as
+wormsec, Federal Screw Worms VERMIS worm-n-talk and General
+Instruments Intelliworm. ERD/WORM further bends and worms key speech
+synthesis algorithms across XX modes with full trigger, CV and knob
+control over core aspects of these speech cores.
 
-ERD/WORM functions best the more it deviates serpentinely from a simulation of recognizable human speech (as if it would ever) towards the slipped and stammered, a/rhythmic and timbral, producing new sounds through the use of fast re-triggering of phrases and phonemes, and exploring multiple bends by knob and CV control.
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
 
 *** background
 
-Human speech synthesis originates in desires both spectacular and utilitarian. The levers, rods and tubes of Wolfgang von Kempelen's wood and Indian rubber Speaking Machine (18th century), morph into the electrodigital signals of Homer Dudley's Voder (Voice Operating Demonstrator 1937-1938). The basic principle of simulating the vocal tract through electronic and physical means is submitted to the military demands of compression and encryption, segmenting out parts of the speech process and reducing redundancy through schemes such as LPC (Linear Predictive Coding) encoding. In the process communication becomes the business of circuit-bent human-worms, opening human and animal speech to the cut-up, to stammerings, stutterings and tics; to an extra-human, outer-word terrain of numbers burrowed and nibbled by the earth worms. ERD/WORM feasts on this electronic legacy.
+Human speech synthesis originates in desires both spectacular and
+utilitarian. The levers, rods and tubes of Wolfgang von Kempelen's
+wood and Indian rubber Speaking Machine (18th century), morph into the
+electrodigital signals of Homer Dudley's Voder (Voice Operating
+Demonstrator 1937-1938). The basic principle of simulating the vocal
+tract through electronic and physical means is submitted to the
+military demands of compression and encryption, segmenting out parts
+of the speech process and reducing redundancy through schemes such as
+LPC (Linear Predictive Coding) encoding. In the process communication
+becomes the business of circuit-bent human-worms, opening human and
+animal speech to the cut-up, to stammerings, stutterings and tics; to
+an extra-human, outer-word terrain of numbers burrowed and nibbled by
+the earth worms. ERD/WORM feasts on this electronic legacy.
 
-ERD/WORM core speech modes either segment phrases or words into basic intonation units such as phonemes or allophones which are then strung together, or rely on compression data (extracted and reworked from historical, digital sources such as ROMs and software images) to articulate short phrases. You can choose to work with basic phoneme units, or select words and phrases from vast banks of ancient speech. Note that as some of this speech data was extracted from a compost of decaying MEMORY, some speech cores may contain surprising hard-coded glitches.
+ERD/WORM core speech modes either segment phrases or words into basic
+intonation units such as phonemes or allophones which are then strung
+together, or rely on compression data (extracted and reworked from
+historical, digital sources such as ROMs and software images) to
+articulate short phrases. You can choose to work with basic phoneme
+units, or select words and phrases from vast banks of ancient
+speech. Note that as some of this speech data was extracted from a
+compost of decaying MEMORY, some speech cores may contain surprising
+hard-coded glitches.
 
-Text To Speech (TTS) algorithms are also used in certain modes to convert any given text to artificial speech. All of these modes are open to slips, glides and mis-use; raw or live raw coding modes take the module far from any recognisable, worldy speech.
+Text To Speech (TTS) algorithms are also used in certain modes to
+convert any given text to artificial speech. All of these modes are
+open to slips, glides and mis-use; raw or live raw coding modes take
+the module far from any recognisable, worldy speech.
 
-Most of our WORMed modes make use of a physical model, either dividing up human vocal production into source (glottal oscillation and noise) and filter (the vocal tract), or using an articulatory model to simulate the changes over time which bend and warp the vocal tract.
+Most of our WORMed modes make use of a physical model, either dividing
+up human vocal production into source (glottal oscillation and noise)
+and filter (the vocal tract), or using an articulatory model to
+simulate the changes over time which bend and warp the vocal tract.
 
 ** 1-basic operations/modes
 
-All technology that is derived of earth, must be decomposed and again reduced to earth... [Valentine]
+All technology that is derived of earth, must be decomposed and again
+reduced to earth... [Valentine]
 
 
-There are six major speech synthesis worm voices, and one extra mode to manipulate a stored buffer of spoken samples as follows:
+There are six major speech synthesis worm voices, and one extra mode
+to manipulate a stored buffer of spoken samples as follows:
 
 - 1 Speak and Worm: This is a software emulation of the Texas
-  Instruments LPC code, introduced across several well-known chipsets and used on applications such as the Speak and Worm. Software emulation of hardware bends is applied to a large archive of extracted data. Raw, live coding submodes and phonetic manipulations are available.
+  Instruments LPC code, introduced across several well-known chipsets
+  and used on applications such as the Speak and Worm. Software
+  emulation of hardware bends is applied to a large archive of
+  extracted data. Raw, live coding submodes and phonetic manipulations
+  are available.
 
 - 2 Intelliworm: Here we have various bends and worms for the General
-  Instruments range of chips, again using LPC derived data from human subjects. We have allophones and phrases, worming out of ROM images.
+  Instruments range of chips, again using LPC derived data from human
+  subjects. We have allophones and phrases, worming out of ROM images.
 
 - 3 VERMIS: Emulates an historic design by Richard T. Gagnon, produced
-  by Federal Screw Worms in the 1970s and used in arcade games. Here you can find derived and bent vocabularies and phonemes.
+  by Federal Screw Worms in the 1970s and used in arcade games. Here
+  you can find derived and bent vocabularies and phonemes.
 
 - 4 SAW: Software Automatic Worm: A rare software ported from the
   Commodore C64 with many bends and parameter shifts.
@@ -44,14 +93,24 @@ There are six major speech synthesis worm voices, and one extra mode to manipula
   speech encoding scheme invented by Forrest S. Mozer.
 
 - 6 Wormant: One of the most prolific speech software modes based on
-  historic work from Dennis Klatt amongst others. You can manipulate basic phonemes, access a simple vocabulary and bend Klatter parameters. A simple articulatory synth is also included.
+  historic work from Dennis Klatt amongst others. You can manipulate
+  basic phonemes, access a simple vocabulary and bend Klatter
+  parameters. A simple articulatory synth is also included.
 
 - 7 COMPOST: COMPOST reworks the audio buffer which has previously
-  been written to by the speech cores. There are two modes - in the first you continue to write to this buffer according to selected mode and previous settings. In the second mode, compost access is frozen.
+  been written to by the speech cores. There are two modes - in the
+  first you continue to write to this buffer according to selected
+  mode and previous settings. In the second mode, compost access is
+  frozen.
 
 ** 1.5 LAYOUT
 
-I am your Rational Power O Albion & that Human Form You call Divine, is but a Worm seventy inches long That creeps forth in a night & is dried in the morning sun In fortuitous concourse of memorys accumulated & lost It plows the Earth in its own conceit, it overwhelms the Hills Beneath its winding labyrinths, till a stone of the brook Stops it in midst of its pride among its hills & rivers
+I am your Rational Power O Albion & that Human Form You call Divine,
+is but a Worm seventy inches long That creeps forth in a night & is
+dried in the morning sun In fortuitous concourse of memorys
+accumulated & lost It plows the Earth in its own conceit, it
+overwhelms the Hills Beneath its winding labyrinths, till a stone of
+the brook Stops it in midst of its pride among its hills & rivers
 
 [William Blake. Jerusalem The Emanation of The Giant Albion]
 
@@ -60,30 +119,48 @@ I am your Rational Power O Albion & that Human Form You call Divine, is but a Wo
 
 There are 64 modes - X major modes subdivided on mode knob and CV.
 
-Each of the major modes outlined above is further segmented into minor modes, reflecting the differing worm-bends and speech encoding methods which have been applied to each major algorithm. These mode types are as follows:
+Each of the major modes outlined above is further segmented into minor
+modes, reflecting the differing worm-bends and speech encoding methods
+which have been applied to each major algorithm. These mode types are
+as follows:
 
 - vocab: controls choose from banks and/or phrases (Y and/or Z), and
-  subject these in general to pitch (X) and length bends (Y). Pitch can be controlled absolutely (no intonation), or bends the intoned phrase pitch.
+  subject these in general to pitch (X) and length bends (Y). Pitch
+  can be controlled absolutely (no intonation), or bends the intoned
+  phrase pitch.
 
 - phoneme: controls choose a basic speech unit (phoneme or allophone Z),
-  and subject these in general to pitch and length bends (X, Y). In some modes, allophones are strung together in a list (XY).
+  and subject these in general to pitch and length bends (X, Y). In
+  some modes, allophones are strung together in a list (XY).
 
 - TTS: Text to speech. X and Y select position (in a text list-X) and
   letter (Y) within that text list.
 
 - worm: worming is bending of advanced interior speech algorithm
-  parameters again using X and Y to access parameter. Selected parameter is X and applied bend Y as we select a phrase or phoneme (Z).
+  parameters again using X and Y to access parameter. Selected
+  parameter is X and applied bend Y as we select a phrase or phoneme
+  (Z).
 
 - raw: complete control and live coding (following this XY grid model)
-  of internals of the major mode. Z is used for pitch or phoneme length. Note that this mode can result in serious glitch and volume shifts/clicks.
+  of internals of the major mode. Z is used for pitch or phoneme
+  length. Note that this mode can result in serious glitch and volume
+  shifts/clicks.
 
-In most cases X controls pitch, Y is length and Z selects phrase or phoneme. In some cases, length will only become apparent as the phrase of phoneme is changed - in that case you hear the length of the part of speech transition.
+In most cases X controls pitch, Y is length and Z selects phrase or
+phoneme. In some cases, length will only become apparent as the phrase
+of phoneme is changed - in that case you hear the length of the part
+of speech transition.
 
-Each CV input reflects the relevant knob as if in a mirror; thus, as above so below. CV is additive to knob setting.
+Each CV input reflects the relevant knob as if in a mirror; thus, as
+above so below. CV is additive to knob setting.
 
-Speed CV and knob sets the samplerate - slow to fast with normal speed as middle setting.
+Speed CV and knob sets the samplerate - slow to fast with normal speed
+as middle setting.
 
-Output is audio level output. Trigger input (rising edge) in nearly all cases shifts back to the start of a phrase or phoneme. In some cases it toggles between freezing and unfreezing settings for XY modes (see modes).
+Output is audio level output. Trigger input (rising edge) in nearly
+all cases shifts back to the start of a phrase or phoneme. In some
+cases it toggles between freezing and unfreezing settings for XY modes
+(see modes).
 
 ** 2-table for each mode 
 
@@ -101,31 +178,60 @@ Suggested format for table example:
 
 [back cable image - we still need to take]
 
-Serpent Lucifer, how do you do?  Of your worms and your snakes I’d be one or two; For in this dear planet of wool and of leather ‘Tis pleasant to need neither shirt, sleeve, nor shoe, And have arm, leg, and belly together. Then aches your head, or are you lazy?  Sing, ‘Round your neck your belly wrap, Tail-a-top, and make your cap Any bee and daisy.  [Beddoes]
+Serpent Lucifer, how do you do?  Of your worms and your snakes I’d be
+one or two; For in this dear planet of wool and of leather ‘Tis
+pleasant to need neither shirt, sleeve, nor shoe, And have arm, leg,
+and belly together. Then aches your head, or are you lazy?  Sing,
+‘Round your neck your belly wrap, Tail-a-top, and make your cap Any
+bee and daisy.  [Beddoes]
 
 *red stripe or -12V DOWN towards the bottom of the unit*
 
-Simply wire up the power connector (red/-12V to the bottom of the unit when facing the back) and connect output, CVs and trigger as necessary.
+Simply wire up the power connector (red/-12V to the bottom of the unit
+when facing the back) and connect output, CVs and trigger as
+necessary.
 
-ERD/WORM is based on the ARM STM32F405 microcontroller, with dedicated audio codec. The design is open hardware and can be accessed (with code) under:
+ERD/WORM is based on the ARM STM32F405 microcontroller, with dedicated
+audio codec. The design is open hardware and can be accessed (with
+code) under:
 
 https://github.com/microresearch/WORM
 
 *** specifications
 
-12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1 audio/trigger input, 1 audio output, 20mm deep.
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
+audio/trigger input, 1 audio output, 20mm deep.
 
 ** 4- credits
 
 [ouroboros image]
 
-Without the excellent archival and reverse engineering work of the MAME and MESS developers (and associated emulation communities) this release would not have been in any way possible. From this community we would like to thank Lord Nightmare, Kevtris, Olivier Galibert, Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet, Couriersud, Michael Zapf, Joseph Zbiciak, and Tim Lindner (who are in no way affiliated with this project). The work of Dennis Klatt, Forrest S. Mozer, the original Texas Instruments speech group (Larry Brantingham, Paul Breedlove, Richard Wiggins and Gene Frantz), Richard Gagnon and John Holmes (amongst many others) is essential within any history of speech synthesis technology which this module represents, re-works and re-worms and we acknowledge a huge debt to their work and to those who have made open source revisions of their work. Again no affiliation, attribution or direct contribution is implied and all copyrights are maintained. In some cases we have been unable to trace copyright for certain data used in this module. We would also like to thank Peter Knight for his work on the Talkie library which was a major inspiration.
+Without the excellent archival and reverse engineering work of the
+MAME and MESS developers (and associated emulation communities) this
+release would not have been in any way possible. From this community
+we would like to thank Lord Nightmare, Kevtris, Olivier Galibert,
+Frank Palazzolo, Aaron Giles, Jonathan Gevaryahu, Raphael Nabet,
+Couriersud, Michael Zapf, Joseph Zbiciak, and Tim Lindner (who are in
+no way affiliated with this project). The work of Dennis Klatt,
+Forrest S. Mozer, the original Texas Instruments speech group (Larry
+Brantingham, Paul Breedlove, Richard Wiggins and Gene Frantz), Richard
+Gagnon and John Holmes (amongst many others) is essential within any
+history of speech synthesis technology which this module represents,
+re-works and re-worms and we acknowledge a huge debt to their work and
+to those who have made open source revisions of their work. Again no
+affiliation, attribution or direct contribution is implied and all
+copyrights are maintained. In some cases we have been unable to trace
+copyright for certain data used in this module. We would also like to
+thank Peter Knight for his work on the Talkie library which was a
+major inspiration.
 
 Manual design and images by Kathrin Guenter and Ioana Vreme Moser.
 
 ** 5- Licensing
 
-Much of ERD/WORM is licensed, where appropriate, under a GPL GNU General Public License, version 2 or later (GPL-2.0+). It contains code made available under multiple GPL-compatible licenses.
+Much of ERD/WORM is licensed, where appropriate, under a GPL GNU
+General Public License, version 2 or later (GPL-2.0+). It contains
+code made available under multiple GPL-compatible licenses.
 
 ** 6- Further resources
 

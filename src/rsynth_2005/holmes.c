@@ -213,10 +213,6 @@ void rsynth_newsay()
   nelm=rsynth_vocab[selected]->length;
   elm=rsynth_vocab[selected]->elements;
   f0=rsynth_vocab[selected]->f0;
-  //  nelm=rsynth_test_help.length;
-  //  elm=rsynth_test_help.elements;
-  //  f0=rsynth_test_help.f0;
-
 
   //  unsigned i = 0;
   f0s = rsynth->speaker->F0Hz;
@@ -374,7 +370,6 @@ int16_t rsynth_get_sample(){
     }
   } // newframe ==1
 
-  // TEST frequency bend = selx
 
   int val=_selx*1028.0f;
   MAXED(val,1023);
@@ -384,7 +379,6 @@ int16_t rsynth_get_sample(){
   //  sample=rand()%32768;
       samplenumber++;
 
-  // TEST duration bend = sely
       val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
@@ -497,7 +491,6 @@ int16_t rsynth_get_sample_sing(){
     }
   } // newframe ==1
 
-  // TEST frequency bend = selx
 
   int val=_selx*1028.0f;
   MAXED(val,1023);
@@ -508,7 +501,6 @@ int16_t rsynth_get_sample_sing(){
   //  sample=rand()%32768;
       samplenumber++;
 
-  // TEST duration bend = sely
       val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
@@ -611,7 +603,6 @@ int16_t rsynth_get_sample_single(){
     }
   } // newframe ==1
 
-  // TEST frequency bend = selx
 
   int val=_selx*1027.0f;
   MAXED(val,1023);
@@ -644,14 +635,14 @@ int16_t rsynth_get_sample_elm(){
   static unsigned t=0;
   //  extent nextent={51,53.0f};
 
-  u8 xaxis=_selx*35.0f;
-  MAXED(xaxis,31); 
-  xaxis=31-xaxis;
+  u8 xaxis=_selx*110.0f;
+  MAXED(xaxis,105); 
+  xaxis=105-xaxis;
   u8 val=_selz*87.0f;
   MAXED(val,83);
   val=83-val;
-  //  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
-  //  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
+  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
+  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
 
   
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:

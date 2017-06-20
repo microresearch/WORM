@@ -27,7 +27,7 @@ static   flag raw_flag;
 static   flag raw_type;
 
 static int16_t frame[40];
-extern float exy[64];
+extern float exy[240];
 extern float _selx, _sely, _selz;
 
   static const int16_t natural_samples[NUMBER_OF_SAMPLES]=

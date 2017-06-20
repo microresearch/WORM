@@ -42,7 +42,7 @@ static nvp_vocab_ const *ourvocab;
 
 /*
 
-test data structure for vocab... need end phoneme = 255
+data structure for vocab... need end phoneme = 255
 
 print str(looky.get(phon))+",",
 print str(phoneme['voicePitch'])+",",
@@ -556,9 +556,6 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
     }
     int16_t vale=1024.0f*(1.0f-_selx);
       tempframe.voicePitch=256.0f*logspeed[vale]; 
-    // TEST pitchinc...
-    //    tempframe.voicePitch=this_pitch*logspeed[vale];
-    //    this_pitch+=this_pitch_inc;
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);

@@ -1133,7 +1133,6 @@ void sound_stream_update(int samples)
 						//	printf("nn %d\n", noise_out_digital);
 		} // end of curclock
 
-		// TODO: cache the filters
 		// filter coefs
 		double k[3], a[4], b[4];
 

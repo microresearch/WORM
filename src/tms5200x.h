@@ -33,15 +33,15 @@ int16_t tms_get_sample_5200ktablea();// allphon ADD
 void tms_newsay_specific(u8 whichbank);
 void tms_newsay_specifica(); // allphons
 void tms_newsay_specific5100(); // 0
-
-/// new to TEST in audio.c and extra vocabs for each and above modes as independent functions
+void tms_newsay_specificx(); // arcadeone for bends
 
 int16_t tms_get_sample_bend5200a(); // vocab=1 which will change for allphons ADD VOCABS
-
 int16_t tms_get_sample_bend5100w(); // vocab=0 ADD VOCABS
+int16_t tms_get_sample_bend5200x(); // vocab=0 ADD VOCABS
 
 int16_t tms_get_sample_5200pitchtablea(); // vocab=1 which will change for allphons + we have more pitches = 64 - reflect this in audio.c ADD VOCABS
+int16_t tms_get_sample_5200pitchtablex(); // vocab=1 which will change for allphons + we have more pitches = 64 - reflect this in audio.c ADD VOCABS
 
 int16_t tms_get_sample_5100kandpitchtablew(); // for 5100 we have 32+168 in exy= 200 5200 is 232 ADD VOCABS
-
 int16_t tms_get_sample_5200kandpitchtablea(); // for 5100 we have 32+168 in exy= 200 5200 is 232 ADD VOCABS
+int16_t tms_get_sample_5200kandpitchtablex(); // for 5100 we have 32+168 in exy= 200 5200 is 232 ADD VOCABS

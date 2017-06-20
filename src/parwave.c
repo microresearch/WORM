@@ -303,7 +303,7 @@ void single_parwave(klatt_global_ptrr globals, int16_t *frame, u8 newframe, u16 
     out = resonator(&(globals->rout),out);
 
     //    out = out * globals->amp_gain0;  /* Convert back to integer */
-    out = out * 32768.0f; // TODO - gain????
+    out = out * 32768.0f; //  gain????
     if (out < -32767) out = -32767;
     if (out > 32767) out = 32767;
    
