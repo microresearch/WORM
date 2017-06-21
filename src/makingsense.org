@@ -2004,18 +2004,33 @@ TODO:
 
 - re-test all modes and changes above
 
-** 20/6
+** 20/6 // 21/6
 
 - added extra tms bend vocab on 5200 so now we have 64 modes. 0-63
 
 TODO:
 
-- check modes as above - all tms first=0->20:DONE , check rsynth elm -- fixed length of elm bug there...
+- check modes as above - all tms first=0->61:DONE , check rsynth elm
+  -- fixed length of elm bug there, reducing sam volume in render.c,
+  fixed phon list bug in sam, changed digitalker length code, fixed
+  bug in rsynthysing, less glitchy version of sp0256bender 
 
+- question if to reduce digitalker and nvp volume - we need to compare all volumes?
+- simpleklatt could be somehow improved
+- nvp distorts quite badly on speed - but is maybe ok
+
+- FULL test is fine but glitch still on  
+
+IN CODE:
 - check logic of tms mode and all mode changes
+- check each set of exy extents for each mode//also all TTS length
 - check logspeed/pitch for each mode
-- start testing individual modes and whole thing
 - check testy comments etc.
+
+////
+
+- start testing individual modes and whole thing again
+- HW program and HW tests - full once code is ready
 
 * announcement: 
 

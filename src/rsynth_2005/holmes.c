@@ -476,12 +476,12 @@ int16_t rsynth_get_sample_sing(){
 		  f0s = f0e;
 		  ntf0 = (unsigned) *f0++;
 		  f0e = *f0++;
-		  }
+		  }*/
 
 		// interpolate the f0 value 
-		F0Hz = linear(f0s, f0e, tf0, ntf0);
+		//		F0Hz = linear(f0s, f0e, tf0, ntf0);
 		nextelement=0;
-		t++; tf0++;*/
+		t++; tf0++;
     } //dur
 
     else { // hit end of DUR number of frames...
@@ -496,7 +496,7 @@ int16_t rsynth_get_sample_sing(){
   MAXED(val,1023);
   val=1023-val;
   //   float newfreq=F0Hz* logspeed[val] * 0.5f;
-  float newfreq=rsynth->speaker->F0Hz * logspeed[val] * 0.5f;
+  float newfreq=rsynth->speaker->F0Hz * logspeed[val];// * 0.5f;
     sample=rsynth_frame_single(rsynth, newfreq, ep);//TODO
   //  sample=rand()%32768;
       samplenumber++;
@@ -607,7 +607,9 @@ int16_t rsynth_get_sample_single(){
   int val=_selx*1027.0f;
   MAXED(val,1023);
   val=1023-val;
-  float newfreq=rsynth->speaker->F0Hz* logspeed[val];//rsynth->speaker->F0Hz
+    float newfreq=rsynth->speaker->F0Hz* logspeed[val];//rsynth->speaker->F0Hz
+  //float newfreq=F0Hz* logspeed[val] * 0.5f;
+
     sample=rsynth_frame_single(rsynth, newfreq, ep);//TODO
       samplenumber++;
       

@@ -287,7 +287,7 @@ void init_nvp(void){
 
   //      change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
   // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
-  change_nvpparams(&framer, 0.5f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.1f); // envpitch=endVoicePitch is unused, 
+  change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.01f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[0][i]; 
@@ -547,8 +547,7 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
     count=0;
     //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
-
-    if (count<this_interpol && changed){
+  if (count<this_interpol && changed){
     float curFadeRatio=(float)count/(this_interpol);
     for(j=0;j<speechPlayer_frame_numParams;++j) {
       ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
@@ -562,7 +561,7 @@ int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
   float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude; // was 0.3
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
-
+  //  float out=(parallelOut)*tempframe.outputGain;
   count++;
   out=out*4000.0f;
   if (out>32000.0f) out=32000.0f;

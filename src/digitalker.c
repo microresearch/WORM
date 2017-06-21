@@ -863,6 +863,7 @@ void digitalker_step_mode_3d()
 
 void digitalker_step()
 {
+  u8 val;
 	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
 		if(m_stop_after == 0 && m_bpos == 0xffff)
 			return;
@@ -874,13 +875,18 @@ void digitalker_step()
 			m_segments = (v1 & 15) + 1;
 			// try bend of m_repeats
 #ifndef LAP
-			u8 val=_sely*67.0f;
-			MAXED(val,63);
-			m_repeats = ((v1 >> 4) & 7) + 1 ;
 			if (modus==0){
-			m_repeats+=val;
+			val=_sely*131.0f;
+			MAXED(val,128);
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+			  //			m_repeats+=val;
+			  m_repeats=(m_repeats*logpitch[val])+1;
 			}
-			else if (modus==1) m_repeats=val+1; // modus is neither for any xy action such as table bends
+			else if (modus==1) {
+			  val=_sely*35.0f;
+			  MAXED(val,31);
+			  m_repeats=val+1; // modus is neither for any xy action such as table bends
+			}
 #else
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 #endif

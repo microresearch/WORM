@@ -277,10 +277,6 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample, compost_newsay_fro
 
 static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengther, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tmsbend5200erx, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5200pitchtablebenderx, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &tms5200kandpitchtablebenderx, &sp0256er, &sp0256singer, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &composter, &compostfrer};
 
-// numbered
-
-//static const wormer *wormlist[]={&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner, &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er, &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx, &13tms5100pitchtablebender, &14tms5200pitchtablebender, &15tms5200pitchtablebenderx, &16tms5100ktablebender, &17tms5200ktablebender, &18tms5100kandpitchtablebender, &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx, &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer, &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer, &29votraxTTSer, &30votraxgorfer, &31votraxwower, &32votraxwowfilterbender, &33votraxbender, &34votraxparamer, &35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer, &39samTTSser, &40samphoner, &41samphonser, &42samphonsinger, &43samxyer, &44samparamer, &45sambender, &46digitalker, &47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy, &50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter, &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing, &58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing, &62composter, &63compostfrer}; // 64 modes
-
 #define MODEF 68.0f // float 64.0f
 #define MODET 63 // mode top 60 // 58 for no COMPOST
 #define COMPOST 62
@@ -428,14 +424,14 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   MAXED(_intmode, MODET); 
   trigger=0; 
 
-  /*    if (oldmode!=_intmode) {// IF there is a modechange!
+   if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     doadc();
     oldselx=_selx;
     oldsely=_sely;
     oldselz=_selz;
     recomposter=1;
-    }*/
+    }
   
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
@@ -452,7 +448,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     src++;
   }
 
-  _intmode=50; //TESTY!
+//&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner, &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er, &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx, &13tms5100pitchtablebender, &14tms5200pitchtablebender, &15tms5200pitchtablebenderx, &16tms5100ktablebender, &17tms5200ktablebender, &18tms5100kandpitchtablebender, &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx, &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer, &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer, &29votraxTTSer, &30votraxgorfer, &31votraxwower, &32votraxwowfilterbender, &33votraxbender, &34votraxparamer, &35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer, &39samTTSser, &40samphoner, &41samphonser, &42samphonsinger, &43samxyer, &44samparamer, &45sambender, &46digitalker, &47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy, &50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter, &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing, &58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing, &62composter, &63compostfrer}; // 64 modes
+  
+//  _intmode=27; //TESTY for sp0256bender
 
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 

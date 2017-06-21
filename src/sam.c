@@ -263,8 +263,14 @@ void sam_newsay_phon(void){
 
   for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
       u8 val=exy[x]*59.0f;
-      MAXED(val,55);
-      val=55-val;
+      if (x==0) {
+	MAXED(val,52)
+	val=52-val;
+	  }
+      else	{
+	MAXED(val,55);
+	val=55-val;
+      }
       strcat(teststring,phoneme_list[val]);
     }
       strcat(teststring,".\x9b");
@@ -456,8 +462,14 @@ void sam_newsay_phonsing(void){
 
   for (u8 x=0;x<16;x++){ // 16 seems the max length here WHY????
       u8 val=exy[x]*58.0f;
-      MAXED(val,55);
-      val=55-val;
+      if (x==0) {
+	MAXED(val,52)
+	val=52-val;
+	  }
+      else	{
+	MAXED(val,55);
+	val=55-val;
+      }      
       strcat(teststring,phoneme_list[val]);
     }
       strcat(teststring,".\x9b");
