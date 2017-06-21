@@ -1020,7 +1020,7 @@ int16_t process(u8 *ending)
 		   if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; //
 		  
 		m_pitch_count &= 0x1FF;
-	return sample;
+	return sample<<2;
 }
 
 int16_t process_k_tabled5100(u8 *ending) 
@@ -1158,7 +1158,7 @@ int16_t process_k_tabled5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample;
+	return sample<<2;
 }
 
 
@@ -1314,7 +1314,7 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
 		m_pitch_count &= 0x1FF;
-	return sample;
+	return sample<<2;
 }
 
 
@@ -1458,7 +1458,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample;
+	return sample<<2;
 }
 
 
@@ -1696,7 +1696,7 @@ int16_t processbend5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample;
+	return sample<<2;
 }
 
 
@@ -1941,7 +1941,7 @@ int16_t process5100raw()
 		//		buf_count++;
 		//		size--;
 		//	}
-	return sample;
+	return sample<<2;
 }
 
 

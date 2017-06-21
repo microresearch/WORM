@@ -2013,13 +2013,14 @@ TODO:
 - check modes as above - all tms first=0->61:DONE , check rsynth elm
   -- fixed length of elm bug there, reducing sam volume in render.c,
   fixed phon list bug in sam, changed digitalker length code, fixed
-  bug in rsynthysing, less glitchy version of sp0256bender 
+  bug in rsynthysing, less glitchy version of sp0256bender, raised volume of all TMS
 
-- question if to reduce digitalker and nvp volume - we need to compare all volumes?
+- question if to reduce digitalker and nvp volume 
 - simpleklatt could be somehow improved
 - nvp distorts quite badly on speed - but is maybe ok
+- we need to compare all volumes?
 
-- FULL test is fine but glitch still on  
+- FULL test is fine so far....
 
 IN CODE:
 - check logic of tms mode and all mode changes
