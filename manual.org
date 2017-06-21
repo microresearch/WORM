@@ -97,7 +97,7 @@ to manipulate a stored buffer of spoken samples as follows:
   basic phonemes, access a simple vocabulary and bend Klatter
   parameters. A simple articulatory synth is also included.
 
-- 7 COMPOST: COMPOST reworks the audio buffer which has previously
+- 7 COMPOST: reworks the audio buffer which has previously
   been written to by the speech cores. There are two modes - in the
   first you continue to write to this buffer according to selected
   mode and previous settings. In the second mode, compost access is

@@ -665,7 +665,7 @@ static void micro()
 			default:
 			{
 				repeat = immed4 | (m_mode & 0x30);
-				int val = (exy[14]*131.0f); // only if we are not in TTS mode
+				int val = (exy[14]*131.0f);
 				MAXED(val,127);
 				repeat=((float)(repeat)*logpitch[val]);
 

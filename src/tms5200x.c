@@ -629,8 +629,8 @@ void parse_frame_bend_5200()
 	if (rep_flag)
 		return;
 	m_new_frame_pitch_idx*=2.0f*(1.0f-exy[1]);
-	if (m_coeff->pitch_bits==6 && m_new_frame_pitch_idx>63) m_new_frame_energy_idx=63;
-	else if  (m_new_frame_pitch_idx>31) m_new_frame_energy_idx=31;
+	if (m_coeff->pitch_bits==6 && m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63;
+	else if  (m_new_frame_pitch_idx>31) m_new_frame_pitch_idx=31; // TESTYY - bug as was energy_idx???
 	
 	// extract first 4 K coefficients - deal with length of these individually
 	//	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },

@@ -1857,7 +1857,7 @@ FINAL:
 
 - TODO: check number of modes and simplify defines for this including compost modes
 
-- TODO: add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST
+- TODO: add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST DONE
 
 - TODO: what to trim -> remove tube.c as also bad on volume changes -
   but also we realize that all of the audio_buffer was in flash too - still now we are at the limit with all in DONE
@@ -1970,7 +1970,7 @@ so maybe for uninitialised arrays  - we cannot do this in flash as we do not kno
 
 *and/or place stack in CCM*
 
-- confusion over elm_ptr and const in rsynth 2005 error - fix/does it still work?
+- confusion over elm_ptr and const in rsynth 2005 error - fix/does it still work?DONE
 
 - make more global buffers to reduce stack eg. for tts stuff
 
@@ -2013,7 +2013,10 @@ TODO:
 - check modes as above - all tms first=0->61:DONE , check rsynth elm
   -- fixed length of elm bug there, reducing sam volume in render.c,
   fixed phon list bug in sam, changed digitalker length code, fixed
-  bug in rsynthysing, less glitchy version of sp0256bender, raised volume of all TMS
+  bug in rsynthysing, less glitchy version of sp0256bender, raised
+  volume of all TMS
+
+*- fixed possible bug in parse_frame_bend_5200() tms5200x.c TO TEST!*
 
 - question if to reduce digitalker and nvp volume 
 - simpleklatt could be somehow improved
@@ -2023,14 +2026,18 @@ TODO:
 - FULL test is fine so far....
 
 IN CODE:
-- check logic of tms mode and all mode changes
-- check each set of exy extents for each mode//also all TTS length
+
+- check each set of exy extents for each mode//also all TTS lengthDONE
+
+- check logic of tms modeDONE-re-checkAGAIN and all mode/modus changes
+- check sanity of each mode including compost
+
 - check logspeed/pitch for each mode
-- check testy comments etc.
+- check testy comments, clean up
 
 ////
 
-- start testing individual modes and whole thing again
+- final testing individual modes and whole thing again
 - HW program and HW tests - full once code is ready
 
 * announcement: 
@@ -2041,7 +2048,7 @@ swelling, and impatient, of further delay, he broke out
 thus... [Maier]
 
 
-ERD finally releases the eurorack-based ERD/WORM synth featuring
+** ERD finally releases the eurorack-based ERD/WORM synth featuring
 software worming of emulated artificial human speech cores from the
 70s to the 90s of the last century. Six key speech cores are simulated
 with a vocabulary of over 4000 words and phrases, including basic

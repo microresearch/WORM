@@ -207,9 +207,9 @@ static const wormer sambanks0er={0, 1.0f, sam_get_sample_banks0a, sam_newsay_ban
 static const wormer sambanks1er={0, 1.0f, sam_get_sample_banks1a, sam_newsay_banks0, 0, 0}; // speed on x, sel phrase on y/z
 static const wormer samTTSer={0, 1.0f, sam_get_sample_TTSa, sam_newsay_TTS, 0, 1}; // pitch on x
 static const wormer samTTSser={0, 1.0f, sam_get_sample_TTSsa, sam_newsay_TTS, 0, 1}; // speed on x
-static const wormer samphoner={15, 1.0f, sam_get_sample_phona, sam_newsay_phon, 0, 0};  // try with newsay trigger - was exy but now has own exy
-static const wormer samphonser={15, 1.0f, sam_get_sample_phonsa, sam_newsay_phon, 0, 0};  // this one is with speed of phoneme
-static const wormer samphonsinger={15, 1.0f, sam_get_sample_phonsinga, sam_newsay_phonsing, 0, 0}; // and - constant pitch on z
+static const wormer samphoner={0, 1.0f, sam_get_sample_phona, sam_newsay_phon, 0, 0};  // try with newsay trigger - was exy but now has own exy
+static const wormer samphonser={0, 1.0f, sam_get_sample_phonsa, sam_newsay_phon, 0, 0};  // this one is with speed of phoneme
+static const wormer samphonsinger={0, 1.0f, sam_get_sample_phonsinga, sam_newsay_phonsing, 0, 0}; // and - constant pitch on z
 ///
 
 static const wormer samxyer={0, 1.0f, sam_get_sample_xya, sam_newsay_banks0, 0, 0};  // pitch on x speed on y
@@ -424,7 +424,10 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   MAXED(_intmode, MODET); 
   trigger=0; 
 
-   if (oldmode!=_intmode) {// IF there is a modechange!
+  //  if (_intmode>32) _intmode=28;
+  //  else _intmode=27;
+  
+  if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     doadc();
     oldselx=_selx;
@@ -432,6 +435,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldselz=_selz;
     recomposter=1;
     }
+  
   
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
