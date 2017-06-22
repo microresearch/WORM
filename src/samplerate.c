@@ -61,7 +61,7 @@ for (u8 ii=0;ii<size;ii++){
   }
 
   // deal also with trigger
-    if (in[ii]>THRESH && !triggered) {
+    if (in[ii]>=THRESH && !triggered) {
       doadc();
       newsay();
       triggered=1;
@@ -109,7 +109,7 @@ for (u8 ii=0;ii<size;ii++){
   }
 
   // deal also with trigger
-    if (in[ii]>THRESH && !triggered) {
+    if (in[ii]>=THRESH && !triggered) {
     parammode^=1;
     triggered=1;
   }
@@ -155,7 +155,7 @@ for (u8 ii=0;ii<size;ii++){
   }
 
   // deal also with trigger
-    if (in[ii]>THRESH && !triggered) {
+    if (in[ii]>=THRESH && !triggered) {
       doadc();
       newsay();
       triggered=1;

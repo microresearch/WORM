@@ -27,13 +27,12 @@ int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
 
 int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
-float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; // SELX, Y, Z, SPEED
+float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; 
 
 extern float exy[240];
 float _mode, _speed, _selx, _sely, _selz;
 static float oldselx=0.5f, oldsely=0.5f, oldselz=1.0f;
 static u8 _intspeed, _intmode=0, trigger=0;
-static u8 TTS=0;
 
 #define float float32_t
 
@@ -277,8 +276,9 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample, compost_newsay_fro
 
 static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengther, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tmsbend5200erx, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5200pitchtablebenderx, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &tms5200kandpitchtablebenderx, &sp0256er, &sp0256singer, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &composter, &compostfrer};
 
-#define MODEF 68.0f // float 64.0f
-#define MODET 63 // mode top 60 // 58 for no COMPOST
+#define MODEF 67.0f // float 68.0f
+#define MODEFC 66.0f // float 68.0f
+#define MODET 63 // mode top 63 // 61 for no COMPOST
 #define COMPOST 62
 #define COMPOSTF 63
 
@@ -321,16 +321,14 @@ int16_t compost_get_sample(){
 
   if (freezer==1){
   // generate into audio_buffer based on selz mode and struct list
-  float value =(float)adc_buffer[SELZ]/65536.0f; 
+    /*  float value =(float)adc_buffer[SELZ]/65536.0f; 
   smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
   _selz=smoothed_adc_value[4];
-  CONSTRAIN(_selz,0.0f,1.0f);
+  CONSTRAIN(_selz,0.0f,1.0f); */ // selz is already done in samplerate
   oldcompost=compostmode;
   _selz=1.0f-_selz; // invert
-  compostmode= _selz*MODEF; // as mode - adapt for excluding compost_mode TODO!
+  compostmode= _selz*MODEFC; 
   MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
-  //if mode change do a newsay or not?
-  //  compostmode=5; // testy - here we just fix
   doadc_compost();
 
   if (oldcompost!=compostmode || recomposter==1 ) // as soon as we enter compost do newsay
@@ -349,20 +347,17 @@ int16_t compost_get_sample(){
 
     alpha = time_now - (float)int_time;
     audio_buffer[ccc++] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
-    //audio_buffer[cc++]=wormlist[compostmode]->getsample();
     if (ccc>AUDIO_BUFSZ-1) ccc=0;
 
   time_now += factor;
   last_time = int_time;
   int_time = time_now;
   while(last_time<int_time)      {
-    //    doadc();
     int16_t val=wormlist[compostmode]->getsample();
     new_data(val);
     last_time += 1;
   }
   } // end of freezer  
-  // resets at start or end - newsay will reset in full
   if (startx>endy){
     dir=-1;
     if (comp_counter<=endy) comp_counter=startx; // swopped round
@@ -396,7 +391,6 @@ void compost_newsay(){
     comp_counter=startx;//
   }  
 }
-
 
 /////////////////---------------------------------------------------------
 
@@ -435,17 +429,15 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldselz=_selz;
     recomposter=1;
     }
-  
-  
+    
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;
       }
 
- // _speed=0.8f;
- samplespeedref=_speed*1028.0f;
- MAXED(samplespeedref, 1023);
- samplespeed=logspeed[samplespeedref];  
+    samplespeedref=_speed*1028.0f;
+    MAXED(samplespeedref, 1023);
+    samplespeed=logspeed[samplespeedref];  
   
   for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
     sample_buffer[x]=*(src++); 
@@ -474,7 +466,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   if (wormlist[_intmode]->TTS==1){ 
     doadc();
     u8 xax=_sely*19.0f; 
-    u8 selz=_selz*68.0f; 
+    u8 selz=_selz*67.0f; 
     MAXED(xax,15);
     MAXED(selz,63);
     xax=15-xax; // inverted

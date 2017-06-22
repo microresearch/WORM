@@ -2016,7 +2016,7 @@ TODO:
   bug in rsynthysing, less glitchy version of sp0256bender, raised
   volume of all TMS
 
-*- fixed possible bug in parse_frame_bend_5200() tms5200x.c TO TEST!*
+*- fixed possible bug in parse_frame_bend_5200() tms5200x.c, test changes in compost for selz - TO TEST!*
 
 - question if to reduce digitalker and nvp volume 
 - simpleklatt could be somehow improved
@@ -2030,7 +2030,8 @@ IN CODE:
 - check each set of exy extents for each mode//also all TTS lengthDONE
 
 - check logic of tms modeDONE-re-checkAGAIN and all mode/modus changes
-- check sanity of each mode including compost
+
+- check sanity of each file/mode including compost> audio.c/compostX, samplerate, >DONE
 
 - check logspeed/pitch for each mode
 - check testy comments, clean up
