@@ -287,7 +287,6 @@ static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengt
 static u16 comp_counter=0;
 static u16 ccc=0;
 static u8 freezer=0;
-static u8 recomposter=0;
 
 static inline void doadc_compost(){
   // exy stays anyway as it is
@@ -331,10 +330,9 @@ int16_t compost_get_sample(){
   MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
   doadc_compost();
 
-  if (oldcompost!=compostmode || recomposter==1 ) // as soon as we enter compost do newsay
+  if (oldcompost!=compostmode )
     {
       wormlist[compostmode]->newsay();
-      recomposter=0;
     }
 
   //wormlist[compostmode]->sampleratio <= 1.0f
@@ -377,11 +375,13 @@ void compost_newsay_frozen(){
 }
 
 
-void compost_newsay(){ 
+void compost_newsay(){ //TODO - restart compost mode
+
+  
   freezer=1; // always unfrozen
   // just reset counter to start 
   doadc();
-  u16 startx=_selx*32767.0f;
+/*  u16 startx=_selx*32767.0f;
   u16 endy=_sely*32767.0f;
 
   if (startx>endy){
@@ -389,7 +389,15 @@ void compost_newsay(){
   }
   else if (startx<=endy){
     comp_counter=startx;//
-  }  
+  }
+*/
+
+  _selz=1.0f-_selz; // invert
+  u8 compostmode= _selz*MODEFC; 
+  MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
+  doadc_compost();
+
+  wormlist[compostmode]->newsay();
 }
 
 /////////////////---------------------------------------------------------
@@ -427,7 +435,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldselx=_selx;
     oldsely=_sely;
     oldselz=_selz;
-    recomposter=1;
     }
     
     if (firsttime==0){ // we can leave this so is always called first

@@ -25,7 +25,6 @@ typedef int32_t INT32;
 #include "english2phoneme/TTS.h"
 #include "resources.h"
 
-// include all ROMS re-grouped TODO
 //** 5100-speak and spell
 //** 5200- early echo II, disks of TRON????, TI99/4 
 //** 5220- later echo II, BBC MICRO
@@ -80,13 +79,13 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_D027-34.h" // wordlist_ffD027to34[61]
 #include "LPC/roms/vocab_echofemale.h" // wordlist_testroms[200] // is this 5220?
 #include "LPC/roms/vocab_mpf.h" // wordlist_mpf[32]
-//#include "LPC/roms/vocab_talko_notelsewhere.h" // wordlist_talko[31] TODO- also can add misc and own vocabs here
+//#include "LPC/roms/vocab_talko_notelsewhere.h" // wordlist_talko[31] // unused
 #include "LPC/roms/vocab_ti99.h" // wordlist_ti99_one[180] // and // wordlist_ti99_two[180]
 
 // then 5220 - all BBC micro
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
-#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - TODO also check vocab_talko?-CHECKED
+#include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - also check vocab_talko?-CHECKED
 
 
 
@@ -179,7 +178,7 @@ const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 42.0f};
 const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 64.0f};
 const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 34.0f};
 //const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
-const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 79.0f};
+const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 77.0f};
 const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 70.0f};
 
 const TMS_vocab vocab_ti99_one_1={wordlist_ti99_one_1, &T0285_2501E_coeff, 89, 93.0f};
@@ -629,8 +628,8 @@ void parse_frame_bend_5200()
 	if (rep_flag)
 		return;
 	m_new_frame_pitch_idx*=2.0f*(1.0f-exy[1]);
-	if (m_coeff->pitch_bits==6 && m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63;
-	else if  (m_new_frame_pitch_idx>31) m_new_frame_pitch_idx=31; // TESTYY - bug as was energy_idx???
+	if (m_coeff->pitch_bits==5 && m_new_frame_pitch_idx>31) m_new_frame_pitch_idx=31;
+	else if  (m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63; // TESTYY - bug as was energy_idx???
 	
 	// extract first 4 K coefficients - deal with length of these individually
 	//	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
@@ -686,7 +685,7 @@ void parse_frame_bend_5200()
 
 
 
-void parse_frame_raw_5100() // TODO - for our 3 sets of coeffs - exy is 0-11
+void parse_frame_raw_5100() //- for our 3 sets of coeffs - exy is 0-11
 {
   // 5100. energy bits=4=16 , pitch bits=5=32 , numk= 10 kbits= 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
   // 5220. energy bits=4 , pitch bits=6=64 , numk= 10 kbits= 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
@@ -740,7 +739,7 @@ void parse_frame_raw_5100() // TODO - for our 3 sets of coeffs - exy is 0-11
 }
 
 
-void parse_frame_raw_5200() // TODO - for our 3 sets of coeffs - exy is 0-11
+void parse_frame_raw_5200() //  - for our 3 sets of coeffs - exy is 0-11
 {
   // 5100. energy bits=4=16 , pitch bits=5=32 , numk= 10 kbits= 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
   // 5220. energy bits=4 , pitch bits=6=64 , numk= 10 kbits= 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
@@ -815,7 +814,7 @@ int16_t process(u8 *ending)
 
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
-			parse_frame(); //TODO!
+			parse_frame();
 			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
@@ -1043,7 +1042,7 @@ int16_t process_k_tabled5100(u8 *ending)
 				*ending=1;
 				return 0;
 			}
-			parse_frame(); //TODO!
+			parse_frame(); 
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
 					m_talk_status = m_speak_external = 0;
@@ -1183,7 +1182,7 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 				*ending=1;
 				return 0;
 			}
-			parse_frame(); //TODO!
+			parse_frame(); 
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
 					m_talk_status = m_speak_external = 0;
@@ -1198,8 +1197,6 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			// TODO as LOG
-			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK
 			u8 val=exy[m_new_frame_pitch_idx]*131.0f;
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
@@ -1339,7 +1336,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 				*ending=1;
 				return 0;
 			}
-			parse_frame(); //TODO!
+			parse_frame(); 
 			if (NEW_FRAME_STOP_FLAG == 1)
 				{
 					m_talk_status = m_speak_external = 0;
@@ -1354,8 +1351,6 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 
 			/* load new frame targets from tables, using parsed indices */
 			m_target_energy = m_coeff->energytable[m_new_frame_energy_idx];
-			// TODO: loggy
-			//			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*(8.0f*(exy[m_new_frame_pitch_idx]+0.1f));// TODO TWEAK! - never zero
 			u8 val=exy[m_new_frame_pitch_idx]*131.0f;
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
@@ -2118,7 +2113,7 @@ void tms_newsay_specificx(){
 }
 
 
-void tms_newsay_specific5100(){ // add vocabs
+void tms_newsay_specific5100(){ 
   tms_newsay_specific(0);
 }
 
@@ -2127,7 +2122,7 @@ void tms_newsay_specific5100(){ // add vocabs
 int16_t tms_get_sample_allphon(){
   modus=9; // length and pitch
   int16_t sample; u8 ending=0;
-  sample=  process(&ending);// TODO - expand for other vocabs
+  sample=  process(&ending);
   if (ending==1){
     tms_newsay_allphon();
   }
@@ -2137,7 +2132,7 @@ int16_t tms_get_sample_allphon(){
 int16_t tms_get_sample_allphon_sing(){
   modus=10; // abs pitch and length
   int16_t sample; u8 ending=0;
-  sample=  process(&ending);// TODO - expand for other vocabs
+  sample=  process(&ending);// 
   if (ending==1){
     tms_newsay_allphon();
   }
@@ -2247,11 +2242,11 @@ int16_t tms_get_sample_bend5200(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_bend5200a(){ // for allphons - TODO - other fixed vocabs
+int16_t tms_get_sample_bend5200a(){ // for allphons 
   tms_get_sample_bend5200(ALLPHON_BANK);
 }
 
-int16_t tms_get_sample_bend5200x(){ // for allphons - TODO - other fixed vocabs
+int16_t tms_get_sample_bend5200x(){ // for allphons 
   tms_get_sample_bend5200(EXTRAX);
 }
 
@@ -2267,7 +2262,7 @@ int16_t tms_get_sample_5100pitchtable(u8 fix){
   return sample;
 }
 
-int16_t tms_get_sample_5100pitchtablew(){  /// additional vocabs as extra functions - which ones?
+int16_t tms_get_sample_5100pitchtablew(){  
   tms_get_sample_5100pitchtable(0);
 }
 
@@ -2308,7 +2303,7 @@ int16_t tms_get_sample_5100ktablew(){  /// additional vocabs as extra functions 
 
 int16_t tms_get_sample_5200ktable(u8 fix){
   modus=0;
-  m_coeff=&T0285_2501E_coeff;
+  m_coeff=&T0285_2501E_coeff; //5200
   int16_t sample; u8 ending=0;
   sample= process_k_tabled5100(&ending);
   if (ending==1){
@@ -2323,7 +2318,7 @@ tms_get_sample_5200ktable(ALLPHON_BANK);
 
 int16_t tms_get_sample_5100kandpitchtable(u8 fix){
   modus=0;
-  m_coeff=&T0280B_0281A_coeff;
+  m_coeff=&T0280B_0281A_coeff; // 5100
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5100(&ending);
   if (ending==1){
@@ -2338,7 +2333,7 @@ int16_t tms_get_sample_5100kandpitchtablew(){
 
 int16_t tms_get_sample_5200kandpitchtable(u8 fix){
   modus=0;
-  m_coeff=&T0285_2501E_coeff;
+  m_coeff=&T0285_2501E_coeff; // 5200
   int16_t sample; u8 ending=0;
   sample= process_pitchk_tabled5100(&ending); // now we recognise pitchbits 
   if (ending==1){

@@ -255,7 +255,7 @@ void single_parwave(klatt_global_ptrr globals, int16_t *frame, u8 newframe, u16 
     par_glotout += aspiration;
 
 
-    if(globals->synthesis_model != 1) // paralllel
+    if(globals->synthesis_model != 1) // ALL paralllel
     {
       /*
        * Cascade vocal tract, excited by laryngeal sources.
@@ -385,7 +385,7 @@ int16_t single_single_parwave(klatt_global_ptrr globals, int16_t *frame){
       /* Increment counter that keeps track of 4*samrate samples per sec */
 
       globals->nper++;
-    }
+    } // 4x samplerate
 
     /*
       Tilt spectrum of voicing source down by soft low-pass filtering, amount
@@ -549,7 +549,7 @@ void simple_parwave_init(klatt_global_ptrr globals)
   */
 void frame_init(klatt_global_ptrr globals, int16_t* frame)
 {
-  globals->original_f0 = frame[0] / 10;
+  globals->original_f0 = frame[0] / 10; // f0
 
   /*  frame[1]  = frame[1] - 7;
   if (frame[1] < 0)   
@@ -557,16 +557,16 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
     frame[1] = 0;
     }*/
 
-  globals->amp_aspir = DBtoLIN(frame[18]) * 0.05f;
-  globals->amp_frica = DBtoLIN(frame[22]) * 0.25f;
-  globals->par_amp_voice = DBtoLIN(frame[38]);
-  globals->amp_bypas = DBtoLIN(frame[37]) * 0.05f;
+  globals->amp_aspir = DBtoLIN(frame[18]) * 0.05f; // ASP
+  globals->amp_frica = DBtoLIN(frame[22]) * 0.25f; // AF
+  globals->par_amp_voice = DBtoLIN(frame[38]); // AVpdb
+  globals->amp_bypas = DBtoLIN(frame[37]) * 0.05f; // AB
   /*  frame[39] = frame[39] - 3;
   if (frame[39] <= 0) 
   {
     frame[39] = 57;
     }*/
-  globals->amp_gain0 = DBtoLIN(frame[39]);
+  globals->amp_gain0 = DBtoLIN(frame[39]); // gain0
 
   /* Set coefficients of variable cascade resonators */
   /*
@@ -600,25 +600,25 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
 
   /* Set coeficients of nasal resonator and zero antiresonator */
  
-  setabc(frame[16],frame[17],&(globals->rnpc),globals);
-  setzeroabc(frame[14],frame[15],&(globals->rnz),globals);
+  setabc(frame[16],frame[17],&(globals->rnpc),globals); //  FNPHz BNPhz 
+  setzeroabc(frame[14],frame[15],&(globals->rnz),globals);// FNZhz BNZhz
   
   /* Set coefficients of parallel resonators, and amplitude of outputs */
 
-  setabc(frame[2],frame[25],&(globals->r1p),globals);
-  globals->r1p.a *= DBtoLIN(frame[24]) * 0.4f;
-  setabc(frame[16],frame[17],&(globals->rnpp),globals);
-  globals->rnpp.a *= DBtoLIN(frame[36]) * 0.6f;
-  setabc(frame[4],frame[27],&(globals->r2p),globals);
-  globals->r2p.a *= DBtoLIN(frame[26]) * 0.15f;
-  setabc(frame[6],frame[29],&(globals->r3p),globals);
-  globals->r3p.a *= DBtoLIN(frame[28]) * 0.06f;
-  setabc(frame[8],frame[31],&(globals->r4p),globals);
-  globals->r4p.a *= DBtoLIN(frame[30]) * 0.04f;
-  setabc(frame[10],frame[33],&(globals->r5p),globals);
-  globals->r5p.a *= DBtoLIN(frame[32]) * 0.022f;
-  setabc(frame[12],frame[35],&(globals->r6p),globals);
-  globals->r6p.a *= DBtoLIN(frame[34]) * 0.03f;
+  setabc(frame[2],frame[25],&(globals->r1p),globals); // F1hz B1phz
+  globals->r1p.a *= DBtoLIN(frame[24]) * 0.4f; // A1
+  setabc(frame[16],frame[17],&(globals->rnpp),globals); // FNPHz BNPhz
+  globals->rnpp.a *= DBtoLIN(frame[36]) * 0.6f; // ANP
+  setabc(frame[4],frame[27],&(globals->r2p),globals); // F2Hz B2phz
+  globals->r2p.a *= DBtoLIN(frame[26]) * 0.15f; // A2
+  setabc(frame[6],frame[29],&(globals->r3p),globals); //F3Hz B3phz
+  globals->r3p.a *= DBtoLIN(frame[28]) * 0.06f; // A3
+  setabc(frame[8],frame[31],&(globals->r4p),globals); // F4Hz B4phz
+  globals->r4p.a *= DBtoLIN(frame[30]) * 0.04f; // A4
+  setabc(frame[10],frame[33],&(globals->r5p),globals); // F5hz B5phz
+  globals->r5p.a *= DBtoLIN(frame[32]) * 0.022f; // A5
+  setabc(frame[12],frame[35],&(globals->r6p),globals); // F6hz b6phz
+  globals->r6p.a *= DBtoLIN(frame[34]) * 0.03f; // A6
   
   /* output low-pass filter */
 
@@ -728,30 +728,30 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
     28, 28, 28, 28, 27, 27
   };
 
-  if (frame[0] > 0) 
+  if (frame[0] > 0) // F0 
   {
     /* T0 is 4* the number of samples in one pitch period */
 
-    globals->T0 = (40 * globals->samrate) / frame[0];
+    globals->T0 = (40 * globals->samrate) / frame[0]; // F0
 
 
-    globals->amp_voice = DBtoLIN(frame[1]);
+    globals->amp_voice = DBtoLIN(frame[1]); //AVdb
 
     /* Duration of period before amplitude modulation */
 
     globals->nmod = globals->T0;
-    if (frame[1] > 0) 
+    if (frame[1] > 0)  // AVdb
     {
       globals->nmod >>= 1;
     }
 
     /* Breathiness of voicing waveform */
 
-    globals->amp_breth = DBtoLIN(frame[20]) * 0.1f;
+    globals->amp_breth = DBtoLIN(frame[20]) * 0.1f; // aturb
 
     /* Set open phase of glottal period where  40 <= open phase <= 263 */
 
-    globals->nopen = 4 * frame[19];
+    globals->nopen = 4 * frame[19]; //kopen
 
     if ((globals->glsource == 1) && (globals->nopen > 263))    
     {
@@ -798,17 +798,17 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
 
 
     temp = globals->T0 - globals->nopen;
-    if (frame[23] > temp) 
+    if (frame[23] > temp) // kskew
     {
-      frame[23] = temp;
+      frame[23] = temp; // kskew
     }
     if (skew >= 0) 
     {
-      skew = frame[23];
+      skew = frame[23]; // kskew
     }
     else 
     {
-      skew = - frame[23];
+      skew = - frame[23];// kskew
     }
 
     /* Add skewness to closed portion of voicing period */
@@ -835,7 +835,7 @@ static void pitch_synch_par_reset(klatt_global_ptrr globals, int16_t* frame)
   {
     /* Set one-pole low-pass filter that tilts glottal source */
 
-    globals->decay = (0.033f * frame[21]);
+    globals->decay = (0.033f * frame[21]); // TLTdb
 
     if (globals->decay > 0.0f) 
     {

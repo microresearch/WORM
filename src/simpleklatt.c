@@ -30,7 +30,7 @@ static int16_t frame[40];
 extern float exy[240];
 extern float _selx, _sely, _selz;
 
-  static const int16_t natural_samples[NUMBER_OF_SAMPLES]=
+static const int16_t natural_samples[NUMBER_OF_SAMPLES]= // unused source
   {
     -310,-400,530,356,224,89,23,-10,-58,-16,461,599,536,701,770,
     605,497,461,560,404,110,224,131,104,-97,155,278,-154,-1165,
@@ -66,7 +66,7 @@ void simpleklatt_init(void){
   //  framer framezz[40];
   //  frame_init(globals,simpleklattset.val); 
 
-  globals->synthesis_model = 1; // all_parallel
+  globals->synthesis_model = 1; // all_parallel - try for other = 0
  globals->samrate = 32000;
  globals->glsource = 2; // 1=impulsive 2=glottal impulse 3=sampled as above
  globals->natural_samples = natural_samples;

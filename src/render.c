@@ -880,13 +880,13 @@ do
 	do
 	{
 	  if (modus&16){
-	    u8 val=(1.0f-exy[X])*130.0f;
+	    u8 val=(1.0f-exy[Y])*130.0f;
 	      MAXED(val,127);
 	      frequency1[X] = freq1data[Y]*logpitch[val];
-	      val=(1.0f-exy[80+X])*130.0f;
+	      val=(1.0f-exy[80+Y])*130.0f;
 	      MAXED(val,127);
 	      frequency2[X] = freq2data[Y]*logpitch[val];
-	      val=(1.0f-exy[160+X])*130.0f;
+	      val=(1.0f-exy[160+Y])*130.0f;
 	      MAXED(val,127);
 	      frequency3[X] = freq3data[Y]*logpitch[val];
 	  }

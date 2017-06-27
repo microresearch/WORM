@@ -85,28 +85,6 @@ void Init()
 	SetMouthThroat( mouth, throat);
 	//phoneme_array[1][16]=255;
 
-	/*
-	freq2data = &mem[45136];
-	freq1data = &mem[45056];
-	freq3data = &mem[45216];
-	*/
-	//pitches = &mem[43008];
-	/*
-	frequency1 = &mem[43264];
-	frequency2 = &mem[43520];
-	frequency3 = &mem[43776];
-	*/
-	/*
-	amplitude1 = &mem[44032];
-	amplitude2 = &mem[44288];
-	amplitude3 = &mem[44544];
-	*/
-	//phoneme = &mem[39904];
-	/*
-	ampl1data = &mem[45296];
-	ampl2data = &mem[45376];
-	ampl3data = &mem[45456];
-	*/
 
 	for(i=0; i<256; i++)
 	{
@@ -125,6 +103,7 @@ void Init()
 
 void sam_init(){
   Init();
+  _sely=0.0f; _selz=0.0f;
   sam_newsay_banks0(); // so we always have something parsed
 }
 
@@ -133,7 +112,7 @@ void sam_newsay_banks0(void){
   singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
-  X=Y=0;
+  //  X=Y=0;
 
   // FOR banks selection
   u8 bank=_sely*34.0f;
@@ -190,7 +169,7 @@ void sam_newsay_banks0(void){
 }
 
 void sam_newsay_TTS(void){
-  X=Y=0;
+  //  X=Y=0;
 
   u8 beginning=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
@@ -251,7 +230,7 @@ void sam_newsay_TTS(void){
 }
 
 void sam_newsay_phon(void){
-  X=Y=0;
+  //  X=Y=0;
 
   u8 beginning=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
@@ -322,13 +301,15 @@ void sam_newsay_phon(void){
 }
 
 void sam_newsay_xy(void){ 
-  X=Y=0;
-
+  //  X=Y=0;
+  // what should singmode be?
+  singmode=0; 
+  
   u8 beginning=0; pitch=64; mouth=128; throat=128; 
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
-  u8 vocab=_selz*136.0f;
+  u8 vocab=_selz*135.0f;
   MAXED(vocab,130);
   vocab=130-vocab;
   strcpy(input,  sam_vocab_custom[vocab]); 
@@ -378,14 +359,15 @@ void sam_newsay_xy(void){
 }
 
 void sam_newsay_param(void){ 
-  X=Y=0;
-
+  //  X=Y=0;
+  // what should singmode be?
+  singmode=0; 
   u8 beginning=0;
   phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
 
-  u8 vocab=_selz*136.0f;
+  u8 vocab=_selz*135.0f;
   MAXED(vocab,130);
   vocab=130-vocab;
   strcpy(input,  sam_vocab_custom[vocab]); 
@@ -448,7 +430,7 @@ void sam_newsay_param(void){
 
 
 void sam_newsay_phonsing(void){
-  X=Y=0;
+  //  X=Y=0;
 
   u8 beginning=0;
   singmode=1; pitch=64; mouth=128; throat=128; 

@@ -235,5 +235,23 @@ code made available under multiple GPL-compatible licenses.
 
 ** 6- Further resources
 
-http://www.cslu.ogi.edu/tts/research/history/
+Wolfgang von Kempelen's speaking machine: http://www2.ling.su.se/staff/hartmut/kemplne.htm
+
+Real-time articulatory speech-synthesis-by-rules: http://pages.cpsc.ucalgary.ca/~hill/papers/avios95/
+
+Review of text-to-speech conversion for English: http://www.cslu.ogi.edu/tts/research/history/
+
+Audio examples: http://www.festvox.org/history/klatt.html
+
+Smithsonian Speech Synthesis History Project: http://amhistory.si.edu/archives/speechsynthesis/ss_home.htm
+
+Screw worms: http://bitsavers.informatik.uni-stuttgart.de/pdf/federalScrewWorks/Votrax_SC-01_Phoneme_Speech_Synthesizer_Data_Sheet_1980.pdf
+
+https://sites.google.com/site/votraxpss/
+
+General Instrument: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+
+
+
+
 

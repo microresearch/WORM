@@ -1,49 +1,53 @@
-// reformat as array - what is order in klatt itself of params - eg. for frame
+static const int16_t mins[40] __attribute__ ((section (".flash"))) = {200, 0, 200, 40, 550,      40, 1200, 40, 1200, 40, 1200, 40, 1200, 40,   248, 40, 248, 40,           0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
 
-// what are globals - flutter, and across all phonemes F0hz10 is the same
+//static const int16_t maxs[40] __attribute__ ((section (".flash"))) = {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
+
+static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450,   960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960,   280, 960, 280, 960,  70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
+
 
 typedef struct
  {
-  long F0hz10;            /* Voicing fund freq in Hz                          */        
-  long AVdb;              /* Amp of voicing in dB,            0 to   70       */        
-  long F1hz;              /* First formant freq in Hz,        200 to 1300     */        
-  long B1hz;              /* First formant bw in Hz,          40 to 1000      */        
-  long F2hz;              /* Second formant freq in Hz,       550 to 3000     */        
-  long B2hz;              /* Second formant bw in Hz,         40 to 1000      */        
-  long F3hz;              /* Third formant freq in Hz,        1200 to 4999    */        
-  long B3hz;              /* Third formant bw in Hz,          40 to 1000      */        
-  long F4hz;              /* Fourth formant freq in Hz,       1200 to 4999    */        
-  long B4hz;              /* Fourth formant bw in Hz,         40 to 1000      */        
-  long F5hz;              /* Fifth formant freq in Hz,        1200 to 4999    */        
-  long B5hz;              /* Fifth formant bw in Hz,          40 to 1000      */        
-  long F6hz;              /* Sixth formant freq in Hz,        1200 to 4999    */        
-  long B6hz;              /* Sixth formant bw in Hz,          40 to 2000      */        
-  long FNZhz;             /* Nasal zero freq in Hz,           248 to  528     */        
-  long BNZhz;             /* Nasal zero bw in Hz,             40 to 1000      */        
-  long FNPhz;             /* Nasal pole freq in Hz,           248 to  528     */        
-  long BNPhz;             /* Nasal pole bw in Hz,             40 to 1000      */        
-  long ASP;               /* Amp of aspiration in dB,         0 to   70       */        
-  long Kopen;             /* # of samples in open period,     10 to   65      */        
-  long Aturb;             /* Breathiness in voicing,          0 to   80       */        
-  long TLTdb;             /* Voicing spectral tilt in dB,     0 to   24       */        
-  long AF;                /* Amp of frication in dB,          0 to   80       */        
-  long Kskew;             /* Skewness of alternate periods,   0 to   40 in sample#/2  */
-  long A1;                /* Amp of par 1st formant in dB,    0 to   80       */        
-  long B1phz;             /* Par. 1st formant bw in Hz,       40 to 1000      */        
-  long A2;                /* Amp of F2 frication in dB,       0 to   80       */        
-  long B2phz;             /* Par. 2nd formant bw in Hz,       40 to 1000      */        
-  long A3;                /* Amp of F3 frication in dB,       0 to   80       */        
-  long B3phz;             /* Par. 3rd formant bw in Hz,       40 to 1000      */        
-  long A4;                /* Amp of F4 frication in dB,       0 to   80       */        
-  long B4phz;             /* Par. 4th formant bw in Hz,       40 to 1000      */        
-  long A5;                /* Amp of F5 frication in dB,       0 to   80       */        
-  long B5phz;             /* Par. 5th formant bw in Hz,       40 to 1000      */        
-  long A6;                /* Amp of F6 (same as r6pa),        0 to   80       */        
-  long B6phz;             /* Par. 6th formant bw in Hz,       40 to 2000      */        
-  long ANP;               /* Amp of par nasal pole in dB,     0 to   80       */        
-  long AB;                /* Amp of bypass fric. in dB,       0 to   80       */        
-  long AVpdb;             /* Amp of voicing,  par in dB,      0 to   70       */        
-  long Gain0;             /* Overall gain, 60 dB is unity,    0 to   60       */        
+0  long F0hz10;            /* Voicing fund freq in Hz          200                */        
+1  long AVdb;              /* Amp of voicing in dB,            0 to   70       */        
+2  long F1hz;              /* First formant freq in Hz,        200 to 1300     */        
+3  long B1hz;              /* First formant bw in Hz,          40 to 1000      */        
+4  long F2hz;              /* Second formant freq in Hz,       550 to 3000     */        
+5  long B2hz;              /* Second formant bw in Hz,         40 to 1000      */        
+6  long F3hz;              /* Third formant freq in Hz,        1200 to 4999    */        
+7  long B3hz;              /* Third formant bw in Hz,          40 to 1000      */        
+8  long F4hz;              /* Fourth formant freq in Hz,       1200 to 4999    */        
+9  long B4hz;              /* Fourth formant bw in Hz,         40 to 1000      */        
+10  long F5hz;              /* Fifth formant freq in Hz,        1200 to 4999    */        
+11  long B5hz;              /* Fifth formant bw in Hz,          40 to 1000      */        
+12  long F6hz;              /* Sixth formant freq in Hz,        1200 to 4999    */        
+13  long B6hz;              /* Sixth formant bw in Hz,          40 to 2000      */        
+
+14  long FNZhz;             /* Nasal zero freq in Hz,           248 to  528     */        
+15  long BNZhz;             /* Nasal zero bw in Hz,             40 to 1000      */
+16  long FNPhz;             /* Nasal pole freq in Hz,           248 to  528     */        
+17  long BNPhz;             /* Nasal pole bw in Hz,             40 to 1000      */        
+18  long ASP;               /* Amp of aspiration in dB,         0 to   70       */        
+19  long Kopen;             /* # of samples in open period,     10 to   65      */        
+20  long Aturb;             /* Breathiness in voicing,          0 to   80       */        
+21  long TLTdb;             /* Voicing spectral tilt in dB,     0 to   24       */        
+22  long AF;                /* Amp of frication in dB,          0 to   80       */        
+23  long Kskew;             /* Skewness of alternate periods,   0 to   40 in sample#/2  */
+24  long A1;                /* Amp of par 1st formant in dB,    0 to   80       */        
+25  long B1phz;             /* Par. 1st formant bw in Hz,       40 to 1000      */        
+26  long A2;                /* Amp of F2 frication in dB,       0 to   80       */        
+27  long B2phz;             /* Par. 2nd formant bw in Hz,       40 to 1000      */        
+28  long A3;                /* Amp of F3 frication in dB,       0 to   80       */        
+29  long B3phz;             /* Par. 3rd formant bw in Hz,       40 to 1000      */        
+30  long A4;                /* Amp of F4 frication in dB,       0 to   80       */        
+31  long B4phz;             /* Par. 4th formant bw in Hz,       40 to 1000      */        
+32  long A5;                /* Amp of F5 frication in dB,       0 to   80       */        
+33  long B5phz;             /* Par. 5th formant bw in Hz,       40 to 1000      */        
+34  long A6;                /* Amp of F6 (same as r6pa),        0 to   80       */        
+35  long B6phz;             /* Par. 6th formant bw in Hz,       40 to 2000      */        
+36  long ANP;               /* Amp of par nasal pole in dB,     0 to   80       */        
+37  long AB;                /* Amp of bypass fric. in dB,       0 to   80       */        
+38  long AVpdb;             /* Amp of voicing,  par in dB,      0 to   70       */        
+39  long Gain0;             /* Overall gain, 60 dB is unity,    0 to   60       */        
  } klatt_frame_t, *klatt_frame_ptr;
 
 

@@ -2041,6 +2041,62 @@ IN CODE:
 - final testing individual modes and whole thing again
 - HW program and HW tests - full once code is ready
 
+** 24/6
+
+- check sanity/modus/modes for:
+
+sp0256.o: DONE
+
+- why we took out rpt counter sample= 0 in sp0256 and 0256bend?
+- removed return in lpc12
+- evaluation of vocab resets 
+- *check modus==3 for vocabs / cnt thing again?*
+
+sp0256bend.o: DONE
+
+- small bug in new exy stuff fixed - *TO TEST!*
+
+simpleklatt.o /and/ parwave.o : DONE - HOW TO IMPROVE ALSO?
+
+- try with   globals->synthesis_model = 1; // all_parallel - *try for other = 0* - but we will also need to deal with nfcascade
+- checking frame array - min and size is fine, check matches upDONE
+
+sam.o /and/ render.o: DONE
+
+- added missing singmodes in sam, we don't need x=y=0 as is done in parser1
+- fixed potential bug in u8 sam_get_sample_bend in render.c with X and y - *TO TEST!*
+
+tms5200x.o  
+
+- *re-test frame bends as fixed potential bug there*
+- checked all modus fine
+- *we could also try differing coeffs for vocabs as maybe some match better*
+
+TODO: - what varies across coeffs and check this again - 5110=5 pitch bits =32 5200=6 pitch bits =64
+
+////
+
+digitalker.o 
+nvp.o 
+newvotrax.o 
+
+TTS stuff: $(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
+
+rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o
+
+klatt: $(rsynth-portDIR)/holmes.o \ $(rsynth-portDIR)/elements.o \
+$(rsynth-portDIR)/nsynth.o $(rsynth-portDIR)/say.o \
+$(rsynth-portDIR)/def_pars.o \
+
+** 26/6 +
+
+- redo compost newsay as restart mode - *TEST*
+
+* MORE FINAL TODO JUNE_+
+
+- image for modulargrid
+
+
 * announcement: 
 
 The WORM was for a long time desirous to speake, but the rule and

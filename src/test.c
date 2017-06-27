@@ -282,7 +282,7 @@ void make_sinc()
 
     }
 }
-
+#define XXXX
 
 void main(){
   //  indexy={1.0,1.0}; 
@@ -303,6 +303,10 @@ void main(){
   unsigned char m_rom_f2=8;
   //   unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
   //   printf("TMPPPP:     %d\n", tmp);
+
+#ifdef XXXX
+  printf("xxxxxxxxxxxxxxxxx\n\n\n\n");
+#endif  
 
 typedef struct TMS_vocab__ {
   // pointer to const

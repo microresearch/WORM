@@ -165,7 +165,7 @@ static inline INT16 limit(INT16 s){
 /* ======================================================================== */
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
-static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
+static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
 	INT16 samp, val;
@@ -278,15 +278,15 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 		{
 		  // intersperse
 		  //		  f->b_coef[j]=f->b_coeforig[j]+ (256-(int)((exy[2 + 2*j]*512.0)));
-		  val=exy[2 + (2*j)]*1028.0f;
-		  MAXED(val,1023);
+		  //	  val=exy[2 + (2*j)]*1028.0f;
+		  //		  MAXED(val,1023);
 		  //		  f->b_coef[j]=f->b_coeforig[j]*logspeed[1023-val];
 		  f->b_coef[j]=f->b_coeforig[j]+(64-(exy[2 + (2*j)]*128.0f));
-		  val=exy[3 + (2*j)]*1028.0f;
-		  MAXED(val,1023);
+		  //		  val=exy[3 + (2*j)]*1028.0f;
+		  //		  MAXED(val,1023);
 		  //		  val=411;
 		  //f->f_coef[j]=f->f_coeforig[j]*logspeed[1023-val];
-		  f->f_coef[j]=f->f_coeforig[j]+(64-(exy[2 + (2*j)]*128.0f));
+		  f->f_coef[j]=f->f_coeforig[j]+(64-(exy[3 + (2*j)]*128.0f));
 		  //		  f->f_coef[j]=f->f_coeforig[j]+ (256-(int)((exy[3 + 2*j]*512.0)));
 		  samp += (((int32_t)f->b_coef[j] * (int32_t)f->z_data[j][1]) >> 9);
 		  samp += (((int32_t)f->f_coef[j] * (int32_t)f->z_data[j][0]) >> 8);
@@ -295,7 +295,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][0] = samp;
 		}
 		*out= limit(samp)<<2;
-		return 1;
+		//		return 1;
 }
 
 static u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };

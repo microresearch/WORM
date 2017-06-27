@@ -197,7 +197,7 @@ static inline INT16 limit(INT16 s)
 /*  LPC12_UPDATE     -- Update the 12-pole filter, outputting samples.      */
 /* ======================================================================== */
 
-static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
+static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 {
 	u8 j;
 	INT16 samp;
@@ -322,7 +322,7 @@ static inline u8 lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][0] = samp;
 		}
 		*out= limit(samp)<<2;
-		return 1;
+		//		return 1;
 }
 
 static u8 stage_map[6] = { 0, 1, 2, 3, 4, 5 };
@@ -1279,7 +1279,7 @@ return output;
 
  int16_t sp0256_get_samplevocabbanktwo(void){
   static int16_t output;   
-  modus=0;
+  modus=3; // was zero
    micro();
 lpc12_update(&m_filt, &output);
    
@@ -1359,7 +1359,7 @@ void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   if (*(vocab_sp0256_bankone[whichone]+vocabindex)==255 || reset==1){
+   if (reset==1 || *(vocab_sp0256_bankone[whichone]+vocabindex)==255 ){ // safer so reset==1  never evaluates past end of array
      vocabindex=0;
      whichone=_selz*92.0f; // split vocab into banks - on this one we need 0-150 values 
      MAXED(whichone,87);
@@ -1382,12 +1382,11 @@ void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
 
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;   
-   if (*(vocab_sp0256_banktwo[whichone]+vocabindex)==255 || reset==1){
+   if (reset==1 || *(vocab_sp0256_banktwo[whichone]+vocabindex)==255){
      vocabindex=0;
-     whichone=_selz*94.0f;
+     whichone=_selz*94.0f; // this is a different bank so we have 94
      MAXED(whichone,89);
      whichone=89-whichone;
-     dada=*(vocab_sp0256_bankone[whichone]+vocabindex);  
    }
    dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
    vocabindex++;
