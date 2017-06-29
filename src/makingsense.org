@@ -2111,7 +2111,7 @@ $(ttsd)/spellwor.o  XXX
 
 *TODO:* 
 
-- check all above, remove and backup ROMS
+- check all above, remove and backup ROMS-how?
 
 - image for modulargrid
 
