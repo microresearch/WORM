@@ -130,7 +130,7 @@ int find_rule(word, index, rules)
 		if (*match != '\0')	/* found missmatch */
 			continue;
 /*
-printf("\nWord: \"%s\", Index:%4d, Trying: \"%s/%s/%s\" = \"%s\"\n",
+oprintf("\nWord: \"%s\", Index:%4d, Trying: \"%s/%s/%s\" = \"%s\"\n",
     word, index, (*rule)[0], (*rule)[1], (*rule)[2], (*rule)[3]);
 */
 		left = (*rule).rulee[0];

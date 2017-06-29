@@ -93,9 +93,7 @@ static const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 620.0f, 1660.0f, 2430.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 77.0f , 112.5f, 240.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 620.0f, 1660.0f, 2430.0f, 3300.0f, 3750.0f, 4900.0f, 70.0f, 150.0f, 320.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f },
 { 310.0f, 2020.0f, 2960.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 49.5f, 150.0f , 300.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 310.0f, 2020.0f, 2960.0f, 3300.0f, 3750.0f, 4900.0f, 45.0f, 200.0f, 400.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f },
 { 300.0f, 1990.0f, 2850.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 275.0f , 120.0f , 247.5f, 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 300.0f, 1990.0f, 2650.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 130.0f, 200.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.8f , 0.633333333333f, 0.366666666667f, 0.383333333333f, 0.383333333333f, 0.0f , 1.0f , 0.0f, 0.0f },
-
 { 472.0f , 1100.0f, 2130.0f, 3300.0f, 3750.0f, 4900.0f, 450.0f, 216.0f , 44.0f , 150.0f , 150.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.f, 480.0f, 1270.0f, 2130.0f, 3300.0f, 3750.0f, 4900.0f, 40.0f, 200.0f, 200.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f },//41
-
 { 540.0f, 1100.0f, 2300.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 88.0f , 52.5f, 52.5f, 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 540.0f, 1100.0f, 2300.0f, 3300.0f, 3750.0f, 4900.0f, 80.0f, 70.0f, 70.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f },//42
 { 270.0f, 1290.0f, 2540.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 66.0f , 60.0f , 127.5f, 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 270.0f, 1290.0f, 2540.0f, 3300.0f, 3750.0f, 4900.0f, 60.0f, 80.0f, 170.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.466666666667f, 0.633333333333f, 1.0f , 1.0f , 0.0f },//43
 { 320.0f, 1390.0f, 2530.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 220.0f , 60.0f , 150.0f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 320.0f, 1390.0f, 2530.0f, 3300.0f, 3750.0f, 5250.0f, 200.0f, 80.0f, 200.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.866666666667f, 0.0f , 1.0f , 0.0f, 0.0f },//44
@@ -308,7 +306,7 @@ void change_nvpparams(speechPlayer_frame_t* frame,float glotty,float prefgain,fl
   /*
 frame.preFormantGain=2.0 or 1.0 for not singing
 frame.voiceAmplitude=1.0
-frame.vibratoPitchOffset=0.125 - change this - maybe singing and voice modes and worm mode TODO!
+frame.vibratoPitchOffset=0.125 - change this - maybe singing and voice modes and worm mode
 frame.vibratoSpeed=5.5 - above
 
 pitch is fundamental and endpitch is used to get voicepitchinc as in: 
@@ -416,14 +414,14 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
 }
 
 void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
-  static u8 nextframe=0;
+  u8 nextframe;
   u8 silence=0;
   count=0;
+  counter=0;
   u8 value=_selz*131.0f;
   MAXED(value,127);
   value=127-value;
   ourvocab=nvp_vocab[value];
-  counter=0;
   nextframe=ourvocab[0].phon;    
 
   if (nextframe==49) {
@@ -480,8 +478,9 @@ int16_t nvp_get_sample(){
     // newFrameRequest->frame.voicePitch+=(newFrameRequest->voicePitchInc*newFrameRequest->numFadeSamples);
     // and: curFrame.voicePitch+=oldFrameRequest->voicePitchInc;
     // oldFrameRequest->frame.voicePitch=curFrame.voicePitch;
-      int16_t vale=128.0f*(1.0f-_selx);
-      tempframe.voicePitch=framer.voicePitch*logpitch[vale]*2.0f; 
+      //      int16_t vale=128.0f*(1.0f-_selx);
+      int16_t vale=1024.0f*(1.0f-_selx);
+      tempframe.voicePitch=framer.voicePitch*logspeed[vale]*2.0f; 
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
@@ -495,7 +494,7 @@ int16_t nvp_get_sample(){
    return (int)out;
 }
 
-int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
+int16_t nvp_get_sample_vocab(){
   float val=0;
   unsigned int j;
   //  static u16 count=0;
@@ -535,7 +534,7 @@ int16_t nvp_get_sample_vocab(){//TODO_ length and pitch rise and fall!
    return (int)out;
 }
 
-int16_t nvp_get_sample_vocab_sing(){//TODO_ length and pitch rise and fall!
+int16_t nvp_get_sample_vocab_sing(){
   float val=0;
   unsigned int j;
   //  static u16 count=0;

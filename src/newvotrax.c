@@ -148,7 +148,7 @@ void inflection_w(int data)
 void device_start()
 {
 	// initialize internal state
-  m_mainclock = 720000; // TODO as we need m_mainclock - 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
+  m_mainclock = 720000; // 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 
   m_sclock = m_mainclock / 18.0f; // so 40000
   m_cclock = m_mainclock / 36.0f; // so 20000
@@ -385,8 +385,6 @@ void chip_update_raw()
 	val=127-val;
 	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 		
-
-
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
 	if((m_pitch >> 2) == 1){
@@ -468,7 +466,6 @@ void chip_update()
 	// There's a delay, hence the +1.
 	m_pitch = (m_pitch + 1) & 0x7f;
 
-	// tuning this DONE - TODO make exponential vot_pitch[]
 	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1+((int)((1.0f-_selx)*64.0f)-8)) + 1)) m_pitch = 0; // maintain as ==
 #ifdef LAP
 	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
@@ -986,7 +983,7 @@ void build_lowpass_filter(myfloat *a, myfloat *b,
 
 	// Compute the filter cutoff frequency
 	myfloat fpeak = 1/(2*M_PI*k);
-	fprintf(stderr, "FPEAK: %f\n", fpeak);
+	//	fprintf(stderr, "FPEAK: %f\n", fpeak);
 
 	// Turn that into a warp multiplier
 	myfloat zc = 2*M_PI*fpeak/tanf(M_PI*fpeak / m_sclock);
@@ -1342,9 +1339,9 @@ void votrax_init(){
 ////[[[[[[[[[[[[[[[[[[[ audio functions:
 
 static int16_t sample_count=0;
-//static myfloat intervals[32]={1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f, 128.0f}; // TODO: fix these
 
 void votrax_newsay(){
+  m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*68.0f; 
   MAXED(sel,64);
   sel=64-sel;
@@ -1357,6 +1354,7 @@ void votrax_newsay(){
 }
 
 void votrax_newsay_sing(){
+  m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*68.0f; 
   MAXED(sel,64);
   sel=64-sel;
@@ -1399,7 +1397,6 @@ int16_t votrax_get_sample_sing(){
   return sample;
 }
 
-
 int16_t votrax_get_sample_rawparam(){ 
   modus=0;
   uint16_t sample; u8 x;
@@ -1410,9 +1407,8 @@ int16_t votrax_get_sample_rawparam(){
   return sample;
 }
 
-/////
-
 void votrax_newsay_bend(u8 reset){
+  m_cclock = m_mainclock / 36.0f;
   signed char tmp;
   u8 it;
   // do bend now for GORF:
@@ -1460,6 +1456,7 @@ int16_t votrax_get_sample_bend(){
 /////
 
 void votrax_newsaygorf(u8 reset){
+    m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_gorf[whichone]+vocabindex);
@@ -1485,6 +1482,7 @@ void votrax_newsaygorfr(){
 }
 
 void votrax_newsaywow(u8 reset){
+  m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_wow[whichone]+vocabindex);
@@ -1590,7 +1588,6 @@ int16_t votrax_get_samplewow(){
 }
 
 void votrax_newsayTTS(){
-
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
   inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
@@ -1623,6 +1620,7 @@ int16_t votrax_get_sampleTTS(){
 }
 
 void votrax_retriggerTTS(){
+  m_cclock = m_mainclock / 36.0f;
   TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
   writer(TTSoutarray[TTSindex]); 
   phone_commit();

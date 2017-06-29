@@ -260,7 +260,7 @@ static const wormer rsynthelm={0, 0.25f, rsynth_get_sample_elm, rsynth_newsay_el
 static const wormer rsynthsingle={0, 0.25f, rsynth_get_sample_single, rsynth_newsay_single, 0, 0};
 static const wormer rsynthysing={0, 0.25f, rsynth_get_sample_sing, rsynth_newsay, 0, 0};
 
-static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0}; 
+static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // elements
 static const wormer klattsingle={0, 1.0f, klatt_get_sample_single, klatt_newsay_single, 0, 0};
 static const wormer klattvocab={0, 1.0f, klatt_get_sample_vocab, klatt_newsay_vocab, 0, 0};
 static const wormer klattsinglesing={0, 1.0f, klatt_get_sample_single_sing, klatt_newsay_single, 0, 0};

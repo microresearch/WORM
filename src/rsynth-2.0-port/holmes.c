@@ -21,21 +21,14 @@ extern float smoothed_adc_value[5]; // SELX, Y, Z, SPEED
 #include "forlap.h"
 #include "resources.c"
 u8 test_elm[ELM_LEN]; // how long test_elm can be!? TEST
-char TTSinarray[17];
-
-unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
-  return 0;
-}
 
 #endif
 #include "nsynth.h"
 #include "elements.h"
 #include "darray.h"
 #include "holmes.h"
-#include "say.h"
 #include "phfeat.h"
 #include "resources.h"
-#include "english2phoneme/TTS.h"
 
 typedef struct {
   unsigned char length;
@@ -43,11 +36,6 @@ typedef struct {
 } klattvocab_;
 
 #include "klatt_vocab.h"
-
-//static const klattvocab_ *vocabklatt[3]={&one, &two, &three};
-
-
-static u8 TTSoutarray[256];
 
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; 
 
@@ -199,9 +187,7 @@ i=0;
 le = &Elements[0];// but what do we do with le?
 top = 1.1 * def_pars.F0hz10;
 
-// TODO break out so works a bit faster
-
- unsigned char len=10; // len is bent in getsample
+unsigned char len=10; // len is bent in getsample
 
 // list of two phonemes in elm_single - newsay shifts last phoneme out and adds new one
 // selz selects phoneme (set standard lengthy for each phoneme) - there are 64 phonemes also:
@@ -221,7 +207,7 @@ elm_single[2]=elm_single[5];
 // new phoneme
 
 elm_single[3]=val;
-elm_single[4]=len; // TEST - just fixed for now
+elm_single[4]=len; 
 elm_single[5]=0; // always
 
 
@@ -599,16 +585,6 @@ void klatt_newsay(){ /// elm is our list
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
-//        top= 200+ adc_buffer[SELX];
-
-// TEST - removed as we use _selx elsewhere
-
-/*
-u8 val=_selx*130.0f;
-MAXED(val,127);
-val=127-val;
-top*=logpitch[val];
-*/
 
     pars = def_pars;
     pars.FNPhz = le->p[fn].stdy;
@@ -616,8 +592,6 @@ top*=logpitch[val];
     pars.B2phz = pars.B2hz = 90;
     pars.B3phz = pars.B3hz = 150;
     pars.B4phz = def_pars.B4phz;
-
-
 
     //    parwave_init(&klatt_global);
     /* Set stress attack/decay slope */

@@ -32,7 +32,6 @@ OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\
  $(rsynth-portDIR)/elements.o				\
  $(rsynth-portDIR)/nsynth.o					\
- $(rsynth-portDIR)/say.o					\
  $(rsynth-portDIR)/def_pars.o				\
 # $(rsynth-portDIR)/darray.o					\
 # $(rsynth-portDIR)/trie.o					

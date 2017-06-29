@@ -2041,7 +2041,7 @@ IN CODE:
 - final testing individual modes and whole thing again
 - HW program and HW tests - full once code is ready
 
-** 24/6
+** 24/6 
 
 - check sanity/modus/modes for:
 
@@ -2056,7 +2056,7 @@ sp0256bend.o: DONE
 
 - small bug in new exy stuff fixed - *TO TEST!*
 
-simpleklatt.o /and/ parwave.o : DONE - HOW TO IMPROVE ALSO?
+simpleklatt.o /and/ parwave.o : DONE - *HOW TO IMPROVE ALSO?*
 
 - try with   globals->synthesis_model = 1; // all_parallel - *try for other = 0* - but we will also need to deal with nfcascade
 - checking frame array - min and size is fine, check matches upDONE
@@ -2072,30 +2072,48 @@ tms5200x.o
 - checked all modus fine
 - *we could also try differing coeffs for vocabs as maybe some match better*
 
-TODO: - what varies across coeffs and check this again - 5110=5 pitch bits =32 5200=6 pitch bits =64
+- what varies across coeffs and check this again - 5110=5 pitch bits =32 5200=6 pitch bits =64, kbits checked, 
+
+digitalker.o: checked exy - pitchvals, CHECK logic of get_Sample against mame/mess DONE
+
+nvp.o: checked, changed nvp to logspeed *TEST*
+
+newvotrax.o: checked modus, fixed bug to reset   m_cclock = m_mainclock / 36.0f; *TEST*, 
+
+rsynth_2005/holmes.o:    *if (once==1){ // question of this ONCE? in rsynthsingle*, recheck logic of getsampleCHECKED, check >nelm vs >=
+
+rsynth_2005/elements.o rsynth_2005/opsynth.o XXX
+
+klatt: $(rsynth-portDIR)/holmes.o: *TODO: change test_elm in main.c
+for new phrase*, checked selx/y, check logic of getsampleDONE, check
+if nelm for vocabs should be +1?
+
+$(rsynth-portDIR)/nsynth.o: hardcoded CASCADES *TEST*  
+
+$(rsynth-portDIR)/def_pars.o XXX
+$(rsynth-portDIR)/elements.o XXX
+
+say.c was removed from makefile 
 
 ////
 
-digitalker.o 
-nvp.o 
-newvotrax.o 
-
-TTS stuff: $(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
-
-rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o
-
-klatt: $(rsynth-portDIR)/holmes.o \ $(rsynth-portDIR)/elements.o \
-$(rsynth-portDIR)/nsynth.o $(rsynth-portDIR)/say.o \
-$(rsynth-portDIR)/def_pars.o \
+TTS stuff: $(ttsd)/parse.o: DONE 
+$(ttsd)/saynum.o XXX
+$(ttsd)/newenglish.o XXX
+$(ttsd)/phoneme.o XXX
+$(ttsd)/spellwor.o  XXX
 
 ** 26/6 +
 
 - redo compost newsay as restart mode - *TEST*
 
-* MORE FINAL TODO JUNE_+
+** 29/6 +
+
+*TODO:* 
+
+- check all above, remove and backup ROMS
 
 - image for modulargrid
-
 
 * announcement: 
 

@@ -1,3 +1,776 @@
+unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave, unsigned int klatthead)
+{
+	short ns;
+	float out = 0.0;
+	/* Output of cascade branch, also final output  */
+
+	/* Initialize synthesizer and get specification for current speech
+    frame from host microcomputer */
+
+	frame_init(globals, frame);
+
+	if (globals->f0_flutter != 0)
+	{
+		time_count++;                  /* used for f0 flutter */
+		flutter(globals, frame);       /* add f0 flutter */
+	}
+
+	/* MAIN LOOP, for each output sample of current frame: */
+
+	for (ns = 0; ns < globals->nspfr; ns++)
+	{
+		static unsigned long seed = 5; /* Fixed staring value */
+		float noise;
+		int n4;
+		float sourc;                   /* Sound source if all-parallel config used  */
+		float glotout;                 /* Output of glottal sound source  */
+		float par_glotout;             /* Output of parallelglottal sound sourc  */
+		float voice;                   /* Current sample of voicing waveform  */
+		float frics;                   /* Frication sound source  */
+		float aspiration;              /* Aspiration sound source  */
+		long nrand;                    /* Varible used by random number generator  */
+
+		/* Our own code like rand(), but portable
+		whole upper 31 bits of seed random 
+		assumes 32-bit unsigned arithmetic
+		with untested code to handle larger.
+		*/
+		seed = seed * 1664525 + 1;
+		if (8 * sizeof(unsigned long) > 32)
+			seed &= 0xFFFFFFFF;
+
+		/* Shift top bits of seed up to top of long then back down to LS 14 bits */
+		/* Assumes 8 bits per sizeof unit i.e. a "byte" */
+		nrand = (((long) seed) << (8 * sizeof(long) - 32)) >> (8 * sizeof(long) - 14);
+
+		/* Tilt down noise spectrum by soft low-pass filter having
+		*    a pole near the origin in the z-plane, i.e.
+		*    output = input + (0.75 * lastoutput) */
+
+		noise = nrand + (0.75 * nlast);	/* Function of samp_rate ? */
+		nlast = noise;
+
+		/* Amplitude modulate noise (reduce noise amplitude during
+		second half of glottal period) if voicing simultaneously present
+		*/
+
+		if (nper > nmod)
+		{
+			noise *= 0.5f;
+		}
+
+		/* Compute frication noise */
+		sourc = frics = amp_frica * noise;
+
+		/* Compute voicing waveform : (run glottal source simulation at
+		4 times normal sample rate to minimize quantization noise in 
+		period of female voice)
+		*/
+
+		for (n4 = 0; n4 < 4; n4++)
+		{
+				voice = natural_source(nper);
+
+			/* Reset period when counter 'nper' reaches T0 */
+			if (nper >= T0)
+			{
+				nper = 0;
+				pitch_synch_par_reset(globals, frame, ns);
+			}
+
+			/* Low-pass filter voicing waveform before downsampling from 4*globals->samrate */
+			/* to globals->samrate samples/sec.  Resonator f=.09*globals->samrate, bw=.06*globals->samrate  */
+
+			voice = resonator(&rlp, voice);	/* in=voice, out=voice */
+
+			/* Increment counter that keeps track of 4*globals->samrate samples/sec */
+			nper++;
+		}
+
+		/* Tilt spectrum of voicing source down by soft low-pass filtering, amount
+		of tilt determined by TLTdb
+		*/
+		voice = (voice * onemd) + (vlast * decay);
+		vlast = voice;
+
+		/* Add breathiness during glottal open phase */
+		if (nper < nopen)
+		{
+			/* Amount of breathiness determined by parameter Aturb */
+			/* Use nrand rather than noise because noise is low-passed */
+			voice += amp_breth * nrand;
+		}
+
+		/* Set amplitude of voicing */
+		glotout = amp_voice * voice;
+
+		/* Compute aspiration amplitude and add to voicing source */
+		aspiration = amp_aspir * noise;
+		glotout += aspiration;
+
+		par_glotout = glotout;
+
+		if (globals->synthesis_model != ALL_PARALLEL)
+		{
+			/* Cascade vocal tract, excited by laryngeal sources.
+			Nasal antiresonator, then formants FNP, F5, F4, F3, F2, F1
+			*/
+			float rnzout = antiresonator(&rnz, glotout);	/* Output of cascade nazal zero resonator  */
+			float casc_next_in = resonator(&rnpc, rnzout);	/* in=rnzout, out=rnpc.p1 */
+
+			/* Recoded from sequence of if's to use C's fall through switch
+			semantics. May allow compiler to optimize
+			*/
+			switch (globals->nfcascade)
+			{
+				case 8:
+					casc_next_in = resonator(&r8c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 7:
+					casc_next_in = resonator(&r7c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 6:
+					casc_next_in = resonator(&r6c, casc_next_in);	/* Do not use unless long vocal tract or samrat increased */
+				case 5:
+					casc_next_in = resonator(&r5c, casc_next_in);
+				case 4:
+					casc_next_in = resonator(&r4c, casc_next_in);
+				case 3:
+					casc_next_in = resonator(&r3c, casc_next_in);
+				case 2:
+					casc_next_in = resonator(&r2c, casc_next_in);
+				case 1:
+					out = resonator(&r1c, casc_next_in);
+					break;
+				default:
+					out = 0.0f;
+			}
+			#if 0
+			/* Excite parallel F1 and FNP by voicing waveform */
+			/* Source is voicing plus aspiration */
+			/* Add in phase, boost lows for nasalized */
+			out += (resonator(&rnpp, par_glotout) + resonator(&r1p, par_glotout));
+			#endif
+		}
+		else
+		{
+			/* Is ALL_PARALLEL */
+			/* NIS - rsynth "hack"
+			As Holmes' scheme is weak at nasals and (physically) nasal cavity
+			is "back near glottis" feed glottal source through nasal resonators
+			Don't think this is quite right, but improves things a bit
+			*/
+			par_glotout = antiresonator(&rnz, par_glotout);
+			par_glotout = resonator(&rnpc, par_glotout);
+			/* And just use r1p NOT rnpp */
+			out = resonator(&r1p, par_glotout);
+			/* Sound sourc for other parallel resonators is frication
+			plus first difference of voicing waveform.
+			*/
+			sourc += (par_glotout - glotlast);
+			glotlast = par_glotout;
+		}
+
+		/* Standard parallel vocal tract
+		Formants F6,F5,F4,F3,F2, outputs added with alternating sign
+		*/
+		out = resonator(&r6p, sourc) - out;
+		out = resonator(&r5p, sourc) - out;
+		out = resonator(&r4p, sourc) - out;
+		out = resonator(&r3p, sourc) - out;
+		out = resonator(&r2p, sourc) - out;
+
+		out = amp_bypas * sourc - out;
+		out = resonator(&rout, out);//*8.0f; - why so quiet tho?
+		//	*(jwave+klatthead) = clip(globals, out); /* Convert back to integer */
+		//		*(jwave+klatthead) = rand()%32768;
+				jwave[klatthead] = clip(globals, out); /* Convert back to integer */
+		klatthead++;
+		//		if (klatthead>=AUDIO_BUFSZ) klatthead=0;
+
+	}
+	return klatthead;
+}
+
+/*
+   function PARWAV
+
+   CONVERT FRAME OF PARAMETER DATA TO A WAVEFORM CHUNK
+   Synthesize globals->nspfr samples of waveform and store in jwave[].
+ */
+
+void parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave)
+{
+	long ns;
+	float out = 0.0f;
+	/* Output of cascade branch, also final output  */
+
+	/* Initialize synthesizer and get specification for current speech
+    frame from host microcomputer */
+
+	frame_init(globals, frame);
+
+	if (globals->f0_flutter != 0)
+	{
+		time_count++;                  /* used for f0 flutter */
+		flutter(globals, frame);       /* add f0 flutter */
+	}
+
+	/* MAIN LOOP, for each output sample of current frame: */
+
+	for (ns = 0; ns < globals->nspfr; ns++)
+	{
+		static unsigned long seed = 5; /* Fixed staring value */
+		float noise;
+		int n4;
+		float sourc;                   /* Sound source if all-parallel config used  */
+		float glotout;                 /* Output of glottal sound source  */
+		float par_glotout;             /* Output of parallelglottal sound sourc  */
+		float voice;                   /* Current sample of voicing waveform  */
+		float frics;                   /* Frication sound source  */
+		float aspiration;              /* Aspiration sound source  */
+		long nrand;                    /* Varible used by random number generator  */
+
+		/* Our own code like rand(), but portable
+		whole upper 31 bits of seed random 
+		assumes 32-bit unsigned arithmetic
+		with untested code to handle larger.
+		*/
+		seed = seed * 1664525 + 1;
+		if (8 * sizeof(unsigned long) > 32)
+			seed &= 0xFFFFFFFF;
+
+		/* Shift top bits of seed up to top of long then back down to LS 14 bits */
+		/* Assumes 8 bits per sizeof unit i.e. a "byte" */
+		nrand = (((long) seed) << (8 * sizeof(long) - 32)) >> (8 * sizeof(long) - 14);
+
+		/* Tilt down noise spectrum by soft low-pass filter having
+		*    a pole near the origin in the z-plane, i.e.
+		*    output = input + (0.75 * lastoutput) */
+
+		noise = nrand + (0.75f * nlast);	/* Function of samp_rate ? */
+		nlast = noise;
+
+		/* Amplitude modulate noise (reduce noise amplitude during
+		second half of glottal period) if voicing simultaneously present
+		*/
+
+		if (nper > nmod)
+		{
+			noise *= 0.5f;
+		}
+
+		/* Compute frication noise */
+		sourc = frics = amp_frica * noise;
+
+		/* Compute voicing waveform : (run glottal source simulation at
+		4 times normal sample rate to minimize quantization noise in 
+		period of female voice)
+		*/
+
+		for (n4 = 0; n4 < 4; n4++) // TODO ALL SOURCES as below
+		{
+		  //				voice = impulsive_source(nper);
+				voice = natural_source(nper);
+		
+
+/*            Modify F1 and BW1 pitch synchrounously - from parwv.c */
+/*
+                if (nper == nopen) {
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz,B1hz);
+                    }
+                    F1hzmod = 0;                // Glottis closes 
+                    B1hzmod = 0;
+                }
+                if (nper == T0) {
+                    F1hzmod = dF1hz;            // opens
+                    B1hzmod = dB1hz;
+                    if ((F1hzmod+B1hzmod) > 0) {
+                        setR1(F1hz+F1hzmod,B1hz+B1hzmod);
+                    }
+                }
+            }
+*/
+
+			/* Reset period when counter 'nper' reaches T0 */
+			if (nper >= T0)
+			{
+				nper = 0;
+				pitch_synch_par_reset(globals, frame, ns);
+			}
+
+			/* Low-pass filter voicing waveform before downsampling from 4*globals->samrate */
+			/* to globals->samrate samples/sec.  Resonator f=.09*globals->samrate, bw=.06*globals->samrate  */
+
+			voice = resonator(&rlp, voice);	/* in=voice, out=voice */
+
+			/* Increment counter that keeps track of 4*globals->samrate samples/sec */
+			nper++;
+		}
+
+		/* Tilt spectrum of voicing source down by soft low-pass filtering, amount
+		of tilt determined by TLTdb
+		*/
+		voice = (voice * onemd) + (vlast * decay);
+		vlast = voice;
+
+		/* Add breathiness during glottal open phase */
+		if (nper < nopen)
+		{
+			/* Amount of breathiness determined by parameter Aturb */
+			/* Use nrand rather than noise because noise is low-passed */
+			voice += amp_breth * nrand;
+		}
+
+		/* Set amplitude of voicing */
+		glotout = amp_voice * voice;
+
+		/* Compute aspiration amplitude and add to voicing source */
+		aspiration = amp_aspir * noise;
+		glotout += aspiration;
+
+		par_glotout = glotout;
+
+		if (globals->synthesis_model != ALL_PARALLEL)
+		{
+			/* Cascade vocal tract, excited by laryngeal sources.
+			Nasal antiresonator, then formants FNP, F5, F4, F3, F2, F1
+			*/
+			float rnzout = antiresonator(&rnz, glotout);	/* Output of cascade nazal zero resonator  */
+			float casc_next_in = resonator(&rnpc, rnzout);	/* in=rnzout, out=rnpc.p1 */
+
+			/* Recoded from sequence of if's to use C's fall through switch
+			semantics. May allow compiler to optimize
+			*/
+			switch (globals->nfcascade)
+			{
+				case 8:
+					casc_next_in = resonator(&r8c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 7:
+					casc_next_in = resonator(&r7c, casc_next_in);	/* Do not use unless samrat = 16000 */
+				case 6:
+					casc_next_in = resonator(&r6c, casc_next_in);	/* Do not use unless long vocal tract or samrat increased */
+				case 5:
+					casc_next_in = resonator(&r5c, casc_next_in);
+				case 4:
+					casc_next_in = resonator(&r4c, casc_next_in);
+				case 3:
+					casc_next_in = resonator(&r3c, casc_next_in);
+				case 2:
+					casc_next_in = resonator(&r2c, casc_next_in);
+				case 1:
+					out = resonator(&r1c, casc_next_in);
+					break;
+				default:
+					out = 0.0f;
+			}
+			#if 0
+			/* Excite parallel F1 and FNP by voicing waveform */
+			/* Source is voicing plus aspiration */
+			/* Add in phase, boost lows for nasalized */
+			out += (resonator(&rnpp, par_glotout) + resonator(&r1p, par_glotout));
+			#endif
+		}
+		else
+		{
+			/* Is ALL_PARALLEL */
+			/* NIS - rsynth "hack"
+			As Holmes' scheme is weak at nasals and (physically) nasal cavity
+			is "back near glottis" feed glottal source through nasal resonators
+			Don't think this is quite right, but improves things a bit
+			*/
+			par_glotout = antiresonator(&rnz, par_glotout);
+			par_glotout = resonator(&rnpc, par_glotout);
+			/* And just use r1p NOT rnpp */
+			out = resonator(&r1p, par_glotout);
+			/* Sound sourc for other parallel resonators is frication
+			plus first difference of voicing waveform.
+			*/
+			sourc += (par_glotout - glotlast);
+			glotlast = par_glotout;
+		}
+
+		/* Standard parallel vocal tract
+		Formants F6,F5,F4,F3,F2, outputs added with alternating sign
+		*/
+		out = resonator(&r6p, sourc) - out;
+		out = resonator(&r5p, sourc) - out;
+		out = resonator(&r4p, sourc) - out;
+		out = resonator(&r3p, sourc) - out;
+		out = resonator(&r2p, sourc) - out;
+
+		out = amp_bypas * sourc - out;
+
+		out = resonator(&rout, out);
+		*jwave++ = clip(globals, out); /* Convert back to integer */
+	}
+}
+
+
+// other sources - eventually all excitations but just test here simple wavetable
+
+// from klatt in docs
+
+/*static float sampled_source(long nper)
+{
+  int itemp;
+  float ftemp;
+  float result;
+  float diff_value;
+  int current_value;
+  int next_value;
+  float temp_diff;
+
+  if(T0!=0)
+  {
+    ftemp = (float) nper;
+    ftemp = ftemp / T0;
+    ftemp = ftemp * 100.0f;
+    itemp = (int) ftemp;
+
+    temp_diff = ftemp - (float) itemp;
+  
+    current_value = natural_samples[itemp];
+    next_value = natural_samples[itemp+1];
+
+    diff_value = (float) next_value - (float) current_value;
+    diff_value = diff_value * temp_diff;
+
+    result = natural_samples[itemp] + diff_value;
+    result = result * 0.00005f;
+    //    printf("xxx %f",result);
+  }
+  else
+  {
+    result = 0.0f;
+  }
+  return(result);
+}
+*
+
+
+
+//extern Wavetable wavtable;
+//extern __IO uint16_t adc_buffer[10];
+
+
+static float wave_source(long nper) {
+  float res;
+  //  res=dosinglewavetable(&wavtable, (adc_buffer[SPEED]>>6)+(F0hz10/16.0)); // TODO FIX is we use
+  return res*2048.0f;
+}
+
+static float triangular_source(long nper) {
+
+/*    See if glottis open */
+        if (nper < nopen) {
+            if (nper < nfirsthalf) {
+                vwave += slopet1;
+                if (vwave > maxt1)    return(maxt1);
+            }
+            else {
+                vwave += slopet2;
+                if (vwave < maxt2)    return(maxt2);
+            }
+            return(vwave);
+        }
+
+/*    Glottis closed */
+        else {
+            return(0.);
+        }
+}
+
+
+
+
+//static unsigned char rsynth_vocab_help[]={37, 10, 66, 4, 38, 8, 2, 8, 3, 1, 4, 2, 1, 6}; // TEST generated by   ~/rsync2016/projects/ERD_modules/worm/docs/rsynth-2005-12-16 ./say "help"
+
+//static const vocab_t_ rsynth_test_comp={{146.300003, 108.000000, 133.339996}, {14, 8, 15, 1, 16, 4, 82, 6, 21, 8, 2, 8, 3, 1, 4, 2, 42, 7, 62, 9, 8, 6, 9, 1, 10, 2, 72, 4, 26, 10, 1, 6, 38, 8, 77, 6, 28, 5, 1, 6}, 40}; // last is length 
+
+//static const vocab_t_ rsynth_test_worm={{146.300003, 137.000000, 129.860001}, {1, 8, 75, 16, 21, 8, 1, 6, 31, 12, 2, 8, 3, 1, 4, 2, 57, 7, 14, 8, 15, 1, 16, 4, 31, 12, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6}, 36};
+
+//static const vocab_t_ rsynth_test_help={{146.300003, 96.000000, 134.779999}, {37, 10, 66, 4, 38, 8, 2, 8, 3, 1, 4, 2, 1, 6, 21, 8, 57, 7, 1, 6, 2, 8, 3, 1, 4, 2, 38, 8, 57, 7, 32, 4, 1, 6}, 34}; 
+
+//static const vocab_t_  *rsynth_vocab[]={&rsynth_test_comp, &rsynth_test_worm, &rsynth_test_help};
+
+
+void digitalker_step_mode_0d()
+{
+	INT8 dac = 0;
+	int i, k, l;
+	UINT8 wpos = 0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+	m_pitch = pitch_vals[pitch_id];
+
+	for(i=0; i<32; i++)
+		m_dac[wpos++] = 0;
+
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta1[(bits >> (6+2*l)) & 15];
+		#else	
+		  	u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+			MAXED(val,127);
+			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			#endif
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=0; l--) {
+#ifndef LAP
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #else
+		    dac -= delta1[(bits >> (6+2*l)) & 15];
+		  #endif
+			digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	for(i=0; i<31; i++)
+		m_dac[wpos++] = 0;
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
+void digitalker_step_mode_3d()
+{
+	UINT8 h = m_rom[m_apos];
+	UINT8 vol = h >> 5;
+	UINT16 bits;
+	UINT8 dac, apos, wpos;
+	int k, l;
+
+	m_pitch = pitch_vals[h & 0x1f];
+
+	if(m_cur_segment == 0 && m_cur_repeat == 0) {
+		m_cur_bits = 0x40;
+		m_cur_dac = 0;
+	}
+	bits = m_cur_bits;
+	dac = 0;
+
+	apos = m_apos + 1 + 32*m_cur_segment;
+	wpos = 0;
+	for(k=0; k != 32; k++) {
+		bits |= m_rom[apos++] << 8;
+		for(l=0; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta2[(bits >> (6+2*l)) & 15];
+		  #else
+		  u8 val=exy[16+((bits >> (6+2*l)) & 15)]*131.0f;
+		  MAXED(val,127);
+		  dac += delta2[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
+		  digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	m_cur_bits = bits;
+	m_cur_dac = dac;
+
+	m_cur_segment++;
+	if(m_cur_segment == m_segments) {
+		m_cur_segment = 0;
+		m_cur_repeat++;
+	}
+}
+
+
+
+void digitalker_step_mode_2d()
+{
+	INT8 dac = 0;
+	int k, l;
+	UINT8 wpos=0;
+	UINT8 h = m_rom[m_apos];
+	UINT16 bits = 0x80;
+	UINT8 vol = h >> 5;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
+
+	m_pitch = pitch_vals[pitch_id];
+	for(k=1; k != 9; k++) {
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=0; l<4; l++) {
+
+#ifdef LAP
+			dac += delta1[(bits >> (6+2*l)) & 15];
+#else
+			u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+			MAXED(val,127);
+			dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+			#endif
+			digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+#ifdef LAP
+		  dac -= delta1[(bits >> (6+2*l)) & 15];
+		  
+		  #else
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
+		  digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=1; k != 9; k++) {
+		int start = k == 1 ? 1 : 0;
+		bits |= m_rom[m_apos+k] << 8;
+		for(l=start; l<4; l++) {
+		  #ifdef LAP
+		  dac += delta1[(bits >> (6+2*l)) & 15];
+		  #else
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+		  MAXED(val,127);
+		  dac += delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
+		  digitalker_write(&wpos, vol, dac);
+		}
+		bits >>= 8;
+	}
+
+	digitalker_write(&wpos, vol, dac);
+
+	for(k=7; k >= 0; k--) {
+		int limit = k ? 0 : 1;
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
+		for(l=3; l>=limit; l--) {
+		  #ifdef LAP
+		  dac -= delta1[(bits >> (6+2*l)) & 15];
+		  #else
+		  u8 val=exy[(bits >> (6+2*l)) & 15]*131.0f;
+		  MAXED(val,127);
+		  dac -= delta1[(bits >> (6+2*l)) & 15]*logpitch[val];
+		  #endif
+		  digitalker_write(&wpos, vol, dac);
+		}
+	}
+
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
+	}
+}
+
+
+void digitalker_step_bendd()
+{
+	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
+		if(m_stop_after == 0 && m_bpos == 0xffff)
+			return;
+		if(m_stop_after == 0) {
+			UINT8 v1 = m_rom[m_bpos++];
+			UINT8 v2 = m_rom[m_bpos++];
+			UINT8 v3 = m_rom[m_bpos++];
+			m_apos = v2 | ((v3 << 8) & 0x3f00);
+			m_segments = (v1 & 15) + 1;
+			m_repeats = ((v1 >> 4) & 7) + 1 ;
+			m_mode = (v3 >> 6) & 3;
+			m_stop_after = (v1 & 0x80) != 0;
+
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+
+			if(!m_apos) {
+				m_zero_count = 40*128*m_segments*m_repeats;
+				m_segments = 0;
+				m_repeats = 0;
+				return;
+			}
+		} else if(m_stop_after == 1) {
+			m_bpos = 0xffff;
+			m_zero_count = 81920;
+			m_stop_after = 2;
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+			m_segments = 0;
+			m_repeats = 0;
+		} else {
+			m_stop_after = 0;
+			//			digitalker_set_intr(1);
+		}
+	}
+
+	switch(m_mode) {
+	case 0: digitalker_step_mode_0d(); break;
+	case 1: digitalker_step_mode_1(); break;
+	case 2: digitalker_step_mode_2d(); break;
+	case 3: digitalker_step_mode_3d(); break;
+	}
+	if(!m_zero_count)
+		m_dac_index = 0;
+}
+
+
+int16_t digitalk_get_sample_benddelta(){ 
+  modus=1; // no changes
+  int16_t sample; static int pp;
+
+  for (u8 xx=0;xx<32;xx++){
+
+	if(m_zero_count == 0 && m_dac_index == 128)
+	  digitalker_step_bendd();
+
+	if(m_zero_count) {
+	  sample = 0;
+	  m_zero_count -= 1;
+	}
+	else if(m_dac_index != 128) {
+	    short v = m_dac[m_dac_index];
+	    if (pp==m_pitch)
+	      {
+		pp=0;
+		m_dac_index++;
+	      }
+	    else {
+	      sample=v;
+	      pp++;
+	      //	      return sample;
+	    }
+	}
+	else {
+	  digitalk_newsay();
+	  sample=0;
+	}
+  }
+	return sample;
+	}
+
+
 unsigned holmes(unsigned nelm, unsigned char *elm, unsigned nsamp, short *samp_base)
 {
 	filter_t flt[nEparm];
