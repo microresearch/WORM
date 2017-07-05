@@ -105,7 +105,6 @@ typedef struct TMS_vocab__ {
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
 
-
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -1010,6 +1009,7 @@ int16_t process(u8 *ending)
 		//		val=127-val;
 		if (modus&1){
 		  if (m_pitch_count >= (m_current_pitch*logpitch[val])) m_pitch_count = 0; //  - pitch bend
+		  //		  		  if (m_pitch_count >= (m_current_pitch)) m_pitch_count = 0; 
 		}
 		else if (modus&2)
 		  {
@@ -1019,7 +1019,7 @@ int16_t process(u8 *ending)
 		   if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; //
 		  
 		m_pitch_count &= 0x1FF;
-	return sample<<2;
+	return sample<<1;
 }
 
 int16_t process_k_tabled5100(u8 *ending) 
@@ -1157,7 +1157,7 @@ int16_t process_k_tabled5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<2;
+	return sample<<1;
 }
 
 
@@ -1311,7 +1311,7 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
 		m_pitch_count &= 0x1FF;
-	return sample<<2;
+	return sample<<1;
 }
 
 
@@ -1453,7 +1453,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<2;
+	return sample<<1;
 }
 
 
@@ -1691,7 +1691,7 @@ int16_t processbend5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<2;
+	return sample<<1;
 }
 
 
@@ -1936,7 +1936,7 @@ int16_t process5100raw()
 		//		buf_count++;
 		//		size--;
 		//	}
-	return sample<<2;
+	return sample<<1;
 }
 
 
@@ -1978,7 +1978,6 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F;
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //  whichbank=12;
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;

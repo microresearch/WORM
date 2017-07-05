@@ -156,10 +156,11 @@ static const unsigned char *elm;
 static u8 element[4];
 static float curpitch;
 
-void rsynth_newsay_single()
+
+void rsynth_newsay_single(u8 once)
 {
   u8 selected=1;
-  static u8 once=1;
+  //  static u8 once=1;
   nelm=4; //0123
 
   u8 val=_selz*87.0f;
@@ -174,8 +175,8 @@ void rsynth_newsay_single()
   //  unsigned i = 0;
   int j;
 
-  if (once==1){ // question of this ONCE?
-    once=0;
+  if (once==1){ // question of this ONCE? - but we should reset or?
+    //    once=0;
   Elm_ptr le = &Elementz[0]; 
   
   for (j = 0; j < nEparm; j++) {
@@ -183,13 +184,16 @@ void rsynth_newsay_single()
 	flt[j].a = rsynth->smooth;
 	flt[j].b = 1.0F - rsynth->smooth;
 	}
-  }
+    }
     i=0;
     tf0=0;
     ntf0=0;
     nextelement=1;
 }
 
+void rsynth_newsay_singlex(){
+  rsynth_newsay_single(1);
+}
 
 
 void rsynth_newsay()
@@ -517,7 +521,7 @@ int16_t rsynth_get_sample_single(){
   static unsigned t=0;
 
   if (i>1 && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
-    rsynth_newsay_single();
+    rsynth_newsay_single(0);
   }
 
   if (nextelement==1){ // we have a new element

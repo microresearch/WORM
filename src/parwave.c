@@ -568,6 +568,12 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
     }*/
   globals->amp_gain0 = DBtoLIN(frame[39]); // gain0
 
+  //  if (globals->nfcascade >= 6)    
+  //  {
+    setabc(frame[12],frame[13],&(globals->r6c),globals);
+    //  }
+
+  
   /* Set coefficients of variable cascade resonators */
   /*
   if (globals->nfcascade >= 8)    

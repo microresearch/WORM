@@ -2016,7 +2016,7 @@ TODO:
   bug in rsynthysing, less glitchy version of sp0256bender, raised
   volume of all TMS
 
-*- fixed possible bug in parse_frame_bend_5200() tms5200x.c, test changes in compost for selz - TO TEST!*
+- fixed possible bug in parse_frame_bend_5200() tms5200x.c, test changes in compost for selz - TESTED
 
 - question if to reduce digitalker and nvp volume 
 - simpleklatt could be somehow improved
@@ -2050,25 +2050,29 @@ sp0256.o: DONE
 - why we took out rpt counter sample= 0 in sp0256 and 0256bend?
 - removed return in lpc12
 - evaluation of vocab resets 
-- *check modus==3 for vocabs / cnt thing again?*
+- check modus==3 for vocabs / cnt thing again?DONE
 
 sp0256bend.o: DONE
 
-- small bug in new exy stuff fixed - *TO TEST!*
+- small bug in new exy stuff fixed - DONE
 
-simpleklatt.o /and/ parwave.o : DONE - *HOW TO IMPROVE ALSO?*
+////
 
-- try with   globals->synthesis_model = 1; // all_parallel - *try for other = 0* - but we will also need to deal with nfcascade
+simpleklatt.o /and/ parwave.o : DONE 
+
+- try with   globals->synthesis_model = 1; // all_parallel - try for other = 0 - but we will also need to deal with nfcascade
 - checking frame array - min and size is fine, check matches upDONE
 
 sam.o /and/ render.o: DONE
 
 - added missing singmodes in sam, we don't need x=y=0 as is done in parser1
-- fixed potential bug in u8 sam_get_sample_bend in render.c with X and y - *TO TEST!*
+- fixed potential bug in u8 sam_get_sample_bend in render.c with X and y - TESTED
+
+////
 
 tms5200x.o  
 
-- *re-test frame bends as fixed potential bug there*
+- re-test frame bends as fixed potential bug thereDONE
 - checked all modus fine
 - *we could also try differing coeffs for vocabs as maybe some match better*
 
@@ -2076,19 +2080,21 @@ tms5200x.o
 
 digitalker.o: checked exy - pitchvals, CHECK logic of get_Sample against mame/mess DONE
 
-nvp.o: checked, changed nvp to logspeed *TEST*
+nvp.o: checked, changed nvp to logspeed TESTED
 
-newvotrax.o: checked modus, fixed bug to reset   m_cclock = m_mainclock / 36.0f; *TEST*, 
+newvotrax.o: checked modus, fixed bug to reset   m_cclock = m_mainclock / 36.0f; 
 
-rsynth_2005/holmes.o:    *if (once==1){ // question of this ONCE? in rsynthsingle*, recheck logic of getsampleCHECKED, check >nelm vs >=
+rsynth_2005/holmes.o:    if (once==1){ // question of this ONCE? in rsynthsingleDONE, recheck logic of getsampleCHECKED, check >nelm vs >=checked
 
 rsynth_2005/elements.o rsynth_2005/opsynth.o XXX
 
-klatt: $(rsynth-portDIR)/holmes.o: *TODO: change test_elm in main.c
-for new phrase*, checked selx/y, check logic of getsampleDONE, check
+klatt: $(rsynth-portDIR)/holmes.o: DONE: change test_elm in main.c
+for new phraseTEST, checked selx/y, check logic of getsampleDONE, check
 if nelm for vocabs should be +1?
 
-$(rsynth-portDIR)/nsynth.o: hardcoded CASCADES *TEST*  
+for new phrase we use:  ~/rsync2016/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0 which reads vocab from /root/test
+
+$(rsynth-portDIR)/nsynth.o: hardcoded CASCADES tested
 
 $(rsynth-portDIR)/def_pars.o XXX
 $(rsynth-portDIR)/elements.o XXX
@@ -2105,15 +2111,41 @@ $(ttsd)/spellwor.o  XXX
 
 ** 26/6 +
 
-- redo compost newsay as restart mode - *TEST*
+- redo compost newsay as restart mode TESTED
 
-** 29/6 +
+** 5/7 
 
-*TODO:* 
+- test of fixes above:
 
-- check all above, remove and backup ROMS - how - trying?
+sp0256= modus==3?check modus==3 for vocabs / cnt thing again DONE
+
+/////
+
+tms: volume reduced was sample<<2 now <<1
+
+- fixed possible bug in parse_frame_bend_5200() tms5200x.c-> checked
+
+sp0256: checked and volume reduced...
+
+- re-check sanity of composting modes - change on oldsel business
+
+simpleklatt: now with nfcascade and impulsive, reducing range of certain params... maybe as free/unfreeze situation DONE
+
+rsynth2005: added extra trigger to reset ONCE
+
+check >nelm vs >= - no great difference?
+
+** FINAL TODO:
+
+- improve simpleklatt
+
+- if we can match better tms coeffs?
+
+- check all above, remove and backup ROMS - DONE
 
 - image for modulargrid
+
+- run through all modes - test all and trigger
 
 * announcement: 
 

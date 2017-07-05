@@ -257,7 +257,7 @@ static const wormer tms5200kandpitchtablebenderx={231, 0.25f, tms_get_sample_520
 
 static const wormer rsynthy={0, 0.25f, rsynth_get_sample, rsynth_newsay, 0, 0};
 static const wormer rsynthelm={0, 0.25f, rsynth_get_sample_elm, rsynth_newsay_elm, 0, 0}; 
-static const wormer rsynthsingle={0, 0.25f, rsynth_get_sample_single, rsynth_newsay_single, 0, 0};
+static const wormer rsynthsingle={0, 0.25f, rsynth_get_sample_single, rsynth_newsay_singlex, 0, 0};
 static const wormer rsynthysing={0, 0.25f, rsynth_get_sample_sing, rsynth_newsay, 0, 0};
 
 static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // elements
@@ -266,7 +266,7 @@ static const wormer klattvocab={0, 1.0f, klatt_get_sample_vocab, klatt_newsay_vo
 static const wormer klattsinglesing={0, 1.0f, klatt_get_sample_single_sing, klatt_newsay_single, 0, 0};
 static const wormer klattvocabsing={0, 1.0f, klatt_get_sample_vocab_sing, klatt_newsay_vocab, 0, 0};
 
-static const wormer simpleklatter={39, 1.0f, simpleklatt_get_sample, simpleklatt_newsay, 2, 0};
+static const wormer simpleklatter={39, 1.0f, simpleklatt_get_sample, simpleklatt_newsay, 1, 0};
 static const wormer nvper={0, 1.0f, nvp_get_sample, nvp_newsay, 0, 0};
 static const wormer nvpvocabsing={0, 1.0f, nvp_get_sample_vocab_sing, nvp_newsay_vocab_trigger, 0, 0};
 static const wormer nvpvocaber={0, 1.0f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
@@ -423,18 +423,19 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
+  _intmode=53; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
-
-  //  if (_intmode>32) _intmode=28;
-  //  else _intmode=27;
   
-  if (oldmode!=_intmode) {// IF there is a modechange!
+   if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
+    // if we are not leaving compost
+    if (oldmode!=COMPOST && oldmode!=COMPOSTF){
     doadc();
     oldselx=_selx;
     oldsely=_sely;
     oldselz=_selz;
+    }
     }
     
     if (firsttime==0){ // we can leave this so is always called first
@@ -453,8 +454,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
 //&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner, &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er, &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx, &13tms5100pitchtablebender, &14tms5200pitchtablebender, &15tms5200pitchtablebenderx, &16tms5100ktablebender, &17tms5200ktablebender, &18tms5100kandpitchtablebender, &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx, &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer, &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer, &29votraxTTSer, &30votraxgorfer, &31votraxwower, &32votraxwowfilterbender, &33votraxbender, &34votraxparamer, &35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer, &39samTTSser, &40samphoner, &41samphonser, &42samphonsinger, &43samxyer, &44samparamer, &45sambender, &46digitalker, &47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy, &50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter, &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing, &58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing, &62composter, &63compostfrer}; // 64 modes
   
-//  _intmode=27; //TESTY for sp0256bender
-
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);

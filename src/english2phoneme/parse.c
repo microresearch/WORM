@@ -110,11 +110,30 @@ void have_number();
 
 #ifdef LAP
 
+
 const char* NRL_list[43] ={"IY", "IH", "EY", "EH", "AE", "AA", "AO", "OW", "UH", "UW", "ER", "AX", "AH", "AY", "AW", "OY", "p", "b", "t", "d", "k", "g", "f", "v", "TH", "DH", "s", "z", "SH", "ZH", "HH", "m", "n", "NG", "l", "w", "y", "r", "CH", "j", "WH", " ", " "};
 
 const char* VOT_list[64]={"EH3", "EH2", "EH1", "PA0", "DT", "A2", "A1", "ZH", "AH2", "I3", "I2", "I1", "M", "N", "B", "V", "CH", "SH", "Z", "AW1", "NG", "AH1", "OO1", "OO", "L", "K", "J", "H", "G", "F", "D", "S", "A", "AY", "Y1", "UH3", "AH", "P", "O", "I", "U", "Y", "T", "R", "E", "W", "AE", "AE1", "AW2", "UH2", "UH1", "UH", "O2", "O1", "IU", "U1", "THV", "TH", "ER", "EH", "E1", "AW", "PA1", "STOP"};
 
 const char* TMS_list[127]={"AE1", "AE1N", "AH1", "AH1N", "AW1", "AW1N", "E1", "E1N", "EH1", "EH1N", "ER1N", "I1", "I1N", "OO1", "OW1N", "U1", "U1N", "UH1", "UH1M", "UH1N", "Y1", "Y1N", "ER1", "OW1", "Y1", "AE2", "AH2", "AI2", "AR2", "AV2", "AW2", "E2", "EER2", "EH2", "EHR2", "EI2", "ER2", "I2", "OI2", "OO2", "OOR2", "OR2", "OW2", "U2", "UH2", "UU2", "AE3", "AH3", "AI3", "AR3", "AU3", "AW3", "E3", "EELL", "EER3", "EH3", "EHR3", "EI3", "ER3", "I3", "ILL", "ING2", "OI3", "OO3", "OOR3", "OR3", "OW3", "U3", "UH3", "ULL", "UHL", "UU3", "L", "L-", "LL", "M", "MM", "N", "NN", "NG1", "NG2", "R", "W", "WH", "Y", "B", "BE", "D", "DD", "G1", "G2", "GG", "J", "JJ", "THV", "THV-", "V", "VV", "Z", "ZZ", "ZH", "ZH-", "K2", "KH", "KH-", "KH1", "KH2", "P", "PH", "PH-", "T", "TH", "TH-", "CH", "F", "FF", "HI", "HO", "HUH", "S", "SS", "SH", "SH-", "THF", "THF-", "PAUSE1", "PAUSE2"}; //127
+
+unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
+  input_array = input;
+  input_length = input_len;
+  input_count = 0; output_count=0;
+  input[input_len] = EOF;
+  xlate_file();
+  unsigned char countme=0;
+   if (output_count>=32) output_count=32;
+   output[0] = '\0';
+  for (unsigned char i=0;i<output_count;i++){
+    countme+=strlen(NRL_list[output_array[i]]);
+    if (countme<32) strcat(output, NRL_list[output_array[i]]); // how do we not overrun
+    else return (countme-strlen(NRL_list[output_array[i]]));
+  }
+  return countme;
+  }
+
 
 void main(argc, argv)
 	int argc;
@@ -173,9 +192,10 @@ void main(argc, argv)
       for (int i=0;i<8;i++){
 	TTSinarray[i]=97+rand()%26;
       }
-      text2speechforklatt(8, TTSinarray, TTSoutarray);
+    */
+      text2speechforklatt(12, TTSinarray, TTSoutarray);
       printf("%s %s\n",TTSinarray, TTSoutarray);
-      }*/
+      //      }*/
 
     //        TTSinarray[count] = 0; // place in text2speech
 
@@ -187,7 +207,7 @@ void main(argc, argv)
     //    }
   
   //transform text to integer code phonemes
-      int output_count = text2speech(count,TTSinarray,TTSoutarray);
+      //      int output_count = text2speech(count,TTSinarray,TTSoutarray);
       //  for(int i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
     //        printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);

@@ -44,13 +44,11 @@ static const int16_t natural_samples[NUMBER_OF_SAMPLES]= // unused source
 // check parameters: see klattparams - could be good to have contour morphing (snap on trigger)
 // param0 is fund freq, param39 is volume
 
-
-
 static const int16_t mins[40] __attribute__ ((section (".flash"))) = {200,  0, 200, 40, 550, 40, 1200, 40, 1200, 40, 1200, 40, 1200, 40, 248, 40, 248, 40, 0, 10, 0, 0, 0, 0, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 40, 0, 0, 0, 0};
 
 //static const int16_t maxs[40] __attribute__ ((section (".flash"))) = {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
-static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 80, 24, 80, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 80, 70, 60};
+static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 40, 24, 40, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 40, 40, 30}; // changed some of range 
 
 static klatt_global_tt globale;
 
@@ -66,14 +64,14 @@ void simpleklatt_init(void){
   //  framer framezz[40];
   //  frame_init(globals,simpleklattset.val); 
 
-  globals->synthesis_model = 1; // all_parallel - try for other = 0
+  globals->synthesis_model = 0; // all_parallel - try for other = 0
  globals->samrate = 32000;
- globals->glsource = 2; // 1=impulsive 2=glottal impulse 3=sampled as above
+ globals->glsource = 1; // 1=impulsive 2=glottal impulse 3=sampled as above
  globals->natural_samples = natural_samples;
  globals->num_samples = NUMBER_OF_SAMPLES;
 //  globals->sample_factor = (float) SAMPLE_FACTOR;
  nmspf_def = 10;
-  globals->nfcascade = 0;
+  globals->nfcascade = 6;
   globals->f0_flutter = 0; // fix this!
 
 unsigned char y;

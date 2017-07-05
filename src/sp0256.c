@@ -321,7 +321,7 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		*out= limit(samp)<<2;
+		*out= limit(samp)<<1;
 		//		return 1;
 }
 
@@ -341,7 +341,7 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	//	f->amp=160;			
-	if (modus==3 || modus==4) f->cnt = 0;
+	if (modus==3 || modus==4) f->cnt = 0; // why just 3 and 4 - non single phon modes
 	f->per_orig = f->r[1];
 
 	/* -------------------------------------------------------------------- */
