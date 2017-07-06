@@ -48,7 +48,11 @@ static const int16_t mins[40] __attribute__ ((section (".flash"))) = {200,  0, 2
 
 //static const int16_t maxs[40] __attribute__ ((section (".flash"))) = {4000, 70, 1300, 1000, 3000, 1000, 4999, 1000, 4999, 1000, 4999, 1000, 4999, 2000, 528, 1000, 528, 1000, 70, 65, 80, 24, 80, 40, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 1000, 80, 2000, 80, 80, 70, 60};
 
-static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 70, 55, 40, 24, 40, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 40, 40, 30}; // changed some of range 
+
+
+static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 50, 55, 40, 20, 40, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 40, 40, 50}; // changed some of range 
+
+// after 280 is nasal bw, asp ampX-reduced, 
 
 static klatt_global_tt globale;
 
@@ -92,13 +96,13 @@ unsigned char y;
 
 int16_t simpleklatt_get_sample(){
   u8 x=0;
-  static int16_t samplenumber=0;
+  static uint16_t samplenumber=0;
   int16_t sampel;
 
   sampel=single_single_parwave(globals, frame);
 
   samplenumber++;
-  if (samplenumber>globals->nspfr*_selz) { // greater than what???? 320 samples - this can be our selz???? 
+  if (samplenumber>globals->nspfr*_selz*4.0f) { // greater than what???? 320 samples - this can be our selz???? 
       // end of frame so...????
     samplenumber=0;
     simpleklatt_newsay();

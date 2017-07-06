@@ -102,28 +102,34 @@ typedef struct TMS_vocab__ {
   float extentplus;
 } TMS_vocab;
 
-const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f};
-const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};
+// alt coeffs for spk and spell
 
-const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; 
+// T0280D_0281D_coeff - later spk and spell
+// T0280F_2801A_coeff - speak and math.spk and read??? - english spk and spell CD2801
+
+const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f}; // en - OK and not 2801!
+const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};//ti99 alphons
+
+const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; //1982 spell
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
-const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f};
-const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 101.0f};
-const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 130.0f};
+const TMS_vocab vocab_2304={wordlist_spell2304, &T0280B_0281A_coeff, 131, 135.0f}; //en
 
-const TMS_vocab vocab_2352_1={wordlist_spell2352_1, &T0280B_0281A_coeff, 71, 75.0f}; 
-const TMS_vocab vocab_2352_2={wordlist_spell2352_2, &T0280B_0281A_coeff, 71, 75.0f}; 
+const TMS_vocab vocab_2321={wordlist_spell2321, &T0280B_0281A_coeff, 97, 101.0f};//
+const TMS_vocab vocab_2322={wordlist_spell2322, &T0280B_0281A_coeff, 126, 130.0f};//
 
-const TMS_vocab vocab_spkspellone_1={wordlist_spell1_1, &T0280B_0281A_coeff, 74, 78.0f}; 
-const TMS_vocab vocab_spkspellone_2={wordlist_spell1_2, &T0280B_0281A_coeff, 75, 79.0f}; 
+const TMS_vocab vocab_2352_1={wordlist_spell2352_1, &T0280F_2801A_coeff, 71, 75.0f};  // FR 1987 - was 0281A..
+const TMS_vocab vocab_2352_2={wordlist_spell2352_2, &T0280F_2801A_coeff, 71, 75.0f}; 
 
-const TMS_vocab vocab_spkspelltwo_1={wordlist_spell2_1, &T0280B_0281A_coeff, 61, 65.0f};
-const TMS_vocab vocab_spkspelltwo_2={wordlist_spell2_2, &T0280B_0281A_coeff, 61, 65.0f};
+const TMS_vocab vocab_spkspellone_1={wordlist_spell1_1, &T0280B_0281A_coeff, 74, 78.0f}; //all 5100
+const TMS_vocab vocab_spkspellone_2={wordlist_spell1_2, &T0280B_0281A_coeff, 75, 79.0f}; //
+
+const TMS_vocab vocab_spkspelltwo_1={wordlist_spell2_1, &T0280B_0281A_coeff, 61, 65.0f};//
+const TMS_vocab vocab_spkspelltwo_2={wordlist_spell2_2, &T0280B_0281A_coeff, 61, 65.0f};//
 
 // 5200
 
-const TMS_vocab vocab_D000_1={wordlist_ffD000_1, &T0285_2501E_coeff, 99, 103.0f}; 
+const TMS_vocab vocab_D000_1={wordlist_ffD000_1, &T0285_2501E_coeff, 99, 103.0f}; //ti
 const TMS_vocab vocab_D000_2={wordlist_ffD000_2, &T0285_2501E_coeff, 98, 102.0f}; 
 
 const TMS_vocab vocab_D001_1={wordlist_ffD001_1, &T0285_2501E_coeff, 96, 100.0f}; 
@@ -175,10 +181,12 @@ const TMS_vocab vocab_D023={wordlist_ffD023, &T0285_2501E_coeff, 55, 59.0f};
 const TMS_vocab vocab_D024_25={wordlist_ffD025, &T0285_2501E_coeff, 75, 79.0f};
 const TMS_vocab vocab_D026={wordlist_ffD026, &T0285_2501E_coeff, 38, 42.0f};
 const TMS_vocab vocab_D027_34={wordlist_ffD027to34, &T0285_2501E_coeff, 60, 64.0f};
-const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 34.0f};
-//const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
-const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 77.0f};
-const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 70.0f};
+
+const TMS_vocab vocab_mpf={wordlist_mpf, &T0285_2501E_coeff, 31, 34.0f}; // could be 5220 TEST! - sounds better as 5200
+//const TMS_vocab vocab_mpf={wordlist_mpf, &tms5220_coeff, 31, 34.0f}; // could be 5220 TEST!
+
+const TMS_vocab vocab_arcade_one={wordlist_arcade_one, &T0285_2501E_coeff, 73, 77.0f};//ti99
+const TMS_vocab vocab_arcade_two={wordlist_arcade_two, &T0285_2501E_coeff, 66, 70.0f};//ti99
 
 const TMS_vocab vocab_ti99_one_1={wordlist_ti99_one_1, &T0285_2501E_coeff, 89, 93.0f};
 const TMS_vocab vocab_ti99_one_2={wordlist_ti99_one_2, &T0285_2501E_coeff, 89, 93.0f};
@@ -190,10 +198,10 @@ const TMS_vocab vocab_ti99_two_2={wordlist_ti99_two_2, &T0285_2501E_coeff, 89, 9
 const TMS_vocab vocab_echofemale_1={wordlist_testroms_1, &tms5220_coeff, 97, 101.0f}; // shifted from 5200 
 const TMS_vocab vocab_echofemale_2={wordlist_testroms_2, &tms5220_coeff, 98, 102.0f}; // shifted from 5200 
 
-const TMS_vocab vocab_acorn_1={wordlist_acorn_1, &tms5220_coeff, 81, 85.0f}; 
-const TMS_vocab vocab_acorn_2={wordlist_acorn_2, &tms5220_coeff, 82, 86.0f}; 
+const TMS_vocab vocab_acorn_1={wordlist_acorn_1, &tms5220_coeff, 81, 85.0f}; //5220
+const TMS_vocab vocab_acorn_2={wordlist_acorn_2, &tms5220_coeff, 82, 86.0f}; //
 
-const TMS_vocab vocab_large_male_one_1={wordlist_largemale_one_1, &tms5220_coeff, 97, 101.0f};
+const TMS_vocab vocab_large_male_one_1={wordlist_largemale_one_1, &tms5220_coeff, 97, 101.0f}; //
 const TMS_vocab vocab_large_male_one_2={wordlist_largemale_one_2, &tms5220_coeff, 98, 102.0f};
 
 const TMS_vocab vocab_large_male_two_1={wordlist_largemale_two_1, &tms5220_coeff, 97, 101.0f};
@@ -1019,6 +1027,8 @@ int16_t process(u8 *ending)
 		   if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; //
 		  
 		m_pitch_count &= 0x1FF;
+		if (m_digital_select==0) return sample>>1;
+		else
 	return sample<<1;
 }
 
@@ -1157,7 +1167,7 @@ int16_t process_k_tabled5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<1;
+	return sample;
 }
 
 
@@ -1311,7 +1321,7 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; // TEST - pitch bend
 		m_pitch_count &= 0x1FF;
-	return sample<<1;
+	return sample;
 }
 
 
@@ -1453,7 +1463,7 @@ int16_t process_pitch_tabled5100(u8 *ending)  // also stripped down
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<1;
+	return sample;
 }
 
 
@@ -1691,7 +1701,7 @@ int16_t processbend5100(u8 *ending)
 		m_pitch_count++;
 		if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; 
 		m_pitch_count &= 0x1FF;
-	return sample<<1;
+	return sample;
 }
 
 
@@ -1936,7 +1946,7 @@ int16_t process5100raw()
 		//		buf_count++;
 		//		size--;
 		//	}
-	return sample<<1;
+	return sample;
 }
 
 
@@ -1978,6 +1988,7 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F;
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
+  //  whichbank=0; // TESTY CHECK!!!
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;

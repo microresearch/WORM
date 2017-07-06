@@ -1,3 +1,6 @@
+
+//const TMS_vocab vocab_talko_not={wordlist_talko, &T0285_2501E_coeff, 30, 34.0f}; // if this should be 5220 - leave as
+
 unsigned int new_parwave(klatt_global_ptr globals, klatt_frame_ptr frame, short *jwave, unsigned int klatthead)
 {
 	short ns;

@@ -390,7 +390,7 @@ int16_t klatt_get_sample_single(){
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
 
-  // TEST duration bend = sely
+  // duration bend = sely
       u8 val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
@@ -565,7 +565,7 @@ int16_t klatt_get_sample_single_sing(){
   //  outgoing[samplenumber]=rand()%32768;
     samplenumber++;
 
-  // TEST duration bend = sely
+  // duration bend = sely
       u8 val=_sely*131.0f;
       MAXED(val,127);
       //      val=127-val;
@@ -649,8 +649,8 @@ int16_t klatt_get_sample(){
   u8 val=_selz*67.0f;
   MAXED(val,63);
   val=63-val;
-  //  test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
-  //  test_elm[(xaxis*3)+1]=((_sely)*32.0f)+1; // length say max 32
+  test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
+  test_elm[(xaxis*3)+1]=((_sely)*32.0f)+1; // length say max 32
 
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
     klatt_newsay();
@@ -997,7 +997,7 @@ int16_t klatt_get_sample_vocab(){
     
     samplenumber++;
 
-  // TEST duration bend = sely
+  //  duration bend = sely
       u8 val=_sely*131.0f;
       MAXED(val,127);
       if (samplenumber>=klatt_global.nspfr*logpitch[val]) {
@@ -1166,7 +1166,7 @@ int16_t klatt_get_sample_vocab_sing(){
     
     samplenumber++;
 
-  // TEST duration bend = sely
+  //  duration bend = sely
       u8 val=_sely*131.0f;
       MAXED(val,127);
       if (samplenumber>=klatt_global.nspfr*logpitch[val]) {

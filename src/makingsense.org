@@ -2113,6 +2113,8 @@ $(ttsd)/spellwor.o  XXX
 
 - redo compost newsay as restart mode TESTED
 
+- remove and backup ROMS - DONE
+
 ** 5/7 
 
 - test of fixes above:
@@ -2135,17 +2137,19 @@ rsynth2005: added extra trigger to reset ONCE
 
 check >nelm vs >= - no great difference?
 
+** 6/7
+
+- improve simpleklatt - tunings of some values and put back to trigger start modeDONE
+
+- changing some volumes in tms so basic is louder, bends and lowbit don't distort
+
+- tested some tms coeffs and changed french one 2352_1 and 2352_2
+
 ** FINAL TODO:
 
-- improve simpleklatt
+- image for modulargrid 
 
-- if we can match better tms coeffs?
-
-- check all above, remove and backup ROMS - DONE
-
-- image for modulargrid
-
-- run through all modes - test all and trigger
+- run through each mode/all modes - test all and test trigger in each
 
 * announcement: 
 
