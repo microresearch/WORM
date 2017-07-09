@@ -2,8 +2,6 @@
 
 ** 0-introduction
 
-[MAIN SCANNED IMAGE OF WORMS: 03EARTHSYMBOLworms.tiff]
-
 The WORM was for a long time desirous to speake, but the rule and
 or∣der of the Court enjoyned him silence, but now strutting and
 swelling, and impatient, of further delay, he broke out
@@ -17,7 +15,7 @@ Instruments' famous Speak and Worm family of devices (and subsequent
 circuit-wormed modifications), Atari and TI99/4 arcade games such as
 wormsec, Federal Screw Worms VERMIS worm-n-talk and General
 Instruments Intelliworm. ERD/WORM further bends and worms key speech
-synthesis algorithms across XX modes with full trigger, CV and knob
+synthesis algorithms across 64 modes with full trigger, CV and knob
 control over core aspects of these speech cores.
 
 ERD/WORM functions best the more it deviates serpentinely from a
@@ -114,10 +112,7 @@ the brook Stops it in midst of its pride among its hills & rivers
 
 [William Blake. Jerusalem The Emanation of The Giant Albion]
 
-
-[LAYOUT DIAGRAM- layout mode, speed, XYZ and triggerIN, OUT]
-
-There are 64 modes - X major modes subdivided on mode knob and CV.
+There are 64 modes - 7 major modes subdivided on mode knob and CV.
 
 Each of the major modes outlined above is further segmented into minor
 modes, reflecting the differing worm-bends and speech encoding methods
@@ -166,17 +161,8 @@ cases it toggles between freezing and unfreezing settings for XY modes
 
 He worshipped the worm and prayed to the wormy grave.  [Beddoes]
 
-Suggested format for table example:
-
-| MODE # | TYPE  | TITLE                    | X      | Y      | Z      | TRIGGER      | NOTES               |
-|--------+-------+--------------------------+--------+--------+--------+--------------+---------------------|
-|        | vocab | digitalker               | pitch  | length | phrase | phrase start | T                   |
-|        | vocab | digitalkersing           | pitch  | length | phrase | phrase start | T pitch is absolute |
-|        | worm  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T worm pitchtable   |
 
 ** 3- use/tech notes
-
-[back cable image - we still need to take]
 
 Serpent Lucifer, how do you do?  Of your worms and your snakes I’d be
 one or two; For in this dear planet of wool and of leather ‘Tis
@@ -204,8 +190,6 @@ audio/trigger input, 1 audio output, 20mm deep.
 
 ** 4- credits
 
-[ouroboros image]
-
 Without the excellent archival and reverse engineering work of the
 MAME and MESS developers (and associated emulation communities) this
 release would not have been in any way possible. From this community
@@ -223,7 +207,8 @@ affiliation, attribution or direct contribution is implied and all
 copyrights are maintained. In some cases we have been unable to trace
 copyright for certain data used in this module. We would also like to
 thank Peter Knight for his work on the Talkie library which was a
-major inspiration.
+major inspiration, and Marie Eve Vachovsky for her great work on
+porting and updating the TTS engine.
 
 Manual design and images by Kathrin Guenter and Ioana Vreme Moser.
 
