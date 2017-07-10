@@ -7,7 +7,6 @@
 #include "stdint.h"
 #include <stdio.h>
 #include "parwave.h"
-#include "worming.h"
 #include "resources.h"
 
 /* for default sampled glottal excitation waveform */
