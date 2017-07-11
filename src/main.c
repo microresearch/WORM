@@ -1,3 +1,6 @@
+// license:GPL-2.0+
+// copyright-holders: Martin Howse
+
 /*
  PATH=~/sat/bin:$PATH
  PATH=~/stm32f4/stlink/flash:$PATH

@@ -1,5 +1,6 @@
 /* An implementation of a Klatt cascade-parallel formant synthesizer.
  *
+ * Copyright (C) 2017 Martin Howse
  * Copyright (C) 2011-2013 Reece H. Dunn
  * (c) 1993,94 Jon Iles and Nick Ing-Simmons
  *

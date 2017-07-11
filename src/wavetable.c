@@ -1,8 +1,9 @@
+// license:GPL-2.0+
+// copyright-holders: Martin Howse
+
 #include "audio.h"
 #include "stdio.h"
 #include <math.h>
-//#include "forlap.h"
-//#include "worming.h"
 #include "wavetable.h"
 
 #include "resources.h"
@@ -84,7 +85,7 @@ wavetable->currentPosition = mod0(wavetable->currentPosition + (frequency * wave
 }
 
 #ifndef TESTING
-extern wormy myworm;
+//extern wormy myworm;
 
 /*inline static void WORMWavetableIncrementPosition(Wavetable *wavetable, float frequency)
 {

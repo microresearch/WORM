@@ -10,7 +10,7 @@
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_rcc.h"
-#include "misc.h"
+
 
 void ADC1_Init(uint16_t *ADC_Buffer);
 

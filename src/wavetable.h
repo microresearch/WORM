@@ -1,3 +1,6 @@
+// license:GPL-2.0+
+// copyright-holders: Martin Howse
+
 typedef struct {
     float FIRData[49], *FIRCoef;
     int FIRPtr, numberTaps;

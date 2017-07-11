@@ -1,5 +1,4 @@
 
-
 #TOOL_PREFIX = /opt/ARM/arm-linaro-eabi-4.6
 TOOL_PREFIX = /root/ARM/gcc-arm-none-eabi-4_9-2015q2
 
@@ -18,15 +17,14 @@ ttsd= ./english2phoneme
 OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			stm32f4xx_tim.o adc.o stm32f4xx_pwr.o\
 			stm32f4xx_gpio.o stm32f4xx_i2c.o stm32f4xx_rcc.o \
-			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o misc.o \
+			stm32f4xx_spi.o stm32f4xx_dma.o stm32f4xx_adc.o \
 			syscalls.o resources.o audio.o \
 			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o  \
 			digitalker.o nvp.o samplerate.o \
 			newvotrax.o sp0256bend.o wavetable.o \
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
 			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o
-#			lpcanalysis.o 
-#			ownvocoder.o
+
 
 OBJECTS += \
  $(rsynth-portDIR)/holmes.o					\
@@ -40,7 +38,7 @@ LDSCRIPT = stm32_flash.ld
 
 # -DTESTING option for wavetables...
 
-CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99 -DTESTING \
+CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
 	 -D'__FPU_PRESENT=1' -DARM_MATH_CM4 \
 	-mthumb \
 	-mfpu=fpv4-sp-d16 \

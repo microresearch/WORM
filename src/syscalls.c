@@ -1,3 +1,6 @@
+// license:GPL-2.0+
+
+
 #include <sys/stat.h>
 #include <errno.h>
 

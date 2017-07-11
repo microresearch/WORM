@@ -1,3 +1,7 @@
+// license:GPL-2.0+
+// copyright-holders: Martin Howse
+
+
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 

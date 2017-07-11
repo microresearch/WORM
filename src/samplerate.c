@@ -1,15 +1,10 @@
-// Thnaks to: perry cook srconvrt.c:
+// license:GPL-2.0+
+// copyright-holders: Martin Howse
 
 #include "audio.h"
 
 #define WIDTH 16              
 #define DELAY_SIZE 6 // was 40 --- 3*width=16 = 3*16=48-5=43 - use 7 for simplea
-
-#define SAMPLES_PER_ZERO_CROSSING 8   /* this defines how finely the sinc function 
-					   is sampled for storage in the table  */
-
-//float sinc_table[WIDTH * SAMPLES_PER_ZERO_CROSSING] = { 0.0 }; 
-//float sinc_table[1] = { 0.0 };
 
 extern __IO uint16_t adc_buffer[10];
 extern float _selx, _sely, _selz;
