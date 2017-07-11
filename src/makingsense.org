@@ -2145,6 +2145,12 @@ check >nelm vs >= - no great difference?
 
 - tested some tms coeffs and changed french one 2352_1 and 2352_2
 
+** 11/7
+
+- test code with wavetable only runs with logspeed as not in FLASH???
+
+- test code is for ADCs and trigger
+
 ** FINAL TODO:
 
 - image for modulargrid 

@@ -3,7 +3,6 @@
 
 #ifdef TESTING
 #include "audio.h"
-#include "effect.h"
 #include "wavetable.h"
 #include "resources.h"
 #else
@@ -88,67 +87,58 @@ void floot_to_int(int16_t* outbuffer, float* inbuffer,u16 howmany){
 
 void test_wave(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size){ // how we choose the wavetable - table of tables?
   float lastbuffer[32];
-  uint16_t val;
+  uint16_t val=0;
   doadc();
-  val=_selz*1030.0f; // how can we test all others????
+    val=(1.0f-_selx)*1027.0f; // how can we test all others???? - add and then mod
+    val+=(1.0f-_sely)*1027.0f; 
+    val+=(1.0f-_selz)*1027.0f;
+
+  float value =(float)adc_buffer[SPEED]/65536.0f; 
+    smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
+    _speed=smoothed_adc_value[0];
+    CONSTRAIN(_speed,0.0f,1.0f);
+        val+=(1.0f-_speed)*1027.0f;
+
+
+    value =(float)adc_buffer[MODE]/65536.0f; 
+    smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // 0.01f for SMOOTHER mode locking
+    _mode=smoothed_adc_value[1];
+    CONSTRAIN(_mode,0.0f,1.0f);
+    val+=(1.0f-_mode)*1027.0f;
+
+  //  val=val%1024;
+
   MAXED(val,1023);
-  val=1023-val;
-  dowavetable(lastbuffer, &wavtable, 2.0f+(logspeed[val]*440.0f), size); // for exp/1v/oct test
+    dowavetable(lastbuffer, &wavtable, 2.0f+(logspeed[val]*440.0f), size); // for exp/1v/oct test
+  //    dowavetable(lastbuffer, &wavtable, 2.0f+(1.038673f*440.0f), size); // for exp/1v/oct test
+  //    dowavetable(lastbuffer, &wavtable, 440.0f, size); // for exp/1v/oct test
   floot_to_int(outgoing,lastbuffer,size);
 }  
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
-  float samplespeed;
-  float value;
-  u16 samplespeedref;
-  static u16 cc;
-  u8 oldmode=255;
-  static u8 firsttime=0;
-  value =(float)adc_buffer[SPEED]/65536.0f; 
-  smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]);
-  _speed=smoothed_adc_value[0];
-  CONSTRAIN(_speed,0.0f,1.0f);
-  _speed=1.0f-_speed;
+  static u8 triggered=0;
 
-  value =(float)adc_buffer[MODE]/65536.0f; 
-  smoothed_adc_value[1] += 0.01f * (value - smoothed_adc_value[1]); // 0.01f for SMOOTHER mode locking
-  _mode=smoothed_adc_value[1];
-  CONSTRAIN(_mode,0.0f,1.0f);
+ float  samplespeed=1.0f;
+  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={test_wave}; 
 
-  oldmode=_intmode;
-  _intmode=_mode*65.0f;
-  MAXED(_intmode, 63);
-  trigger=0; 
-  _intmode=0;
- if (firsttime==0){// TEST CODE - for fake trigger
-   trigger=1;
-   firsttime=1;
- }
- 
-  samplespeedref=_speed*1027.0f;
-  MAXED(samplespeedref, 1023);
-  samplespeed=logspeed[samplespeedref];  
-  
   // splitting input
-  for (u8 x=0;x<sz/2;x++){
+    for (u8 x=0;x<sz/2;x++){
+  // we want to test trigger here??? void wave_newsay(void)
     sample_buffer[x]=*(src++); // right is input on LACH, LEFT ON EURO!
     src++;
+    if (sample_buffer[x]>=THRESH && !triggered) {
+      doadc();
+      wave_newsay();
+      triggered=1;
   }
-
-  void (*generators[])(int16_t* incoming,  int16_t* outgoing, float samplespeed, u8 size)={test_wave}; 
+  else if (sample_buffer[x]<THRESHLOW && triggered) triggered=0;
+    //  mono_buffer[x]=rand()%32768;
+  }
+    
+    
+    generators[0](sample_buffer,mono_buffer,samplespeed,sz/2); 
   
-  generators[_intmode](sample_buffer,mono_buffer,samplespeed,sz/2); 
-
-  // copy sample buffer into audio_buffer as COMPOST
-  //  if (!toggled){
-  for (u8 x=0;x<sz/2;x++) {
-    audio_buffer[cc]=mono_buffer[x];
-    cc++;
-    if (cc>AUDIO_BUFSZ) cc=0;
-  }
-  //  }
-
   audio_comb_stereo(sz, dst, mono_buffer,left_buffer);
 }
 
@@ -423,7 +413,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=58; //TESTY
+  _intmode=38; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
   

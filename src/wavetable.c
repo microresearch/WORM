@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include <math.h>
 //#include "forlap.h"
-#include "worming.h"
+//#include "worming.h"
 #include "wavetable.h"
 
 #include "resources.h"
@@ -13,7 +13,7 @@ Wavetable *wavetable;
 
 #define TWO_PI 6.28318530717958647693
 
-#define OVERSAMPLING_OSCILLATOR 1
+#define OVERSAMPLING_OSCILLATOR 0
 
 #define FIR_BETA                  .2
 #define FIR_GAMMA                 .1

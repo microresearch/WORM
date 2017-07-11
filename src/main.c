@@ -72,7 +72,6 @@ float exy[240];
 
 #ifdef TESTING
 extern Wavetable wavtable;
-wormy myworm;
 #endif
 extern char TTSinarray[17];
 

@@ -22,7 +22,7 @@ OBJECTS = 	startup_stm32f4xx.o system_stm32f4xx.o main.o codec.o i2s.o \
 			syscalls.o resources.o audio.o \
 			sp0256.o simpleklatt.o parwave.o sam.o render.o tms5200x.o  \
 			digitalker.o nvp.o samplerate.o \
-			newvotrax.o sp0256bend.o\
+			newvotrax.o sp0256bend.o wavetable.o \
 			$(ttsd)/parse.o $(ttsd)/saynum.o $(ttsd)/newenglish.o $(ttsd)/phoneme.o $(ttsd)/spellwor.o \
 			rsynth_2005/holmes.o rsynth_2005/elements.o rsynth_2005/opsynth.o
 #			lpcanalysis.o 
@@ -33,22 +33,14 @@ OBJECTS += \
  $(rsynth-portDIR)/elements.o				\
  $(rsynth-portDIR)/nsynth.o					\
  $(rsynth-portDIR)/def_pars.o				\
-# $(rsynth-portDIR)/darray.o					\
-# $(rsynth-portDIR)/trie.o					
-# $(rsynth-portDIR)/phtoelm.o				\
 
 
 # Linker script
-#LDSCRIPT = stm32f407.ld
 LDSCRIPT = stm32_flash.ld
 
-#CFLAGS = -g -ggdb -O2 -mlittle-endian -mthumb -std=gnu99
-#CFLAGS +=  -I. -DARM_MATH_CM4 -D'__FPU_PRESENT=1'-DTEST_PUSHPULL #-DTEST_STRAIGHT #-DPCSIM #-DLACH #-DSUSP #-DTENE #-DTEST_EEG  -DTEST_EFFECTS
-#CFLAGS += -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mthumb -mfloat-abi=hard -Wall
+# -DTESTING option for wavetables...
 
-# LACH is -DTEST option!
-
-CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
+CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99 -DTESTING \
 	 -D'__FPU_PRESENT=1' -DARM_MATH_CM4 \
 	-mthumb \
 	-mfpu=fpv4-sp-d16 \
