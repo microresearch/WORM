@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2017 Martin Howse
     Copyright (c) 1994,2001-2003 Nick Ing-Simmons. All rights reserved.
  
     This library is free software; you can redistribute it and/or
