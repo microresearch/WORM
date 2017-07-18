@@ -5,6 +5,9 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
+#define THRESH 16000 // wa 16000
+#define THRESHLOW 10000
+
 #ifdef TESTING
 #include "audio.h"
 #include "wavetable.h"
@@ -403,6 +406,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   u16 samplespeedref;
   static u16 cc;
   u8 oldmode; 
+  u8 triggered=0;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]); // smooth
@@ -417,11 +421,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=38; //TESTY
+  _intmode=0; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
+
+  // TESTY: OUT COMMENT BELOW
   
-   if (oldmode!=_intmode) {// IF there is a modechange!
+  /*   if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     // if we are not leaving compost
     if (oldmode!=COMPOST && oldmode!=COMPOSTF){
@@ -430,7 +436,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldsely=_sely;
     oldselz=_selz;
     }
-    }
+    }*/
     
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
@@ -440,9 +446,10 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     samplespeedref=_speed*1028.0f;
     MAXED(samplespeedref, 1023);
     samplespeed=logspeed[samplespeedref];  
-  
+    //    samplespeed=1.0f; // TESTY CHECK!!!    
   for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
-    sample_buffer[x]=*(src++); 
+    //    sample_buffer[x]=*(src++);
+    if (*(src++)> THRESH) triggered=1;
     src++;
   }
 
@@ -450,11 +457,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
-  if (wormlist[_intmode]->xy==0) samplerate_simple(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio);
+  if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
   else if (wormlist[_intmode]->xy==1)
-    samplerate_simple_exy(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
+    samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
   else 
-    samplerate_simple_exy_trigger(sample_buffer, mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent);
+    samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
 
   if (_intmode!=COMPOST && _intmode!=COMPOSTF){
     for (u8 x=0;x<sz/2;x++) {

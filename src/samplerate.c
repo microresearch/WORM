@@ -40,29 +40,32 @@ static void new_data(int16_t data)
 }
 
 
-void samplerate_simple(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio){
+void samplerate_simple(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio, u8 triggered){
   float alpha;
   static float time_now=0.0f;
   long last_time;
   static long int_time=0;
-  static u8 triggered=0;
+  //  static u8 triggered=0;
   factor*=sampleratio;
 
+  if (triggered) newsay();
+  
 for (u8 ii=0;ii<size;ii++){
 
-  if (time_now>32768){
+  /*   if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-  }
+    }*/
 
-  // deal also with trigger
-    if (in[ii]>=THRESH && !triggered) {
-      doadc();
+  // deal also with trigger - TODO: take trigger out of here...
+   /*    if (!triggered && in[ii]>=THRESH ) {
+      //      doadc();
       newsay();
       triggered=1;
   }
-  else if (in[ii]<THRESHLOW && triggered) triggered=0;
-
+  if (in[ii]<THRESHLOW) triggered=0;
+   */
+   
 
   //  out[ii]=getsample();
     alpha = time_now - (float)int_time;
@@ -87,28 +90,32 @@ for (u8 ii=0;ii<size;ii++){
  }
 }
 
-void samplerate_simple_exy(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsample)(void), float sampleratio, u8 extent){
+void samplerate_simple_exy(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), float sampleratio, u8 extent, u8 triggered){
   static u8 parammode=1;
   float alpha;
   static float time_now=0.0f;
   long last_time;
   static long int_time=0;
-  static u8 triggered=0;
+  //  static u8 triggered=0;
   factor*=sampleratio;
 
+  if (triggered)      parammode^=1;
+
+  
 for (u8 ii=0;ii<size;ii++){
 
-  if (time_now>32768){
+  /*  if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-  }
+    }*/
 
   // deal also with trigger
-    if (in[ii]>=THRESH && !triggered) {
+  /*    if (in[ii]>=THRESH && !triggered) {
     parammode^=1;
     triggered=1;
   }
   else if (in[ii]<THRESHLOW && triggered) triggered=0;
+  */
     alpha = time_now - (float)int_time;
      out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
 
@@ -134,28 +141,32 @@ for (u8 ii=0;ii<size;ii++){
  }
 }
 
-void samplerate_simple_exy_trigger(int16_t* in, int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio, u8 extent){
+void samplerate_simple_exy_trigger(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio, u8 extent, u8 triggered){
   float alpha;
   static float time_now=0.0f;
   long last_time;
   static long int_time=0;
-  static u8 triggered=0;
+  //  static u8 triggered=0;
   factor*=sampleratio;
 
+  if (triggered) newsay();
+
+  
 for (u8 ii=0;ii<size;ii++){
 
-  if (time_now>32768){
+  /*  if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-  }
+    }*/
 
   // deal also with trigger
-    if (in[ii]>=THRESH && !triggered) {
+  /*    if (!triggered && in[ii]>=THRESH ) {
       doadc();
       newsay();
       triggered=1;
   }
-  else if (in[ii]<THRESHLOW && triggered) triggered=0;
+  else if (in[ii]<THRESHLOW) triggered=0;
+  */
     alpha = time_now - (float)int_time;
      out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
 

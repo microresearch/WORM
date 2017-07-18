@@ -1998,6 +1998,7 @@ void tms_newsay(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
+  //  sel=0; // TESTY CHECK!!!
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 };

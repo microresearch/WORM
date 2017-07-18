@@ -2150,6 +2150,35 @@ check >nelm vs >= - no great difference?
 - test code with wavetable only runs with logspeed as not in FLASH??? DONE
 
 - test code is for ADCs and trigger DONE - 29 tested with basic code and ready for next tests with WORM code...
+  
+
+** 18/7+
+
+//&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
+&5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er,
+&9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx,
+&13tms5100pitchtablebender, &14tms5200pitchtablebender,
+&15tms5200pitchtablebenderx, &16tms5100ktablebender,
+&17tms5200ktablebender, &18tms5100kandpitchtablebender,
+&19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
+&21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer,
+&25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, &46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+&58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing,
+&62composter, &63compostfrer}; // 64 modes
+
+TESTINGS: 0->
+
+check threshold and trigger in general...
+
+- trigger simplified into audio.c 
 
 ** FINAL TODO:
 
