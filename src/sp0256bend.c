@@ -294,7 +294,7 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		*out= limit(samp)<<1;
+		*out= limit(samp);
 		//		return 1;
 }
 

@@ -40,7 +40,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
 
-
+/*
 #include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
@@ -86,7 +86,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 #include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - also check vocab_talko?-CHECKED
-
+*/
 
 
 // list of which_coeff:
@@ -110,6 +110,7 @@ typedef struct TMS_vocab__ {
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f}; // en - OK and not 2801!
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};//ti99 alphons
 
+/*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; //1982 spell
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -211,14 +212,14 @@ const TMS_vocab vocab_male_1={wordlist_male_1, &tms5220_coeff, 102, 106.0f};
 const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
  
 const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_2}; // 67
-
+*/
 //LIST: &0vocab_2303, &1vocab_2304, &2vocab_2321, &3vocab_2322, &4vocab_2350_1, &5vocab_2350_2, &6vocab_2352_1, &7vocab_2352_2, &8vocab_spkspellone_1, &9vocab_spkspellone_2, &10vocab_spkspelltwo_1, &11vocab_spkspelltwo_2, &12vocab_D000_1, &13vocab_D000_2, &14vocab_D001_1, &15vocab_D001_2, &16vocab_D002_1, &17vocab_D002_2, &18vocab_D003, &19vocab_D004_1, &20vocab_D004_2, &21vocab_D005_1, &22vocab_D005_2, &23vocab_D006_1, &24vocab_D006_2, &25vocab_D007_1, &26vocab_D007_2, &27vocab_D008, &28vocab_D009_1, &29vocab_D009_2, &30vocab_D010_1, &31vocab_D010_2, &32vocab_D011, &33vocab_D012_1, &34vocab_D012_2, &35vocab_D013, &36vocab_D014, &37vocab_D015_1, &38vocab_D015_2, &39vocab_D016, &40vocab_D017, &41vocab_D018, &42vocab_D019, &43vocab_D020_21, &44vocab_D022, &45vocab_D023, &46vocab_D024_25, &47vocab_D026, &48vocab_D027_34, &49vocab_echofemale_1, &50vocab_echofemale_2, &51vocab_mpf, &52vocab_alphons, &53vocab_arcade_one, &54vocab_arcade_two, &55vocab_ti99_one_1, &56vocab_ti99_one_2, &57vocab_ti99_two_1, &58vocab_ti99_two_2, &59vocab_acorn_1, &60vocab_acorn_2, &61vocab_male_1, &62vocab_male_2};//, &63vocab_large_male_one_1, &64vocab_large_male_one_2, &65vocab_large_male_two_1, &66vocab_large_male_two_2}; // 67
 
 //};//
 
-//const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
+const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
-// TEST: above commented out to speed up
+// TESTY: above commented out to speed up
 
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 uint8_t byte_rev[256];
@@ -636,7 +637,7 @@ void parse_frame_bend_5200()
 		return;
 	m_new_frame_pitch_idx*=2.0f*(1.0f-exy[1]);
 	if (m_coeff->pitch_bits==5 && m_new_frame_pitch_idx>31) m_new_frame_pitch_idx=31;
-	else if  (m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63; // TESTYY - bug as was energy_idx???
+	if  (m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63; // TESTYY - bug as was energy_idx???
 	
 	// extract first 4 K coefficients - deal with length of these individually
 	//	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
@@ -719,10 +720,10 @@ void parse_frame_raw_5100() //- for our 3 sets of coeffs - exy is 0-11
 	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[2]-exy[5]
 	}
 	*/
-	m_new_frame_k_idx[0] =   exy[1]*31.0f;
+	m_new_frame_k_idx[0] =   exy[1]*31.0f; //5
 	m_new_frame_k_idx[1] =   exy[2]*31.0f;
-	m_new_frame_k_idx[2] =   exy[3]*15.0f;
-	m_new_frame_k_idx[3] =   exy[4]*15.0f;
+	m_new_frame_k_idx[2] =   exy[3]*15.0f; //4
+	m_new_frame_k_idx[3] =   exy[4]*15.0f; //4
 
 	// if the pitch index was zero, we only need 4 K's...
 	if (m_new_frame_pitch_idx == 0)
@@ -737,10 +738,10 @@ void parse_frame_raw_5100() //- for our 3 sets of coeffs - exy is 0-11
 	  m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]); // exy[6]-exy[11]
 	  }*/
 
-	m_new_frame_k_idx[4] =   exy[5]*15.0f;
+	m_new_frame_k_idx[4] =   exy[5]*15.0f; 
 	m_new_frame_k_idx[5] =   exy[6]*15.0f;
 	m_new_frame_k_idx[6] =   exy[7]*15.0f;
-	m_new_frame_k_idx[7] =   exy[8]*7.0f;
+	m_new_frame_k_idx[7] =   exy[8]*7.0f; //3
 	m_new_frame_k_idx[8] =   exy[9]*7.0f;
 	m_new_frame_k_idx[9] =   exy[10]*7.0f;
 }
@@ -998,13 +999,13 @@ int16_t process(u8 *ending)
 		{
 			m_subcycle = m_subc_reload;
 			if (modus&4){
-			if (counter++>(16-((1.0f-_selx)*16.0f))){
+			if (counter++>=(16-((1.0f-_selx)*17.0f))){
 			  m_PC++;
 			counter=0;
 			}
 			}
 			else if (modus&8){
-			if (counter++>(16-((1.0f-_sely)*16.0f))){
+			if (counter++>=(16-((1.0f-_sely)*17.0f))){
 			  m_PC++;
 			counter=0;
 			}
@@ -1027,9 +1028,9 @@ int16_t process(u8 *ending)
 		   if (m_pitch_count >= m_current_pitch) m_pitch_count = 0; //
 		  
 		m_pitch_count &= 0x1FF;
-		if (m_digital_select==0) return sample>>1;
+		if (m_digital_select==0) return sample>>2; // 0 is lowbit
 		else
-	return sample<<1;
+		  return sample<<1; 
 }
 
 int16_t process_k_tabled5100(u8 *ending) 
@@ -1211,22 +1212,22 @@ int16_t process_pitchk_tabled5100(u8 *ending) // for 5100 we have 32+168 in exy=
 			MAXED(val,127);
 			m_target_pitch = m_coeff->pitchtable[m_new_frame_pitch_idx]*logpitch[val];
 
-			offsetage=1<<m_coeff->pitch_bits;
+			offsetage=1<<m_coeff->pitch_bits; // 32 in case of 5100 or 64 for others
 			
 			
 			for (i = 0; i < 4; i++) {
-			  val=exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
-			MAXED(val,127);
-			//			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
-			m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*logpitch[val];
+			  //			  val=exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
+			  //			MAXED(val,127);
+			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(2.0f*exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]+0.1f);
+			  //			m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*logpitch[val];
 			}
 			for (i = 4; i < m_coeff->num_k; i++){
-			  val=exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
-			  MAXED(val,127);
-			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(1-zpar) * logpitch[val];
+			  //			  val=exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]*131.0f;
+			  //			  MAXED(val,127);
+			  //			  m_target_k[i] = m_coeff->ktable[i][m_new_frame_k_idx[i]]*(1-zpar) * logpitch[val];
 
 
-			  //			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[32+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
+			  m_target_k[i] = (m_coeff->ktable[i][m_new_frame_k_idx[i]] * (1-zpar)*(2.0f*exy[offsetage+(koffset[i]+m_new_frame_k_idx[i])]+0.1f));
 			}
 
 			if (m_talk_status == 0)
@@ -2001,6 +2002,10 @@ void tms_newsay(){
   //  sel=0; // TESTY CHECK!!!
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
+
+  //  		if ((m_IP == 0) && (m_PC == 12) && (m_subcycle == 1))
+  m_IP=0; m_PC=12;m_subcycle=1; // ???
+  
 };
 
 void tms_newsay_lowbit(){
@@ -2022,6 +2027,8 @@ void tms_newsay_lowbit(){
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
+    m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 };
 
 void tms_newsay_allphon(){
@@ -2038,6 +2045,7 @@ void tms_newsay_allphon(){
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
+  m_IP=0; m_PC=12;m_subcycle=1; // ???
 };
 
 void tms_newsay_TTS(){
@@ -2071,6 +2079,8 @@ void tms_retriggerTTS(){
   ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[0]]; 
   ptrBit = 0;
   TTSindex=1; // for next round
+  m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 }
 
 void tms_newsay_raw5100(){
@@ -2080,6 +2090,8 @@ void tms_newsay_raw5100(){
     m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
+    m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 };
 
 void tms_newsay_raw5200(){
@@ -2088,6 +2100,8 @@ void tms_newsay_raw5200(){
     m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
+  //    m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 };
 
 void tms_newsay_raw5220(){
@@ -2096,6 +2110,8 @@ void tms_newsay_raw5220(){
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
+  //    m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 };
 
 void tms_newsay_specific(u8 whichbank){
@@ -2111,6 +2127,8 @@ void tms_newsay_specific(u8 whichbank){
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
+    m_IP=0; m_PC=12;m_subcycle=1; // ???
+
 };
 
 /// newsays for specific vocabs/chipsets

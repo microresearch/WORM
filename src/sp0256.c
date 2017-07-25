@@ -1230,7 +1230,7 @@ int16_t sp0256_get_sample(void){
    }
 
 
-   return output;
+   return output<<1;
  }
 
 int16_t sp0256_get_sample_sing(void){
@@ -1243,7 +1243,7 @@ int16_t sp0256_get_sample_sing(void){
     sp0256_newsay();
    }
   
-   return output;
+   return output<<1;
  }
 
 
@@ -1259,7 +1259,7 @@ int16_t sp0256_get_sample_sing(void){
           sp0256_newsayTTS();
    }
 
-   return output;
+   return output<<1;
  }
 
 
@@ -1274,7 +1274,7 @@ int16_t sp0256_get_sample_sing(void){
    }
 
    
-return output;
+return output<<1;
  }
 
  int16_t sp0256_get_samplevocabbanktwo(void){
@@ -1287,7 +1287,7 @@ lpc12_update(&m_filt, &output);
           sp0256_newsayvocabbanktwo(0);
    }
 
-   return output;
+   return output<<1;
  }
 
 extern char TTSinarray[17];

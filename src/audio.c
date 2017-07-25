@@ -31,7 +31,7 @@
 extern __IO uint16_t adc_buffer[10];
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
 
-int16_t	left_buffer[MONO_BUFSZ], sample_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
+int16_t	left_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
 float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; 
 
@@ -183,7 +183,7 @@ static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_new
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
 static const wormer sp02561219er={0, 0.3125f, sp0256_get_sample1219, sp0256_newsay1219, 0, 0};
-static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 1, 0}; // trigger as toggle
+static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 1, 0}; // trigger as toggle // checked exy extent
 
 // 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
 
@@ -401,12 +401,14 @@ void compost_newsay(){ //TODO - restart compost mode
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
+  int16_t sample;
   float samplespeed;
   float value;
   u16 samplespeedref;
   static u16 cc;
   u8 oldmode; 
   u8 triggered=0;
+  static u8 retrigger=0;
   static u8 firsttime=0;
   value =(float)adc_buffer[SPEED]/65536.0f; 
   smoothed_adc_value[0] += 0.1f * (value - smoothed_adc_value[0]); // smooth
@@ -421,7 +423,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=0; //TESTY
+  _intmode=27; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
@@ -446,11 +448,17 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     samplespeedref=_speed*1028.0f;
     MAXED(samplespeedref, 1023);
     samplespeed=logspeed[samplespeedref];  
-    //    samplespeed=1.0f; // TESTY CHECK!!!    
+    //    samplespeed=1.0f; // TESTY CHECK!!!
+    // how can we avoid trigger crossing boundary - this should work
   for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
-    //    sample_buffer[x]=*(src++);
-    if (*(src++)> THRESH) triggered=1;
+    sample=*(src++);
     src++;
+    if (retrigger==0 && sample> THRESH) {
+      triggered=1;
+      retrigger=1;
+      break; // ???
+    }
+    if (sample<THRESHLOW) retrigger=0;
   }
 
 //&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner, &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er, &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx, &13tms5100pitchtablebender, &14tms5200pitchtablebender, &15tms5200pitchtablebenderx, &16tms5100ktablebender, &17tms5200ktablebender, &18tms5100kandpitchtablebender, &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx, &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer, &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer, &29votraxTTSer, &30votraxgorfer, &31votraxwower, &32votraxwowfilterbender, &33votraxbender, &34votraxparamer, &35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer, &39samTTSser, &40samphoner, &41samphonser, &42samphonsinger, &43samxyer, &44samparamer, &45sambender, &46digitalker, &47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy, &50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter, &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing, &58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing, &62composter, &63compostfrer}; // 64 modes

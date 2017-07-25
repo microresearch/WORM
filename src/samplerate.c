@@ -52,10 +52,10 @@ void samplerate_simple(int16_t* out, float factor, u8 size, int16_t(*getsample)(
   
 for (u8 ii=0;ii<size;ii++){
 
-  /*   if (time_now>32768){
+  if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-    }*/
+    }
 
   // deal also with trigger - TODO: take trigger out of here...
    /*    if (!triggered && in[ii]>=THRESH ) {
@@ -104,10 +104,10 @@ void samplerate_simple_exy(int16_t* out, float factor, u8 size, int16_t(*getsamp
   
 for (u8 ii=0;ii<size;ii++){
 
-  /*  if (time_now>32768){
+  if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-    }*/
+    }
 
   // deal also with trigger
   /*    if (in[ii]>=THRESH && !triggered) {
@@ -154,10 +154,10 @@ void samplerate_simple_exy_trigger(int16_t* out, float factor, u8 size, int16_t(
   
 for (u8 ii=0;ii<size;ii++){
 
-  /*  if (time_now>32768){
+    if (time_now>32768){
     int_time=0; // preserve???
     time_now-=32768.0f;
-    }*/
+    }
 
   // deal also with trigger
   /*    if (!triggered && in[ii]>=THRESH ) {
