@@ -20,7 +20,7 @@
 |         18 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 ktable      |
 |         19 | worm    | x-axis | worm      | phrase  | retrigger     | 5100 k/pitch     |
 |         20 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 k/pitch     |
-|         21 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 k/p +vocab  |
+|         21 | worm    | x-axis | worm      | phoneme | retrigger     | 5200 k/p +vocab  |TESTED
 |   22 INTEL | phoneme | pitch  | length    | phoneme | phoneme start |                  |
 |         23 | phoneme | pitch  | length    | phoneme | phoneme start | pitch/l absolute |
 |         24 | TTS     | pitch  | position  | letter  | re-phrase TTS |                  |

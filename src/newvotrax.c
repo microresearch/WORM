@@ -11,7 +11,9 @@
 
 ***************************************************************************/
 
-// gcc newvotrax.c -lm -ovot -std=c99 -DLAP
+// gcc newvotrax.c resources.c -lm -ovot -std=c99 -DLAP
+
+// aplay -r40000 -f S16_LE testnewvotrax.pcm
 
 /*
   tp3 stb i1 i2 tp2
@@ -148,8 +150,11 @@ void inflection_w(int data)
 void device_start()
 {
 	// initialize internal state
-  m_mainclock = 720000; // 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
+  m_mainclock = 720000.0f; // 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // try 57600 for 32k
 
+  //votrax.h: double m_sclock;                                // Stream sample clock (40KHz, main/18)
+  // double m_cclock;                                // 20KHz capacitor switching clock (main/36)
+  
   m_sclock = m_mainclock / 18.0f; // so 40000
   m_cclock = m_mainclock / 36.0f; // so 20000
 }
@@ -433,6 +438,11 @@ void chip_update()
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		//      interpolate(m_cur_va,  m_rom_va);
 	  m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
+	  /*	  u8 val=_selx*131.0f; // TESTY!
+	  MAXED(val,127);
+	  val=127-val;
+	  m_cur_f1_orig=interpolate(m_cur_f1_orig,  m_rom_f1);
+	  m_cur_f1=m_cur_f1_orig*logpitch[val]*0.5f;*/
 	  m_cur_f1=interpolate(m_cur_f1,  m_rom_f1);
 	  m_cur_f2=interpolate(m_cur_f2,  m_rom_f2);
 	  m_cur_f2q=interpolate(m_cur_f2q, m_rom_f2q);
@@ -474,7 +484,8 @@ void chip_update()
 	MAXED(val,127);
 	val=127-val;
 	if (modus==0){
-		if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
+	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
+	  //	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as == TESTY!
 	}
 	else
 	  {
@@ -595,7 +606,7 @@ void filters_commit(bool force)
 	m_filt_fa = m_cur_fa >> 4;
 	m_filt_fc = m_cur_fc >> 4;
 	m_filt_va = m_cur_va >> 4;
-
+	
 	if(force || m_filt_f1 != m_cur_f1 >> 4) {
 	  //	  printf("filtercommit\n");
 		m_filt_f1 = m_cur_f1 >> 4;
@@ -650,7 +661,7 @@ void filters_commit(bool force)
 							  7289);
 
 		build_lowpass_filter(m_fx_a, m_fx_b,
-				     412, // 1122
+				     1122, // 1122 or 441???
 							 23131);
 
 		build_noise_shaper_filter(m_fn_a, m_fn_b,
@@ -668,6 +679,8 @@ u32 analog_calc()
 	// 1. Pick up the pitch wave
 
 	myfloat v = m_pitch >= (9 << 2) ? 0 : s_glottal_wave[m_pitch >> 2];
+	//int avvl=(int)(v*50000.0f);
+	//	return avvl;
 
 	// 2. Multiply by the initial amplifier.  It's linear on the die,
 	// even if it's not in the patent.
@@ -675,7 +688,7 @@ u32 analog_calc()
 	shift_hist(v, m_voice_1, 4);
 
 	// 3. Apply the f1 filter
-	v = apply_filter(m_voice_1, m_voice_2, m_f1_a, m_f1_b, 4,4);
+	//v = apply_filter(m_voice_1, m_voice_2, m_f1_a, m_f1_b, 4,4);
 	shift_hist(v, m_voice_2, 4);
 
 	// 4. Apply the f2 filter, voice half
@@ -685,8 +698,9 @@ u32 analog_calc()
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
 	// intensity should be checked w.r.t the voice.
-	myfloat n = 10000.0f * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	myfloat n = 10000.0f * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1); // was 10000
 	n = n * m_filt_fa / 15.0f;
+	//	printf("n %f, ", n);
 	shift_hist(n, m_noise_1, 3);
 
 	// 6. Apply the noise shaper
@@ -703,11 +717,12 @@ u32 analog_calc()
 
 	// Mixed path
 	// 9. Add the f2 voice and f2 noise outputs
-	myfloat vn = v + n2;
+	//	myfloat vn = v;
+	myfloat vn = v+n2;
 	shift_hist(vn, m_vn_1, 4);
 
 	// 10. Apply the f3 filter
-	vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b,4,4);
+	//vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b,4,4); // TESTY!
 	shift_hist(vn, m_vn_2, 4);
 
 	// 11. Second noise insertion
@@ -715,8 +730,8 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_3, 4);
 
 	// 12. Apply the f4 filter
-	vn = apply_filter(m_vn_3, m_vn_4, m_f4_a, m_f4_b,4,4);
-	shift_hist(vn, m_vn_4, 4);
+	//	vn = apply_filter(m_vn_3, m_vn_4, m_f4_a, m_f4_b,4,4); // TESTY!
+ 	shift_hist(vn, m_vn_4, 4);
 
 	// 13. Apply the glottal closure amplitude, also linear
 	vn = vn * (7 ^ (m_cur_closure >> 2)) / 7.0f;
@@ -728,6 +743,7 @@ u32 analog_calc()
 		//	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
 	int avl=(int)(vn*50000.0f);
+	//	printf("xx %d %f,", avl, vn);
 	return avl;
 }
 
@@ -991,6 +1007,8 @@ void build_lowpass_filter(myfloat *a, myfloat *b,
 	// Finally compute the result of the z-transform
 	myfloat m = zc*k;
 
+	printf("MMM: %f\n", m);
+	
 	a[0] = 1.0f;
 	b[0] = 1.0f+m;
 	b[1] = 1.0f-m;
@@ -1373,7 +1391,7 @@ int16_t votrax_get_sample(){
   modus=0;
   uint16_t sample; u8 x;
   m_sample_count++;
-  if(m_sample_count & 1)
+  if(m_sample_count & 1)// TESTY!
     chip_update();
   sample=analog_calc();
   if (sample_count++>=lenny){
@@ -1649,6 +1667,7 @@ void main(void){
 //  const unsigned char TTStest[]  = {24, 27, 0, 24, 38, 40, 62, 57, 0, 43, 62, 27, 36, 61, 38, 40, 62, 36, 43, 62, 41, 40, 40, 0, 62};
 
  const unsigned char TTStest[]  = {7, 12, 36, 43, 42, 39, 13, 62}; // MARTIN
+//  const unsigned char TTStest[]  = {4, 4, 4, 4, 4, 4, 62}; // MARTIN
  
   // try and say
   for (x=1;x<TTStest[0]+1;x++){ // for vocab [0] is length
@@ -1661,16 +1680,18 @@ void main(void){
 
     ///    int lenny=PhonemeLengths[welcome[x]]*100;
     //    int lenny=m_rom_duration*144;
-    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/30); // what of sample-rate?
+    int lenny=((16*(m_rom_duration*4+1)*4*9+2)/32); // what of sample-rate?
 // this is not precise - say 1200 above = 16*41*4*9+2=24000 odd
     // sample rate? say 24000 as about right?
   generate_votrax_samples(lenny);
+  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d %d\n", m_rom_duration, lenny);
   }
   //  writer(1);
   //  phone_commit();
   //  generate_votrax_samples(lenny);
   //  }
-  lenny=(16*(32*logpitch[127]*4+1) *4*9+2)/32; 
-  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d %d\n", m_rom_duration, (16*(m_rom_duration*4+1)*4*9+2)/32);
+  //  lenny=(16*(32*logpitch[127]*4+1) *4*9+2)/32; 
+  //  printf("rom_durxxxxxxxxxxzzzzzzzzzz %d %d\n", m_rom_duration, (16*(m_rom_duration*4+1)*4*9+2)/32);
+    printf("rom_durxxxxxxxxxxzzzzzzzzzz %d %d\n", m_rom_duration, (16*(m_rom_duration*4+1)*4*9+2)/32);
 }
 #endif

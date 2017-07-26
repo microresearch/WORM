@@ -187,7 +187,7 @@ static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_new
 
 // 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
 
-static const wormer votraxer={0, 1.25f, votrax_get_sample, votrax_newsay, 0, 0};
+static const wormer votraxer={0, 0.8f, votrax_get_sample, votrax_newsay, 0, 0};
 static const wormer votraxTTSer={0, 1.25f, votrax_get_sampleTTS, votrax_retriggerTTS, 0, 1};
 
 static const wormer votraxgorfer={0, 1.25f, votrax_get_samplegorf, votrax_newsaygorfr, 0, 0}; 
@@ -423,7 +423,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=27; //TESTY
+  _intmode=36; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 

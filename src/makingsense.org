@@ -2197,10 +2197,14 @@ check threshold and trigger in general...
   raw/bends are rough in places on 5200/5220 but not so much for 5100,
   bug in kandpitchFIXED
 
-- SP0256: 21-27 // increasing volumes - maybe check distortion on
-  scopeTODO, pitch is a bit warbly, reduced volume in bendFIXED
+- SP0256/intel: 21-27 // increasing volumes - maybe check distortion on
+  scopeTODO-all <<2 to test, pitch is a bit warbly, reduced volume in bendFIXED
 
-- VOTRAX: 28-35
+- VOTRAX: 28-35 // harshness at high speeds - low pass, not quite
+  right TO FIX! - some changes (removed f3 and f4 on basic phonemes)
+  but re-test maybe...
+
+- SAM: 36-45 //
 
 ** FINAL TODO:
 

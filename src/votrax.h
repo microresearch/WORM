@@ -68,7 +68,7 @@ we have either 4 bits or 1 or 7 so...
 //	sound_stream *m_stream;                         // Output stream
 //	emu_timer *m_timer;                             // General timer
 //	required_memory_region m_rom;                   // Internal ROM
-	u32 m_mainclock;                                // Current main clock
+	myfloat m_mainclock;                                // Current main clock
 	myfloat m_sclock;                                // Stream sample clock (40KHz, main/18)
 	myfloat m_cclock;                                // 20KHz capacitor switching clock (main/36)
 	u32 m_sample_count;                             // Sample counter, to cadence chip updates
@@ -163,15 +163,22 @@ static myfloat bits_to_caps(u32 value, u32 *caps_values, u8 howm) {
 	// Shift a history of values by one and insert the new value at the front
 static void shift_hist(myfloat val, myfloat *hist_array, u8 N) {
   for(u8 i=N-1; i>0; i--)
-  			hist_array[i] = hist_array[i-1];
-  		hist_array[0] = val;
+    hist_array[i] = hist_array[i-1];
+  hist_array[0] = val;
 	}
+
+	// Shift a history of values by one and insert the new value at the front
+/*	template<u32 N> static void shift_hist(double val, double (&hist_array)[N]) {
+		for(u32 i=N-1; i>0; i--)
+			hist_array[i] = hist_array[i-1];
+		hist_array[0] = val;
+		}*/
 
 
 
 	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
 static myfloat apply_filter(const myfloat *x, const myfloat *y, const myfloat *a, const myfloat *b, u8 Na, u8 Nb) {
-		myfloat total = 0;
+		myfloat total = 0.0f;
 		for(u8 i=0; i<Na; i++)
 			total += x[i] * a[i];
 		for(u8 i=1; i<Nb; i++)
@@ -180,6 +187,17 @@ static myfloat apply_filter(const myfloat *x, const myfloat *y, const myfloat *a
 	}
 
 /*older
+
+	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
+	template<u32 Nx, u32 Ny, u32 Na, u32 Nb> static double apply_filter(const double (&x)[Nx], const double (&y)[Ny], const double (&a)[Na], const double (&b)[Nb]) {
+		double total = 0;
+		for(u32 i=0; i<Na; i++)
+			total += x[i] * a[i];
+		for(u32 i=1; i<Nb; i++)
+			total -= y[i-1] * b[i];
+		return total / b[0];
+	}
+
 
 myfloat apply_filter(const myfloat *x, const myfloat *y, const myfloat *a, const myfloat *b)
 {
