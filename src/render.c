@@ -280,7 +280,10 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	//		Output(3, X);
 	*howmany=Output(3);
 	//		*sample=((X)<<12)-28672; // check >>12???
-	*sample=(((int16_t)(X)-8)<<10); //1 byte
+	//	*sample=(((int16_t)(X)-8)<<12); //1 byte
+	//*sample=18432; // this is (26-8)<<10
+       	*sample=2048;
+	//		*sample=(((int16_t)(X))<<12); //1 byte
 			
       } else
       {
@@ -290,8 +293,10 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 	//	Output(4, X);
 	*howmany=Output(4);
 	//		*sample=((X)<<12)-28672; // check >>12???
-	*sample=(((int16_t)(X)-8)<<10); //1 byte
-
+	//	*sample=(((int16_t)(X)-8)<<10); //1 byte
+	*sample=-2048;
+	//	*sample=0;
+	
       }
 
     mem56--;
@@ -381,8 +386,11 @@ pos48280:
 		*howmany=Output(1);
 
 		//		*sample=((X&15)<<12)-28672; // check >>12??? .. but we can't output further one?
-		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte
-		//	*sample=(rand()%65536)-32768;
+		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
+		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
+		//				*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
+		*sample=(((int16_t)(X&15))<<11)-16384; // 32768>>1 16384 >>2 8192 >>3 4096
+		//*sample=(rand()%65536)-32768;
 
 		if (X!=0) goto pos48296;
 		else return 6;
@@ -393,7 +401,9 @@ pos48295:
 	*howmany=Output(2);
 
 	//	*sample=((5)<<12)-28672; // check >>12???
-		*sample=((-3)<<5); //1 byte
+	//		*sample=((-3)<<5); //1 byte
+	*sample=-5120;
+	//	*sample=0;
 	//		*sample=(rand()%65536)-32768;
 
 
@@ -573,7 +583,11 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 			// output the accumulated value
 						//			Output(0, A);
 			howmany=Output(0);
-			*sample=(((int16_t)(A)-8)<<10); //1 byte
+			//			*sample=(((int16_t)(A)-8)<<12); //1 byte - was <<10
+			//			*sample=(((int16_t)(A&15))<<12)-32768;
+			*sample=(((int16_t)(A&15))<<11)-16384;
+			//			*sample=0;
+			//						*sample=(((int16_t)(A))<<11)-16384;
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;

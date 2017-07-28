@@ -46,7 +46,7 @@ return modulus - 1;
 }
 
 
-float doFIRFilter(TRMFIRFilter *filter, float input, u8 needOutput)
+static float doFIRFilter(TRMFIRFilter *filter, float input, u8 needOutput)
 {
         if (needOutput) {
 	float output = 0.0f;

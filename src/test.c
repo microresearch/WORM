@@ -304,6 +304,11 @@ void main(){
   //   unsigned char tmp=m_rom_f2+(64-(_sely*128.0f));
   //   printf("TMPPPP:     %d\n", tmp);
 
+
+  //  printf("*sample=(((int16_t)(X)-8)<<12); //1 byte %d", (((int16_t)(-4)-1)<<10)); //1 byte
+
+  printf("32768>>1 %d >>2 %d >>3 %d\n",32768>>1, 32768>>2, 32768>>3); 
+  
 #ifdef XXXX
   printf("xxxxxxxxxxxxxxxxx\n\n\n\n");
 #endif  

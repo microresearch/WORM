@@ -11,6 +11,62 @@ extern float _selx, _sely, _selz;
 extern float exy[240];
 extern float smoothed_adc_value[5];
 
+typedef struct {
+  float FIRData[49];
+  float const *FIRCoef;
+    int FIRPtr, numberTaps;
+} TRMFIRFilter;
+
+
+static TRMFIRFilter firfilt;
+
+static const float filtertaps[49]={ 0.00000001f,  0.00000007f,  0.00000021f, -0.00000007f, -0.00000243f, -0.00000627f,  0.00000224f,  0.00004326f,  0.00006970f, -0.00008697f, -0.00043244f, -0.00028644f,  0.00113161f,  0.00232968f, -0.00061607f, -0.00709116f, -0.00592280f,  0.01120457f,  0.02472395f, -0.00136324f, -0.05604421f, -0.05124764f,  0.08785309f,  0.29650419f,  0.39847428f,  0.29650419f,  0.08785309f, -0.05124764f, -0.05604421f, -0.00136324f,  0.02472395f,  0.01120457f, -0.00592280f, -0.00709116f, -0.00061607f,  0.00232968f,  0.00113161f, -0.00028644f, -0.00043244f, -0.00008697f,  0.00006970f,  0.00004326f,  0.00000224f, -0.00000627f, -0.00000243f, -0.00000007f,  0.00000021f,  0.00000007f,  0.00000001f}; // filter coeffs for above settings
+
+void samplerate_init(){
+  firfilt.FIRCoef=filtertaps;
+  firfilt.numberTaps=49; firfilt.FIRPtr=0;
+}
+
+inline int iincrement(int pointer, int modulus)
+{
+    if (++pointer >= modulus)
+	return 0;
+
+    return pointer;
+}
+
+inline int ddecrement(int pointer, int modulus)
+{
+    if (--pointer < 0)
+return modulus - 1;
+
+    return pointer;
+}
+
+
+static float doFIRFilter(TRMFIRFilter *filter, float input, u8 needOutput)
+{
+        if (needOutput) {
+	float output = 0.0f;
+
+	filter->FIRData[filter->FIRPtr] = input;
+
+	for (u8 i = 0; i < filter->numberTaps; i++) {
+	  output += filter->FIRData[filter->FIRPtr] * filter->FIRCoef[i];
+	  //output=input;
+	  filter->FIRPtr = iincrement(filter->FIRPtr, filter->numberTaps);
+	}
+
+	filter->FIRPtr = ddecrement(filter->FIRPtr, filter->numberTaps);
+	return output;
+    } else {
+	  filter->FIRData[filter->FIRPtr] = input;
+	  filter->FIRPtr = ddecrement(filter->FIRPtr, filter->numberTaps);
+	return 0.0f;
+	}
+}
+
+
 static inline void doadc(){
   float value;
   
@@ -74,7 +130,23 @@ for (u8 ii=0;ii<size;ii++){
     //       out[ii]=InterpolateHermite4pt3oX(delay_buffer[DELAY_SIZE-8], delay_buffer[DELAY_SIZE-7], delay_buffer[DELAY_SIZE-6], delay_buffer[DELAY_SIZE-5], alpha);
       //      out[ii]=0;
     //    }
-     out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+
+    //    factor=0.5f;
+    /*    if (factor>1){
+    // low pass for decimation - 32000 / factor = max 4 = 8khz = 16->4kHz
+      // int to float
+      float interpolatedValue=(float32_t)(((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha)))/32768.0f;
+      float sample = doFIRFilter(&firfilt, interpolatedValue, 1); //sample is float
+      // float to int
+      int16_t tmp = sample * 32768.0f;
+      tmp = (tmp <= -32768) ? -32768 : (tmp >= 32767) ? 32767 : tmp;
+
+      out[ii]=sample;
+
+      //      out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+        }
+	else */// no filter 
+    out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
     //out[ii] = delay_buffer[DELAY_SIZE-5];
 
 

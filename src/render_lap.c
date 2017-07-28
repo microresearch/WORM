@@ -352,6 +352,7 @@ pos48280:
 		//mem[54296] = X;
         // output the byte
 		//		Output(1, X);
+		printf("X: %d\n", X);
 		*sample=((X&15)<<12)-32768; // check >>12??? .. but we can't output further one?
 		if (X!=0) goto pos48296;
 		else return 6;
@@ -461,7 +462,7 @@ u8 rendersamsample(int16_t* sample){
 			// output the accumulated value
 						//			Output(0, A);
 
-						*sample=((A&15)<<12)-32768; //1 byte
+			*sample=((A&15)<<12)-32768; //1 byte
 			speedcounter--;
 			if (speedcounter != 0) { //goto pos48155;
 			  secondstate=0;

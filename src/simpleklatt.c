@@ -83,7 +83,7 @@ void simpleklatt_init(void){
   //  frame_init(globals,simpleklattset.val); 
 
   globals->synthesis_model = 0; // all_parallel - try for other = 0
- globals->samrate = 32000;
+ globals->samrate = 16000;
  globals->glsource = 1; // 1=impulsive 2=glottal impulse 3=sampled as above
  globals->natural_samples = natural_samples;
  globals->num_samples = NUMBER_OF_SAMPLES;
@@ -103,9 +103,10 @@ simple_parwave_init(globals);
 void generate_exy_frame(int16_t* frame){
 unsigned char y;
 
-    for (y=0;y<40;y++){
+    for (y=0;y<39;y++){
       frame[y]=mins[y] + (range[y]*(1.0f-exy[y])); // TODO: floated loggy!
     }
+    frame[39]=60; // volume
       }
 
 int16_t simpleklatt_get_sample(){

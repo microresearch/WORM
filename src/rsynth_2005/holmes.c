@@ -232,14 +232,14 @@ float contour[3];//={146.300003, 108.000000, 133.339996};
 void rsynth_newsay_elm() 
 {
 
-  nelm=106; // length
+  nelm=108; // length
 
   // do f0 contour?
   unsigned char ii;
   ff0 = contour;
   //  nf0 = 3;
   ff0[1]=0;
-  for (ii = 0; ii < nelm; ii += 2) {
+  for (ii = 0; ii <= nelm; ii += 2) {
     ff0[1] += test_elm_rsynthy[ii + 1]; // length in frames
   }
   ff0[0] = 1.1f * rsynth->speaker->F0Hz;	/* top */

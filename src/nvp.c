@@ -101,7 +101,7 @@ static const float data[48][39]  __attribute__ ((section (".flash"))) ={
 { 310.0f, 1050.0f, 1350.0f, 3300.0f, 3750.0f, 4900.0f, 250.0f, 200.0f , 77.0f , 75.0f , 112.5f , 250.0f, 200.0f, 1000.0f, 100.0f, 100.0f, 0.0f, 310.0f, 1050.0f, 2050.0f, 3300.0f, 3750.0f, 4900.0f, 70.0f, 100.0f, 150.0f, 250.0f, 200.0f, 1000.0f, 0.0f, 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f , 0.0f, 1.0f , 0.0f }//47
 };
 
-static unsigned int sampleRRate=32000;
+static unsigned int sampleRRate=16000;
 
 typedef unsigned char bool;
 

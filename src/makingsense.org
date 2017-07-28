@@ -2204,7 +2204,15 @@ check threshold and trigger in general...
   right TO FIX! - some changes (removed f3 and f4 on basic phonemes)
   but re-test maybe...
 
-- SAM: 36-45 //
+- SAM: 36-45 // fixed large glitch on some phrases - can fine tune volumes
+
+- DIGITALKER: 46-48 // fine
+
+- RSYNTHY: 49-61 50rsynthelm-glitch at end or startFIXED, rawmode58 is
+  wierd-reduced samplerate and fixed volume, fixed some glitch in nvp
+  by reducing samplerate
+
+- finished first set of rough tests, still decided against interpolation
 
 ** FINAL TODO:
 
@@ -2214,9 +2222,13 @@ check threshold and trigger in general...
 
 - run through each mode/all modes - test all and test trigger in each
 
-- samples: work through 1501->1522 and 1524-1533 (some chosen already)
+- samples: work through 1501->1522 and 1524+ (some chosen already)
+
+- check all volumes/levels on scope... 
 
 - remove TESTY and check tms on this for shorter loadings
+
+- re-check all modes, full test with compost
 
 * announcement: 
 

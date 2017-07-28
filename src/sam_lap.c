@@ -6,6 +6,8 @@
 #include <time.h>
 #include <string.h>
 
+///  gcc sam_lap.c render_lap.c -std=c99 -osamm              
+
 char input[256];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 
 //char input[256]={"KAX4MPYUX4TAH.\x9b"}; //tab39445
@@ -276,7 +278,7 @@ void main(){
   sam_newsay();
     while(1) {
   cc=sam_get_sample();
-    printf("%c",cc>>8);
+  //    printf("%c",cc>>8);
   //  for (x=0;x<327680;x++){
 //    printf("%c",buffer[x]+128);
 //    }

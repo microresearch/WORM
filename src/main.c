@@ -65,7 +65,7 @@ extern int errno;
 
 u8 test_elm[51]={44, 8, 0, 54, 16, 0, 20, 8, 0, 1, 6, 0, 1, 6, 0, 25, 12, 0, 2, 8, 0, 3, 1, 0, 4, 2, 0, 53, 9, 0, 8, 8, 0, 9, 1, 0, 10, 4, 0, 46, 7, 0, 22, 8, 0, 1, 6, 0, 1, 6, 0}; // worm speaking = we use ~/rsync2016/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0 - glitchy
 
-u8 test_elm_rsynthy[106]={30, 4, 72, 4, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6, 41, 8, 82, 6, 32, 4, 1, 6, 27, 12, 82, 6, 26, 10, 1, 6, 72, 4, 1, 6, 38, 8, 82, 6, 23, 8, 1, 6, 8, 6, 9, 1, 10, 2, 47, 6, 45, 6, 21, 8, 1, 6, 11, 8, 12, 1, 13, 1, 45, 6, 32, 4, 47, 6, 45, 6, 25, 11, 72, 4, 31, 12, 1, 6, 8, 6, 9, 1, 10, 2, 62, 9, 1, 6, 31, 12, 2, 8, 3, 1, 4, 2, 57, 7, 14, 8, 15, 1, 16, 4, 1, 6}; // length 106 and we keep last 1 and 6 as end so... 104 105
+u8 test_elm_rsynthy[108]={30, 4, 72, 4, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6, 41, 8, 82, 6, 32, 4, 1, 6, 27, 12, 82, 6, 26, 10, 1, 6, 72, 4, 1, 6, 38, 8, 82, 6, 23, 8, 1, 6, 8, 6, 9, 1, 10, 2, 47, 6, 45, 6, 21, 8, 1, 6, 11, 8, 12, 1, 13, 1, 45, 6, 32, 4, 47, 6, 45, 6, 25, 11, 72, 4, 31, 12, 1, 6, 8, 6, 9, 1, 10, 2, 62, 9, 1, 6, 31, 12, 2, 8, 3, 1, 4, 2, 57, 7, 14, 8, 15, 1, 16, 4, 1, 6, 1, 6}; // length 106 and we keep last 1 and 6 as end so... 104 105
 
 // ./say "The worm was for a long time desirous to speake" > /dev/null
 
@@ -109,6 +109,7 @@ void main(void)
   klatt_init(); 
   parwave_init(&klatt_global); // klatt_global is in def_pars //parwave_init in nsynth.c
   rsynth_init(8000, 10.0f); //void rsynth_init(long sr, float ms_per_frame)
+  samplerate_init();
 #endif
 
  ////////
