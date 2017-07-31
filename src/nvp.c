@@ -487,7 +487,7 @@ int16_t nvp_get_sample(){
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
   count++;
-  out=out*4000.0f;
+  out=out*8000.0f;
   if (out>32000.0f) out=32000.0f;
   else if (out<-32000.0f) out=-32000.0f;
    return (int)out;
@@ -527,7 +527,7 @@ int16_t nvp_get_sample_vocab(){
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
 
   count++;
-  out=out*4000.0f;
+  out=out*8000.0f;
   if (out>32000.0f) out=32000.0f;
   else if (out<-32000.0f) out=-32000.0f;
    return (int)out;
@@ -561,7 +561,7 @@ int16_t nvp_get_sample_vocab_sing(){
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
   //  float out=(parallelOut)*tempframe.outputGain;
   count++;
-  out=out*4000.0f;
+  out=out*8000.0f;
   if (out>32000.0f) out=32000.0f;
   else if (out<-32000.0f) out=-32000.0f;
    return (int)out;

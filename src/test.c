@@ -284,6 +284,8 @@ void make_sinc()
 }
 #define XXXX
 
+
+
 void main(){
   //  indexy={1.0,1.0}; 
   float x=0.0f;

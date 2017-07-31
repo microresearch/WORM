@@ -389,7 +389,7 @@ pos48280:
 		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
 		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
 		//				*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
-		*sample=(((int16_t)(X&15))<<11)-16384; // 32768>>1 16384 >>2 8192 >>3 4096
+		*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
 		//*sample=(rand()%65536)-32768;
 
 		if (X!=0) goto pos48296;
@@ -585,7 +585,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 			howmany=Output(0);
 			//			*sample=(((int16_t)(A)-8)<<12); //1 byte - was <<10
 			//			*sample=(((int16_t)(A&15))<<12)-32768;
-			*sample=(((int16_t)(A&15))<<11)-16384;
+			*sample=(((int16_t)(A&15))<<12)-32768;
 			//			*sample=0;
 			//						*sample=(((int16_t)(A))<<11)-16384;
 			speedcounter--;

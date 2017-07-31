@@ -31,6 +31,7 @@
 #include "rsynth.h"
 #include "resources.h"
 
+float ampl;
 extern float _selx, _sely, _selz;
 extern u8 test_elm_rsynthy[106]; // as is just phon code and length... with lat stop
 
@@ -160,6 +161,8 @@ static float curpitch;
 
 void rsynth_newsay_single(u8 once)
 {
+    ampl=1.2f;
+
   u8 selected=1;
   //  static u8 once=1;
   nelm=4; //0123
@@ -200,6 +203,7 @@ void rsynth_newsay_singlex(){
 void rsynth_newsay()
 {
   //  u8 selected=1;
+  ampl=1.2f;
   u8 selected=_selz*131.0f;
   MAXED(selected,127);
   selected=127-selected;
@@ -232,17 +236,21 @@ float contour[3];//={146.300003, 108.000000, 133.339996};
 void rsynth_newsay_elm() 
 {
 
-  nelm=108; // length
+  nelm=106; // length
+  ampl=1.0f;
 
   // do f0 contour?
   unsigned char ii;
   ff0 = contour;
   //  nf0 = 3;
   ff0[1]=0;
-  for (ii = 0; ii <= nelm; ii += 2) {
+  for (ii = 0; ii < nelm; ii += 2) {
     ff0[1] += test_elm_rsynthy[ii + 1]; // length in frames
   }
+  //  ff0[1] = 0.6f * ff0[0];	/* bottom */
+
   ff0[0] = 1.1f * rsynth->speaker->F0Hz;	/* top */
+  //    ff0[1] = 1.1f * rsynth->speaker->F0Hz;	/* top */
   ff0[2] = 0.6f * ff0[0];	/* bottom */
 
   f0s = rsynth->speaker->F0Hz;
@@ -630,9 +638,9 @@ int16_t rsynth_get_sample_elm(){
   static unsigned t=0;
   //  extent nextent={51,53.0f};
 
-  u8 xaxis=_selx*110.0f;
-  MAXED(xaxis,105); 
-  xaxis=105-xaxis;
+  u8 xaxis=_selx*56.0f;
+  MAXED(xaxis,52); 
+  xaxis=52-xaxis;
   u8 val=_selz*87.0f;
   MAXED(val,83);
   val=83-val;
@@ -707,13 +715,14 @@ int16_t rsynth_get_sample_elm(){
 
 		while (tf0 == ntf0) { // first time?
 		  tf0 = 0;
-		  f0s = f0e;
+		  //		  f0s = f0e;
 		  ntf0 = (unsigned int) *ff0++;
-		  f0e = *ff0++;
+		  //		  f0e = *ff0++;
 		  }
 
 		/* interpolate the f0 value */
-		F0Hz = linear(f0s, f0e, tf0, ntf0);
+		//		F0Hz = linear(f0s, f0e, tf0, ntf0);
+		F0Hz = rsynth->speaker->F0Hz;
 		nextelement=0;
 		t++; tf0++;
     } //dur

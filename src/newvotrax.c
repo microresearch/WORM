@@ -722,7 +722,7 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_1, 4);
 
 	// 10. Apply the f3 filter
-	//vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b,4,4); // TESTY!
+	vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b,4,4); // TESTY!
 	shift_hist(vn, m_vn_2, 4);
 
 	// 11. Second noise insertion
@@ -730,7 +730,7 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_3, 4);
 
 	// 12. Apply the f4 filter
-	//	vn = apply_filter(m_vn_3, m_vn_4, m_f4_a, m_f4_b,4,4); // TESTY!
+	vn = apply_filter(m_vn_3, m_vn_4, m_f4_a, m_f4_b,4,4); // TESTY!
  	shift_hist(vn, m_vn_4, 4);
 
 	// 13. Apply the glottal closure amplitude, also linear
@@ -743,6 +743,8 @@ u32 analog_calc()
 		//	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
 	int avl=(int)(vn*50000.0f);
+	if (avl>32767) avl=32767;
+	else if (avl<-32767) avl=-32767;
 	//	printf("xx %d %f,", avl, vn);
 	return avl;
 }

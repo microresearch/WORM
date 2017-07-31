@@ -2180,9 +2180,14 @@ TESTED to here...
 &47digitalker_sing, &48digitalker_bendpitchvals, 
 
 &49rsynthy,
-&50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+&53klatter,
 &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
-&58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+&58simpleklatter, 
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
 
 &62composter, &63compostfrer}; // 64 modes
 
@@ -2214,13 +2219,30 @@ check threshold and trigger in general...
 
 - finished first set of rough tests, still decided against interpolation
 
+** 31/7
+
+- DONEre-testings - checking group of modes volumes on scope -
+  TMS=13Vpp(lowbit=10-12v), sp0256/intel=12Vpp, votrax-put in peak/no
+  distort also, digitalker - fixed bug in length, ALL VOLS approx 10Vpp
+
+- DONE: add peaks for all modes where necessary: rsynthy has, klatt
+  has, simpleklatt has, tms not needed, sp0256has, vot has, sam no
+  need, digitalker no need
+
+- glitch in rsynthy elements to fix=FIXED/major bug in element list
+
+- re-try f3 and f4 back in votrax REVERTED DONE
+
+/////
+
+- sanity check of all array extents and re-test each mode/full...
+
 ** FINAL TODO:
 
 - image for modulargrid - DONE
 
-- web page/description
 
-- run through each mode/all modes - test all and test trigger in each
+- run through each mode/all modes - test all and test trigger in eachDONE
 
 - samples: work through 1501->1522 and 1524+ (some chosen already)
 
@@ -2228,7 +2250,7 @@ check threshold and trigger in general...
 
 - remove TESTY and check tms on this for shorter loadings
 
-- re-check all modes, full test with compost
+*- re-check all modes, full test with compost*
 
 * announcement: 
 
@@ -2696,5 +2718,80 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 |--------+---------+----------------+-------+-----+------+---------------+-------|
 |        | compost | composter      | start | end | mode | restart mode  | T     |
 |        | compost | compost frozen | start | end | mode | toggle freeze | T     |
+
+
+
+* website/announce
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
+
+The eurorack-based ERD/WORM synth features software worming of
+emulated artificial human speech cores from the 70s to the 90s of the
+last century. Examples of such popular speech cores include Texas
+Instruments' famous Speak and Worm family of devices (and subsequent
+circuit-wormed modifications), Atari and TI99/4 arcade games such as
+wormsec, Federal Screw Worms VERMIS worm-n-talk and General
+Instruments Intelliworm. ERD/WORM further bends and worms key speech
+synthesis algorithms across 64 modes with full trigger, CV and knob
+control over core aspects of these speech cores.
+
+Six key speech cores are wormed and bent with a vocabulary of over
+4000 words and phrases, including basic allophones or phonemes which
+can be used to build new phrases as well as a Text to Speech engine
+for advanced textual constructions. A further set of COMPOST modes
+allows for sample-based re-working of constructed and wormed words and
+phrases.
+
+ERD/WORM is produced in Berlin by various worms and hands.
+
+This module is released in four batches in a strictly limited edition
+of 100. The first batch of 25 is now ready for order.
+
+Pricing: 275 euros with free, tracked worldwide shipping. x in stock of first batch.
+
+*** Sounds like:
+
+*** Technical and HOWTO
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
+audio/trigger input, 1 audio output, 20mm deep.
+
+Manual and layout at:
+
+With thanks to Ioana Vreme Moser for manual editing, layout and design
+and Kathrin Guenter for image.
+
+Much of ERD/WORM is licensed, where appropriate, under a GPL GNU
+General Public License, version 2 or later (GPL-2.0+). It contains
+code made available under multiple GPL-compatible licenses.
+
+*** older/notes
+
+the ERD/WORM voice speech synthesis module and celebrates the
+boneless, anti-geologic realm of non-human speech which the
+technologies of encoding and synthesis introduced.
+
+... worming, bending and breaking a compost of historical speech
+generation algorithms. Vocoding and speech applied worms have been
+broken out into future ERD/RAVEN and ERD/[z] modules.
+
+software simulated creation of non-human voices and vocalisations. The
+history of speech synthesis stresses the mundane, the military and the
+spectacular, commencing with Van Kempelen's 18th centuty rubber
+squeaking or speaking machine. The basic principle of simulating the
+vocal tract through electronic and physical means was submitted to the
+military demands of compression and encryption, segmenting out parts
+of the speech process and reducing redundancy. In the process
+communication becomes the business of circuit-bent human-worms,
+opening human and animal speech to the cut-up, to stammerings,
+stutterings and tics; to an extra-human, outer-word terrain of numbers
+burrowed and nibbled by the earth worms. ERD/WORM feasts on this
+electronic legacy.
+
+
+
 
 

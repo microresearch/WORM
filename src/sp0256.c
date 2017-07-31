@@ -321,7 +321,12 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 			f->z_data[j][1] = f->z_data[j][0];
 			f->z_data[j][0] = samp;
 		}
-		*out= limit(samp)<<1;
+		//		*out= limit(samp);
+		samp=samp<<3;
+		if (samp>32767) samp=32767;
+		else if (samp<-32767) samp=-32767;
+		*out=samp;
+		
 		//		return 1;
 }
 
@@ -1230,7 +1235,7 @@ int16_t sp0256_get_sample(void){
    }
 
 
-   return output<<2;
+   return output;
  }
 
 int16_t sp0256_get_sample_sing(void){
@@ -1243,7 +1248,7 @@ int16_t sp0256_get_sample_sing(void){
     sp0256_newsay();
    }
   
-   return output<<2;
+   return output;
  }
 
 
@@ -1259,7 +1264,7 @@ int16_t sp0256_get_sample_sing(void){
           sp0256_newsayTTS();
    }
 
-   return output<<2;
+   return output;
  }
 
 
@@ -1274,7 +1279,7 @@ int16_t sp0256_get_sample_sing(void){
    }
 
    
-return output<<2;
+return output;
  }
 
  int16_t sp0256_get_samplevocabbanktwo(void){
@@ -1287,7 +1292,7 @@ lpc12_update(&m_filt, &output);
           sp0256_newsayvocabbanktwo(0);
    }
 
-   return output<<2;
+   return output;
  }
 
 extern char TTSinarray[17];

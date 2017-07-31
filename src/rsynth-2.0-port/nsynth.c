@@ -935,7 +935,7 @@ unsigned int parwavesinglesample(klatt_global_ptr globals, klatt_frame_ptr frame
 		out = resonator(&r2p, sourc) - out;
 
 		out = amp_bypas * sourc - out;
-		out = resonator(&rout, out);//*8.0f; - why so quiet tho?
+		out = resonator(&rout, out)*0.6f;//*8.0f; - why so quiet tho?
 		//		*(jwave+(ns%32)) = clip(globals, out); /* Convert back to integer */
 		//		u8 rr=ns%32;
 		return clip(globals,out);

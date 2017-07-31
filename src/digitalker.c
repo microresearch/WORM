@@ -686,7 +686,7 @@ void digitalker_step()
 #ifndef LAP
 			if (modus==0){
 			val=_sely*131.0f;
-			MAXED(val,128);
+			MAXED(val,127);
 			m_repeats = ((v1 >> 4) & 7) + 1 ;
 			  //			m_repeats+=val;
 			  m_repeats=(m_repeats*logpitch[val])+1;

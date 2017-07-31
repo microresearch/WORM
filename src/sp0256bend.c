@@ -851,7 +851,7 @@ int16_t sp0256_get_samplebend(void){
      sp0256_newsaybend();
    }
       //          }
-   return output;
+   return output<<1;
 }
 
 extern const unsigned char remap19[];
