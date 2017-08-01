@@ -243,22 +243,22 @@ void rsynth_newsay_elm()
   unsigned char ii;
   ff0 = contour;
   //  nf0 = 3;
-  ff0[1]=0;
-  for (ii = 0; ii < nelm; ii += 2) {
+  //  ff0[1]=0;
+  /*  for (ii = 0; ii < nelm; ii += 2) {
     ff0[1] += test_elm_rsynthy[ii + 1]; // length in frames
-  }
+    }*/
   //  ff0[1] = 0.6f * ff0[0];	/* bottom */
 
-  ff0[0] = 1.1f * rsynth->speaker->F0Hz;	/* top */
+  //  ff0[0] = 1.1f * rsynth->speaker->F0Hz;	/* top */
   //    ff0[1] = 1.1f * rsynth->speaker->F0Hz;	/* top */
-  ff0[2] = 0.6f * ff0[0];	/* bottom */
+  //  ff0[2] = 0.6f * ff0[0];	/* bottom */
 
   f0s = rsynth->speaker->F0Hz;
   f0e = f0s;
   int j;
   const Elm_ptr le = &Elementz[0];
   
-  f0e = f0s = *ff0++;
+  //  f0e = f0s = *ff0++;
     for (j = 0; j < nEparm; j++) {
 	flt[j].v = le->p[j].stdy;
 	flt[j].a = rsynth->smooth;
@@ -266,8 +266,8 @@ void rsynth_newsay_elm()
     }
 
     i=0; // start of new elements
-    tf0=0;
-    ntf0=0;
+    //    tf0=0;
+    //    ntf0=0;
     nextelement=1;
 }
 
@@ -644,8 +644,8 @@ int16_t rsynth_get_sample_elm(){
   u8 val=_selz*87.0f;
   MAXED(val,83);
   val=83-val;
-  test_elm_rsynthy[xaxis*2]=val; // xaxis must be 
-  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+1; // length say max 32 - short to long left to t=right
+  test_elm_rsynthy[xaxis*2]=val+1; // xaxis must be 
+  test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+2; // length say max 32 - long to short left to right
 
   
   if (i>nelm && nextelement==1){   // NEW utterance which means we hit nelm=0 in our cycling:
@@ -713,18 +713,19 @@ int16_t rsynth_get_sample_elm(){
 					   t, dur));
 		}
 
-		while (tf0 == ntf0) { // first time?
-		  tf0 = 0;
+		//		while (tf0 == ntf0) { // first time?
+      // tf0 = 0;
 		  //		  f0s = f0e;
-		  ntf0 = (unsigned int) *ff0++;
+		//	  ntf0 = (unsigned int) *ff0++;
 		  //		  f0e = *ff0++;
-		  }
+		//  }
 
 		/* interpolate the f0 value */
 		//		F0Hz = linear(f0s, f0e, tf0, ntf0);
 		F0Hz = rsynth->speaker->F0Hz;
 		nextelement=0;
-		t++; tf0++;
+		t++;
+		// tf0++;
     } //dur
 
     else { // hit end of DUR number of frames...

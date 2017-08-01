@@ -178,7 +178,6 @@ typedef struct wormer_ {
 
 static const wormer sp0256er={0, 0.3125f, sp0256_get_sample, sp0256_newsay, 0, 0};
 static const wormer sp0256TTSer={0, 0.3125f, sp0256_get_sampleTTS, sp0256_retriggerTTS, 0, 1};
-
 static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_newsay, 0, 0};
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
@@ -273,8 +272,8 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample, compost_newsay_fro
 
 static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengther, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tmsbend5200erx, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5200pitchtablebenderx, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &tms5200kandpitchtablebenderx, &sp0256er, &sp0256singer, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &composter, &compostfrer};
 
-#define MODEF 67.0f // float 68.0f
-#define MODEFC 66.0f // float 68.0f
+#define MODEF 66.0f // float 68.0f
+#define MODEFC 65.0f // float 68.0f
 #define MODET 63 // mode top 63 // 61 for no COMPOST
 #define COMPOST 62
 #define COMPOSTF 63
@@ -423,13 +422,13 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=31; //TESTY
+  _intmode=25; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
   // TESTY: OUT COMMENT BELOW
-  
-  /*   if (oldmode!=_intmode) {// IF there is a modechange!
+  /*
+     if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     // if we are not leaving compost
     if (oldmode!=COMPOST && oldmode!=COMPOSTF){
@@ -438,8 +437,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldsely=_sely;
     oldselz=_selz;
     }
-    }*/
-    
+    }
+  */
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;

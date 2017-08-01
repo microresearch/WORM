@@ -1214,7 +1214,7 @@ void sp0256_newsay1219(void){
     else {    
       m_romm=m_rom19;
       indexy=selector-37;
-      dada=remap19[indexy];
+      dada=remap19[indexy]; // checked
       
       if (indexy>19) m_page=0x8000<<3;
       else m_page=0x1000<<3;
@@ -1347,7 +1347,7 @@ void sp0256_retriggerTTS(void){// called on a trigger
      m_lrq = 0; //from 8 bit write
  }
 
-void sp0256_newsayvocabbankonea(){
+void sp0256_newsayvocabbankonea(){ // calls a reset back to start of phoneme vocab
   sp0256_newsayvocabbankone(1);
 }
 

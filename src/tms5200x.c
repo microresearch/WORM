@@ -31,9 +31,9 @@ typedef int32_t INT32;
 
 #define TMS_VOCAB 67 // TOTAL
 #define TMS_VOCAB_TOP 66 // 0-
-#define TMS_VOCAB_F 71.0f 
+#define TMS_VOCAB_F 70.0f 
 #define ALLPHON_BANK 52 // CHECKed
-#define EXTRAX 53 // this is the extra vocab
+#define EXTRAX 53 // this is the extra vocab - arcade_one
 
 // group first 5100:
 
@@ -108,8 +108,8 @@ typedef struct TMS_vocab__ {
 
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f}; // en - OK and not 2801!
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};//ti99 alphons
-/*
 
+/*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; //1982 spell
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -211,10 +211,8 @@ const TMS_vocab vocab_male_1={wordlist_male_1, &tms5220_coeff, 102, 106.0f};
 const TMS_vocab vocab_male_2={wordlist_male_2, &tms5220_coeff, 102, 106.0f};
  
 const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321, &vocab_2322, &vocab_2350_1, &vocab_2350_2, &vocab_2352_1, &vocab_2352_2, &vocab_spkspellone_1, &vocab_spkspellone_2, &vocab_spkspelltwo_1, &vocab_spkspelltwo_2, &vocab_D000_1, &vocab_D000_2, &vocab_D001_1, &vocab_D001_2, &vocab_D002_1, &vocab_D002_2, &vocab_D003, &vocab_D004_1, &vocab_D004_2, &vocab_D005_1, &vocab_D005_2, &vocab_D006_1, &vocab_D006_2, &vocab_D007_1, &vocab_D007_2, &vocab_D008, &vocab_D009_1, &vocab_D009_2, &vocab_D010_1, &vocab_D010_2, &vocab_D011, &vocab_D012_1, &vocab_D012_2, &vocab_D013, &vocab_D014, &vocab_D015_1, &vocab_D015_2, &vocab_D016, &vocab_D017, &vocab_D018, &vocab_D019, &vocab_D020_21, &vocab_D022, &vocab_D023, &vocab_D024_25, &vocab_D026, &vocab_D027_34, &vocab_echofemale_1, &vocab_echofemale_2, &vocab_mpf, &vocab_alphons, &vocab_arcade_one, &vocab_arcade_two, &vocab_ti99_one_1, &vocab_ti99_one_2, &vocab_ti99_two_1, &vocab_ti99_two_2, &vocab_acorn_1, &vocab_acorn_2, &vocab_large_male_one_1, &vocab_large_male_one_2, &vocab_large_male_two_1, &vocab_large_male_two_2, &vocab_male_1, &vocab_male_2}; // 67
-
-//LIST: &0vocab_2303, &1vocab_2304, &2vocab_2321, &3vocab_2322, &4vocab_2350_1, &5vocab_2350_2, &6vocab_2352_1, &7vocab_2352_2, &8vocab_spkspellone_1, &9vocab_spkspellone_2, &10vocab_spkspelltwo_1, &11vocab_spkspelltwo_2, &12vocab_D000_1, &13vocab_D000_2, &14vocab_D001_1, &15vocab_D001_2, &16vocab_D002_1, &17vocab_D002_2, &18vocab_D003, &19vocab_D004_1, &20vocab_D004_2, &21vocab_D005_1, &22vocab_D005_2, &23vocab_D006_1, &24vocab_D006_2, &25vocab_D007_1, &26vocab_D007_2, &27vocab_D008, &28vocab_D009_1, &29vocab_D009_2, &30vocab_D010_1, &31vocab_D010_2, &32vocab_D011, &33vocab_D012_1, &34vocab_D012_2, &35vocab_D013, &36vocab_D014, &37vocab_D015_1, &38vocab_D015_2, &39vocab_D016, &40vocab_D017, &41vocab_D018, &42vocab_D019, &43vocab_D020_21, &44vocab_D022, &45vocab_D023, &46vocab_D024_25, &47vocab_D026, &48vocab_D027_34, &49vocab_echofemale_1, &50vocab_echofemale_2, &51vocab_mpf, &52vocab_alphons, &53vocab_arcade_one, &54vocab_arcade_two, &55vocab_ti99_one_1, &56vocab_ti99_one_2, &57vocab_ti99_two_1, &58vocab_ti99_two_2, &59vocab_acorn_1, &60vocab_acorn_2, &61vocab_male_1, &62vocab_male_2};//, &63vocab_large_male_one_1, &64vocab_large_male_one_2, &65vocab_large_male_two_1, &66vocab_large_male_two_2}; // 67
-
 */
+//LIST: &0vocab_2303, &1vocab_2304, &2vocab_2321, &3vocab_2322, &4vocab_2350_1, &5vocab_2350_2, &6vocab_2352_1, &7vocab_2352_2, &8vocab_spkspellone_1, &9vocab_spkspellone_2, &10vocab_spkspelltwo_1, &11vocab_spkspelltwo_2, &12vocab_D000_1, &13vocab_D000_2, &14vocab_D001_1, &15vocab_D001_2, &16vocab_D002_1, &17vocab_D002_2, &18vocab_D003, &19vocab_D004_1, &20vocab_D004_2, &21vocab_D005_1, &22vocab_D005_2, &23vocab_D006_1, &24vocab_D006_2, &25vocab_D007_1, &26vocab_D007_2, &27vocab_D008, &28vocab_D009_1, &29vocab_D009_2, &30vocab_D010_1, &31vocab_D010_2, &32vocab_D011, &33vocab_D012_1, &34vocab_D012_2, &35vocab_D013, &36vocab_D014, &37vocab_D015_1, &38vocab_D015_2, &39vocab_D016, &40vocab_D017, &41vocab_D018, &42vocab_D019, &43vocab_D020_21, &44vocab_D022, &45vocab_D023, &46vocab_D024_25, &47vocab_D026, &48vocab_D027_34, &49vocab_echofemale_1, &50vocab_echofemale_2, &51vocab_mpf, &52vocab_alphons, &53vocab_arcade_one, &54vocab_arcade_two, &55vocab_ti99_one_1, &56vocab_ti99_one_2, &57vocab_ti99_two_1, &58vocab_ti99_two_2, &59vocab_acorn_1, &60vocab_acorn_2, &61vocab_male_1, &62vocab_male_2};//, &63vocab_large_male_one_1, &64vocab_large_male_one_2, &65vocab_large_male_two_1, &66vocab_large_male_two_2}; // 67
 
 //};//
 
@@ -243,14 +241,13 @@ static INT16 clip_analog(INT16 cliptemp);
  * The second line is more accurate mathematically but not accurate to the patent
  */
 #define INTERP_SHIFT >> m_coeff->interp_coeff[m_IP]
-//define INTERP_SHIFT / (1<<m_coeff->interp_coeff[m_IP])
+//#define INTERP_SHIFT / (1<<m_coeff->interp_coeff[m_IP])
 
 /* Other hacks */
 /* HACK?: if defined, outputs the low 4 bits of the lattice filter to the i/o
  * or clip logic, even though the real hardware doesn't do this, partially verified by decap */
-//#undef ALLOW_4_LSB
-
-#define ALLOW_4_LSB 1
+#undef ALLOW_4_LSB
+//#define ALLOW_4_LSB 1
 
 /* *****configuration of chip connection stuff***** */
 /* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
@@ -391,7 +388,7 @@ UINT8 m_subc_reload=1;      /* contains 1 for normal speech, 0 when SPKSLOW is a
 	   The internal DAC used to feed the analog pin is only 8 bits, and has the
 	   funny clipping/clamping logic, while the digital pin gives full 10 bit
 	   resolution of the output data.
-	   TODO: add a way to set/reset this other than the FORCE_DIGITAL define
+	   set/reset this other than the FORCE_DIGITAL define
 	 */
 	UINT8 m_digital_select=1;
 
@@ -638,7 +635,7 @@ void parse_frame_bend_5200()
 		return;
 	m_new_frame_pitch_idx*=2.0f*(1.0f-exy[1]);
 	if (m_coeff->pitch_bits==5 && m_new_frame_pitch_idx>31) m_new_frame_pitch_idx=31;
-	if  (m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63; // TESTYY - bug as was energy_idx???
+	if  (m_new_frame_pitch_idx>63) m_new_frame_pitch_idx=63; // fixed bug as was energy_idx???
 	
 	// extract first 4 K coefficients - deal with length of these individually
 	//	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
@@ -1031,7 +1028,7 @@ int16_t process(u8 *ending)
 		m_pitch_count &= 0x1FF;
 		if (m_digital_select==0) return sample>>1; // 0 is lowbit
 		else
-		  return sample<<1; 
+		  return sample<<1; // tested and leave as is 
 }
 
 int16_t process_k_tabled5100(u8 *ending) 
@@ -1991,6 +1988,7 @@ void tms_newsay(){
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
   //  whichbank=0; // TESTY CHECK!!!
+  //  whichbank=1;
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -2000,7 +1998,7 @@ void tms_newsay(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  //  sel=0; // TESTY CHECK!!!
+  //sel=0; // TESTY CHECK!!!
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 

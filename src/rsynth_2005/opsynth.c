@@ -39,7 +39,7 @@
 
 #define FPCHECK(x)
 
-
+extern float ampl;
 static float range_max = 0.0f;	/* largest value seen */
 static int range_ln = 0;	/* Line number it occurred */
 
@@ -477,8 +477,11 @@ int16_t rsynth_frame_single(rsynth_t * rsynth, float F0Hz, float *frame){
 #endif
 	noise *= PVT(amp_af);
 
-	voice = rsynth_filter(rsynth, voice, noise);
-  
+	voice = rsynth_filter(rsynth, voice, noise)*ampl;
+	if (voice>32767) voice=32767;
+	else if (voice<-32767) voice=-32767;
+
+	
 	return voice;
 
   }

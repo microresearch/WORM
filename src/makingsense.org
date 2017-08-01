@@ -2154,15 +2154,13 @@ check >nelm vs >= - no great difference?
 
 ** 18/7+ 21/7
 
-//&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
+&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
 &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er,
 &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx,
 &13tms5100pitchtablebender, &14tms5200pitchtablebender,
 &15tms5200pitchtablebenderx, &16tms5100ktablebender,
 &17tms5200ktablebender, &18tms5100kandpitchtablebender,
 &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
-
-TESTED to here...
 
 &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer,
 &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, 
@@ -2233,20 +2231,27 @@ check threshold and trigger in general...
 
 - re-try f3 and f4 back in votrax REVERTED DONE
 
-/////
+** 1/8
 
-- sanity check of all array extents and re-test each mode/full...
+- all files and re-test each mode/full - no defines in tms/all tested
+
+checked volumes/sanity: 
+
+TMS: vocab_spkspelltwo_1 issue FIXED, checked 0,1,4-10 of TMS vocabs so far TODO
+
+sp0256: testing 21->
+
+- sanity check of all array extents, check TTS sanity AGAIN and any general stuff eg. ???
 
 ** FINAL TODO:
 
 - image for modulargrid - DONE
 
-
 - run through each mode/all modes - test all and test trigger in eachDONE
 
 - samples: work through 1501->1522 and 1524+ (some chosen already)
 
-- check all volumes/levels on scope... 
+- check all volumes/levels on scope... DONE
 
 - remove TESTY and check tms on this for shorter loadings
 
@@ -2718,7 +2723,6 @@ NOTES: on RAW if we need to invert certain parameters or keep all consistent, al
 |--------+---------+----------------+-------+-----+------+---------------+-------|
 |        | compost | composter      | start | end | mode | restart mode  | T     |
 |        | compost | compost frozen | start | end | mode | toggle freeze | T     |
-
 
 
 * website/announce
