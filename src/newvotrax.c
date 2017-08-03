@@ -1391,7 +1391,7 @@ int16_t votrax_get_sample(){
   modus=0;
   uint16_t sample; u8 x;
   m_sample_count++;
-  if(m_sample_count & 1)// TESTY!
+  if(m_sample_count & 1)
     chip_update();
   sample=analog_calc();
   if (sample_count++>=lenny){

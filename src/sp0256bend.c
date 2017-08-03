@@ -860,9 +860,9 @@ void sp0256_newsaybend(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selz*88.0f; // total is 36+49=85
-  MAXED(selector,84);
-  selector=84-selector;
+  u8 selector=_selz*89.0f; // total is 36+49=85
+  MAXED(selector,85);
+  selector=85-selector;
   if (selector<37) { // so top is 36
     m_page=0x1000<<3;
    m_romm=m_rom12;
@@ -871,7 +871,7 @@ void sp0256_newsaybend(void){
     else {    
       m_romm=m_rom19;
       indexy=selector-37;
-      dada=remap19[indexy];
+      dada=remap19[indexy]; // there are 49 so should be 85
       if (indexy>19) m_page=0x8000<<3;
       else m_page=0x1000<<3;
     }

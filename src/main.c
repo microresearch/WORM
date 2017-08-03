@@ -43,7 +43,7 @@
 #include "vot.h"
 #include "parwave.h"
 #include "samplerate.h"
-#endif
+b#endif
 
 void rsynth_init(long sr, float ms_per_frame);
 

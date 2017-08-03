@@ -1201,9 +1201,9 @@ void sp0256_newsay1219(void){
   u8 dada, indexy;
   m_lrq=0; m_halted=1; m_filt.rpt=0;
 
-  u8 selector=_selz*88.0f; // total is 36+49=85
-  MAXED(selector, 84); //0-84
-  selector=84-selector; // inverted
+  u8 selector=_selz*89.0f; // total is 36+49=85
+  MAXED(selector, 85); //0-85
+  selector=85-selector; // inverted
   
   //  selector=34;
 

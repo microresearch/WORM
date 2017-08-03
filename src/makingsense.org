@@ -2248,11 +2248,9 @@ SAM: 36-45 tested and keep volume as is... re-check pitch and 45/bendCHECKED
 
 DIGI: all fine - but re-test with full tests
 
-RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small changes
+RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small changes - 49-61: checked
 
-///// sanity/TTS/check each mode/check all modes and compost
-
-- sanity check of all array extents, check TTS sanity AGAIN and any general stuff eg. ???
+- checked all MAXED extents
 
 ** FINAL TODO:
 
@@ -2266,7 +2264,11 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 - remove TESTY and check tms on this for shorter loadings
 
+///// sanity/all array extents/TTS/check each mode/check all modes and compost
+
 *- re-check all modes, full test with compost*
+
+- announce
 
 * announcement: 
 

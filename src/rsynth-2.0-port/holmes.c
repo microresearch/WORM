@@ -815,7 +815,7 @@ top = 1.1 * def_pars.F0hz10;
   MAXED(val,127);
   val=127-val;
 
- const klattvocab_ *ourvocab=vocabklatt[val];
+  const klattvocab_ *ourvocab=vocabklatt[val]; // 128 in vocab
  elm_plen=ourvocab->length; 
  vocab_elm=ourvocab->elements;
  
