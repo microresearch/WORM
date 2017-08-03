@@ -7,6 +7,9 @@
 
 // this one is stock allophone al2 rom
 
+// stderr redirect etc =  ./say 0  2>&1 > /dev/dsp
+
+
 #include "sp0romstest.h"
 
 
@@ -220,7 +223,8 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 		if (f->per_orig)
 		{
 		  f->per=f->per_orig;//*0.5f;//+40;
-			if (--f->cnt <= 0)
+		  fprintf(stderr, "per %d count %d rpt %d\n", f->per, f->cnt, f->rpt);
+		  if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
@@ -233,7 +237,7 @@ static inline INT16 lpc12_update(struct lpc12_t *f)
 			} else
 			{
 				samp = 0;
-				//				f->cnt--;
+				f->cnt--;
 			}
 
 		} else
@@ -1248,9 +1252,9 @@ void main(int argc, char *argv[]){
       	  
    while(1){
 
-     dada=rand()%64;
-     m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
-     m_page     = 0x8000 << 3; // was 0x1000 // this works!
+     //     dada=rand()%64;
+     //     m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
+     //     m_page     = 0x8000 << 3; // was 0x1000 // this works!
      m_lrq = 0; //from 8 bit write
      m_halted=0;
      

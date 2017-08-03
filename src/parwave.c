@@ -470,7 +470,7 @@ int16_t single_single_parwave(klatt_global_ptrr globals, int16_t *frame){
     out = resonator(&(globals->r3p),sourc) - out;
     out = resonator(&(globals->r2p),sourc) - out;
 
-    out = globals->amp_bypas * sourc - out;
+        out = globals->amp_bypas * sourc - out;
 
     out = resonator(&(globals->rout),out);
 
@@ -562,35 +562,32 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
   globals->amp_frica = DBtoLIN(frame[22]) * 0.25f; // AF
   globals->par_amp_voice = DBtoLIN(frame[38]); // AVpdb
   globals->amp_bypas = DBtoLIN(frame[37]) * 0.05f; // AB
-  /*  frame[39] = frame[39] - 3;
-  if (frame[39] <= 0) 
-  {
-    frame[39] = 57;
-    }*/
+
+
   globals->amp_gain0 = DBtoLIN(frame[39]); // gain0
 
-  //  if (globals->nfcascade >= 6)    
-  //  {
-    setabc(frame[12],frame[13],&(globals->r6c),globals);
-    //  }
+   if (globals->nfcascade >= 6)    
+    {
+      setabc(frame[12],frame[13],&(globals->r6c),globals);
+      }
 
   
   /* Set coefficients of variable cascade resonators */
-  /*
+  
   if (globals->nfcascade >= 8)    
   {
-    if (globals->samrate >= 16000){
+    if (globals->samrate >= 16000)
       setabc(7500,600,&(globals->r8c),globals);
     else
       globals->nfcascade = 6;
   }
   if (globals->nfcascade >= 7)    
   {
-    //    if (globals->samrate >= 16000){
+        if (globals->samrate >= 16000)
       setabc(6500,500,&(globals->r7c),globals);
-    //    else
-    //      globals->nfcascade = 6;
-    //  }
+        else
+          globals->nfcascade = 6;
+      }
   if (globals->nfcascade >= 6)    
   {
     setabc(frame[12],frame[13],&(globals->r6c),globals);
@@ -599,7 +596,6 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
   {
     setabc(frame[10],frame[11],&(globals->r5c),globals);
   }
-  (
   setabc(frame[8],frame[9],&(globals->r4c),globals);
   setabc(frame[6],frame[7],&(globals->r3c),globals);
   setabc(frame[4],frame[5],&(globals->r2c),globals);
@@ -641,7 +637,7 @@ void frame_init(klatt_global_ptrr globals, int16_t* frame)
   */
 static float impulsive_source(klatt_global_ptrr globals)
 {
-  static float doublet[] = {0.0,13000000.0f,-13000000.0f};
+    static float doublet[] = {0.0,13000000.0f,-13000000.0f};
   static float vwave;
 
   if (globals->nper < 3) 

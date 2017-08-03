@@ -169,7 +169,7 @@ void sp0256_init()
 	m_filt.rng = 1;
 
 	memset(m_rom,0,65536);
-	memcpy(m_rom+0x1000,m_romTRON,24576);
+	memcpy(m_rom+0x1000,m_roma,24576);
 	//	memcpy(m_rom+0x4000,m_romb,0x4000);
 	//	memcpy(m_rom+0x8000,m_romc,0x4000);
 	

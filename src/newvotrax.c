@@ -358,7 +358,7 @@ void chip_update_bend()
 	MAXED(val,127);
 	val=127-val;
 
-	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0;
+	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*logpitch[val])))) m_pitch = 0; // 7 bits 128
 
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -485,13 +485,11 @@ void chip_update()
 	val=127-val;
 	if (modus==0){
 	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ ((int)(m_filt_f1*2.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
-	  //	  if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as == TESTY!
 	}
 	else
 	  {
 	    if(m_pitch == (int)(0x7f ^ ((int)(12.0f*logpitch[val])))) m_pitch = 0; // maintain as ==
 	  }
-	//	if(m_pitch == (0x7f ^ (m_inflection << 4) ^ (m_filt_f1))) m_pitch = 0; // maintain as ==
 #endif
 	// Filters are updated in index 1 of the pitch wave, which does
 	// indeed mean four times in a row.
@@ -1362,22 +1360,22 @@ static int16_t sample_count=0;
 
 void votrax_newsay(){
   m_cclock = m_mainclock / 36.0f;
-  u8 sel=_selz*68.0f; 
-  MAXED(sel,64);
-  sel=64-sel;
+  u8 sel=_selz*67.0f; 
+  MAXED(sel,63);
+  sel=63-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
   u8 val=_sely*131.0f;
   MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(3.2f*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 }
 
 void votrax_newsay_sing(){
   m_cclock = m_mainclock / 36.0f;
-  u8 sel=_selz*68.0f; 
-  MAXED(sel,64);
-  sel=64-sel;
+  u8 sel=_selz*67.0f; 
+  MAXED(sel,63);
+  sel=63-sel;
   writer(sel); // what are we writing - is ROM index
   phone_commit();
   u8 val=_sely*131.0f;
@@ -1447,11 +1445,11 @@ void votrax_newsay_bend(u8 reset){
   u8 val=exy[8]*132.0f;
   MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(3.2f*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   //  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32;  // we should bend length too as last exy-> exy[8]DONE
 }
 
-void votrax_newsay_bendr(u8 reset){
+void votrax_newsay_bendr(){
   votrax_newsay_bend(1);
 }
 
@@ -1494,7 +1492,7 @@ void votrax_newsaygorf(u8 reset){
   u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(3.2f*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
   }
   
 void votrax_newsaygorfr(){
@@ -1520,7 +1518,7 @@ void votrax_newsaywow(u8 reset){
   u8 val=_sely*132.0f;
   MAXED(val,127);
   //  val=127-val;
-  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(3.2f*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
 
   //m_timer->adjust(attotime::from_ticks(16*(m_rom_duration*4+1)*4*9+2, m_mainclock), T_END_OF_PHONE);
   //  m_sclock = m_mainclock / 18.0f * logpitch[val]; // so 40000 - doesn't do anything if we have both in sync - crashes filter

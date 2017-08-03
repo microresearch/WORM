@@ -225,7 +225,7 @@ static inline u8 rendervoicedsample(unsigned char *mem66, int16_t* sample, u8 st
 		  //	  	  MAXED(val,1023);
 		  //	  	  pitchmod=pitches[mem49]*logspeed[val];
 	}
-	else if (modus&8) {
+	else if (modus&8) { //sam_get_sample_param
 	  u8 val=exy[0]*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[mem49]*logpitch[val];
@@ -388,8 +388,8 @@ pos48280:
 		//		*sample=((X&15)<<12)-28672; // check >>12??? .. but we can't output further one?
 		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
 		//		*sample=((((int16_t)(X)&15)-8)<<10); //1 byte - was <<10
-		//				*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
-		*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
+				*sample=(((int16_t)(X&15))<<12)-32768; // 32768>>1 16384 >>2 8192 >>3 4096
+		//		*sample=(((int16_t)(X&15))<<11)-16384; // 32768>>1 16384 >>2 8192 >>3 4096
 		//*sample=(rand()%65536)-32768;
 
 		if (X!=0) goto pos48296;
@@ -448,7 +448,7 @@ void    sam_frame_rerun() {
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
 		    }*/	
-		  else if (modus&8) {
+		  else if (modus&8) {//sam_get_sample_param
 		    u8 val=exy[1]*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
@@ -469,7 +469,7 @@ void    sam_frame_rerun() {
 	  //	  pitchmod=pitches[0]*logspeed[val];
 
 		  }
-		  else if (modus&8) {
+		  else if (modus&8) { //sam_get_sample_param
 		    u8 val=exy[0]*130.0f;
 		    MAXED(val,127);
 		    pitchmod=pitches[0]*logpitch[val];
@@ -542,7 +542,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
 		    }*/	
-		  else if (modus&8) {
+		  else if (modus&8) { //sam_get_sample_param
 		    u8 val=exy[1]*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
@@ -584,8 +584,8 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 						//			Output(0, A);
 			howmany=Output(0);
 			//			*sample=(((int16_t)(A)-8)<<12); //1 byte - was <<10
-			//			*sample=(((int16_t)(A&15))<<12)-32768;
-			*sample=(((int16_t)(A&15))<<12)-32768;
+				*sample=(((int16_t)(A&15))<<12)-32768;
+			//*sample=(((int16_t)(A&15))<<11)-16384;
 			//			*sample=0;
 			//						*sample=(((int16_t)(A))<<11)-16384;
 			speedcounter--;
@@ -621,7 +621,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 		    speedcounter=speedd*logpitch[val];
 		    }*/	
 
-		  else if (modus&8) {
+		  else if (modus&8) { //sam_get_sample_param
 		    u8 val=exy[1]*130.0f;
 		    MAXED(val,127);
 		    speedcounter=speedd*logpitch[val];
@@ -651,7 +651,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 				      //		      		      pitchmod=pitches[Y]*logspeed[val];
 
 		  }
-		  else if (modus&8) {
+		  else if (modus&8) { //sam_get_sample_param
 		    u8 val=exy[0]*130.0f;
 		    MAXED(val,127);
 		    pitchmod=pitches[Y]*logpitch[val];
@@ -709,7 +709,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 	  //	  pitchmod=pitches[Y]*logspeed[val];
 
 	}
-	else if (modus&8) {
+	else if (modus&8) { //sam_get_sample_param
 	  u8 val=exy[0]*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[Y]*logpitch[val];
@@ -783,7 +783,7 @@ u8 rendersamsample(int16_t* sample,u8* ending){
 	  //	  pitchmod=pitches[Y]*logspeed[val];
 
 	}
-	else if (modus&8) {
+	else if (modus&8) { //sam_get_sample_param
 	  u8 val=exy[0]*130.0f;
 	  MAXED(val,127);
 	  pitchmod=pitches[Y]*logpitch[val];
@@ -893,7 +893,7 @@ do
 	// copy from the source to the frames list
 	do
 	{
-	  if (modus&16){
+	  if (modus&16){//sam_get_sample_bend
 	    u8 val=(1.0f-exy[Y])*130.0f;
 	      MAXED(val,127);
 	      frequency1[X] = freq1data[Y]*logpitch[val];

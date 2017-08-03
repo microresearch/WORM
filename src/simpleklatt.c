@@ -64,7 +64,7 @@ static const int16_t mins[40] __attribute__ ((section (".flash"))) = {200,  0, 2
 
 
 
-static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 50, 55, 40, 20, 40, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 40, 40, 50}; // changed some of range 
+static const int16_t range[40] __attribute__ ((section (".flash"))) ={3800, 70, 1100, 960, 2450, 960, 3799, 960, 3799, 960, 3799, 960, 3799, 1960, 280, 960, 280, 960, 40, 55, 40, 20, 40, 40, 80, 960, 80, 960, 80, 960, 80, 960, 80, 960, 80, 1960, 80, 40, 40, 40}; // changed some of range 
 
 // after 280 is nasal bw, asp ampX-reduced, 
 
@@ -82,9 +82,9 @@ void simpleklatt_init(void){
   //  framer framezz[40];
   //  frame_init(globals,simpleklattset.val); 
 
-  globals->synthesis_model = 0; // all_parallel - try for other = 0
+  globals->synthesis_model = 0; // all_parallel=1 cascade=0
  globals->samrate = 16000;
- globals->glsource = 1; // 1=impulsive 2=glottal impulse 3=sampled as above
+ globals->glsource = 1; // 1=impulsive 2=glottal impulse 3=sampled as above =1
  globals->natural_samples = natural_samples;
  globals->num_samples = NUMBER_OF_SAMPLES;
 //  globals->sample_factor = (float) SAMPLE_FACTOR;
@@ -104,9 +104,9 @@ void generate_exy_frame(int16_t* frame){
 unsigned char y;
 
     for (y=0;y<39;y++){
-      frame[y]=mins[y] + (range[y]*(1.0f-exy[y])); // TODO: floated loggy!
+      frame[y]=mins[y] + (range[y]*(1.0f-exy[y])); 
     }
-    frame[39]=60; // volume
+    frame[39]=42; // FIXED volume - higher if we revert to all parallel
       }
 
 int16_t simpleklatt_get_sample(){

@@ -2215,7 +2215,8 @@ check threshold and trigger in general...
   wierd-reduced samplerate and fixed volume, fixed some glitch in nvp
   by reducing samplerate
 
-- finished first set of rough tests, still decided against interpolation
+- finished first set of rough tests, still decided against
+  interpolation as this is not the issue
 
 ** 31/7
 
@@ -2231,15 +2232,25 @@ check threshold and trigger in general...
 
 - re-try f3 and f4 back in votrax REVERTED DONE
 
-** 1/8
+** 1/8 ->
 
 - all files and re-test each mode/full - no defines in tms/all tested
 
-checked volumes/sanity: 
+checked volumes/sanity/focus on problems: 
 
-TMS: vocab_spkspelltwo_1 issue FIXED, checked 0,1,4-10 of TMS vocabs so far TODO
+TMS: vocab_spkspelltwo_1 issue FIXED, checked 0,1,4-10 of *TMS vocabs so far TODO*
 
-sp0256: testing 21->
+sp0256: testing 21->27 // small changes 
+
+VOT: 28-35 tested. &34votraxparamer->volume?NON. fixed some length and phoneme bugs
+
+SAM: 36-45 tested and keep volume as is... re-check pitch and 45/bendCHECKED
+
+DIGI: all fine - but re-test with full tests
+
+RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small changes
+
+///// sanity/TTS/check each mode/check all modes and compost
 
 - sanity check of all array extents, check TTS sanity AGAIN and any general stuff eg. ???
 

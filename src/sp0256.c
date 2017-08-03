@@ -222,10 +222,11 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 		  MAXED(val,1023);
 		  if (modus!=1)	f->per=f->per_orig*logspeed[val];
 		  else f->per=64.0f*logspeed[val];
+		  //		  f->per=f->per_orig;
 		  //		  f->per=128;
 		  //		  f->per=count++;
 		  //		  if (count>255) count=128;
-			if (f->cnt-- <= 0)
+			if (f->cnt <= 0)
 			{
 				f->cnt += f->per;
 				samp    = f->amp;
@@ -238,7 +239,7 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 			} else
 			{
 				samp = 0;
-				//				f->cnt--;
+				f->cnt--;
 			}
 
 		} else
@@ -281,10 +282,10 @@ static inline void lpc12_update(struct lpc12_t *f, INT16* out)
 		/*  Stop if we expire our repeat counter and return the actual      */
 		/*  number of samples we did.                                       */
 		/* ---------------------------------------------------------------- */
-		//		if (f->rpt <= 0) {
-		  //		  *out=0;
-		  //		  return 0; 
-		//		}
+				if (f->rpt <= 0) {
+		  		  *out=0;
+		  		  return; 
+				}
 		/* ---------------------------------------------------------------- */
 		/*  Each 2nd order stage looks like one of these.  The App. Manual  */
 		/*  gives the first form, the patent gives the second form.         */
