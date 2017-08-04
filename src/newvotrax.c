@@ -1608,7 +1608,7 @@ int16_t votrax_get_samplewow(){
 void votrax_newsayTTS(){
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
-  inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
+    inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
   //  u8 val=_selx*132.0f;
   //  MAXED(val,127);
   //  val=127-val;
@@ -1640,9 +1640,9 @@ int16_t votrax_get_sampleTTS(){
 void votrax_retriggerTTS(){
   m_cclock = m_mainclock / 36.0f;
   TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
-  writer(TTSoutarray[TTSindex]); 
+  writer(TTSoutarray[0]); 
   phone_commit();
-  inflection_w(TTSoutarray[0]>>6); // how many bits?
+  //  inflection_w(TTSoutarray[0]>>6); // how many bits?
   //  u8 val=_sely*132.0f;
   //  MAXED(val,127);
   //  val=127-val;

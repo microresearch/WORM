@@ -169,7 +169,7 @@ void rsynth_newsay_single(u8 once)
 
   u8 val=_selz*87.0f;
   MAXED(val,83);
-  val=83-val;
+  val=83-val; // there are 84 elements
 
   element[0]=element[2];
   element[1]=element[3];

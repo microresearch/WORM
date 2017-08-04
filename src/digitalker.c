@@ -806,19 +806,20 @@ void digitalk_newsay(){
   // say 44+64=108
 
   u8 val=_selz*112.0f;// but there should be 0-143 phrases or in scorpion - 45??? what do we have
-  MAXED(val,107);
-  val=107-val; // invert
-  if (val>63){
-    val=val-64;
+  MAXED(val,104); // was 107
+  val=104-val; // invert
+  //  val=104;
+  if (val>64){
+    val=val-65;
     m_rom=m_rom_scorpion;
   }
   else 
     m_rom=m_rom_SSR1;
-  u8 which=val; 
+  //  u8 which=val; 
 #else
        u8 which =1;
 #endif
-  digitalker_start_command(which);
+  digitalker_start_command(val);
 }
 
 

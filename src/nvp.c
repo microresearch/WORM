@@ -282,9 +282,10 @@ void init_nvp(void){
 
   //change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
-  //      change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+  //        change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused,
+  //  change_nvpparams(&framer, 0.5f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
   // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
-  change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.01f); // envpitch=endVoicePitch is unused, 
+    change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.01f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[0][i]; 

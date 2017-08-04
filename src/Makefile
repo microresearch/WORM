@@ -37,6 +37,7 @@ OBJECTS += \
 LDSCRIPT = stm32_flash.ld
 
 # -DTESTING option for wavetables...
+# we need -Os to keep size in limits
 
 CFLAGS  =  -I. -IInclude -Iinc -I./rsynth-2.0-port -I./LPC -std=gnu99  \
 	 -D'__FPU_PRESENT=1' -DARM_MATH_CM4 \

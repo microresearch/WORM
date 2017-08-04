@@ -481,7 +481,6 @@ int16_t rsynth_frame_single(rsynth_t * rsynth, float F0Hz, float *frame){
 	if (voice>32767) voice=32767;
 	else if (voice<-32767) voice=-32767;
 
-	
 	return voice;
 
   }

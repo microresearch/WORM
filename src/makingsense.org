@@ -2262,11 +2262,21 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 - check all volumes/levels on scope... DONE
 
-- remove TESTY and check tms on this for shorter loadings
+- sanity-checked all - tweaks to nvp, digitalker
 
-///// sanity/all array extents/TTS/check each mode/check all modes and compost
+/check all array extents DONE
 
-*- re-check all modes, full test with compost*
+///4/8
+
+TTS re-check and test
+
+check each mode again
+
+check compost
+
+finally remove TESTY and check tms on this for shorter loadings
+
+full tests...
 
 - announce
 

@@ -5,7 +5,7 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
-#define THRESH 16000 // wa 16000
+#define THRESH 16000 
 #define THRESHLOW 10000
 
 #ifdef TESTING
@@ -73,7 +73,7 @@ static inline void doadc(){
   CONSTRAIN(_sely,0.0f,1.0f);
 
   value =(float)adc_buffer[SELZ]/65536.0f; 
-  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
+  smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // smoother
   _selz=smoothed_adc_value[4];
   CONSTRAIN(_selz,0.0f,1.0f);
 }
@@ -162,9 +162,7 @@ int16_t none_get_sample(){
 }
 
 void none_newsay(){
-
 }
-
 
 typedef struct wormer_ {
   u8 maxextent;
@@ -314,7 +312,7 @@ int16_t compost_get_sample(){
   u16 endy=(1.0f-_sely)*32767.0f;
   signed char dir;
 
-  if (freezer==1){
+  if (freezer==1){ // UNFROZEN
   // generate into audio_buffer based on selz mode and struct list
     /*  float value =(float)adc_buffer[SELZ]/65536.0f; 
   smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
@@ -335,7 +333,7 @@ int16_t compost_get_sample(){
   float factor=wormlist[compostmode]->sampleratio;
 
   if (time_now>32768){
-    int_time=0; // preserve???
+    int_time=0; 
     time_now-=32768.0f;
   }
 
@@ -422,7 +420,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=26; //TESTY
+  _intmode=60; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
@@ -430,8 +428,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   /*
      if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
-    // if we are not leaving compost
-    if (oldmode!=COMPOST && oldmode!=COMPOSTF){
+    // if we are not leaving compost - if we are entering compost ???
+    if ((intmode== COMPOST || intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
     doadc();
     oldselx=_selx;
     oldsely=_sely;
@@ -460,8 +458,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (sample<THRESHLOW) retrigger=0;
   }
 
-//&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner, &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er, &9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx, &13tms5100pitchtablebender, &14tms5200pitchtablebender, &15tms5200pitchtablebenderx, &16tms5100ktablebender, &17tms5200ktablebender, &18tms5100kandpitchtablebender, &19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx, &21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer, &25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, &28votraxer, &29votraxTTSer, &30votraxgorfer, &31votraxwower, &32votraxwowfilterbender, &33votraxbender, &34votraxparamer, &35votraxsinger, &36sambanks0er, &37sambanks1er, &38samTTSer, &39samTTSser, &40samphoner, &41samphonser, &42samphonsinger, &43samxyer, &44samparamer, &45sambender, &46digitalker, &47digitalker_sing, &48digitalker_bendpitchvals, &49rsynthy, &50rsynthelm, &51rsynthsingle, &52rsynthysing, &53klatter, &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing, &58simpleklatter, &59nvper, &60nvpvocaber, &61nvpvocabsing, &62composter, &63compostfrer}; // 64 modes
-  
   if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);

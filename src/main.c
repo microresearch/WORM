@@ -35,7 +35,6 @@
 #include "elements.h"
 #include "holmes.h"
 #include "sam.h"
-//#include "tube.h"
 #include "sp0256.h"
 #include "tms5200x.h"
 #include "digitalker.h"
@@ -43,11 +42,9 @@
 #include "vot.h"
 #include "parwave.h"
 #include "samplerate.h"
-b#endif
+#endif
 
 void rsynth_init(long sr, float ms_per_frame);
-
-//#include "raven.h"
 
 /* DMA buffers for I2S */
 __IO int16_t tx_buffer[BUFF_LEN], rx_buffer[BUFF_LEN];
@@ -68,8 +65,6 @@ u8 test_elm[51]={44, 8, 0, 54, 16, 0, 20, 8, 0, 1, 6, 0, 1, 6, 0, 25, 12, 0, 2, 
 u8 test_elm_rsynthy[108]={30, 4, 72, 4, 1, 6, 41, 8, 75, 16, 21, 8, 1, 6, 41, 8, 82, 6, 32, 4, 1, 6, 27, 12, 82, 6, 26, 10, 1, 6, 72, 4, 1, 6, 38, 8, 82, 6, 23, 8, 1, 6, 8, 6, 9, 1, 10, 2, 47, 6, 45, 6, 21, 8, 1, 6, 11, 8, 12, 1, 13, 1, 45, 6, 32, 4, 47, 6, 45, 6, 25, 11, 72, 4, 31, 12, 1, 6, 8, 6, 9, 1, 10, 2, 62, 9, 1, 6, 31, 12, 2, 8, 3, 1, 4, 2, 57, 7, 14, 8, 15, 1, 16, 4, 1, 6, 1, 6}; // length 106 and we keep last 1 and 6 as end so... 104 105
 
 // ./say "The worm was for a long time desirous to speake" > /dev/null
-
-// ELM_LEN is 48 = 16 phonemes
 
 float exy[240]; 
 

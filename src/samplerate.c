@@ -109,18 +109,10 @@ void samplerate_simple(int16_t* out, float factor, u8 size, int16_t(*getsample)(
 for (u8 ii=0;ii<size;ii++){
 
   if (time_now>32768){
-    int_time=0; // preserve???
+    int_time=0; 
     time_now-=32768.0f;
     }
 
-  // deal also with trigger - TODO: take trigger out of here...
-   /*    if (!triggered && in[ii]>=THRESH ) {
-      //      doadc();
-      newsay();
-      triggered=1;
-  }
-  if (in[ii]<THRESHLOW) triggered=0;
-   */
    
 
   //  out[ii]=getsample();

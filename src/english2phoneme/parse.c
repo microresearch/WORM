@@ -70,7 +70,7 @@ static const vottts ourvot[] __attribute__ ((section (".flash")))=  {{1, {0x21}}
 				{1, {0x2d}}, //wh
 				{1, {0x3e}}, //pause
 				{1, {0x3f}}//'' STOP???
-  };
+};// 43
 
 
 static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 15, 32, 18, 41};
@@ -194,7 +194,7 @@ void main(argc, argv)
       }
     */
       text2speechforklatt(12, TTSinarray, TTSoutarray);
-      printf("%s %s\n",TTSinarray, TTSoutarray);
+      printf("xxxx %s xxxx %s\n",TTSinarray, TTSoutarray);
       //      }*/
 
     //        TTSinarray[count] = 0; // place in text2speech
