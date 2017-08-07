@@ -2254,6 +2254,10 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 ** FINAL TODO:
 
+*- check TMS vocabs 2,3 11+*
+
+- check each TTS mapping so for: TMS-X, VOTRAX-X, SAM-X, 256-X
+
 - image for modulargrid - DONE
 
 - run through each mode/all modes - test all and test trigger in eachDONE
@@ -2262,13 +2266,13 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 - check all volumes/levels on scope... DONE
 
+////////////////
+
 - sanity-checked all - tweaks to nvp, digitalker
 
 /check all array extents DONE
 
 ///4/8
-
-TTS re-check and test
 
 check each mode again
 
@@ -2276,7 +2280,7 @@ check compost
 
 finally remove TESTY and check tms on this for shorter loadings
 
-full tests...
+full tests, uncomment retrigger code
 
 - announce
 
@@ -2288,7 +2292,9 @@ swelling, and impatient, of further delay, he broke out
 thus... [Maier]
 
 
-** ERD finally releases the eurorack-based ERD/WORM synth featuring
+** 
+
+ERD finally releases the eurorack-based ERD/WORM synth featuring
 software worming of emulated artificial human speech cores from the
 70s to the 90s of the last century. Six key speech cores are simulated
 with a vocabulary of over 4000 words and phrases, including basic

@@ -77,7 +77,10 @@ static const unsigned char poynt[5]  __attribute__ ((section (".flash"))) ={16, 
 
 //KLATT: END 0",  Q 1,  P 2,  PY 3,  PZ 4,  T 5,  TY 6,  TZ 7,  K 8,  KY 9,  KZ 10,  B 11,  BY 12,  BZ 13,  D 14,  DY 15,  DZ 16,  G 17,  GY 18,  GZ 19,  M 20,  N 21,  NG 22,  F 23,  TH 24,  S 25,  SH 26,  X 27,  H 28,  V 29,  QQ 30,  DH 31,  DI 32,  Z 33,  ZZ 34,  ZH 35,  CH 36,  CI 37,  J 38,  JY 39,  L 40,  LL 41,  RX 42,  R 43,  W 44,  Y 45,  I 46,  E 47,  AA 48,  U 49,  O 50,  OO 51,  A 52,  EE 53,  ER 54,  AR 55,  AW 56,  UU 57,  AI 58,  IE 59,  OI 60,  OU 61,  OV 62,  OA 63,  IA 64,  IB 65,  AIR 66,  OOR 67,  OR 68
 
-static const unsigned char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence?
+static const unsigned char remap256[43]  __attribute__ ((section (".flash"))) ={19, 12, 20, 7, 26, 24, 23, 53, 30, 31, 51, 15, 15, 6, 32, 5, 9, 28, 17, 21, 42, 61, 40, 35, 29, 18, 55, 43, 37, 38, 27, 16, 11, 44, 45, 46, 49, 14, 50, 10, 48, 3, 3}; // what about silence and case 12=AX AX? DONE but silence? - double checked
+
+// SAM: {"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements!
+
 
 static const unsigned char remapsam[43]  __attribute__ ((section (".flash"))) ={0, 1, 13, 2, 3, 4, 6, 17, 8, 18, 10, 11, 5, 14, 16, 15, 39, 27, 40, 28, 41, 29, 37, 33, 38, 34, 35, 31, 36, 32, 43, 24, 25, 26, 20, 21, 23, 19, 42, 30, 22, 54, 54};
 
@@ -85,7 +88,7 @@ static const unsigned char remapsam[43]  __attribute__ ((section (".flash"))) ={
 
 //NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
 
-static const unsigned char remaptms[43]  __attribute__ ((section (".flash"))) ={52, 59, 57, 33, 25, 2, 30, 14, 70, 71, 22, 1, 68, 27, 29, 38, 107, 85, 110, 87, 102, 89, 114, 96, 95, 94, 119, 98, 122, 100, 116, 75, 77, 79, 72, 82, 84, 81, 113, 92, 83, 125, 126};
+static const unsigned char remaptms[43]  __attribute__ ((section (".flash"))) ={52, 59, 57, 33, 25, 2, 30, 14, 70, 71, 22, 1, 68, 27, 29, 38, 107, 85, 110, 87, 105, 89, 114, 96, 95, 94, 119, 98, 122, 100, 117, 76, 77, 79, 72, 82, 84, 81, 113, 92, 83, 125, 126}; // double checked/few changes
   
 //static const char remapklatt[43]  __attribute__ ((section (".flash"))) ={IY, IH, EY, EH, AE, 48, AO, OW, UH, UW, 54, AX, AH, AY, 56, OY, 2, 11, 5, 14, 8, 17, 23, 29 , 24, 31, 25, 33, 26, 35, 28, 20, 21, 22, 40, 44, 45, 43, 36, 38, WH, PAUSE, 0};
 
@@ -106,7 +109,7 @@ void say_ordinal(long int value);
 void outnum(const char* ooo);
 void have_number();
 
-
+unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output);
 
 #ifdef LAP
 
@@ -117,22 +120,7 @@ const char* VOT_list[64]={"EH3", "EH2", "EH1", "PA0", "DT", "A2", "A1", "ZH", "A
 
 const char* TMS_list[127]={"AE1", "AE1N", "AH1", "AH1N", "AW1", "AW1N", "E1", "E1N", "EH1", "EH1N", "ER1N", "I1", "I1N", "OO1", "OW1N", "U1", "U1N", "UH1", "UH1M", "UH1N", "Y1", "Y1N", "ER1", "OW1", "Y1", "AE2", "AH2", "AI2", "AR2", "AV2", "AW2", "E2", "EER2", "EH2", "EHR2", "EI2", "ER2", "I2", "OI2", "OO2", "OOR2", "OR2", "OW2", "U2", "UH2", "UU2", "AE3", "AH3", "AI3", "AR3", "AU3", "AW3", "E3", "EELL", "EER3", "EH3", "EHR3", "EI3", "ER3", "I3", "ILL", "ING2", "OI3", "OO3", "OOR3", "OR3", "OW3", "U3", "UH3", "ULL", "UHL", "UU3", "L", "L-", "LL", "M", "MM", "N", "NN", "NG1", "NG2", "R", "W", "WH", "Y", "B", "BE", "D", "DD", "G1", "G2", "GG", "J", "JJ", "THV", "THV-", "V", "VV", "Z", "ZZ", "ZH", "ZH-", "K2", "KH", "KH-", "KH1", "KH2", "P", "PH", "PH-", "T", "TH", "TH-", "CH", "F", "FF", "HI", "HO", "HUH", "S", "SS", "SH", "SH-", "THF", "THF-", "PAUSE1", "PAUSE2"}; //127
 
-unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
-  input_array = input;
-  input_length = input_len;
-  input_count = 0; output_count=0;
-  input[input_len] = EOF;
-  xlate_file();
-  unsigned char countme=0;
-   if (output_count>=32) output_count=32;
-   output[0] = '\0';
-  for (unsigned char i=0;i<output_count;i++){
-    countme+=strlen(NRL_list[output_array[i]]);
-    if (countme<32) strcat(output, NRL_list[output_array[i]]); // how do we not overrun
-    else return (countme-strlen(NRL_list[output_array[i]]));
-  }
-  return countme;
-  }
+const char* SAM_list[58]= {"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements!
 
 
 void main(argc, argv)
@@ -140,12 +128,18 @@ void main(argc, argv)
 	char *argv[];
 	{
 
+	  
    FILE *fp = fopen(argv[1], "r");
    //   fseek(fp,0, SEEK_END);
    // read in and how long is it?
    //   int lengthy=ftell(fp);
    //   fseek(fp,0, SEEK_SET);
    unsigned char xxx;
+
+   for (xxx=0;xxx<43;xxx++){
+     printf("VOT %s NRL %s\n", VOT_list[ourvot[xxx].mmm[0]], NRL_list[xxx]);
+   }
+
    // malloc and reverse into buffer
    //   unsigned char *xxx=malloc(lengthy+1);
    //   fread(xxx,lengthy,1,fp);
@@ -193,8 +187,8 @@ void main(argc, argv)
 	TTSinarray[i]=97+rand()%26;
       }
     */
-      text2speechforklatt(12, TTSinarray, TTSoutarray);
-      printf("xxxx %s xxxx %s\n",TTSinarray, TTSoutarray);
+    //      text2speech(count, TTSinarray, TTSoutarray);
+    //      printf("xxxx %s xxxx %s\n",TTSinarray, TTSoutarray);
       //      }*/
 
     //        TTSinarray[count] = 0; // place in text2speech
@@ -217,7 +211,8 @@ void main(argc, argv)
       //  }
       //  printf("\n\n");
 
-  //    output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
+    //    output_count = text2speechforTMS(count,TTSinarray,TTSoutarray);
+        output_count = text2speechforSAM(count,TTSinarray,TTSoutarray);
   //  output_count = text2speechfor256(count,TTSinarray,TTSoutarray);
       
     //    int output_count = text2speechforTMS(input_size,TTSinarray,TTSoutarray);
@@ -226,12 +221,13 @@ void main(argc, argv)
   for(i = 0; i < output_count; i++){
     //    for(int j = 0; j < strlen(output[i]); j++){
     //    printf("%d, %s ..", TTSoutarray[i], NRL_list[TTSoutarray[i]]);
-    //    printf("%d %s ..", TTSoutarray[i], TMS_list[TTSoutarray[i]]);
+    //printf("%d %s ..", TTSoutarray[i], TMS_list[TTSoutarray[i]]);
+    printf("%d %s ..", TTSoutarray[i], SAM_list[TTSoutarray[i]]);
     //    printf("%s", NRL_list[TTSoutarray[i]]);
-        for (unsigned char ii=0;ii<strlen(NRL_list[TTSoutarray[i]]);ii++){
+    //        for (unsigned char ii=0;ii<strlen(NRL_list[TTSoutarray[i]]);ii++){
 	  //  printf("%s",NRL_list[TTSoutarray[i]]);
-	  printf("%s",*(NRL_list+TTSoutarray[i]));
-          }
+    //	  printf("%s",*(NRL_list+TTSoutarray[i]));
+	  //    }
   }
   printf("\n");
   printf("COUNT: %d\n", output_count);
@@ -241,12 +237,13 @@ void main(argc, argv)
   countme=0;
   output[0]=0;
 
+  /*
   for (unsigned char i=0;i<output_count;i++){
     if (countme+strlen(NRL_list[TTSoutarray[i]])<254) strcat(output, NRL_list[TTSoutarray[i]]); // how do we not overrun
     //    else return i;
     countme+=strlen(NRL_list[TTSoutarray[i]]);
     printf("%s count: %d\n", NRL_list[TTSoutarray[i]], countme);
-  }
+    }*/
   printf("%s %d", output, strlen(output));
   printf("\n");
 	}
@@ -259,7 +256,8 @@ void main(argc, argv)
 /*
 ** Transforms text to integer code phonemes.
 */
-/*unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output){
+
+unsigned char text2speech(unsigned char input_len, unsigned char *input, unsigned char *output){
   input_array = input;
   input_length = input_len;
   input_count = 0; output_count=0;
@@ -270,7 +268,7 @@ void main(argc, argv)
     output[i]=output_array[i]; 
   }
   return output_count;
-  }*/
+  }
 
 /*unsigned char text2speechforklatt(unsigned char input_len, unsigned char *input, unsigned char *output){
   input_array = input;
