@@ -317,7 +317,7 @@ int16_t compost_get_sample(){
     /*  float value =(float)adc_buffer[SELZ]/65536.0f; 
   smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
   _selz=smoothed_adc_value[4];
-  CONSTRAIN(_selz,0.0f,1.0f); */ // selz is already done in samplerate
+  CONSTRAIN(_selz,0.0f,1.0f); */ // selz is already done in samplerate around this
   oldcompost=compostmode;
   _selz=1.0f-_selz; // invert
   compostmode= _selz*MODEFC; 
@@ -329,7 +329,6 @@ int16_t compost_get_sample(){
       wormlist[compostmode]->newsay();
     }
 
-  //wormlist[compostmode]->sampleratio <= 1.0f
   float factor=wormlist[compostmode]->sampleratio;
 
   if (time_now>32768){
@@ -369,28 +368,15 @@ void compost_newsay_frozen(){
 }
 
 
-void compost_newsay(){ //TODO - restart compost mode
+void compost_newsay(){ //triggers newsay for compostmode
 
   
   freezer=1; // always unfrozen
-  // just reset counter to start 
   doadc();
-/*  u16 startx=_selx*32767.0f;
-  u16 endy=_sely*32767.0f;
-
-  if (startx>endy){
-    comp_counter=startx; // backwards
-  }
-  else if (startx<=endy){
-    comp_counter=startx;//
-  }
-*/
-
   _selz=1.0f-_selz; // invert
   u8 compostmode= _selz*MODEFC; 
   MAXED(compostmode, MODET-2); // NUMMODES-2 for composts
   doadc_compost();
-
   wormlist[compostmode]->newsay();
 }
 
@@ -420,7 +406,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=60; //TESTY
+  _intmode=0; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 

@@ -2254,9 +2254,7 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 ** FINAL TODO:
 
-*- check TMS vocabs 2,3 11+*
-
-- check each TTS mapping so for: TMS-X, VOTRAX-X, SAM-X, 256-X
+- check each TTS mapping so for: TMS-X, VOTRAX-X, SAM-X, 256-X DONE
 
 - image for modulargrid - DONE
 
@@ -2272,17 +2270,20 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 
 /check all array extents DONE
 
-///4/8
+///17/8+
 
-check each mode again
+- check TMS vocabs DONE-fixed pauses on acorn1/59mode
+////
 
-check compost
+- check each mode again
+
+- check compost
 
 finally remove TESTY and check tms on this for shorter loadings
 
 full tests, uncomment retrigger code
 
-- announce
+- announce SEPT
 
 * announcement: 
 
