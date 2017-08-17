@@ -2275,7 +2275,42 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 - check TMS vocabs DONE-fixed pauses on acorn1/59mode
 ////
 
-- check each mode again
+- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(16)?
+-20DONE
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+
+256 phonemes but strange on end?
+
+TESTING STILL:
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, 
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+&49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+&53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+&58simpleklatter, 
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+&62composter, &63compostfrer}; // 64 modes
+
+
+doublechecks: 7tmsraw5100er - seems bit lacking, 
 
 - check compost
 

@@ -406,7 +406,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=0; //TESTY
+  _intmode=23; //TESTY 15
   MAXED(_intmode, MODET); 
   trigger=0; 
 
