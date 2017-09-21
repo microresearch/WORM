@@ -774,8 +774,9 @@ UINT32 getb( int len )
 	  // we have added 0x1000
 	  int32_t idx0 = (m_pc    ) >> 3;
 	  int32_t idx1 = (m_pc + 8) >> 3;
-	  whichrom=m_rom12;
-
+	  //	  whichrom=m_rom12;
+	  whichrom=m_romAL2;
+	  
 	  fprintf(stderr,"m_pc %X idx0: %X idx1: %X\n", m_pc, idx0, idx1);
 
 	  data=1;
@@ -1250,20 +1251,23 @@ void main(int argc, char *argv[]){
       m_lrq = 0; //from 8 bit write
       m_halted=0;
       	  
-   while(1){
+   while(m_halted==0){
 
      //     dada=rand()%64;
      //     m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
      //     m_page     = 0x8000 << 3; // was 0x1000 // this works!
-     m_lrq = 0; //from 8 bit write
-     m_halted=0;
+     //     m_lrq = 0; //from 8 bit write
+     //     m_halted=0;
      
-    for (int x=0;x<1024;x++){     
-   micro();
+     //         for (int x=0;x<1024;x++){     
+      //         micro();
+      if (m_filt.rpt <= 0)
+      				micro();
+
    //   u8 output=lpc12_update(&m_filt);
 
    if (m_silent && m_filt.rpt <= 0) {
-     //     	fprintf(stderr, "XXXXX");
+     fprintf(stderr, "XXXXX");
      output=0;
    }
    else output=lpc12_update(&m_filt);
@@ -1275,7 +1279,7 @@ void main(int argc, char *argv[]){
 	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
       m_lrq = 0; //from 8 bit write
       }*/
-	    }
+     //	    }
    }
 
  }

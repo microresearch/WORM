@@ -2281,8 +2281,6 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 &21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
 &25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
 
-256 phonemes but strange on end?
-
 TESTING STILL:
 
 &28votraxer,
@@ -2310,7 +2308,22 @@ TESTING STILL:
 &62composter, &63compostfrer}; // 64 modes
 
 
-doublechecks: 7tmsraw5100er - seems bit lacking, 
+*TO FIX and re-test:*
+
+7tmsraw5100er - seems bit lacking, 
+256 phonemes are a bit strange on end?
+
+- looking at 256.cpp:
+
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+
+whereas we always run micro... -> this makes no difference (tested on lap with diffs)
+
+////
 
 - check compost
 
