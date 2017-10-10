@@ -2275,13 +2275,13 @@ RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small 
 - check TMS vocabs DONE-fixed pauses on acorn1/59mode
 ////
 
-- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(16)?
+- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(=16there as always +1)?
 -20DONE
 
 &21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
 &25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
 
-TESTING STILL:
+*TESTING STILL TODO:*
 
 &28votraxer,
 &29votraxTTSer, &30votraxgorfer, &31votraxwower,
@@ -2323,7 +2323,7 @@ TESTING STILL:
 
 whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
 
-all 256 checkecd against cpp...
+all 256 checked against cpp...
 
 ////
 
@@ -2333,7 +2333,7 @@ finally remove TESTY and check tms on this for shorter loadings
 
 full tests, uncomment retrigger code
 
-- announce SEPT
+- announce OCT
 
 * announcement: 
 
@@ -2367,7 +2367,6 @@ simulation of recognizable human speech (as if it would ever) towards
 the slipped and stammered, a/rhythmic and timbral, producing new
 sounds through the use of fast re-triggering of phrases and phonemes,
 and exploring multiple bends by knob and CV control.
-
 
 * FINAL/FURTHER TODO:
 
