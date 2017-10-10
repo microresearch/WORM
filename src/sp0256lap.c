@@ -1205,13 +1205,30 @@ void micro()
    return output;
  }
 
- void sp0256_newsay(void){
+int count=0;
+
+void sp0256_newsay(void){
+  u8 dada,i;
+   dada=_selz*67.0f; 
+   MAXED(dada,63);
+   dada=63-dada;
+   m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_page     = 0x1000 << 3; //32768 =0x8000
+   for (i = 0; i < 16; i++)
+           m_filt.r[i] = 0;
+   //   m_romm=m_romAL2;
+   m_ald = ((dada&63) << 4);  		
+   m_lrq = 0; //from 8 bit write
+ }
+
+
+/* void sp0256_newsay(void){
    static u8 dada=0;
    //   m_halted=1;
    dada=8; // ???
    m_ald = ((dada&64) << 4); // or do as index <<3 and store this index TODO! 		
    m_lrq = 0; //from 8 bit write
- }
+   }*/
 
  void sp0256_init(void){
    sp0256_iinit();
@@ -1242,16 +1259,42 @@ void main(int argc, char *argv[]){
       m_halted=1;
       micro();
       m_lrq = 0; //from 8 bit write
-      //m_halted=1;
+      m_halted=1;
       */
       //          m_ald = ((dada&0xff) << 4); // or do as index <<3 and store this index TODO!
 	  m_page     = 0x1000 << 3; // was 0x1000 // this works!
+	  m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
 
-	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
-      m_lrq = 0; //from 8 bit write
-      m_halted=0;
-      	  
-   while(m_halted==0){
+	  while (count<5){
+	    //	    if (m_filt.rpt <= 0)
+	    //	      micro();
+
+	    micro();
+	    output=lpc12_update(&m_filt);
+	    printf("%c",output);
+
+   if (m_halted==1 && m_filt.rpt <= 0)     {
+     sp0256_newsay();
+     count++;
+     dada-=1;
+     m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
+   }
+	  }
+	  
+	/*
+	m_lrq = 0; //from 8 bit write
+      m_halted=1;
+      micro();
+      // test double write...
+      for (int x=0;x<2;x++){
+	printf("\n\n");
+	if (x==1) {
+	   dada-=1;
+	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 			
+	m_halted=1;
+	micro();
+	}
+   while(m_filt.rpt > 0){
 
      //     dada=rand()%64;
      //     m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
@@ -1260,9 +1303,9 @@ void main(int argc, char *argv[]){
      //     m_halted=0;
      
      //         for (int x=0;x<1024;x++){     
-      //         micro();
-      if (m_filt.rpt <= 0)
-      				micro();
+               micro();
+     // if (m_filt.rpt <= 0)
+     //				micro();
 
    //   u8 output=lpc12_update(&m_filt);
 
@@ -1273,13 +1316,11 @@ void main(int argc, char *argv[]){
    else output=lpc12_update(&m_filt);
 
      printf("%c",output);
-
+	*/
      /*     if (m_halted==1 && m_filt.rpt <= 0)     {
        // newsay...
 	m_ald = dada<<4; // or do as index <<3 and store this index TODO! 		
       m_lrq = 0; //from 8 bit write
       }*/
-     //	    }
-   }
+}
 
- }

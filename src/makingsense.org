@@ -2321,7 +2321,9 @@ TESTING STILL:
 			if (m_filt.rpt <= 0)
 				micro();
 
-whereas we always run micro... -> this makes no difference (tested on lap with diffs)
+whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
+
+all 256 checkecd against cpp...
 
 ////
 
