@@ -347,7 +347,7 @@ void nvp_newsay(){
   oldframe=nextframe;
   nextframe=_selz*51.0f;
   MAXED(nextframe,47);
-  nextframe=47-nextframe;
+  //  nextframe=47-nextframe;
   
   if (oldframe!=nextframe) changed=1;
   else changed=0;

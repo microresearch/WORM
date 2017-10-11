@@ -692,8 +692,8 @@ void digitalker_step()
 			  m_repeats=(m_repeats*logpitch[val])+1;
 			}
 			else if (modus==1) {
-			  val=_sely*35.0f;
-			  MAXED(val,31);
+			  val=_sely*18.0f; // was 35.0f and 31
+			  MAXED(val,15);
 			  m_repeats=val+1; // modus is neither for any xy action such as table bends
 			}
 #else

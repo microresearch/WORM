@@ -195,7 +195,7 @@ unsigned char len=10; // len is bent in getsample
 
 u8 val=_selz*67.0f;
 MAXED(val,63);
-val=63-val;
+//val=63-val;
 val=phoneme_prob_remap[val];
 
 // deal with old phoneme 
@@ -648,7 +648,7 @@ int16_t klatt_get_sample(){
   xaxis=15-xaxis;
   u8 val=_selz*67.0f;
   MAXED(val,63);
-  val=63-val;
+  //  val=63-val;
   test_elm[xaxis*3]=phoneme_prob_remap[val]; // 64 phonemes
   test_elm[(xaxis*3)+1]=((_sely)*32.0f)+1; // length say max 32
 

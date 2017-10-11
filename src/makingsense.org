@@ -1,3 +1,92 @@
+* latest/latest
+
+- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(=16there as always +1)?
+-20DONE
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+
+*TESTING STILL TODO:*
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+// check pitch of 28-35
+// 32 is loud - check nature of the bend too!
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, 
+
+// checked allFINE
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+//between 46 and 47 pitch seems wierdFIXED-as digitalker has very short repeat
+
+&49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+// 50,51 - how we select phoneme as 0(far left) is silent one - FIXED as now no inversion here
+
+&53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+// also same as above FIXED as now inversion
+
+//
+
+&58simpleklatter, 
+
+//
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+// 59 - also inversion FIXED for phonemes
+
+// ALL TESTED 11/10/2017
+
+*TO FIX and re-test:*
+
+*check sanity of trigger length and retrigger*
+
+for votrax: // check pitch of 28-35
+// 32 is loud - check nature of the bend too!
+
+7tmsraw5100er - seems bit lacking, 
+
+15 -re-check volume
+
+256 phonemes are a bit strange on end?
+
+- looking at 256.cpp:
+
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+
+whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
+
+all 256 checked against cpp...
+
+////
+
+- check compost
+
+finally remove TESTY and check tms on this for shorter loadings
+
+full tests, uncomment retrigger code
+
+- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
+
+- check all hardware
+
+
 * general TODO/notes
 
 - FIX ADC extents! - see newsaybankone - works on new hardware but
@@ -2368,7 +2457,7 @@ the slipped and stammered, a/rhythmic and timbral, producing new
 sounds through the use of fast re-triggering of phrases and phonemes,
 and exploring multiple bends by knob and CV control.
 
-* FINAL/FURTHER TODO:
+* FINAL/FURTHER TODO-DONE
 
 - ADCs for 0-127 we need to max/multiply 132.0f
 
