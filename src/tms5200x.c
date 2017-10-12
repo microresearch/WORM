@@ -2086,17 +2086,16 @@ void tms_newsay_raw5100(){
     m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
-    m_IP=0; m_PC=12;m_subcycle=1; // ???
-
+  //    m_IP=0; m_PC=12;m_subcycle=1; // ???
 };
 
 void tms_newsay_raw5200(){
   m_digital_select=1;
   m_coeff=&T0285_2501E_coeff;
-    m_new_frame_energy_idx = 0;
+  m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
-  //    m_IP=0; m_PC=12;m_subcycle=1; // ???
+  m_IP=0; m_PC=12;m_subcycle=1; // ???
 
 };
 

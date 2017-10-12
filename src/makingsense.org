@@ -39,7 +39,18 @@ removed inversion // DONE
 
 *////FINALS:::/// 13/10/2017+*
 
-- re-check TMS
+- re-check TMS: &0tmserX, &1tmslowbiterX, &2tmssingerX, &3tmsbendlengtherX, &4tmsphonerX,
+&5tmsphonsingerX, &6tmsttserX, &7tmsraw5100erX, &8tmsraw5200er*CLICKS*,
+&9tmsraw5220er*CLICKS*, &10tmsbend5100erX, &11tmsbend5200erX, &12tmsbend5200erxCLICKY
+////,
+&13tms5100pitchtablebender, &14tms5200pitchtablebender,
+&15tms5200pitchtablebenderx, &16tms5100ktablebender,
+&17tms5200ktablebender, &18tms5100kandpitchtablebender,
+&19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
+
+clicks can only be data related?
+
+- re-check all FIXED modes above
 
 - check compost/checked sanity but check operations
 
