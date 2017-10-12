@@ -5,7 +5,7 @@
 #define STEREO_BUFSZ (BUFF_LEN/2) // 64
 #define MONO_BUFSZ (STEREO_BUFSZ/2) // 32
 
-#define THRESH 16000 
+#define THRESH 12000 
 #define THRESHLOW 10000
 
 #ifdef TESTING
@@ -368,9 +368,7 @@ void compost_newsay_frozen(){
 }
 
 
-void compost_newsay(){ //triggers newsay for compostmode
-
-  
+void compost_newsay(){ //triggers newsay for compostmode  
   freezer=1; // always unfrozen
   doadc();
   _selz=1.0f-_selz; // invert
@@ -406,7 +404,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=61; //TESTY
+  _intmode=7; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
@@ -439,7 +437,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (retrigger==0 && sample> THRESH) {
       triggered=1;
       retrigger=1;
-      break; // ???
+      //      break; // ???
     }
     if (sample<THRESHLOW) retrigger=0;
   }
@@ -452,7 +450,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   else 
     samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
 
-  if (_intmode!=COMPOST && _intmode!=COMPOSTF){
+  if (_intmode!=COMPOST && _intmode!=COMPOSTF){ // only if we're not composting...
     for (u8 x=0;x<sz/2;x++) {
       audio_buffer[cc++]=mono_buffer[x];
     if (cc>AUDIO_BUFSZ-1) cc=0;

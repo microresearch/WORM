@@ -169,7 +169,7 @@ void rsynth_newsay_single(u8 once)
 
   u8 val=_selz*87.0f;
   MAXED(val,83);
-  val=83-val; // there are 84 elements
+  //  val=83-val; // there are 84 elements // DON't INVERT?
 
   element[0]=element[2];
   element[1]=element[3];
@@ -643,7 +643,7 @@ int16_t rsynth_get_sample_elm(){
   xaxis=52-xaxis;
   u8 val=_selz*87.0f;
   MAXED(val,83);
-  val=83-val;
+  //  val=83-val; // DON'T INVERT?
   test_elm_rsynthy[xaxis*2]=val+1; // xaxis must be 
   test_elm_rsynthy[(xaxis*2)+1]=(_sely*33.0f)+2; // length say max 32 - long to short left to right
 

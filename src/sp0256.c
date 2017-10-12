@@ -79,6 +79,7 @@ static int32_t            m_pc;              /* Microcontroller's PC value.     
 static uint32_t            m_stack;           /* Microcontroller's PC stack.                  */
 static u8            m_fifo_sel;        /* True when executing from FIFO.               */
 static u8            m_halted;          /* True when CPU is halted.                     */
+//static u8 really=0;
 static UINT32         m_mode;            /* Mode register.                               */
 static UINT32         m_page;            /* Page set by SETPAGE                          */
 
@@ -347,7 +348,8 @@ static inline void lpc12_regdec(struct lpc12_t *f)
 	/* -------------------------------------------------------------------- */
 	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
 	//	f->amp=160;			
-	if (modus==3 || modus==4) f->cnt = 0; // why just 3 and 4 - non single phon modes
+	//	if (modus==3 || modus==4) f->cnt = 0; // why just 3 and 4 - non single phon modes????
+	f->cnt = 0;
 	f->per_orig = f->r[1];
 
 	/* -------------------------------------------------------------------- */
@@ -885,7 +887,7 @@ void micro()
 				m_filt.r[i] = 0;
 
 			//			SET_SBY(1)
-
+			//			really=1;
 			return;
 		}
 
@@ -1013,7 +1015,8 @@ void micro()
 			  if (modus!=4) {// TTS mode
 			    val = (_sely*131.0f); // only if we are not in TTS mode
 			    MAXED(val,127);
-			    if (modus==1) repeat=64.0f*logpitch[val]; // make much longer for singing 
+			    if (modus==1) repeat=64.0f*logpitch[val]; // make much longer for singing
+			    else if (modus==16) repeat=((float)(repeat)*8.0f*logpitch[val]);
 			    else repeat=((float)(repeat)*logpitch[val]);
 			  }
 			  if (repeat<1) repeat=1;
@@ -1227,15 +1230,16 @@ void sp0256_newsay1219(void){
 
 int16_t sp0256_get_sample(void){
   static int16_t output; 
-  modus=0;
+  modus=16;
   micro();
   lpc12_update(&m_filt, &output);
-
-   if (m_halted==1 && m_filt.rpt <= 0)     {
-     sp0256_newsay();
+  m_lrq=0x8000;
+  
+  if (m_halted==1)     {
+  //  if (really==1){
+  //    really=0;
+	sp0256_newsay();
    }
-
-
    return output;
  }
 
@@ -1286,8 +1290,9 @@ return output;
  int16_t sp0256_get_samplevocabbanktwo(void){
   static int16_t output;   
   modus=3; // was zero
-   micro();
-lpc12_update(&m_filt, &output);
+
+  micro();
+  lpc12_update(&m_filt, &output);
    
    if (m_halted==1 && m_filt.rpt <= 0)     {
           sp0256_newsayvocabbanktwo(0);
@@ -1305,7 +1310,7 @@ inline void sp0256_newsay(void){
    u8 dada;
    dada=_selz*67.0f; 
    MAXED(dada,63);
-   dada=63-dada;
+   //   dada=63-dada;
    m_lrq=0; m_halted=1; m_filt.rpt=0;
    m_page     = 0x1000 << 3; //32768 =0x8000
    m_romm=m_romAL2;
@@ -1382,7 +1387,7 @@ void sp0256_newsayvocabbankone(u8 reset){// called at end of phoneme
 
 void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
    u8 dada;
-   m_lrq=0; m_halted=1; m_filt.rpt=0;
+   m_lrq=0;m_halted=1;      m_filt.rpt=0;
    static u8 vocabindex=0, whichone=0;
    //   m_halted=1;
 
@@ -1397,7 +1402,7 @@ void sp0256_newsayvocabbanktwo(u8 reset){// called at end of phoneme
    dada=*(vocab_sp0256_banktwo[whichone]+vocabindex);  // in this case end switch
    vocabindex++;
    m_ald = ((dada&63) << 4);  		
-   m_lrq = 0; //from 8 bit write
+   //   m_lrq = 0; //from 8 bit write
  }
 
 

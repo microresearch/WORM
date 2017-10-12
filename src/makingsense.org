@@ -1,5 +1,56 @@
 * latest/latest
 
+*TO FIX and re-test:*
+
+- check sanity of trigger length and retrigger - FIXED
+
+- for votrax: // check pitch/extent of 28-35 - leave as it is DONE
+
+- &32votraxwowfilterbender is loud - volume reducedDONE
+- check nature of the bend too - just to mainclock and reduced by half so is low now...
+
+///
+
+- 256 phonemes are a bit strange on end?
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+
+extended length for 21 only - CHECK ALL! CHECKED!
+
+- looking at 256.cpp:
+
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+
+whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
+
+all 256 checked against cpp...
+
+removed inversion // DONE 
+
+- 15tms -re-check volume &15tms5200pitchtablebenderx LEAVE AS IS/DONE
+
+- 7tmsraw5100er - seems bit lacking - but all checks out ok
+
+
+*////FINALS:::/// 13/10/2017+*
+
+- re-check TMS
+
+- check compost/checked sanity but check operations
+
+finally remove TESTY -> full tests, uncomment retrigger code
+
+- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
+
+- check all hardware
+
+* mode tests to 11 Oct 2017 DONE
+
 - check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(=16there as always +1)?
 -20DONE
 
@@ -46,45 +97,6 @@
 &59nvper, &60nvpvocaber, &61nvpvocabsing,
 
 // 59 - also inversion FIXED for phonemes
-
-// ALL TESTED 11/10/2017
-
-*TO FIX and re-test:*
-
-*check sanity of trigger length and retrigger*
-
-for votrax: // check pitch of 28-35
-// 32 is loud - check nature of the bend too!
-
-7tmsraw5100er - seems bit lacking, 
-
-15 -re-check volume
-
-256 phonemes are a bit strange on end?
-
-- looking at 256.cpp:
-
-			/* ------------------------------------------------------------ */
-			/*  If our repeat count expired, emulate the microsequencer.    */
-			/* ------------------------------------------------------------ */
-			if (m_filt.rpt <= 0)
-				micro();
-
-whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
-
-all 256 checked against cpp...
-
-////
-
-- check compost
-
-finally remove TESTY and check tms on this for shorter loadings
-
-full tests, uncomment retrigger code
-
-- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
-
-- check all hardware
 
 
 * general TODO/notes
