@@ -1,5 +1,18 @@
 * latest/latest
 
+** 
+
+- full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
+
+- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
+
+- check all hardware
+
+
+** DONE
+
+- leave volumes more or less as is
+
 *TO FIX and re-test:*
 
 - check sanity of trigger length and retrigger - FIXED
@@ -55,13 +68,9 @@ clicks can only be data related?
 
 ////
 
-- check compost/checked sanity but check operations
+- check compost/checked sanity but check operationsDONE
 
-finally remove TESTY -> full tests, uncomment retrigger code
-
-- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
-
-- check all hardware
+finally remove TESTY -> full tests, uncomment retrigger codeDONE
 
 * mode tests to 11 Oct 2017 DONE
 
