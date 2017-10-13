@@ -43,14 +43,17 @@ removed inversion // DONE
 &5tmsphonsingerX, &6tmsttserX, &7tmsraw5100erX, &8tmsraw5200er*CLICKS*,
 &9tmsraw5220er*CLICKS*, &10tmsbend5100erX, &11tmsbend5200erX, &12tmsbend5200erxCLICKY
 ////,
-&13tms5100pitchtablebender, &14tms5200pitchtablebender,
-&15tms5200pitchtablebenderx, &16tms5100ktablebender,
-&17tms5200ktablebender, &18tms5100kandpitchtablebender,
-&19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
+
+&13tms5100pitchtablebenderX, &14tms5200pitchtablebenderX,
+&15tms5200pitchtablebenderxX, &16tms5100ktablebenderX,
+&17tms5200ktablebenderX, &18tms5100kandpitchtablebenderX,
+&19tms5200kandpitchtablebenderX, &20tms5200kandpitchtablebenderxX,
 
 clicks can only be data related?
 
-- re-check all FIXED modes above
+- re-check all modes = 21-61 - DONE
+
+////
 
 - check compost/checked sanity but check operations
 
@@ -66,7 +69,7 @@ finally remove TESTY -> full tests, uncomment retrigger code
 -20DONE
 
 &21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
-&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX-vol reduced, 
 
 *TESTING STILL TODO:*
 
@@ -89,7 +92,7 @@ finally remove TESTY -> full tests, uncomment retrigger code
 
 //between 46 and 47 pitch seems wierdFIXED-as digitalker has very short repeat
 
-&49rsynthy,
+&49rsynthy,-changed pitch
 &50rsynthelm, &51rsynthsingle, &52rsynthysing, 
 
 // 50,51 - how we select phoneme as 0(far left) is silent one - FIXED as now no inversion here

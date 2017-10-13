@@ -510,7 +510,7 @@ u8 sam_get_sample_xy(int16_t* newsample){
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=3; // x AND y
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_xy();
   *newsample=lastsample;
   lastsample=swopsample;
@@ -524,11 +524,11 @@ u8 sam_get_sample_bend(int16_t* newsample){
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=16; // bends frequencies
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_xy();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -541,11 +541,11 @@ u8 sam_get_sample_param(int16_t* newsample){
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=8; // selx mode
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_param();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -562,11 +562,11 @@ u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
   exy[xaxis]=_selz;
 
   modus=1; // was 32 but now we want z
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -582,11 +582,11 @@ u8 sam_get_sample_phons(int16_t* newsample){
   xaxis=15-xaxis;
   exy[xaxis]=_selz;
 
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phon();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -602,11 +602,11 @@ u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 fo
   xaxis=15-xaxis;
   exy[xaxis]=_selz;
 
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_phonsing();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -702,7 +702,7 @@ u8 sam_get_sample_banks0(int16_t* newsample){
   if (ending) sam_newsay_banks0();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -712,11 +712,11 @@ u8 sam_get_sample_banks1(int16_t* newsample){ // same newsay only change is modu
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=4; // speed on selx
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_banks0();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -726,11 +726,11 @@ u8 sam_get_sample_TTS(int16_t* newsample){
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=1; // pitch on selx
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_TTS();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 
@@ -740,11 +740,11 @@ u8 sam_get_sample_TTSs(int16_t* newsample){
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=4; // speed on selx
-  howmany=rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
+  rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) sam_newsay_TTS();
   *newsample=lastsample;
   lastsample=swopsample;
-  howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
+  howmany=(bufferpos/50)-(oldbufferpos/50); 
   return howmany;
 }
 

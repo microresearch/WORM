@@ -375,7 +375,7 @@ int16_t rsynth_get_sample(){
   int val=_selx*1028.0f;
   MAXED(val,1023);
   val=1023-val;
-  float newfreq=F0Hz* logspeed[val] * 0.5f;
+  float newfreq=F0Hz* logspeed[val]; // was * 0.5f
     sample=rsynth_frame_single(rsynth, newfreq, ep);
   //  sample=rand()%32768;
       samplenumber++;

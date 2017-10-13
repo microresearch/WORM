@@ -404,23 +404,23 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  _intmode=11; //TESTY
+  _intmode=36; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
   // TESTY: OUT COMMENT BELOW
-  /*
-     if (oldmode!=_intmode) {// IF there is a modechange!
+  
+  /*  if (oldmode!=_intmode) {// IF there is a modechange!
     trigger=1; // for now this is never/always called TEST
     // if we are not leaving compost - if we are entering compost ???
-    if ((intmode== COMPOST || intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
+       if ((_intmode== COMPOST || _intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
     doadc();
     oldselx=_selx;
     oldsely=_sely;
     oldselz=_selz;
     }
-    }
-  */
+    }*/
+  
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;

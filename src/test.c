@@ -291,6 +291,8 @@ void main(){
   float x=0.0f;
   int y=0;
   int xx;
+  int xv=0xf;
+  printf("xxxxxxx %d\n", xv);
   int m_pc=128;
   int d0;
   unsigned char X=16;
