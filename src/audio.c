@@ -260,7 +260,7 @@ static const wormer klattvocab={0, 1.0f, klatt_get_sample_vocab, klatt_newsay_vo
 static const wormer klattsinglesing={0, 1.0f, klatt_get_sample_single_sing, klatt_newsay_single, 0, 0};
 static const wormer klattvocabsing={0, 1.0f, klatt_get_sample_vocab_sing, klatt_newsay_vocab, 0, 0};
 
-static const wormer simpleklatter={38, 0.5f, simpleklatt_get_sample, simpleklatt_newsay, 2, 0}; // TODO: which kind of trigger mode?
+static const wormer simpleklatter={38, 0.5f, simpleklatt_get_sample, simpleklatt_newsay, 2, 0}; 
 static const wormer nvper={0, 0.5f, nvp_get_sample, nvp_newsay, 0, 0};
 static const wormer nvpvocabsing={0, 0.5f, nvp_get_sample_vocab_sing, nvp_newsay_vocab_trigger, 0, 0};
 static const wormer nvpvocaber={0, 0.5f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
