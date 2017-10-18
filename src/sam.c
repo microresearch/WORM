@@ -15,8 +15,10 @@ extern char TTSinarray[17];
 u8 modus;
 
 #define MAX_CYCLES 128
+#define MAX_CYCLES_TTS 1024
 
 extern int16_t trigger_cycles;
+u8 resetted=0;
 
 static char input[512];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 static char tmpinput[257];
@@ -102,7 +104,8 @@ void Init()
 		stressOutput[i] = 0;
 		phonemeLengthOutput[i] = 0;
 	}
-	phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
+	phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs - was 32?
+	resetted=1; // TESTY!
 }
 
 void sam_init(){
@@ -177,7 +180,7 @@ void sam_newsay_banks0(void){
 }
 
 void sam_newsay_TTS(void){
-  if (trigger_cycles>1024){
+  if (trigger_cycles>MAX_CYCLES_TTS){// TESTY!?
     trigger_cycles=0;
   X=Y=0;
 
@@ -797,7 +800,7 @@ u8 sam_get_sample_TTS(int16_t* newsample){
   modus=1; // pitch on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
+    trigger_cycles=MAX_CYCLES_TTS+1;
     sam_newsay_TTS();
     //    trigger_cycles=0;
   }
@@ -815,7 +818,8 @@ u8 sam_get_sample_TTSs(int16_t* newsample){
   int32_t oldbufferpos=bufferpos;
   modus=4; // speed on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) {trigger_cycles=MAX_CYCLES+1;
+  if (ending) {
+    trigger_cycles=MAX_CYCLES_TTS+1;
     sam_newsay_TTS();
     //    trigger_cycles=0;
   }

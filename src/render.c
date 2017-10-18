@@ -9,7 +9,7 @@
 
 extern float _selx, _sely, _selz;
 extern float exy[240];
-extern u8 modus;
+extern u8 modus, resetted;
 
 //timetable for more accurate c64 simulation
 static const u8 timetable[5][5] =
@@ -499,7 +499,7 @@ void    sam_frame_rerun() {
 	mem66=0;
 }
 
- rendersamsample(int16_t* sample,u8* ending){
+u8 rendersamsample(int16_t* sample, u8* ending){
   //  signed char pitchmod=(adc_buffer[SELX]>>5)-64; // -64 to +64 I hope
   signed int pitchmod;
   //  signed char pitchmod=(_selx * 64.0f)-44; // say +-32
@@ -510,7 +510,10 @@ void    sam_frame_rerun() {
   static u8 secondstate=0;
   u8 nosample=1; u8 howmany=0;
   //  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48);
-
+  if (resetted==1) { // reset in init which is always called by newsay - TESTY!
+    state=0;
+    resetted=0;
+  }
   
   while (nosample){
 

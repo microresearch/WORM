@@ -1359,6 +1359,7 @@ void votrax_init(){
 static int16_t sample_count=0;
 
 void votrax_newsay(){
+  sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*67.0f; 
   MAXED(sel,63);
@@ -1372,6 +1373,7 @@ void votrax_newsay(){
 }
 
 void votrax_newsay_sing(){
+  sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*67.0f; 
   MAXED(sel,63);
@@ -1395,7 +1397,7 @@ int16_t votrax_get_sample(){
     chip_update();
   sample=analog_calc();
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsay();
   }
   return sample;
@@ -1409,7 +1411,7 @@ int16_t votrax_get_sample_sing(){
     chip_update();
   sample=analog_calc();
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsay_sing();
   }
   return sample;
@@ -1426,6 +1428,7 @@ int16_t votrax_get_sample_rawparam(){
 }
 
 void votrax_newsay_bend(u8 reset){
+    sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   signed char tmp;
   u8 it;
@@ -1465,7 +1468,7 @@ int16_t votrax_get_sample_bend(){
   sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsay_bend(0);
   }
   return sample;
@@ -1474,6 +1477,7 @@ int16_t votrax_get_sample_bend(){
 /////
 
 void votrax_newsaygorf(u8 reset){
+    sample_count=0;
     m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
@@ -1500,6 +1504,7 @@ void votrax_newsaygorfr(){
 }
 
 void votrax_newsaywow(u8 reset){
+    sample_count=0;
   m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
@@ -1531,6 +1536,7 @@ void votrax_newsaywowr(){
 }
 
 void votrax_newsaywow_bendfilter(u8 reset){
+    sample_count=0;
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_wow[whichone]+vocabindex);
@@ -1568,7 +1574,7 @@ int16_t votrax_get_samplegorf(){
   sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsaygorf(0);
   }
   return sample;
@@ -1584,7 +1590,7 @@ int16_t votrax_get_samplewow_bendfilter(){
   sample=analog_calc()>>2; // reduce volume TESTY!!
   // hit end and then newsay
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsaywow_bendfilter(0);
   }
   return sample;
@@ -1600,7 +1606,7 @@ int16_t votrax_get_samplewow(){
   sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsaywow(0);
   }
   return sample;
@@ -1632,7 +1638,7 @@ int16_t votrax_get_sampleTTS(){
   sample=analog_calc();
   // hit end and then newsay
   if (sample_count++>=lenny){
-    sample_count=0;
+    //    sample_count=0;
     votrax_newsayTTS();
   }
   return sample;

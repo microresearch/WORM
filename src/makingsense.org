@@ -2,6 +2,14 @@
 
 ** 
 
+- check TTS and triggers on modes
+
+- check new reset of states in sam...
+
+- check all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST
+
+checked nvp, tms, digi, sp0256
+
 - full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
 
 - check all hardware before release 

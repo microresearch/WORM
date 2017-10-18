@@ -292,7 +292,7 @@ int16_t rsynth_get_sample(){
 
 
   if (nextelement==1){ // we have a new element
-
+    samplenumber=0; // TESTY!
     ce = &Elementz[elm[i++]];
     dur = elm[i++];
 	/* Skip zero length elements which are only there to affect
@@ -413,6 +413,7 @@ int16_t rsynth_get_sample_sing(){
   }
 
   if (nextelement==1){ // we have a new element
+    samplenumber=0; // TESTY!
 
     ce = &Elementz[elm[i++]];
     dur = elm[i++];
@@ -534,6 +535,7 @@ int16_t rsynth_get_sample_single(){
   }
 
   if (nextelement==1){ // we have a new element
+    samplenumber=0; // TESTY!
 
     ce = &Elementz[element[i++]];
     dur = element[i++];
@@ -654,6 +656,7 @@ int16_t rsynth_get_sample_elm(){
 
 
   if (nextelement==1){ // we have a new element
+    samplenumber=0; // TESTY!
 
     ce = &Elementz[test_elm_rsynthy[i++]];
     dur = test_elm_rsynthy[i++];

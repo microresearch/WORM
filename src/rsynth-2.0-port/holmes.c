@@ -37,6 +37,9 @@ typedef struct {
 
 #include "klatt_vocab.h"
 
+static short samplenumber=0;
+
+
 const u8 phoneme_prob_remap[64] __attribute__ ((section (".flash")))={1, 46, 30, 5, 7, 6, 21, 15, 14, 16, 25, 40, 43, 53, 47, 29, 52, 48, 20, 34, 33, 59, 32, 31, 28, 62, 44, 9, 8, 10, 54, 11, 13, 12, 3, 2, 4, 50, 23, 49, 56, 58, 57, 63, 24, 22, 17, 19, 18, 61, 39, 26, 45, 37, 36, 51, 38, 60, 65, 64, 35, 68, 61, 62}; 
 
 //#if 0
@@ -183,6 +186,7 @@ static klatt_frame_t pars;
 static u8 elm_single[6]={28, 10, 0, 47, 6, 0};
 
 void klatt_newsay_single(){ /// elm_single is our list selx is pitch // sely is len // selz is next phoneme
+  samplenumber=0;
 i=0; 
 le = &Elements[0];// but what do we do with le?
 top = 1.1 * def_pars.F0hz10;
@@ -233,7 +237,7 @@ elm_single[5]=0; // always
 }
 
 int16_t klatt_get_sample_single(){
-  static short samplenumber=0;
+  //  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;
@@ -406,7 +410,7 @@ int16_t klatt_get_sample_single(){
 }
 
 int16_t klatt_get_sample_single_sing(){
-  static short samplenumber=0;
+  //  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;
@@ -582,6 +586,8 @@ int16_t klatt_get_sample_single_sing(){
 
 
 void klatt_newsay(){ /// elm is our list
+    samplenumber=0;
+
 i=0; 
 le = &Elements[0];
 top = 1.1 * def_pars.F0hz10;
@@ -629,7 +635,6 @@ static inline void doadc(){
 
 
 int16_t klatt_get_sample(){
-  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;
@@ -805,6 +810,7 @@ static unsigned int elm_plen;
 static u8 const *vocab_elm;
 
 void klatt_newsay_vocab(){ /// elm is our list
+  samplenumber=0;
 
 i=0; 
 le = &Elements[0];
@@ -843,7 +849,7 @@ top = 1.1 * def_pars.F0hz10;
 }
 
 int16_t klatt_get_sample_vocab(){
-  static short samplenumber=0;
+  //  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;
@@ -1012,7 +1018,7 @@ int16_t klatt_get_sample_vocab(){
 
 
 int16_t klatt_get_sample_vocab_sing(){
-  static short samplenumber=0;
+  //  static short samplenumber=0;
   static u8 newframe=0;
   static Elm_ptr ce; 
   int16_t sample;

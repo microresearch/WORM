@@ -109,9 +109,11 @@ unsigned char y;
     frame[39]=42; // FIXED volume - higher if we revert to all parallel
       }
 
+static uint16_t samplenumber=0;
+
+
 int16_t simpleklatt_get_sample(){
   u8 x=0;
-  static uint16_t samplenumber=0;
   int16_t sampel;
 
   sampel=single_single_parwave(globals, frame);
@@ -129,6 +131,7 @@ void simpleklatt_newsay(){
   // generate the frame from our exy -> frame
   generate_exy_frame(frame);
   frame_init(globals,frame); 
+    samplenumber=0;
   //    if (globals->f0_flutter != 0)
   //      flutter(globals,frame);  
     globals->ns=0;
