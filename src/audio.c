@@ -28,6 +28,9 @@
 #include "samplerate.h"
 #endif
 
+int16_t trigger_cycles=0;
+
+
 extern __IO uint16_t adc_buffer[10];
 int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
 
@@ -411,7 +414,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   // TESTY: OUT COMMENT BELOW
   
     if (oldmode!=_intmode) {// IF there is a modechange!
-    trigger=1; // for now this is never/always called TEST
+      trigger=1; // for now this is never/always called TEST
     // if we are not leaving compost - if we are entering compost ???
        if ((_intmode== COMPOST || _intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
     doadc();
@@ -442,7 +445,11 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (sample<THRESHLOW) retrigger=0;
   }
 
-  if (trigger==1) wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
+  trigger_cycles++;
+  
+  if (trigger==1) {
+    wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below
+  }
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
   else if (wormlist[_intmode]->xy==1)

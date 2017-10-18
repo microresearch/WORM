@@ -14,6 +14,10 @@ extern float exy[240];
 extern char TTSinarray[17];
 u8 modus;
 
+#define MAX_CYCLES 128
+
+extern int16_t trigger_cycles;
+
 static char input[512];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
 static char tmpinput[257];
 static const char* phoneme_list[56]={"IY", "IH", "EH", "AE", "AA", "AH", "AO", "OH", "UH", "UX", "ER", "AX", "IX", "EY", "AY", "OY", "AW", "OW", "UW", "R", "L", "W", "WH", "Y", "M", "N", "NX", "B", "D", "G", "J", "Z", "ZH", "V", "DH", "S", "SH", "F", "TH", "P", "T", "K", "CH", "/H", "YX", "WX", "RX", "LX", "/X", "DX", "UL", "UM", "UN", "Q", " ", "."}; // 56 elements!
@@ -98,7 +102,7 @@ void Init()
 		stressOutput[i] = 0;
 		phonemeLengthOutput[i] = 0;
 	}
-	phonemeindex[255] = 32; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
+	phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs
 }
 
 void sam_init(){
@@ -109,10 +113,13 @@ void sam_init(){
 
 
 void sam_newsay_banks0(void){
+  if (trigger_cycles>MAX_CYCLES){
+    trigger_cycles=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
-  //  X=Y=0;
+  Init();
+  //  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  X=Y=0;
 
   // FOR banks selection
   u8 bank=_sely*34.0f;
@@ -167,13 +174,17 @@ void sam_newsay_banks0(void){
       }
 	}	
 }
+}
 
 void sam_newsay_TTS(void){
-  //  X=Y=0;
+  if (trigger_cycles>1024){
+    trigger_cycles=0;
+  X=Y=0;
 
   u8 beginning=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  Init();
+  //  phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // FOR TTS
     char teststring[256];
@@ -228,13 +239,19 @@ void sam_newsay_TTS(void){
       }
 	}	
 }
+}
 
 void sam_newsay_phon(void){
-  //  X=Y=0;
+  if (trigger_cycles>MAX_CYCLES){
+        trigger_cycles=0;
+
+    X=Y=0;
 
   u8 beginning=0;
-  singmode=0; pitch=64; mouth=128; throat=128; 
-    phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  singmode=0; pitch=64; mouth=128; throat=128;
+    Init();
+
+  //    phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
   char teststring[256];
@@ -299,14 +316,20 @@ void sam_newsay_phon(void){
       }
 	}	
 }
+}
 
 void sam_newsay_xy(void){ 
-  //  X=Y=0;
+  if (trigger_cycles>MAX_CYCLES){
+        trigger_cycles=0;
+
+    X=Y=0;
   // what should singmode be?
   singmode=0; 
   
-  u8 beginning=0; pitch=64; mouth=128; throat=128; 
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  u8 beginning=0; pitch=64; mouth=128; throat=128;
+    Init();
+
+  //  phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
   u8 vocab=_selz*135.0f;
@@ -357,13 +380,18 @@ void sam_newsay_xy(void){
       }
 	}	
 }
+}
 
 void sam_newsay_param(void){ 
-  //  X=Y=0;
+  if (trigger_cycles>MAX_CYCLES){
+        trigger_cycles=0;
+
+    X=Y=0;
   // what should singmode be?
   singmode=0; 
   u8 beginning=0;
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+
+    //  phonemeindex[255] = 32; //to prevent buffer overflow or 255
 
 // set input
 
@@ -382,7 +410,8 @@ void sam_newsay_param(void){
   MAXED(mouth,254);
   u8 throat=exy[3]*255.0;
   MAXED(throat,254);
-  SetMouthThroat(mouth, throat);
+  //  SetMouthThroat(mouth, throat); // but we never reset this??? TESTY!
+    Init();
 
   if (!Parser1()) return; // if we don't parse then reject and do what? well still have last
   Parser2();
@@ -427,14 +456,19 @@ void sam_newsay_param(void){
       }
 	}	
 }
-
+}
 
 void sam_newsay_phonsing(void){
-  //  X=Y=0;
+   if (trigger_cycles>MAX_CYCLES){
+         trigger_cycles=0;
+
+   X=Y=0;
 
   u8 beginning=0;
   singmode=1; pitch=64; mouth=128; throat=128; 
-  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+  //  phonemeindex[255] = 32; //to prevent buffer overflow or 255
+    Init();
+
   //  u8 val=_selz*130.0f; // pitch now on selz
   //  MAXED(val,127);
   //  pitch=64.0f*logpitch[val];
@@ -501,17 +535,20 @@ void sam_newsay_phonsing(void){
       }
 	}	
 }
-
+}
 //6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3
 
 u8 sam_get_sample_xy(int16_t* newsample){
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=3; // x AND y
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_xy();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_xy();
+  }
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); // which howmany do we use? this one then discard the above
@@ -519,13 +556,17 @@ u8 sam_get_sample_xy(int16_t* newsample){
 }
 
 u8 sam_get_sample_bend(int16_t* newsample){
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=16; // bends frequencies
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_xy();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_xy();
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -536,13 +577,17 @@ u8 sam_get_sample_bend(int16_t* newsample){
 //7- all x params as x/y axis with z as selected vocab - modus=8
 
 u8 sam_get_sample_param(int16_t* newsample){
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=8; // selx mode
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_param();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_param();
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -551,7 +596,7 @@ u8 sam_get_sample_param(int16_t* newsample){
 
 
 u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
@@ -563,7 +608,11 @@ u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
 
   modus=1; // was 32 but now we want z
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_phon();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_phon();
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -571,7 +620,7 @@ u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
 }
 
 u8 sam_get_sample_phons(int16_t* newsample){
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
@@ -583,7 +632,12 @@ u8 sam_get_sample_phons(int16_t* newsample){
   exy[xaxis]=_selz;
 
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_phon();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+   sam_newsay_phon();
+   //        trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -591,7 +645,7 @@ u8 sam_get_sample_phons(int16_t* newsample){
 }
 
 u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 for extra pitch mode
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
@@ -603,7 +657,12 @@ u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 fo
   exy[xaxis]=_selz;
 
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_phonsing();
+  if (ending) {
+        trigger_cycles=MAX_CYCLES+1;
+	sam_newsay_phonsing();
+	//        trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -693,13 +752,18 @@ return samplel;
 }
 
 u8 sam_get_sample_banks0(int16_t* newsample){
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=1;
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_banks0();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_banks0();
+    //        trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -707,13 +771,18 @@ u8 sam_get_sample_banks0(int16_t* newsample){
 }
 
 u8 sam_get_sample_banks1(int16_t* newsample){ // same newsay only change is modus - selx is speed
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=4; // speed on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_banks0();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_banks0();
+    //    trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -721,13 +790,18 @@ u8 sam_get_sample_banks1(int16_t* newsample){ // same newsay only change is modu
 }
 
 u8 sam_get_sample_TTS(int16_t* newsample){ 
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=1; // pitch on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_TTS();
+  if (ending) {
+    trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_TTS();
+    //    trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 
@@ -735,13 +809,17 @@ u8 sam_get_sample_TTS(int16_t* newsample){
 }
 
 u8 sam_get_sample_TTSs(int16_t* newsample){ 
-  static int16_t lastsample;
+  static int16_t lastsample=0;
   int16_t swopsample;
   u8 howmany=0; u8 ending=0;
   int32_t oldbufferpos=bufferpos;
   modus=4; // speed on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
-  if (ending) sam_newsay_TTS();
+  if (ending) {trigger_cycles=MAX_CYCLES+1;
+    sam_newsay_TTS();
+    //    trigger_cycles=0;
+  }
+
   *newsample=lastsample;
   lastsample=swopsample;
   howmany=(bufferpos/50)-(oldbufferpos/50); 

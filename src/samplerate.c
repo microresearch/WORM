@@ -3,6 +3,8 @@
 
 #include "audio.h"
 
+#define LIMIN 16000 // or 32000?
+
 #define WIDTH 16              
 #define DELAY_SIZE 6 // was 40 --- 3*width=16 = 3*16=48-5=43 - use 7 for simplea
 
@@ -98,6 +100,7 @@ static void new_data(int16_t data)
 
 void samplerate_simple(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio, u8 triggered){
   float alpha;
+  int16_t outt;
   static float time_now=0.0f;
   long last_time;
   static long int_time=0;
@@ -138,7 +141,11 @@ for (u8 ii=0;ii<size;ii++){
       //      out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
         }
 	else */// no filter 
-    out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    outt = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    if (outt>LIMIN) outt=LIMIN;
+    else if (outt<-LIMIN) outt=-LIMIN;
+    out[ii]=outt;
+        
     //out[ii] = delay_buffer[DELAY_SIZE-5];
 
 
@@ -156,6 +163,7 @@ for (u8 ii=0;ii<size;ii++){
 
 void samplerate_simple_exy(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), float sampleratio, u8 extent, u8 triggered){
   static u8 parammode=1;
+  int16_t outt;
   float alpha;
   static float time_now=0.0f;
   long last_time;
@@ -181,7 +189,11 @@ for (u8 ii=0;ii<size;ii++){
   else if (in[ii]<THRESHLOW && triggered) triggered=0;
   */
     alpha = time_now - (float)int_time;
-     out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+     outt = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+     if (outt>LIMIN) outt=LIMIN;
+     else if (outt<-LIMIN) outt=-LIMIN;
+     out[ii]=outt;
+
 
   time_now += factor;
   last_time = int_time;
@@ -208,6 +220,7 @@ for (u8 ii=0;ii<size;ii++){
 void samplerate_simple_exy_trigger(int16_t* out, float factor, u8 size, int16_t(*getsample)(void), void(*newsay)(void), float sampleratio, u8 extent, u8 triggered){
   float alpha;
   static float time_now=0.0f;
+  int16_t outt;
   long last_time;
   static long int_time=0;
   //  static u8 triggered=0;
@@ -232,7 +245,10 @@ for (u8 ii=0;ii<size;ii++){
   else if (in[ii]<THRESHLOW) triggered=0;
   */
     alpha = time_now - (float)int_time;
-     out[ii] = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+     outt = ((float)delay_buffer[DELAY_SIZE-5] * alpha) + ((float)delay_buffer[DELAY_SIZE-6] * (1.0f - alpha));
+    if (outt>LIMIN) outt=LIMIN;
+    else if (outt<-LIMIN) outt=-LIMIN;
+    out[ii]=outt;
 
   time_now += factor;
   last_time = int_time;

@@ -4,10 +4,14 @@
 
 - full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
 
-- announce OCT - soundcloud=more recordings/instagram/twitter/mail-list/muffs
+- check all hardware before release 
 
-- check all hardware
+- announce - soundcloud=more recordings/instagram/twitter/mail-list/muffs
 
+** fixings
+
+- limitings in samplerate.c
+- glitches between sam modes and also on too fast re-trigger so added limit to how fast can do newsay TEST!
 
 ** DONE
 
