@@ -1,14 +1,16 @@
 * latest/latest
 
-** 
+** 18/10
 
 - check TTS and triggers on modes
 
 - check new reset of states in sam...
 
-- check all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST
+- checked all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST
 
 checked nvp, tms, digi, sp0256
+
+- check fast triggering and changing between modes - re-check all modes!
 
 - full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
 
@@ -18,8 +20,8 @@ checked nvp, tms, digi, sp0256
 
 ** fixings
 
-- limitings in samplerate.c
-- glitches between sam modes and also on too fast re-trigger so added limit to how fast can do newsay TEST!
+- limitings in samplerate.cDONE
+- glitches when changing between sam modes and also on too fast re-trigger so added limit to how fast can do newsay TEST!
 
 ** DONE
 

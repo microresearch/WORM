@@ -176,7 +176,6 @@ typedef struct wormer_ {
   u8 TTS;
 } wormer;
 
-
 static const wormer sp0256er={0, 0.3125f, sp0256_get_sample, sp0256_newsay, 0, 0};
 static const wormer sp0256TTSer={0, 0.3125f, sp0256_get_sampleTTS, sp0256_retriggerTTS, 0, 1};
 static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_newsay, 0, 0};
@@ -309,7 +308,7 @@ int16_t compost_get_sample(){
   static float time_now=0.0f;
   long last_time;
   static long int_time=0;
-  static u8 triggered=0;
+  //  static u8 triggered=0;
   static u8 oldcompost=255, compostmode=255;
   doadc();
   u16 startx=(1.0f-_selx)*32767.0f;
