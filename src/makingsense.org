@@ -26,6 +26,10 @@ RE_CHECK:
 
 - full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
 
+// changed newvotrax.c volume mult
+
+- vol/limiting Q?
+
 - check all hardware before release 
 
 - announce - soundcloud=more recordings/instagram/twitter/mail-list/muffs

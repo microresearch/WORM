@@ -740,9 +740,9 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_6, 2);  // 2 is length of array
 		//	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
-	int avl=(int)(vn*50000.0f);
-	if (avl>32767) avl=32767;
-	else if (avl<-32767) avl=-32767;
+	int32_t avl=(int)(vn*16000.0f); // TESTY - was 50000.0f
+	if (avl>32000) avl=32000;
+	else if (avl<-32000) avl=-32000;
 	//	printf("xx %d %f,", avl, vn);
 	return avl;
 }
