@@ -1613,6 +1613,7 @@ int16_t votrax_get_samplewow(){
 }
 
 void votrax_newsayTTS(){
+    sample_count=0;
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
     inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
@@ -1629,6 +1630,22 @@ void votrax_newsayTTS(){
    }
 }
 
+void votrax_retriggerTTS(){
+    sample_count=0;
+  m_cclock = m_mainclock / 36.0f;
+  TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
+  writer(TTSoutarray[0]); 
+  phone_commit();
+  //  inflection_w(TTSoutarray[0]>>6); // how many bits?
+  //  u8 val=_sely*132.0f;
+  //  MAXED(val,127);
+  //  val=127-val;
+  //  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
+  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
+  TTSindex=1;
+}
+
+
 int16_t votrax_get_sampleTTS(){ 
   modus=0;
   int16_t sample; u8 x;
@@ -1642,20 +1659,6 @@ int16_t votrax_get_sampleTTS(){
     votrax_newsayTTS();
   }
   return sample;
-}
-
-void votrax_retriggerTTS(){
-  m_cclock = m_mainclock / 36.0f;
-  TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
-  writer(TTSoutarray[0]); 
-  phone_commit();
-  //  inflection_w(TTSoutarray[0]>>6); // how many bits?
-  //  u8 val=_sely*132.0f;
-  //  MAXED(val,127);
-  //  val=127-val;
-  //  lenny=(2*(m_rom_duration*4+1)*4*9+2)*logpitch[val]; 
-  lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
-  TTSindex=1;
 }
 
 #endif

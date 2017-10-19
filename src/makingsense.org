@@ -1,16 +1,28 @@
 * latest/latest
 
-** 18/10
+** 18-19/10
 
-- check TTS and triggers on modes
+- check TTS and triggers on modesDONE
 
-- check new reset of states in sam...
+- check new reset of states in sam... - REMOVED as problem was in resets... FIXED
 
-- checked all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST
+- checked all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST-DONE/TESTED
 
-checked nvp, tms, digi, sp0256
+checked nvp, tms, digi, sp0256 in code
 
-- check fast triggering and changing between modes - re-check all modes!
+- check fast triggering and changing between modes - re-check all modes! 0->61DONE
+
+NOTES: 17,18 - tms is noisy (but not to do with trigger)
+
+RE_CHECK:
+29-votraxTTS trigger???-> votrax_retriggerTTS-FIXED
+///
+
+53-klatt trigger???-> klatt_newsay // or is 54?fine!
+
+58-simpleklatt trigger-> simpleklatt_newsay OK!
+
+////
 
 - full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
 

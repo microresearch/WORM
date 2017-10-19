@@ -13,11 +13,6 @@ extern float _selx, _sely, _selz;
 extern float exy[240];
 extern char TTSinarray[17];
 u8 modus;
-
-#define MAX_CYCLES 128
-#define MAX_CYCLES_TTS 1024
-
-extern int16_t trigger_cycles;
 u8 resetted=0;
 
 static char input[512];//={"KAX4MPYUX4TAH.\x9b"}; //tab39445 - shorten MAX size is 32
@@ -116,8 +111,6 @@ void sam_init(){
 
 
 void sam_newsay_banks0(void){
-  if (trigger_cycles>MAX_CYCLES){
-    trigger_cycles=0;
   singmode=0; pitch=64; mouth=128; throat=128; 
   u8 beginning=0;
   Init();
@@ -177,11 +170,9 @@ void sam_newsay_banks0(void){
       }
 	}	
 }
-}
+
 
 void sam_newsay_TTS(void){
-  if (trigger_cycles>MAX_CYCLES_TTS){// TESTY!?
-    trigger_cycles=0;
   X=Y=0;
 
   u8 beginning=0;
@@ -242,12 +233,9 @@ void sam_newsay_TTS(void){
       }
 	}	
 }
-}
+
 
 void sam_newsay_phon(void){
-  if (trigger_cycles>MAX_CYCLES){
-        trigger_cycles=0;
-
     X=Y=0;
 
   u8 beginning=0;
@@ -319,12 +307,9 @@ void sam_newsay_phon(void){
       }
 	}	
 }
-}
+
 
 void sam_newsay_xy(void){ 
-  if (trigger_cycles>MAX_CYCLES){
-        trigger_cycles=0;
-
     X=Y=0;
   // what should singmode be?
   singmode=0; 
@@ -383,12 +368,9 @@ void sam_newsay_xy(void){
       }
 	}	
 }
-}
+
 
 void sam_newsay_param(void){ 
-  if (trigger_cycles>MAX_CYCLES){
-        trigger_cycles=0;
-
     X=Y=0;
   // what should singmode be?
   singmode=0; 
@@ -459,12 +441,9 @@ void sam_newsay_param(void){
       }
 	}	
 }
-}
+
 
 void sam_newsay_phonsing(void){
-   if (trigger_cycles>MAX_CYCLES){
-         trigger_cycles=0;
-
    X=Y=0;
 
   u8 beginning=0;
@@ -538,7 +517,7 @@ void sam_newsay_phonsing(void){
       }
 	}	
 }
-}
+
 //6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3
 
 u8 sam_get_sample_xy(int16_t* newsample){
@@ -549,7 +528,6 @@ u8 sam_get_sample_xy(int16_t* newsample){
   modus=3; // x AND y
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_xy();
   }
   *newsample=lastsample;
@@ -566,7 +544,6 @@ u8 sam_get_sample_bend(int16_t* newsample){
   modus=16; // bends frequencies
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_xy();
   }
 
@@ -587,7 +564,6 @@ u8 sam_get_sample_param(int16_t* newsample){
   modus=8; // selx mode
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_param();
   }
 
@@ -612,7 +588,6 @@ u8 sam_get_sample_phon(int16_t* newsample){ //TESTING new own exy solution
   modus=1; // was 32 but now we want z
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_phon();
   }
 
@@ -636,9 +611,7 @@ u8 sam_get_sample_phons(int16_t* newsample){
 
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
    sam_newsay_phon();
-   //        trigger_cycles=0;
   }
 
   *newsample=lastsample;
@@ -661,9 +634,7 @@ u8 sam_get_sample_phonsing(int16_t* newsample){ // why is modus 0?-fix to 128 fo
 
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-        trigger_cycles=MAX_CYCLES+1;
 	sam_newsay_phonsing();
-	//        trigger_cycles=0;
   }
 
   *newsample=lastsample;
@@ -762,9 +733,7 @@ u8 sam_get_sample_banks0(int16_t* newsample){
   modus=1;
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_banks0();
-    //        trigger_cycles=0;
   }
 
   *newsample=lastsample;
@@ -781,9 +750,7 @@ u8 sam_get_sample_banks1(int16_t* newsample){ // same newsay only change is modu
   modus=4; // speed on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES+1;
     sam_newsay_banks0();
-    //    trigger_cycles=0;
   }
 
   *newsample=lastsample;
@@ -800,9 +767,7 @@ u8 sam_get_sample_TTS(int16_t* newsample){
   modus=1; // pitch on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES_TTS+1;
     sam_newsay_TTS();
-    //    trigger_cycles=0;
   }
 
   *newsample=lastsample;
@@ -819,9 +784,7 @@ u8 sam_get_sample_TTSs(int16_t* newsample){
   modus=4; // speed on selx
   rendersamsample(&swopsample, &ending);      // we need ended back if we want to new_say on end
   if (ending) {
-    trigger_cycles=MAX_CYCLES_TTS+1;
     sam_newsay_TTS();
-    //    trigger_cycles=0;
   }
 
   *newsample=lastsample;
