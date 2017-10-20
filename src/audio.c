@@ -404,7 +404,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=58; //TESTY
+  //  _intmode=12; //TESTY
   MAXED(_intmode, MODET); 
   trigger=0; 
 
@@ -420,7 +420,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     oldselz=_selz;
     }
     }
-  
+   
+
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;

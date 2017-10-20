@@ -595,7 +595,7 @@ void main(){
 
   while(1){
     sample=  fiveoneprocess(&ending);
-    printf("%c",(sample+32768)>>8);
+    //    printf("%c",(sample+32768)>>8);
     if (ending==1){
       ending=0; tms5100_newsay();
     }
