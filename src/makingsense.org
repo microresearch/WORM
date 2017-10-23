@@ -30,7 +30,7 @@ RE_CHECK:
 
 - vol/limiting Q? leave as is now
 
-*/// check through tms noisiness - we need to re-work raw ones (5100-7 also)!*
+/// check through tms noisiness - we need to re-work raw ones (5100-7 also)! checked-DONE/ no changes...
 
 - should these frames have a length? length would need to be an extra parameter - or just use trigger...
 - we do not use any unvoiced here...
@@ -44,6 +44,12 @@ RE_CHECK:
 &15tms5200pitchtablebenderxX, &16tms5100ktablebenderX,
 &17tms5200ktablebenderX, &18tms5100kandpitchtablebenderX,
 &19tms5200kandpitchtablebenderX, &20tms5200kandpitchtablebenderxX,
+
+////
+
+- final sanity check of all modes, raw modes, trigger, compost
+
+////
 
 
 - check all hardware before release 
