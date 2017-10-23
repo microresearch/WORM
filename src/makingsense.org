@@ -28,7 +28,23 @@ RE_CHECK:
 
 // changed newvotrax.c volume mult
 
-- vol/limiting Q?
+- vol/limiting Q? leave as is now
+
+*/// check through tms noisiness - we need to re-work raw ones (5100-7 also)!*
+
+- should these frames have a length? length would need to be an extra parameter - or just use trigger...
+- we do not use any unvoiced here...
+
+&8tmsraw5200er*CLICKS*,
+&9tmsraw5220er*CLICKS*, 
+
+&10tmsbend5100erX, &11tmsbend5200erX, &12tmsbend5200erxCLICKY
+
+&13tms5100pitchtablebenderX, &14tms5200pitchtablebenderX,
+&15tms5200pitchtablebenderxX, &16tms5100ktablebenderX,
+&17tms5200ktablebenderX, &18tms5100kandpitchtablebenderX,
+&19tms5200kandpitchtablebenderX, &20tms5200kandpitchtablebenderxX,
+
 
 - check all hardware before release 
 
