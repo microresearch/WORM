@@ -3,7 +3,7 @@
 
 #include "audio.h"
 
-#define LIMIN 16000 // or 32000?
+#define LIMIN 32000 // or 32000?
 
 #define WIDTH 16              
 #define DELAY_SIZE 6 // was 40 --- 3*width=16 = 3*16=48-5=43 - use 7 for simplea

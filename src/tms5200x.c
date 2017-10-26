@@ -373,7 +373,7 @@ UINT8 m_subc_reload=1;      /* contains 1 for normal speech, 0 when SPKSLOW is a
 	UINT8 m_uv_zpar;          /* If 1, zero k5 thru k10 coefficients */
 	UINT8 m_zpar;             /* If 1, zero ALL parameters. */
 	UINT8 m_pitch_zero;       /* circuit 412; pitch is forced to zero under certain circumstances */
-	UINT8 m_c_variant_rate;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
+	UINT8 m_c_variant_rate=0;    /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 m_pitch_count;     /* pitch counter; provides chirp rom address */
 
 	INT32 m_u[11];
@@ -1758,7 +1758,11 @@ int16_t process5100raw()
 		}
 		else // Not a new frame, just interpolate the existing frame.
 		{
-		  int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
+		  //		  m_inhibit = 0; thus
+		  //		  int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
+		  int inhibit_state = 0;
+#ifdef PERFECT_INTERPOLATION_HACK
+
 #ifdef PERFECT_INTERPOLATION_HACK
 			int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
 			//int samples_per_frame = m_subc_reload?200:304; // either (13 A cycles + 12 B cycles) * 8 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 8 interps for SPKSLOW

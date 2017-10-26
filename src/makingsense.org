@@ -1,5 +1,19 @@
 * latest/latest
 
+- final sanity check of all modes, raw modes// 
+
+26/10 - small fixes to tms raw to check?
+
+////
+
+DONE-triggerX-changed so trigger and triggered don't run twice, compostX
+
+////
+
+
+- check all hardware before release - reprog first set of 3...
+
+
 ** 18-19/10
 
 - check TTS and triggers on modesDONE
@@ -47,12 +61,18 @@ RE_CHECK:
 
 ////
 
-- final sanity check of all modes, raw modes, trigger, compost
+*25/10 - changed limit volume back to 32000 ///*
+
+- final sanity check of all modes, raw modes// 
+
+////
+
+DONE-triggerX-changed so trigger and triggered don't run twice, compostX
 
 ////
 
 
-- check all hardware before release 
+- check all hardware before release - reprog first set of 3...
 
 - announce - soundcloud=more recordings/instagram/twitter/mail-list/muffs
 
