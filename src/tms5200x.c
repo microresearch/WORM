@@ -1761,7 +1761,7 @@ int16_t process5100raw()
 		  //		  m_inhibit = 0; thus
 		  //		  int inhibit_state = ((m_inhibit==1)&&(m_IP != 0)); // disable inhibit when reaching the last interp period, but don't overwrite the m_inhibit value
 		  int inhibit_state = 0;
-#ifdef PERFECT_INTERPOLATION_HACK
+		  //#ifdef PERFECT_INTERPOLATION_HACK
 
 #ifdef PERFECT_INTERPOLATION_HACK
 			int samples_per_frame = m_subc_reload?175:266; // either (13 A cycles + 12 B cycles) * 7 interps for normal SPEAK/SPKEXT, or (13*2 A cycles + 12 B cycles) * 7 interps for SPKSLOW
