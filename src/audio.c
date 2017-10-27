@@ -212,7 +212,7 @@ static const wormer sambender={239, 1.0f, sam_get_sample_benda, sam_newsay_xy, 2
 
 static const wormer digitalker={0, 1.0f, digitalk_get_sample, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
 static const wormer digitalker_sing={0, 1.0f, digitalk_get_sample_sing, digitalk_newsay, 0, 0}; // digitalker now has resampling inside say
-static const wormer digitalker_bendpitchvals={31, 1.0f, digitalk_get_sample_bendpitchvals, digitalk_newsay, 2, 0}; // digitalker now has resampling inside say
+static const wormer digitalker_bendpitchvals={31, 1.0f, digitalk_get_sample_bendpitchvals, digitalk_newsay, 2, 0}; // digitalker now has resampling inside say - checked
 
 // tms modes: 
 
