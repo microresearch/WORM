@@ -364,7 +364,7 @@ int16_t compost_get_sample(){
   return sample;
 }
 
-void compost_newsay_frozen(){ 
+void compost_newsay_frozen(){ // toggled when we change so is unfrozen - TEST!
   freezer^=1; // toggles freezer
 }
 
