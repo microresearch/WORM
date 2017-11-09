@@ -280,7 +280,7 @@ static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengt
 
 static u16 comp_counter=0;
 static u16 cc=0;
-static u8 freezer=0;
+static u8 freezer=0, freezery=0;
 
 static inline void doadc_compost(){
   // exy stays anyway as it is
@@ -312,7 +312,7 @@ int16_t compost_get_sample(){
   u16 endy=(1.0f-_sely)*32767.0f;
   signed char dir;
 
-  if (freezer==1){ // UNFROZEN
+  if (freezer==1 || freezery==1){ // UNFROZEN
   // generate into audio_buffer based on selz mode and struct list
     /*  float value =(float)adc_buffer[SELZ]/65536.0f; 
   smoothed_adc_value[4] += 0.01f * (value - smoothed_adc_value[4]); // try to smooth it!
@@ -366,11 +366,11 @@ int16_t compost_get_sample(){
 
 void compost_newsay_frozen(){ // toggled when we change so is unfrozen - TEST!
   freezer^=1; // toggles freezer
-}
+ }
 
 
 void compost_newsay(){ //triggers newsay for compostmode  
-  freezer=1; // always unfrozen
+  freezery=1; // always unfrozen
   doadc();
   _selz=1.0f-_selz; // invert
   u8 compostmode= _selz*MODEFC; 
@@ -404,7 +404,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=12; //TESTY
+  //  _intmode=63; //TESTY
+  
   MAXED(_intmode, MODET); 
   trigger=0; 
 
@@ -414,19 +415,25 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
       trigger=1; // for now this is never/always called TEST
     // if we are not leaving compost - if we are entering compost ???
        if ((_intmode== COMPOST || _intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
-    doadc();
-    oldselx=_selx;
-    oldsely=_sely;
-    oldselz=_selz;
+	 //	 trigger=0; // TEST!
+	 doadc();
+	 oldselx=_selx;
+	 oldsely=_sely;
+	 oldselz=_selz;
     }
     }
-   
 
+    
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;
       }
 
+    if (_intmode==COMPOSTF) {
+      trigger=0;
+      freezery=0;
+    }
+    
     samplespeedref=_speed*1028.0f;
     MAXED(samplespeedref, 1023);
     samplespeed=logspeed[samplespeedref];  
