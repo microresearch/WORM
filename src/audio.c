@@ -38,7 +38,6 @@ float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 extern float exy[240];
 float _mode, _speed, _selx, _sely, _selz;
 static float oldselx=0.5f, oldsely=0.5f, oldselz=1.0f;
-static u8 _intspeed, _intmode=0, trigger=0;
 
 #define float float32_t
 
@@ -365,7 +364,7 @@ int16_t compost_get_sample(){
 }
 
 void compost_newsay_frozen(){ // toggled when we change so is unfrozen - TEST!
-  freezer^=1; // toggles freezer
+  freezer^=1; // toggles freezer only on input trigger
  }
 
 
@@ -383,6 +382,8 @@ void compost_newsay(){ //triggers newsay for compostmode
 
 void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 {
+  static u8 _intmode=0;
+  u8 trigger=0;
   int16_t sample;
   float samplespeed;
   float value;
@@ -407,7 +408,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   //  _intmode=63; //TESTY
   
   MAXED(_intmode, MODET); 
-  trigger=0; 
 
   // TESTY: OUT COMMENT BELOW
   
@@ -451,16 +451,16 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (sample<THRESHLOW) retrigger=0;
   }
 
-  
-  if (trigger==1) {
-    wormlist[_intmode]->newsay();   // first trigger from mode-change pulled out from below - we need this but exclusive or below so we don't trigger newsay twice...
+    //triggered->thresh and trigger->modechange
+    if (trigger==1 && wormlist[_intmode]->xy!=1) { // modechange except mode 1
+    triggered=1; 
   }
 
-  if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered^trigger);
+  if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
   else if (wormlist[_intmode]->xy==1)
-    samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
+    samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered); // no trigger
   else 
-    samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered^trigger);
+    samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
 
   if (_intmode!=COMPOST && _intmode!=COMPOSTF){ // only if we're not composting...
     for (u8 x=0;x<sz/2;x++) {
