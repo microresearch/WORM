@@ -2,9 +2,10 @@
 
 - compost/trigger sanity 
 
-// 25/11 - changes to trigger -> test on exy and normal modes
+// 25/11 - changes to trigger -> test on exy and normal modes - TEST!
 
 - final sanity check of all modes, raw modes// tmsX, sp0256X, 
+
 - HW tests
 - release: manual online, modulargrid, web page, mailing list, muffwiggler, soundcloud
 
