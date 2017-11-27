@@ -18,6 +18,7 @@ void sam_newsay_phon();
 void sam_newsay_phonsing();
 void sam_newsay_xy();
 void sam_newsay_param();
+void sam_newsay_banks0fix(void);
 
 u8 sam_get_sample_banks0(int16_t *newsample);
 u8 sam_get_sample_banks1(int16_t *newsample);

@@ -215,6 +215,7 @@ const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321,
 
 //};//
 
+
 //const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
 // TESTY: above commented out to speed up
@@ -701,7 +702,7 @@ void parse_frame_raw_5100() //- for our 3 sets of coeffs - exy is 0-10
 
 	// attempt to extract the energy index
 	m_new_frame_energy_idx = 13-(exy[0]*13.0f); // exy[0]
-	m_new_frame_energy_idx+=1; // TESTY!
+	m_new_frame_energy_idx+=1;
 	// if the energy index is 0 or 15, we're done
 	//if (m_new_frame_energy_idx == 0)
 	//		return;

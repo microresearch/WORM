@@ -740,7 +740,7 @@ u32 analog_calc()
 	shift_hist(vn, m_vn_6, 2);  // 2 is length of array
 		//	printf("VNNNNNN::: %d\n",(int)(vn*50.0f));
 	//	return vn*50000;
-	int32_t avl=(int)(vn*16000.0f); // TESTY - was 50000.0f
+	int32_t avl=(int)(vn*16000.0f);
 	if (avl>32000) avl=32000;
 	else if (avl<-32000) avl=-32000;
 	//	printf("xx %d %f,", avl, vn);
@@ -1356,10 +1356,9 @@ void votrax_init(){
 #ifndef LAP
 ////[[[[[[[[[[[[[[[[[[[ audio functions:
 
-static int16_t sample_count=0;
 
 void votrax_newsay(){
-  sample_count=0;
+  m_sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*67.0f; 
   MAXED(sel,63);
@@ -1373,7 +1372,7 @@ void votrax_newsay(){
 }
 
 void votrax_newsay_sing(){
-  sample_count=0;
+  m_sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   u8 sel=_selz*67.0f; 
   MAXED(sel,63);
@@ -1396,7 +1395,7 @@ int16_t votrax_get_sample(){
   if(m_sample_count & 1)
     chip_update();
   sample=analog_calc();
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsay();
   }
@@ -1410,7 +1409,7 @@ int16_t votrax_get_sample_sing(){
   if(m_sample_count & 1)
     chip_update();
   sample=analog_calc();
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsay_sing();
   }
@@ -1428,7 +1427,8 @@ int16_t votrax_get_sample_rawparam(){
 }
 
 void votrax_newsay_bend(u8 reset){
-    sample_count=0;
+    m_sample_count=0;
+
   m_cclock = m_mainclock / 36.0f;
   signed char tmp;
   u8 it;
@@ -1467,7 +1467,7 @@ int16_t votrax_get_sample_bend(){
 
   sample=analog_calc();
   // hit end and then newsay
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsay_bend(0);
   }
@@ -1477,7 +1477,7 @@ int16_t votrax_get_sample_bend(){
 /////
 
 void votrax_newsaygorf(u8 reset){
-    sample_count=0;
+    m_sample_count=0;
     m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
@@ -1504,7 +1504,7 @@ void votrax_newsaygorfr(){
 }
 
 void votrax_newsaywow(u8 reset){
-    sample_count=0;
+    m_sample_count=0;
   m_cclock = m_mainclock / 36.0f;
      static u8 vocabindex=0, whichone=0;
      u8 it;
@@ -1536,7 +1536,7 @@ void votrax_newsaywowr(){
 }
 
 void votrax_newsaywow_bendfilter(u8 reset){
-    sample_count=0;
+    m_sample_count=0;
      static u8 vocabindex=0, whichone=0;
      u8 it;
      it=*(vocablist_wow[whichone]+vocabindex);
@@ -1573,7 +1573,7 @@ int16_t votrax_get_samplegorf(){
     chip_update();
   sample=analog_calc();
   // hit end and then newsay
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsaygorf(0);
   }
@@ -1589,7 +1589,7 @@ int16_t votrax_get_samplewow_bendfilter(){
     chip_update();
   sample=analog_calc()>>2; // reduce volume TESTY!!
   // hit end and then newsay
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsaywow_bendfilter(0);
   }
@@ -1605,7 +1605,7 @@ int16_t votrax_get_samplewow(){
     chip_update();
   sample=analog_calc();
   // hit end and then newsay
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsaywow(0);
   }
@@ -1613,7 +1613,7 @@ int16_t votrax_get_samplewow(){
 }
 
 void votrax_newsayTTS(){
-    sample_count=0;
+    m_sample_count=0;
   writer(TTSoutarray[TTSindex]); 
   phone_commit();
     inflection_w(TTSoutarray[TTSindex]>>6); // how many bits?
@@ -1631,7 +1631,7 @@ void votrax_newsayTTS(){
 }
 
 void votrax_retriggerTTS(){
-    sample_count=0;
+    m_sample_count=0;
   m_cclock = m_mainclock / 36.0f;
   TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
   writer(TTSoutarray[0]); 
@@ -1654,7 +1654,7 @@ int16_t votrax_get_sampleTTS(){
     chip_updateTTS();
   sample=analog_calc();
   // hit end and then newsay
-  if (sample_count++>=lenny){
+  if (m_sample_count>=lenny){
     //    sample_count=0;
     votrax_newsayTTS();
   }

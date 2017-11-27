@@ -203,7 +203,7 @@ static const wormer samphonser={0, 1.0f, sam_get_sample_phonsa, sam_newsay_phon,
 static const wormer samphonsinger={0, 1.0f, sam_get_sample_phonsinga, sam_newsay_phonsing, 0, 0}; // and - constant pitch on z
 ///
 
-static const wormer samxyer={0, 1.0f, sam_get_sample_xya, sam_newsay_banks0, 0, 0};  // pitch on x speed on y
+static const wormer samxyer={0, 1.0f, sam_get_sample_xya, sam_newsay_xy, 0, 0};  // pitch on x speed on y - FIXED wrong newsay here
 static const wormer samparamer={3, 1.0f, sam_get_sample_parama, sam_newsay_param, 2, 0}; // all x params as x/y axis with z as selected vocab 2=exy_trigger
 static const wormer sambender={239, 1.0f, sam_get_sample_benda, sam_newsay_xy, 2, 0};  // x/y bends freq data, z as selected
 
@@ -246,12 +246,13 @@ static const wormer tms5200ktablebender={167, 0.25f, tms_get_sample_5200ktablea,
 static const wormer tms5100kandpitchtablebender={199, 0.25f, tms_get_sample_5100kandpitchtablew, tms_newsay_specific5100, 2, 0}; // maxextent=199, triggerxymode
 static const wormer tms5200kandpitchtablebender={231, 0.25f, tms_get_sample_5200kandpitchtablea, tms_newsay_specifica, 2, 0}; // maxextent=231, triggerxymode - allphons
 static const wormer tms5200kandpitchtablebenderx={231, 0.25f, tms_get_sample_5200kandpitchtablex, tms_newsay_specificx, 2, 0}; // maxextent=231, triggerxymode - allphons
-
+//rsynth_2005
 static const wormer rsynthy={0, 0.25f, rsynth_get_sample, rsynth_newsay, 0, 0};
 static const wormer rsynthelm={0, 0.25f, rsynth_get_sample_elm, rsynth_newsay_elm, 0, 0}; 
 static const wormer rsynthsingle={0, 0.25f, rsynth_get_sample_single, rsynth_newsay_singlex, 0, 0};
 static const wormer rsynthysing={0, 0.25f, rsynth_get_sample_sing, rsynth_newsay, 0, 0};
 
+//rsynth-2.0-port
 static const wormer klatter={0, 1.0f, klatt_get_sample, klatt_newsay, 0, 0};  // elements
 static const wormer klattsingle={0, 1.0f, klatt_get_sample_single, klatt_newsay_single, 0, 0};
 static const wormer klattvocab={0, 1.0f, klatt_get_sample_vocab, klatt_newsay_vocab, 0, 0};
@@ -260,6 +261,7 @@ static const wormer klattvocabsing={0, 1.0f, klatt_get_sample_vocab_sing, klatt_
 
 static const wormer simpleklatter={38, 0.5f, simpleklatt_get_sample, simpleklatt_newsay, 2, 0}; 
 
+//nvp.c
 static const wormer nvper={0, 0.5f, nvp_get_sample, nvp_newsay, 0, 0};
 static const wormer nvpvocabsing={0, 0.5f, nvp_get_sample_vocab_sing, nvp_newsay_vocab_trigger, 0, 0};
 static const wormer nvpvocaber={0, 0.5f, nvp_get_sample_vocab, nvp_newsay_vocab_trigger, 0, 0};
@@ -269,8 +271,8 @@ static const wormer compostfrer={0, 1.0f, compost_get_sample, compost_newsay_fro
 
 static const wormer *wormlist[]={&tmser, &tmslowbiter, &tmssinger, &tmsbendlengther, &tmsphoner, &tmsphonsinger, &tmsttser, &tmsraw5100er, &tmsraw5200er, &tmsraw5220er, &tmsbend5100er, &tmsbend5200er, &tmsbend5200erx, &tms5100pitchtablebender, &tms5200pitchtablebender, &tms5200pitchtablebenderx, &tms5100ktablebender, &tms5200ktablebender, &tms5100kandpitchtablebender, &tms5200kandpitchtablebender, &tms5200kandpitchtablebenderx, &sp0256er, &sp0256singer, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer, &sp02561219er, &sp0256bender, &votraxer, &votraxTTSer, &votraxgorfer, &votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, &votraxsinger, &sambanks0er, &sambanks1er, &samTTSer, &samTTSser, &samphoner, &samphonser, &samphonsinger, &samxyer, &samparamer, &sambender, &digitalker, &digitalker_sing, &digitalker_bendpitchvals, &rsynthy, &rsynthelm, &rsynthsingle, &rsynthysing, &klatter, &klattsingle, &klattsinglesing, &klattvocab, &klattvocabsing, &simpleklatter, &nvper, &nvpvocaber, &nvpvocabsing, &composter, &compostfrer};
 
-#define MODEF 66.0f // float 68.0f
-#define MODEFC 65.0f // float 68.0f
+#define MODEF 65.0f // float 68.0f
+#define MODEFC 64.0f // float 68.0f
 #define MODET 63 // mode top 63 // 61 for no COMPOST
 #define COMPOST 62
 #define COMPOSTF 63
@@ -405,11 +407,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=63; //TESTY
+  //    _intmode=61; //TESTY
   
   MAXED(_intmode, MODET); 
 
   // TESTY: OUT COMMENT BELOW
+
   
       if (oldmode!=_intmode) {// IF there is a modechange!
       trigger=1; // for now this is never/always called TEST
@@ -422,7 +425,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	 oldselz=_selz;
     }
     }
-
+ 
     
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;

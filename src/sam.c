@@ -171,7 +171,6 @@ void sam_newsay_banks0(void){
 	}	
 }
 
-
 void sam_newsay_TTS(void){
   X=Y=0;
 

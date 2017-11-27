@@ -364,7 +364,7 @@ const u8 sp0256starting[10] __attribute__ ((section (".flash")))  ={55, 55, 2, 1
 const u8 sp0256hello[6] __attribute__ ((section (".flash")))  ={27, 7, 45, 15, 53, 255};
 const u8 sp0256talk[6] __attribute__ ((section (".flash")))  ={13, 23, 23, 1, 41, 255};
 
-// TODO: split into two sections 276+42=318/2=159 each
+// DONE: split into two sections 276+42=318/2=159 each
 
 const uint8_t *vocab_sp0256_bankone[88] =  {sp0256ampere, sp0256b,  sp0256c, sp0256cent, sp0256cognitive, sp0256collide, sp0256computer,  sp0256d, sp0256degree, sp0256divided, sp0256dollar, sp0256e, sp0256eight, sp0256eleven, sp0256equal, sp0256error, sp0256f, sp0256farads, sp0256fifteen, sp0256fifty, sp0256first, sp0256five, sp0256forty, sp0256four, sp0256fourteen, sp0256g, sp0256gauge, sp0256gram, sp0256h, sp0256hour, sp0256hundred, sp0256i, sp0256infinitive, sp0256j, sp0256k, sp0256kilo, sp0256l, sp0256legislate, sp0256m, sp0256memory, sp0256microo, sp0256million, sp0256minus, sp0256n, sp0256nine, sp0256nineteen, sp0256ninety, sp0256number, sp0256o, sp0256one, sp0256p, sp0256percent, sp0256pico, sp0256pulses, sp0256q, sp0256r, sp0256robot, sp0256s, sp0256score, sp0256second, sp0256set, sp0256seven, sp0256seventeen, sp0256seventy, sp0256six, sp0256sixteen, sp0256sixty, sp0256system, sp0256t, sp0256temperature, sp0256ten, sp0256thirteen, sp0256thirty, sp0256thousand, sp0256three, sp0256time, sp0256today, sp0256twelve, sp0256twenty, sp0256two, sp0256u, sp0256v, sp0256volt, sp0256w, sp0256x, sp0256y, sp0256z, sp0256zero};
 

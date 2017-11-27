@@ -161,7 +161,7 @@ static float curpitch;
 
 void rsynth_newsay_single(u8 once)
 {
-    ampl=1.2f;
+    ampl=0.7f;
 
   u8 selected=1;
   //  static u8 once=1;
@@ -203,7 +203,7 @@ void rsynth_newsay_singlex(){
 void rsynth_newsay()
 {
   //  u8 selected=1;
-  ampl=1.2f;
+  ampl=1.0f;
   u8 selected=_selz*131.0f;
   MAXED(selected,127);
   selected=127-selected;
@@ -292,7 +292,7 @@ int16_t rsynth_get_sample(){
 
 
   if (nextelement==1){ // we have a new element
-    samplenumber=0; // TESTY!
+    samplenumber=0; 
     ce = &Elementz[elm[i++]];
     dur = elm[i++];
 	/* Skip zero length elements which are only there to affect
@@ -413,7 +413,7 @@ int16_t rsynth_get_sample_sing(){
   }
 
   if (nextelement==1){ // we have a new element
-    samplenumber=0; // TESTY!
+    samplenumber=0; 
 
     ce = &Elementz[elm[i++]];
     dur = elm[i++];
@@ -535,7 +535,7 @@ int16_t rsynth_get_sample_single(){
   }
 
   if (nextelement==1){ // we have a new element
-    samplenumber=0; // TESTY!
+    samplenumber=0; 
 
     ce = &Elementz[element[i++]];
     dur = element[i++];
@@ -656,7 +656,7 @@ int16_t rsynth_get_sample_elm(){
 
 
   if (nextelement==1){ // we have a new element
-    samplenumber=0; // TESTY!
+    samplenumber=0; 
 
     ce = &Elementz[test_elm_rsynthy[i++]];
     dur = test_elm_rsynthy[i++];

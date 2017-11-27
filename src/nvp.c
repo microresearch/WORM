@@ -283,9 +283,9 @@ void init_nvp(void){
   //change_nvpparams(const speechPlayer_frame_t* frame, float glotty,float prefgain,float vpoffset,float vspeed,float vpitch,float outgain,float envpitch, float voiceamp, float turby);
 
   //        change_nvpparams(&framer, 0.1f, 1.0f, 1.825f, 10.5f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused,
-  //  change_nvpparams(&framer, 0.5f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+    change_nvpparams(&framer, 0.5f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
   // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
-    change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.01f); // envpitch=endVoicePitch is unused, 
+  //    change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 0.01f); // envpitch=endVoicePitch is unused, 
 
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[0][i]; 
@@ -293,7 +293,7 @@ void init_nvp(void){
 
 ourvocab=nvp_vocab[0];
 
-  //  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
+ memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // no interpol
 
 }
 
@@ -342,8 +342,10 @@ void nvp_init(){
 static u8 changed=0;
 
 void nvp_newsay(){
-  static u8 oldframe=0, nextframe=0;
-  count=0;
+  u8 oldframe=0;
+  static u8 nextframe=0;
+  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+    count=0;
   oldframe=nextframe;
   nextframe=_selz*51.0f;
   MAXED(nextframe,47);
@@ -373,8 +375,8 @@ static u8 counter=0;
 void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
   u8 nextframe;
   u8 value;
-  u8 silence=0;
-  
+  u8 silence=0, newframe=0;
+
   nextframe=ourvocab[counter].phon;
 
   if (nextframe==255) { // end of frame!
@@ -384,11 +386,12 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
     counter=0;
     ourvocab=nvp_vocab[value];
     nextframe=ourvocab[0].phon;    
+    //    newframe=1;
   }
 
-  if (nextframe==49) {
-    nextframe=0; 
-  }
+      if (nextframe==49) {
+        nextframe=0; 
+      }
   
   if (nextframe==0) {
       *indexy[36]=0.0f;
@@ -397,9 +400,14 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
       changed=0;
   }
   else {
-  for (u8 i=0;i<39;i++){
+  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+
+    for (u8 i=0;i<39;i++){
     *indexy[i]=data[nextframe][i];
   }
+    //        if (newframe==1)   memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+	
+    changed=1;
   }
 
     int val=_sely*1028.0f;
@@ -410,14 +418,17 @@ void nvp_newsay_vocab(){ // note that this cycles thru vocab frame by frame
     this_pitch_inc=(ourvocab[counter].endVoicePitch-ourvocab[counter].voicePitch)/this_frame_length;
     counter++;
     count=0;
-    changed=1;
+
+
 }
 
-void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
+void nvp_newsay_vocab_trigger(){ // trigger at start of vocab item
   u8 nextframe;
   u8 silence=0;
   count=0;
   counter=0;
+  memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
+
   u8 value=_selz*131.0f;
   MAXED(value,127);
   value=127-value;
@@ -438,6 +449,7 @@ void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
   for (u8 i=0;i<39;i++){
     *indexy[i]=data[nextframe][i];
   }
+    changed=1;
   }
     int val=_sely*1028.0f;
     MAXED(val,1023);
@@ -446,7 +458,6 @@ void nvp_newsay_vocab_trigger(){ // note that this cycles thru vocab
     this_pitch=ourvocab[0].voicePitch;
     this_pitch_inc=(ourvocab[0].endVoicePitch-ourvocab[0].voicePitch)/this_frame_length;
     counter++;
-    changed=1;
     //    return nextframe;
 }
 
@@ -458,9 +469,9 @@ int16_t nvp_get_sample(){
   if (count>this_frame_length){
   // is this a new frame?
     //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
-    oldframer=framer;
+    //oldframer=framer;
     nvp_newsay();
-    count=0;
+    //    count=0;
     //        memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
 
@@ -484,7 +495,7 @@ int16_t nvp_get_sample(){
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude;
+  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude;
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
   count++;
@@ -501,21 +512,21 @@ int16_t nvp_get_sample_vocab(){
   if (count>this_frame_length){
   // is this a new frame?
     //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
-    oldframer=framer;
+    //        oldframer=framer;
     nvp_newsay_vocab();
-    count=0;
-    //      memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
+    //    count=0;
+    //       memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
   }// new frame - we also need to take care of pitch and pitch interpol
 
    
    if (count<this_interpol && changed){
       float curFadeRatio=(float)count/(this_interpol);
   //    float curFadeRatio=(float)count/(this_frame_length);
-    for(j=0;j<speechPlayer_frame_numParams;++j) {
-      ((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio); 
+      for(j=0;j<speechPlayer_frame_numParams;++j) {
+	((float*)&tempframe)[j]=calculateValueAtFadePosition(((float*)&oldframer)[j],((float*)&framer)[j],curFadeRatio);
     }
-       }
- 
+    }
+   
 
     int16_t vale=1024.0f*(1.0f-_selx);
     tempframe.voicePitch=this_pitch*logspeed[vale]*2.0f;
@@ -523,7 +534,7 @@ int16_t nvp_get_sample_vocab(){
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude; // was 0.3
+  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude; // was 0.3
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
 
@@ -541,7 +552,7 @@ int16_t nvp_get_sample_vocab_sing(){
   if (count>this_frame_length){
   // is this a new frame?
     //    memcpy(&oldframer, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol
-    oldframer=framer;
+    //    oldframer=framer;
     nvp_newsay_vocab();
     count=0;
     //    memcpy(&tempframe, &framer, sizeof(speechPlayer_frame_t)); // old frame for interpol TESTING no interpol
@@ -557,7 +568,7 @@ int16_t nvp_get_sample_vocab_sing(){
 
   float voice=getNextVOICE(&tempframe);
   float cascadeOut=getNextCASC(&tempframe,voice*tempframe.preFormantGain);
-  float fric=getNextNOISE(&lastValueTwo)*0.03f*tempframe.fricationAmplitude; // was 0.3
+  float fric=getNextNOISE(&lastValueTwo)*0.3f*tempframe.fricationAmplitude; // was 0.3
   float parallelOut=getNextPARALLEL(&tempframe,fric*tempframe.preFormantGain);
   float out=(cascadeOut+parallelOut)*tempframe.outputGain;
   //  float out=(parallelOut)*tempframe.outputGain;

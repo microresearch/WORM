@@ -478,8 +478,8 @@ int16_t rsynth_frame_single(rsynth_t * rsynth, float F0Hz, float *frame){
 	noise *= PVT(amp_af);
 
 	voice = rsynth_filter(rsynth, voice, noise)*ampl;
-	if (voice>32767) voice=32767;
-	else if (voice<-32767) voice=-32767;
+	if (voice>32000) voice=32000;
+	else if (voice<-32000) voice=-32000;
 
 	return voice;
 
