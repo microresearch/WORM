@@ -1338,7 +1338,7 @@ void sp0256_newsayTTS(void){// called at end of phoneme
 
 // new code to retrigger TTS
 
-void sp0256_retriggerTTS(void){// called on a trigger
+void sp0256_retriggerTTS(void){// called on an outside trigger
    u8 dada;
    //   m_halted=1;
    m_lrq=0; m_halted=1; m_filt.rpt=0;

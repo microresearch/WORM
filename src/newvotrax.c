@@ -1636,7 +1636,7 @@ void votrax_retriggerTTS(){
   TTSlength= text2speechforvotrax(16,TTSinarray,TTSoutarray);
   writer(TTSoutarray[0]); 
   phone_commit();
-  //  inflection_w(TTSoutarray[0]>>6); // how many bits?
+  inflection_w(TTSoutarray[0]>>6); // how many bits?
   //  u8 val=_sely*132.0f;
   //  MAXED(val,127);
   //  val=127-val;

@@ -178,7 +178,7 @@ static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_new
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
 static const wormer sp02561219er={0, 0.3125f, sp0256_get_sample1219, sp0256_newsay1219, 0, 0};
-static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 1, 0}; // trigger as toggle // checked exy extent
+static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, none_newsay, 1, 0}; // trigger as toggle // checked exy extent .. newsay not used
 
 // 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
 
@@ -189,7 +189,7 @@ static const wormer votraxgorfer={0, 1.25f, votrax_get_samplegorf, votrax_newsay
 static const wormer votraxwower={0, 1.25f, votrax_get_samplewow, votrax_newsaywowr, 0, 0};
 static const wormer votraxwowfilterbender={0, 1.25f, votrax_get_samplewow_bendfilter, votrax_newsaywow_bendfilterr, 0, 0}; 
 static const wormer votraxbender={8, 1.25f, votrax_get_sample_bend, votrax_newsay_bendr, 2, 0}; // as extra samplerate mode with trigger as newsay
-static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, votrax_newsay_bendr, 1, 0}; // exy-raw .. newsay is not used
+static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, none_newsay, 1, 0}; // exy-raw .. newsay is not used
 static const wormer votraxsinger={0, 1.25f, votrax_get_sample_sing, votrax_newsay_sing, 0, 0};
 
 // 10 sam modes: sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend
@@ -407,7 +407,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //    _intmode=61; //TESTY
+  //  _intmode=56; //TESTY
   
   MAXED(_intmode, MODET); 
 
@@ -415,8 +415,8 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 
   
       if (oldmode!=_intmode) {// IF there is a modechange!
-      trigger=1; // for now this is never/always called TEST
-    // if we are not leaving compost - if we are entering compost ???
+      trigger=1; 
+    // and if we are not leaving compost - if we are entering compost ???
        if ((_intmode== COMPOST || _intmode== COMPOSTF) && oldmode!=COMPOST && oldmode!=COMPOSTF){
 	 //	 trigger=0; // TEST!
 	 doadc();
@@ -425,14 +425,14 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
 	 oldselz=_selz;
     }
     }
- 
+  
     
     if (firsttime==0){ // we can leave this so is always called first
       trigger=1;
       firsttime=1;
       }
 
-    if (_intmode==COMPOSTF) {
+    if (_intmode==COMPOSTF) { // never trigger a freeze/toggle on entry
       trigger=0;
       freezery=0;
     }
@@ -454,14 +454,14 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (sample<THRESHLOW) retrigger=0;
   }
 
-    //triggered->thresh and trigger->modechange
+    //triggered=thresh and trigger=modechange
     if (trigger==1 && wormlist[_intmode]->xy!=1) { // modechange except mode 1
     triggered=1; 
   }
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
   else if (wormlist[_intmode]->xy==1)
-    samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered); // no trigger
+    samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered); // trigger toggle only on threshold
   else 
     samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
 
@@ -474,7 +474,7 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   
   if (wormlist[_intmode]->TTS==1){ 
     doadc();
-    u8 xax=_sely*19.0f; 
+    u8 xax=_sely*18.0f; 
     u8 selz=_selz*67.0f; 
     MAXED(xax,15);
     MAXED(selz,63);

@@ -40,6 +40,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_2303.h" // wordlist_spell2303[102] - check this starts with "I" -> "lINGER" - checked
 #include "LPC/roms/vocab_testroms.h" // 5200=wordlist_alphons[127] // and // wordlist_arcade_one[74] // and // wordlist_arcade_two[67]
 
+///*
 #include "LPC/roms/vocab_2350.h" // wordlist_spell2350[152]
 #include "LPC/roms/vocab_2304.h" // wordlist_spell2304[132]
 #include "LPC/roms/vocab_2321.h" // wordlist_spell2321[98] 
@@ -85,7 +86,7 @@ typedef int32_t INT32;
 #include "LPC/roms/vocab_acorn.h" // wordlist_acorn[165]
 #include "LPC/roms/vocab_large_male.h" //wordlist_largemale_one[197] // and // wordlist_largemale_two[197]
 #include "LPC/roms/vocab_male.h" // wordlist_male[206] --- is male in large male? *NO* - also check vocab_talko?-CHECKED
-
+//*/
 
 // list of which_coeff:
 
@@ -108,7 +109,7 @@ typedef struct TMS_vocab__ {
 
 const TMS_vocab vocab_2303={wordlist_spell2303, &T0280B_0281A_coeff, 101, 105.0f}; // en - OK and not 2801!
 const TMS_vocab vocab_alphons={wordlist_alphons, &T0285_2501E_coeff, 126, 130.0f};//ti99 alphons
-
+///*
 const TMS_vocab vocab_2350_1={wordlist_spell2350_1, &T0280B_0281A_coeff, 75, 79.0f}; //1982 spell
 const TMS_vocab vocab_2350_2={wordlist_spell2350_2, &T0280B_0281A_coeff, 75, 79.0f}; 
 
@@ -2062,13 +2063,12 @@ void tms_newsay_allphon(){
 void tms_newsay_TTS(){
   // this is our allphon code
   m_digital_select=1;
-  u8 whichbank=ALLPHON_BANK; 
-  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+  m_coeff=allTMSvocabs[ALLPHON_BANK]->m_coeff;
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
 
-    ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[TTSindex]]; 
+    ptrAddr=allTMSvocabs[ALLPHON_BANK]->wordlist[TTSoutarray[TTSindex]]; 
     ptrBit = 0;
 
     TTSindex++;
@@ -2076,22 +2076,21 @@ void tms_newsay_TTS(){
      TTSindex=0;
      TTSlength= text2speechforTMS(16,TTSinarray,TTSoutarray);
      }
+   m_IP=0; m_PC=12;m_subcycle=1; // ???
 };
 
 void tms_retriggerTTS(){
   m_digital_select=1;
-  u8 whichbank=ALLPHON_BANK; 
-  m_coeff=allTMSvocabs[whichbank]->m_coeff;
+  m_coeff=allTMSvocabs[ALLPHON_BANK]->m_coeff;
   m_new_frame_energy_idx = 0;
   m_new_frame_pitch_idx = 0;
   m_talk_status = 1;
 
   TTSlength= text2speechforTMS(16,TTSinarray,TTSoutarray); 
-  ptrAddr=allTMSvocabs[whichbank]->wordlist[TTSoutarray[0]]; 
+  ptrAddr=allTMSvocabs[ALLPHON_BANK]->wordlist[TTSoutarray[0]]; 
   ptrBit = 0;
   TTSindex=1; // for next round
   m_IP=0; m_PC=12;m_subcycle=1; // ???
-
 }
 
 void tms_newsay_raw5100(){

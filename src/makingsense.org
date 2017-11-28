@@ -1,3 +1,7 @@
+* HW
+
+28/11 HW programmed and tested TOTAL: 28
+
 * latest/latest
 
 // 27/11 - trigger is fine on exy and normal, compost is fine, reduced float on modesDONE
@@ -5,7 +9,20 @@
 // 25/11 - changes to trigger -> test on exy and normal modes - TEST!DONE
 
 
-- final sanity check of all modes, raw modes// tmsX, sp0256X, 
+- final sanity check of all modes - DONE
+
+- check code-> audio.cDONE
+
+// 28/11 - re-check sp0256bender=27 and votraxparamer=34 as added null newsay for compostDONE
+// check 53/54 clicky????CHECKED - recheck sanity
+
+// re-check compostDONE
+
+check HW 14.31 several hours fine
+
+// added clear audio buffer in main
+
+// code checks - votrax, sam, digitalker, rsynth/klatt/simpleklatt/nvp
 
 - HW tests
 
@@ -39,8 +56,8 @@
 &49rsynthy,
 &50rsynthelm, &51rsynthsingle, &52rsynthysing,  ADJUSTED_VOLUMES
 
-&53klatter, 53/54 clickly?
-
+//rsynth-2.0-port
+&53klatter, 53/54 clicky?
 &54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
 
 &58simpleklatter, 

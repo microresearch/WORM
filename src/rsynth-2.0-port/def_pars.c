@@ -23,15 +23,15 @@ void klatt_init(void)
   //	int impulse = 0;
   //  int impulse = 1;
 	//int casc = 1;
-	int casc = 6;
+  int casc = 4; // was 6
 	klatt_global.samrate = samp_rate;
 	klatt_global.quiet_flag = TRUE;
 
 	//	klatt_global.glsource = NATURAL;/// SAMPLE=fixed, NATURAL seems same as IMPULSIVE, TRIANGULAR-loud-leave, WAVETABLE - not implemented?
 	// we fix this as NATURAL
-	klatt_global.f0_flutter = 0.0f;
+	klatt_global.f0_flutter = 10.0f;
 	def_pars.TLTdb=0;
-	def_pars.Kskew=10;
+	def_pars.Kskew=10; // was 10
 	def_pars.F0hz10=1600;//         "Base F0 in 0.1Hz",
 
 	if (casc > 0)

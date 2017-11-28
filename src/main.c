@@ -75,6 +75,8 @@ extern char TTSinarray[17];
 
 char TTStester[16]={'w','o','r','m',' ','s', 'p', 'e','e','c','h',' ','w', 'o', 'r', 'm'};
 
+extern int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
+
 void main(void)
 {
   int16_t x;
@@ -89,6 +91,12 @@ void main(void)
   for (x=0;x<240;x++){
     exy[x]=0.4f; // this is midway when we do invert it.. = 1.0f approx
   }
+
+  // fill audio buffer
+
+      for (u16 xx=0;xx<AUDIO_BUFSZ;xx++) {
+      audio_buffer[xx]=0;
+      }
 
   
   // all generator inits
