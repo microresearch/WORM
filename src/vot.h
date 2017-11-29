@@ -29,3 +29,4 @@ void votrax_newsaywow_bendfilter(u8 reset);
 void votrax_newsaywow_bendfilterr(); 
 int16_t votrax_get_samplewow_bendfilter();
 void votrax_retriggerTTS();
+void votrax_rawparam_newsay();

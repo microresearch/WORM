@@ -841,7 +841,7 @@ void sp0256_initbend(void){
  }
 
 
-int16_t sp0256_get_samplebend(void){
+int16_t sp0256_get_samplebend(void){ // what if we enter and is not set
   static int16_t output; 
 
       micro();

@@ -1426,6 +1426,11 @@ int16_t votrax_get_sample_rawparam(){
   return sample;
 }
 
+void votrax_rawparam_newsay(){
+  m_cclock = m_mainclock / 36.0f; // just in case????
+}
+
+
 void votrax_newsay_bend(u8 reset){
     m_sample_count=0;
 

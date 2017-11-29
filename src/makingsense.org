@@ -2,7 +2,15 @@
 
 28/11 HW programmed and tested TOTAL: 28
 
+but may re-program as some small chanhes
+
 * latest/latest
+
+- release: manual online, modulargrid, web page, mailing list, muffwiggler, soundcloud
+
+// code checks - votraxX, samX, digitalkerX, rsynth/klatt/simpleklatt/nvp
+
+// 29/11 - newvotrax: mainclock in rawparam as no newsay in votraxparamer and also changes in sp0256bender - TEST!
 
 // 27/11 - trigger is fine on exy and normal, compost is fine, reduced float on modesDONE
 
@@ -22,11 +30,8 @@ check HW 14.31 several hours fine
 
 // added clear audio buffer in main
 
-// code checks - votrax, sam, digitalker, rsynth/klatt/simpleklatt/nvp
+- HW testsDONE
 
-- HW tests
-
-- release: manual online, modulargrid, web page, mailing list, muffwiggler, soundcloud
 
 &0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
 &5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er,

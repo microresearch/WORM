@@ -178,7 +178,7 @@ static const wormer sp0256singer={0, 0.3125f, sp0256_get_sample_sing, sp0256_new
 static const wormer sp0256vocaboneer={0, 0.3125f, sp0256_get_samplevocabbankone, sp0256_newsayvocabbankonea, 0, 0}; // wrapped newsay
 static const wormer sp0256vocabtwoer={0, 0.3125f, sp0256_get_samplevocabbanktwo, sp0256_newsayvocabbanktwoa, 0, 0};
 static const wormer sp02561219er={0, 0.3125f, sp0256_get_sample1219, sp0256_newsay1219, 0, 0};
-static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, none_newsay, 1, 0}; // trigger as toggle // checked exy extent .. newsay not used
+static const wormer sp0256bender={14, 0.3125f, sp0256_get_samplebend, sp0256_newsaybend, 1, 0}; // trigger as toggle // checked exy extent .. newsay on entry
 
 // 8 votrax modes: votrax, votraxTTS, votraxgorf, votraxwow, votraxwowfilterbend, votrax_param, votrax_bend, votraxsing
 
@@ -189,7 +189,7 @@ static const wormer votraxgorfer={0, 1.25f, votrax_get_samplegorf, votrax_newsay
 static const wormer votraxwower={0, 1.25f, votrax_get_samplewow, votrax_newsaywowr, 0, 0};
 static const wormer votraxwowfilterbender={0, 1.25f, votrax_get_samplewow_bendfilter, votrax_newsaywow_bendfilterr, 0, 0}; 
 static const wormer votraxbender={8, 1.25f, votrax_get_sample_bend, votrax_newsay_bendr, 2, 0}; // as extra samplerate mode with trigger as newsay
-static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, none_newsay, 1, 0}; // exy-raw .. newsay is not used
+static const wormer votraxparamer={6, 1.25f, votrax_get_sample_rawparam, votrax_rawparam_newsay, 1, 0}; // exy-raw .. newsay on entry
 static const wormer votraxsinger={0, 1.25f, votrax_get_sample_sing, votrax_newsay_sing, 0, 0};
 
 // 10 sam modes: sam_banks0, sam_banks1, sam_TTS, sam_TTSs, sam_phon, sam_phons, sam_phonsing, sam_xy, sam_param, sam_bend
@@ -460,8 +460,12 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   }
 
   if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
-  else if (wormlist[_intmode]->xy==1)
+  else if (wormlist[_intmode]->xy==1){
+    if (trigger==1) {// entry into mode triggers newsay
+      wormlist[_intmode]->newsay();
+    }
     samplerate_simple_exy(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered); // trigger toggle only on threshold
+  }
   else 
     samplerate_simple_exy_trigger(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, wormlist[_intmode]->maxextent, triggered);
 
