@@ -1,3 +1,38 @@
+* NEW announcement: 
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
+
+ERD finally releases the eurorack-based ERD/WORM synth featuring
+software worming of emulated artificial human speech cores from the
+70s to the 90s of the last century. Six key speech cores are simulated
+with a vocabulary of over 4000 words and phrases, including basic
+allophones or phonemes which can be used to build new phrases as well
+as a Text to Speech engine for advanced textual constructions. A
+further set of COMPOST modes allows for sample-based re-working of
+constructed and wormed words and phrases.
+
+Emulated speech cores include Texas Instruments' famous Speak and Worm
+family of devices (and subsequent circuit-wormed modifications), Atari
+and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
+worm-n-talk and General Instruments Intelliworm. ERD/WORM further
+bends and worms these key speech synthesis algorithms across 61 modes
+with full trigger, CV and knob control over nearly all aspects of these
+speech cores.
+
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
+ERD/WORM ships with a golden Riso-printed full manual in a limited
+edition of 100. The first batch of 25 units is now available for
+tracked shipping. The next batch will be available in February 2018.
+
+
 * HW
 
 28/11 HW programmed and tested TOTAL: 28
@@ -8,7 +43,7 @@ but may re-program as some small chanhes
 
 - release: manual online, modulargrid, web page, mailing list, muffwiggler, soundcloud
 
-// code checks - votraxX, samX, digitalkerX, rsynth/klatt/simpleklatt/nvp
+// code checks - votraxX, samX, digitalkerX, rsynthX/klatt=rsynth-2.0-port/simpleklattX/nvpX
 
 // 29/11 - newvotrax: mainclock in rawparam as no newsay in votraxparamer and also changes in sp0256bender - TEST!
 
@@ -2607,38 +2642,6 @@ full tests, uncomment retrigger code
 
 - announce OCT
 
-* announcement: 
-
-The WORM was for a long time desirous to speake, but the rule and
-or∣der of the Court enjoyned him silence, but now strutting and
-swelling, and impatient, of further delay, he broke out
-thus... [Maier]
-
-
-** 
-
-ERD finally releases the eurorack-based ERD/WORM synth featuring
-software worming of emulated artificial human speech cores from the
-70s to the 90s of the last century. Six key speech cores are simulated
-with a vocabulary of over 4000 words and phrases, including basic
-allophones or phonemes which can be used to build new phrases as well
-as a Text to Speech engine for advanced textual constructions. A
-further set of COMPOST modes allows for sample-based re-working of
-constructed and wormed words and phrases.
-
-Emulated speech cores include Texas Instruments' famous Speak and Worm
-family of devices (and subsequent circuit-wormed modifications), Atari
-and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
-worm-n-talk and General Instruments Intelliworm. ERD/WORM further
-bends and worms these key speech synthesis algorithms across 61 modes
-with full trigger, CV and knob control over nearly all aspects of these
-speech cores.
-
-ERD/WORM functions best the more it deviates serpentinely from a
-simulation of recognizable human speech (as if it would ever) towards
-the slipped and stammered, a/rhythmic and timbral, producing new
-sounds through the use of fast re-triggering of phrases and phonemes,
-and exploring multiple bends by knob and CV control.
 
 * FINAL/FURTHER TODO-DONE
 
