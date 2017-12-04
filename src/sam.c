@@ -100,7 +100,7 @@ void Init()
 		phonemeLengthOutput[i] = 0;
 	}
 	phonemeindex[255] = 255; //to prevent buffer overflow // ML : changed from 32 to 255 to stop freezing with long inputs - was 32?
-	resetted=1; // TESTY!
+	resetted=1; 
 }
 
 void sam_init(){
@@ -394,7 +394,6 @@ void sam_newsay_param(void){
   MAXED(mouth,254);
   u8 throat=exy[3]*255.0;
   MAXED(throat,254);
-  //  SetMouthThroat(mouth, throat); // but we never reset this??? TESTY!
     Init();
 
   if (!Parser1()) return; // if we don't parse then reject and do what? well still have last

@@ -407,13 +407,9 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
   _mode=1.0f-_mode; // invert
     oldmode=_intmode;
   _intmode=_mode*MODEF;
-  //  _intmode=56; //TESTY
   
   MAXED(_intmode, MODET); 
 
-  // TESTY: OUT COMMENT BELOW
-
-  
       if (oldmode!=_intmode) {// IF there is a modechange!
       trigger=1; 
     // and if we are not leaving compost - if we are entering compost ???
@@ -440,8 +436,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     samplespeedref=_speed*1028.0f;
     MAXED(samplespeedref, 1023);
     samplespeed=logspeed[samplespeedref];  
-    //    samplespeed=1.0f; // TESTY CHECK!!!
-    // how can we avoid trigger crossing boundary - this should work
 
     for (u8 x=0;x<sz/2;x++){ /// sz/2=128/2-64 = /2=32
     sample=*(src++);
@@ -449,7 +443,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (retrigger==0 && sample> THRESH) {
       triggered=1;
       retrigger=1;
-      //      break; // ???
     }
     if (sample<THRESHLOW) retrigger=0;
   }

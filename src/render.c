@@ -510,7 +510,7 @@ u8 rendersamsample(int16_t* sample, u8* ending){
   static u8 secondstate=0;
   u8 nosample=1; u8 howmany=0;
   //  printf("mem49 %d speedcounter %d Y %d X %d mem38 %d mem44 %d mem48 %d\n",mem49,speedcounter,Y,X,mem38,mem44,mem48);
-  if (resetted==1) { // reset in init which is always called by newsay - TESTY!
+  if (resetted==1) { // reset in init which is always called by newsay
     state=0;
     resetted=0;
   }

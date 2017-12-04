@@ -438,7 +438,7 @@ void chip_update()
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		//      interpolate(m_cur_va,  m_rom_va);
 	  m_cur_fc=interpolate(m_cur_fc,  m_rom_fc);
-	  /*	  u8 val=_selx*131.0f; // TESTY!
+	  /*	  u8 val=_selx*131.0f; 
 	  MAXED(val,127);
 	  val=127-val;
 	  m_cur_f1_orig=interpolate(m_cur_f1_orig,  m_rom_f1);
@@ -1560,7 +1560,7 @@ void votrax_newsaywow_bendfilter(u8 reset){
   MAXED(val,127);
   val=127-val; // we invert it
   lenny=(16*(m_rom_duration*4+1)*4*9+2)/32; 
-  m_cclock = 10000.0f * logpitch[val]; //  TESTY!- DONE
+  m_cclock = 10000.0f * logpitch[val]; 
   //   m_cclock = (m_mainclock / 36.0f) * logpitch[val];  // was this before
 
 }
@@ -1592,7 +1592,7 @@ int16_t votrax_get_samplewow_bendfilter(){
   m_sample_count++;
   if(m_sample_count & 1)
     chip_update();
-  sample=analog_calc()>>2; // reduce volume TESTY!!
+  sample=analog_calc()>>2; // reduce volume 
   // hit end and then newsay
   if (m_sample_count>=lenny){
     //    sample_count=0;

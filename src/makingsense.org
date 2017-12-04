@@ -1,4 +1,6 @@
-* NEW announcement: 
+* NEW announcement/site: 
+
+** announce
 
 The WORM was for a long time desirous to speake, but the rule and
 or∣der of the Court enjoyned him silence, but now strutting and
@@ -28,16 +30,84 @@ the slipped and stammered, a/rhythmic and timbral, producing new
 sounds through the use of fast re-triggering of phrases and phonemes,
 and exploring multiple bends by knob and CV control.
 
+ERD/WORM is produced in Berlin by various worms and hands.
+
 ERD/WORM ships with a golden Riso-printed full manual in a limited
 edition of 100. The first batch of 25 units is now available for
 tracked shipping. The next batch will be available in February 2018.
+
+Order here: http://www.1010.co.uk/org/ERD.html
+
+___+++ *workshop!!*
+
+A related workshop exploring wormy speech synthesis and building your
+very own touch-based voice synthesizer will take place in London in a
+few weeks:
+
+http://musichackspace.org/events/hardware-workshop-wormed-voice-martin-howse/
+
+
+** websites
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
+
+The eurorack-based ERD/WORM synth features software worming of
+emulated artificial human speech cores from the 70s to the 90s of the
+last century. Six key speech cores are simulated with a vocabulary of
+over 4000 words and phrases, including basic allophones or phonemes
+which can be used to build new phrases as well as a Text to Speech
+engine for advanced textual constructions. A further set of COMPOST
+modes allows for sample-based re-working of constructed and wormed
+words and phrases.
+
+Emulated speech cores include Texas Instruments' famous Speak and Worm
+family of devices (and subsequent circuit-wormed modifications), Atari
+and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
+worm-n-talk and General Instruments Intelliworm. ERD/WORM further
+bends and worms these key speech synthesis algorithms across 61 modes
+with full trigger, CV and knob control over nearly all aspects of these
+speech cores.
+
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
+
+ERD/WORM is produced in Berlin by various worms and hands.
+
+ERD/WORM ships with a golden Riso-printed full manual in a limited
+edition of 100. The first batch of 25 units is now available for
+tracked shipping. The next batch will be available in February 2018.
+
+Pricing: 265 euros with free, tracked worldwide shipping. x in stock of first batch.
+
+**** Sounds like:
+
+**** Technical and HOWTO
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
+audio/trigger input, 1 audio output, 20mm deep.
+
+Manual and layout at: ErdWormOnlinewhite.pdf and github
+
+With thanks to Ioana Vreme Moser for manual editing, layout and design
+and Kathrin Guenter for image.
+
+Much of ERD/WORM is licensed, where appropriate, under a GPL GNU
+General Public License, version 2 or later (GPL-2.0+). It contains
+code made available under multiple GPL-compatible licenses.
 
 
 * HW
 
 28/11 HW programmed and tested TOTAL: 28
 
-but may re-program as some small chanhes
+TO re-program as some small changes 1/12/// DONE ALL 28
 
 * latest/latest
 

@@ -219,8 +219,6 @@ const TMS_vocab *allTMSvocabs[TMS_VOCAB]={&vocab_2303, &vocab_2304, &vocab_2321,
 
 //const TMS_vocab *allTMSvocabs[46]={&vocab_2303, &vocab_alphons};
 
-// TESTY: above commented out to speed up
-
 static const uint8_t* ptrAddr; static uint8_t ptrBit;
 uint8_t byte_rev[256];
 
@@ -1892,7 +1890,7 @@ int16_t process5100raw()
 }
 
 
-int16_t process5100raw_no_inter() // TESTY this is with no interpolation
+int16_t process5100raw_no_inter() // this is with no interpolation
 {
   static u8 counter;
 	int i, bitout, zpar;
@@ -2001,7 +1999,6 @@ void tms_newsay(){
   whichbank=_sely*TMS_VOCAB_F;
   MAXED(whichbank, TMS_VOCAB_TOP);
   whichbank=TMS_VOCAB_TOP-whichbank; // inversion
-  //whichbank=55; // TESTY CHECK!!!
   m_coeff=allTMSvocabs[whichbank]->m_coeff;
   
   m_new_frame_energy_idx = 0;
@@ -2011,7 +2008,6 @@ void tms_newsay(){
   INT16 sel=_selz*allTMSvocabs[whichbank]->extentplus; 
   MAXED(sel, allTMSvocabs[whichbank]->extent);
   sel=allTMSvocabs[whichbank]->extent-sel; // inversion
-  //sel=0; // TESTY CHECK!!!
   ptrAddr=allTMSvocabs[whichbank]->wordlist[sel]; 
   ptrBit = 0;
 
