@@ -33,7 +33,7 @@ int16_t audio_buffer[AUDIO_BUFSZ] __attribute__ ((section (".ccmdata")));
 
 int16_t	left_buffer[MONO_BUFSZ], mono_buffer[MONO_BUFSZ];
 
-float smoothed_adc_value[5]={0.0f, 0.0f, 0.0f, 0.0f, 0.0f}; 
+float smoothed_adc_value[5]={0.0f, 1.0f, 0.0f, 0.0f, 0.0f}; // as mode is inverted and we don't want to start with COMPOSTF?
 
 extern float exy[240];
 float _mode, _speed, _selx, _sely, _selz;
@@ -423,16 +423,6 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     }
   
     
-    if (firsttime==0){ // we can leave this so is always called first
-      trigger=1;
-      firsttime=1;
-      }
-
-    if (_intmode==COMPOSTF) { // never trigger a freeze/toggle on entry
-      trigger=0;
-      freezery=0;
-    }
-    
     samplespeedref=_speed*1028.0f;
     MAXED(samplespeedref, 1023);
     samplespeed=logspeed[samplespeedref];  
@@ -447,11 +437,25 @@ void I2S_RX_CallBack(int16_t *src, int16_t *dst, int16_t sz)
     if (sample<THRESHLOW) retrigger=0;
   }
 
+    if (firsttime==0){ // we can leave this so is always called first
+      trigger=1;
+      firsttime=1;
+      //      if (_intmode==COMPOSTF) triggered=0; // TESTY or we just have COMPOSTF as unfrozen at first maybe so is something there?
+      }
+
+    if (_intmode==COMPOSTF) { // never trigger a freeze/toggle on entry
+      trigger=0;
+      freezery=0;
+    }
+
+    
     //triggered=thresh and trigger=modechange
     if (trigger==1 && wormlist[_intmode]->xy!=1) { // modechange except mode 1
     triggered=1; 
   }
 
+   
+    
   if (wormlist[_intmode]->xy==0) samplerate_simple(mono_buffer, samplespeed, sz/2, wormlist[_intmode]->getsample, wormlist[_intmode]->newsay , wormlist[_intmode]->sampleratio, triggered);
   else if (wormlist[_intmode]->xy==1){
     if (trigger==1) {// entry into mode triggers newsay
