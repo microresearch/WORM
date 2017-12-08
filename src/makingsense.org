@@ -3,9 +3,9 @@
 ** announce
 
 The WORM was for a long time desirous to speake, but the rule and
-or∣der of the Court enjoyned him silence, but now strutting and
+order of the Court enjoyned him silence, but now strutting and
 swelling, and impatient, of further delay, he broke out
-thus... [Maier]
+thus... [Michael Maier]
 
 ERD finally releases the eurorack-based ERD/WORM synth featuring
 software worming of emulated artificial human speech cores from the
@@ -20,7 +20,7 @@ Emulated speech cores include Texas Instruments' famous Speak and Worm
 family of devices (and subsequent circuit-wormed modifications), Atari
 and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
 worm-n-talk and General Instruments Intelliworm. ERD/WORM further
-bends and worms these key speech synthesis algorithms across 61 modes
+bends and worms these key speech synthesis algorithms across 64 modes
 with full trigger, CV and knob control over nearly all aspects of these
 speech cores.
 
@@ -38,11 +38,11 @@ tracked shipping. The next batch will be available in February 2018.
 
 Order here: http://www.1010.co.uk/org/ERD.html
 
-___+++ *workshop!!*
+///AND...
 
 A related workshop exploring wormy speech synthesis and building your
-very own touch-based voice synthesizer will take place in London in a
-few weeks:
+very own touch-based voice synthesizer (though not the ERD/WORM) will
+take place in London at the end of next week:
 
 http://musichackspace.org/events/hardware-workshop-wormed-voice-martin-howse/
 
@@ -50,9 +50,9 @@ http://musichackspace.org/events/hardware-workshop-wormed-voice-martin-howse/
 ** websites
 
 The WORM was for a long time desirous to speake, but the rule and
-or∣der of the Court enjoyned him silence, but now strutting and
+order of the Court enjoyned him silence, but now strutting and
 swelling, and impatient, of further delay, he broke out
-thus... [Maier]
+thus... [Michael Maier]
 
 The eurorack-based ERD/WORM synth features software worming of
 emulated artificial human speech cores from the 70s to the 90s of the
@@ -67,7 +67,7 @@ Emulated speech cores include Texas Instruments' famous Speak and Worm
 family of devices (and subsequent circuit-wormed modifications), Atari
 and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
 worm-n-talk and General Instruments Intelliworm. ERD/WORM further
-bends and worms these key speech synthesis algorithms across 61 modes
+bends and worms these key speech synthesis algorithms across 64 modes
 with full trigger, CV and knob control over nearly all aspects of these
 speech cores.
 
@@ -77,14 +77,14 @@ the slipped and stammered, a/rhythmic and timbral, producing new
 sounds through the use of fast re-triggering of phrases and phonemes,
 and exploring multiple bends by knob and CV control.
 
-
 ERD/WORM is produced in Berlin by various worms and hands.
 
 ERD/WORM ships with a golden Riso-printed full manual in a limited
 edition of 100. The first batch of 25 units is now available for
-tracked shipping. The next batch will be available in February 2018.
+immediate tracked shipping. The next batch will be available in
+February 2018.
 
-Pricing: 265 euros with free, tracked worldwide shipping. x in stock of first batch.
+Pricing: 265 euros with free, tracked worldwide shipping. 24 now in stock of first batch.
 
 **** Sounds like:
 
@@ -95,7 +95,7 @@ Pricing: 265 euros with free, tracked worldwide shipping. x in stock of first ba
 12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
 audio/trigger input, 1 audio output, 20mm deep.
 
-Manual and layout at: ErdWormOnlinewhite.pdf and github
+Manual, code and design files at: http://1010.co.uk/ErdWormOnlinewhitemanual.pdf and https://github.com/microresearch/WORM
 
 With thanks to Ioana Vreme Moser for manual editing, layout and design
 and Kathrin Guenter for image.
@@ -113,9 +113,7 @@ TO re-program as some small changes 1/12/// DONE ALL 27
 
 * latest/latest
 
-- release: manual online, modulargrid, web page, mailing list, muffwiggler, soundcloud
-
-// 5/12 - check compostmodef start/trigger code? TEST!
+// 5/12 - check compostmodef start/trigger code? TEST!DONE_COMPLETED
 
 // code checks - votraxX, samX, digitalkerX, rsynthX/klatt=rsynth-2.0-port/simpleklattX/nvpX
 
