@@ -1,9 +1,11 @@
 
 #TOOL_PREFIX = /opt/ARM/arm-linaro-eabi-4.6
-TOOL_PREFIX = /root/ARM/gcc-arm-none-eabi-4_9-2015q2
+#TOOL_PREFIX = /root/ARM/gcc-arm-none-eabi-4_9-2015q2
+#TOOL_PREFIX = /root/gcc-arm-none-eabi-7-2018-q2-update
+TOOL_PREFIX = /usr
 
 PRG_PREFIX = $(TOOL_PREFIX)/bin/arm-none-eabi-
-LIB_PREFIX = $(TOOL_PREFIX)/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/
+#LIB_PREFIX = $(TOOL_PREFIX)/arm-none-eabi/lib/thumb/cortex-m4/float-abi-hard/fpuv4-sp-d16/
 
 # LIB_PREFIX is not used
 
@@ -84,7 +86,7 @@ FLASH = st-flash
 all: main.bin
 
 clean:
-	-rm -f $(OBJECTS) *.lst *.elf *.bin *.map *.dmp
+	-rm -f $(OBJECTS) *.lt *.elf *.bin *.map *.dmp
 
 flash: gdb_flash
 

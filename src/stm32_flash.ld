@@ -110,6 +110,15 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
 
+.flash :
+{
+. = ALIGN(4);
+*(.flash)
+. = ALIGN(4);
+} >FLASH
+
+
+
   /* used by the startup to initialize data */
   _sidata = .;
 
@@ -124,6 +133,7 @@ SECTIONS
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
   } >RAM
+
 
   /* Uninitialized data section */
   . = ALIGN(4);
