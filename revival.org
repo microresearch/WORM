@@ -1,0 +1,33 @@
+For worm renewal we need: BOM, open new panel, pos file(footprint pos?) - cannot open old brd and pos file looks a bit different (no footprint)
+
+Opened in 5.1 and re-saved so can use latest kicad!
+
+
+Parts which needed fixing from segments and check all footprints against SEG:
+Stm32f405 - LQFP64
+Wm8731 - otherwise all should match easily and change our 1206 following SEG
+Part:C40;Part No.:TAJA105M025SNJ;
+Part:C22;Part No.:TAJA475M025SNJ;
+Part:C8,C14,C16;Part No.:T491A106K010AT7280;
+Part:C12,C13,C39;Part No.:TCJA106M020R0150E;
+The package of the  part in BOM is 1206(Case A)  and the width of the pins is 1.2mm ,but the width of the pads of the footprint in PCB is 2.0mm. We advise reducing the pad and the width of the pads be 1.4mm
+
+
+* how to acces brd -> pcbnew update
+
+- opened in 5.1 the re-saved and now openable in 6 - pulledsrc/tmp
+
+* new BOM 
+
+- what footprints might need re-working (check against AC and SEG)
+
+changed L1, 100N, diodes, MCP, 330R, LED, LM(fix)
+
+
+some res but need to update all footprints, and to check ALL orientations
+
+* new POS/drill/GERBER
+
+- to be generated
+
+* new panel for black on gold inversion
