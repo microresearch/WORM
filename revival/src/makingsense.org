@@ -1,0 +1,3227 @@
+* NEW announcement/site: 
+
+** announce
+
+The WORM was for a long time desirous to speake, but the rule and
+order of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Michael Maier]
+
+ERD finally releases the eurorack-based ERD/WORM synth featuring
+software worming of emulated artificial human speech cores from the
+70s to the 90s of the last century. Six key speech cores are simulated
+with a vocabulary of over 4000 words and phrases, including basic
+allophones or phonemes which can be used to build new phrases as well
+as a Text to Speech engine for advanced textual constructions. A
+further set of COMPOST modes allows for sample-based re-working of
+constructed and wormed words and phrases.
+
+Emulated speech cores include Texas Instruments' famous Speak and Worm
+family of devices (and subsequent circuit-wormed modifications), Atari
+and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
+worm-n-talk and General Instruments Intelliworm. ERD/WORM further
+bends and worms these key speech synthesis algorithms across 64 modes
+with full trigger, CV and knob control over nearly all aspects of these
+speech cores.
+
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
+ERD/WORM is produced in Berlin by various worms and hands.
+
+ERD/WORM ships with a golden Riso-printed full manual in a limited
+edition of 100. The first batch of 25 units is now available for
+tracked shipping. The next batch will be available in February 2018.
+
+Order here: http://www.1010.co.uk/org/ERD.html
+
+///AND...
+
+A related workshop exploring wormy speech synthesis and building your
+very own touch-based voice synthesizer (though not the ERD/WORM) will
+take place in London at the end of next week:
+
+http://musichackspace.org/events/hardware-workshop-wormed-voice-martin-howse/
+
+
+** websites
+
+The WORM was for a long time desirous to speake, but the rule and
+order of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Michael Maier]
+
+The eurorack-based ERD/WORM synth features software worming of
+emulated artificial human speech cores from the 70s to the 90s of the
+last century. Six key speech cores are simulated with a vocabulary of
+over 4000 words and phrases, including basic allophones or phonemes
+which can be used to build new phrases as well as a Text to Speech
+engine for advanced textual constructions. A further set of COMPOST
+modes allows for sample-based re-working of constructed and wormed
+words and phrases.
+
+Emulated speech cores include Texas Instruments' famous Speak and Worm
+family of devices (and subsequent circuit-wormed modifications), Atari
+and TI99/4 arcade games such as wormsec, Federal Screw Worms VERMIS
+worm-n-talk and General Instruments Intelliworm. ERD/WORM further
+bends and worms these key speech synthesis algorithms across 64 modes
+with full trigger, CV and knob control over nearly all aspects of these
+speech cores.
+
+ERD/WORM functions best the more it deviates serpentinely from a
+simulation of recognizable human speech (as if it would ever) towards
+the slipped and stammered, a/rhythmic and timbral, producing new
+sounds through the use of fast re-triggering of phrases and phonemes,
+and exploring multiple bends by knob and CV control.
+
+ERD/WORM is produced in Berlin by various worms and hands.
+
+ERD/WORM ships with a golden Riso-printed full manual in a limited
+edition of 100. The first batch of 25 units is now available for
+immediate tracked shipping. The next batch will be available in
+February 2018.
+
+Pricing: 265 euros with free, tracked worldwide shipping. 24 now in stock of first batch.
+
+**** Sounds like:
+
+<iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/332275862&amp;color=%23130701&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;show_teaser=true"></iframe>
+
+**** Technical and HOWTO
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
+audio/trigger input, 1 audio output, 20mm deep.
+
+Manual, code and design files at: http://1010.co.uk/ErdWormOnlinewhitemanual.pdf and https://github.com/microresearch/WORM
+
+With thanks to Ioana Vreme Moser for manual editing, layout and design
+and Kathrin Guenter for image.
+
+Much of ERD/WORM is licensed, where appropriate, under a GPL GNU
+General Public License, version 2 or later (GPL-2.0+). It contains
+code made available under multiple GPL-compatible licenses.
+
+
+* HW
+
+28/11 HW programmed and tested TOTAL: 27
+
+TO re-program as some small changes 1/12/// DONE ALL 27
+
+* latest/latest
+
+// 5/12 - check compostmodef start/trigger code? TEST!DONE_COMPLETED
+
+// code checks - votraxX, samX, digitalkerX, rsynthX/klatt=rsynth-2.0-port/simpleklattX/nvpX
+
+// 29/11 - newvotrax: mainclock in rawparam as no newsay in votraxparamer and also changes in sp0256bender - TEST!
+
+// 27/11 - trigger is fine on exy and normal, compost is fine, reduced float on modesDONE
+
+// 25/11 - changes to trigger -> test on exy and normal modes - TEST!DONE
+
+
+- final sanity check of all modes - DONE
+
+- check code-> audio.cDONE
+
+// 28/11 - re-check sp0256bender=27 and votraxparamer=34 as added null newsay for compostDONE
+// check 53/54 clicky????CHECKED - recheck sanity
+
+// re-check compostDONE
+
+check HW 14.31 several hours fine
+
+// added clear audio buffer in main
+
+- HW testsDONE
+
+
+&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
+&5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er,
+&9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx,
+&13tms5100pitchtablebender, &14tms5200pitchtablebender,
+&15tms5200pitchtablebenderx, &16tms5100ktablebender,
+&17tms5200ktablebender, &18tms5100kandpitchtablebender,
+&19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
+
+&21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer,
+&25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, 
+
+// changed votrax sample countings -> CHECK CODE FROM HERE ON
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer=TRIGGER_WEIRD/fixed wrong newsayDONE, &44samparamer, &45sambender, 
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+&49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing,  ADJUSTED_VOLUMES
+
+//rsynth-2.0-port
+&53klatter, 53/54 clicky?
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+&58simpleklatter, 
+
+////RE_TEST SANITY:
+
+// some changes to nvp interpol/old/new framesDONE-tested + changed voice more breathynow
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+///DONE
+
+&62composter, &63compostfrer}; // 64 modes
+
+///
+
+26/10 - small fixes to tms raw to check?
+
+////
+
+DONE-triggerX-changed so trigger and triggered don't run twice, compostX
+
+////
+
+
+- check all hardware before release - reprog first set of 3...
+
+
+** 18-19/10
+
+- check TTS and triggers on modesDONE
+
+- check new reset of states in sam... - REMOVED as problem was in resets... FIXED
+
+- checked all resets - fixed in simpleklattDONE-TEST!, in klattTEST, in rsynthTEST, in votraxTEST-DONE/TESTED
+
+checked nvp, tms, digi, sp0256 in code
+
+- check fast triggering and changing between modes - re-check all modes! 0->61DONE
+
+NOTES: 17,18 - tms is noisy (but not to do with trigger)
+
+RE_CHECK:
+29-votraxTTS trigger???-> votrax_retriggerTTS-FIXED
+///
+
+53-klatt trigger???-> klatt_newsay // or is 54?fine!
+
+58-simpleklatt trigger-> simpleklatt_newsay OK!
+
+////
+
+- full modes workout (2x SIR?), volume and other tweaks and fixes (first TMS volume leave as is)...
+
+// changed newvotrax.c volume mult
+
+- vol/limiting Q? leave as is now
+
+/// check through tms noisiness - we need to re-work raw ones (5100-7 also)! checked-DONE/ no changes...
+
+- should these frames have a length? length would need to be an extra parameter - or just use trigger...
+- we do not use any unvoiced here...
+
+&8tmsraw5200er*CLICKS*,
+&9tmsraw5220er*CLICKS*, 
+
+&10tmsbend5100erX, &11tmsbend5200erX, &12tmsbend5200erxCLICKY
+
+&13tms5100pitchtablebenderX, &14tms5200pitchtablebenderX,
+&15tms5200pitchtablebenderxX, &16tms5100ktablebenderX,
+&17tms5200ktablebenderX, &18tms5100kandpitchtablebenderX,
+&19tms5200kandpitchtablebenderX, &20tms5200kandpitchtablebenderxX,
+
+////
+
+*25/10 - changed limit volume back to 32000 ///*
+
+- final sanity check of all modes, raw modes// 
+
+////
+
+DONE-triggerX-changed so trigger and triggered don't run twice, compostX
+
+////
+
+
+- check all hardware before release - reprog first set of 3...
+
+- announce - soundcloud=more recordings/instagram/twitter/mail-list/muffs
+
+** fixings
+
+- limitings in samplerate.cDONE
+- glitches when changing between sam modes and also on too fast re-trigger so added limit to how fast can do newsay TEST!
+
+** DONE
+
+- leave volumes more or less as is
+
+*TO FIX and re-test:*
+
+- check sanity of trigger length and retrigger - FIXED
+
+- for votrax: // check pitch/extent of 28-35 - leave as it is DONE
+
+- &32votraxwowfilterbender is loud - volume reducedDONE
+- check nature of the bend too - just to mainclock and reduced by half so is low now...
+
+///
+
+- 256 phonemes are a bit strange on end?
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+
+extended length for 21 only - CHECK ALL! CHECKED!
+
+- looking at 256.cpp:
+
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+
+whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
+
+all 256 checked against cpp...
+
+removed inversion // DONE 
+
+- 15tms -re-check volume &15tms5200pitchtablebenderx LEAVE AS IS/DONE
+
+- 7tmsraw5100er - seems bit lacking - but all checks out ok
+
+
+*////FINALS:::/// 13/10/2017+*
+
+- re-check TMS: &0tmserX, &1tmslowbiterX, &2tmssingerX, &3tmsbendlengtherX, &4tmsphonerX,
+&5tmsphonsingerX, &6tmsttserX, &7tmsraw5100erX, &8tmsraw5200er*CLICKS*,
+&9tmsraw5220er*CLICKS*, &10tmsbend5100erX, &11tmsbend5200erX, &12tmsbend5200erxCLICKY
+////,
+
+&13tms5100pitchtablebenderX, &14tms5200pitchtablebenderX,
+&15tms5200pitchtablebenderxX, &16tms5100ktablebenderX,
+&17tms5200ktablebenderX, &18tms5100kandpitchtablebenderX,
+&19tms5200kandpitchtablebenderX, &20tms5200kandpitchtablebenderxX,
+
+clicks can only be data related?
+
+- re-check all modes = 21-61 - DONE
+
+////
+
+- check compost/checked sanity but check operationsDONE
+
+finally remove TESTY -> full tests, uncomment retrigger codeDONE
+
+* mode tests to 11 Oct 2017 DONE
+
+- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(=16there as always +1)?
+-20DONE
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX-vol reduced, 
+
+*TESTING STILL TODO:*
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+// check pitch of 28-35
+// 32 is loud - check nature of the bend too!
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, 
+
+// checked allFINE
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+//between 46 and 47 pitch seems wierdFIXED-as digitalker has very short repeat
+
+&49rsynthy,-changed pitch
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+// 50,51 - how we select phoneme as 0(far left) is silent one - FIXED as now no inversion here
+
+&53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+// also same as above FIXED as now inversion
+
+//
+
+&58simpleklatter, 
+
+//
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+// 59 - also inversion FIXED for phonemes
+
+
+* general TODO/notes
+
+- FIX ADC extents! - see newsaybankone - works on new hardware but
+  would *need to test across other HW versions - tested so far on one* DONE
+
+*new hardware is not so bad but we should fix with over-multiply but ALWAYS constrain if it is IMPORTANT!*
+
+- try different filter coeffs... (0.01f is maybe too low=too
+  smooth/filtered = 0.05 or 0.01 in clouds for our dual CV/pots - same design!)
+
+////
+
+- compost
+
+- XYZSPEED arrangement for each mode and where these are updated - in audio.c is preferableDONE
+
+-  control models: eg. - TMS could be CV controlled with trigger/freeze=toggle settings - model for this kind of controlDONE
+
+- split/catalogue of glottal sources - if used?
+
+- basic modes templated: XYZ, speed, triggering, compost
+
+- each source/filter mode has regular in (eg. TMS, external in, other glottal sources) X,Y,Z and speed...??
+
+///////
+
+- LPC inverse filter as excitation to TEST - tested and is quite rough!
+
+- vocoder and experimental modes
+
+- clean ups, documentation, tests and release
+
+- all licensing in place and acknowledgments
+
+- *worm control - MOVED OUT TO NEW MODULE alongside RAVEN! = except for wavetable maybe*
+
+* TODO  UPDATED:1/2
+** sp0256 as first model mode for others!-check what has been done
+
+- sp0256 AL2 - how to map allophones as all pauses are at one end?DONE
+
+/////
+
+*- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!* raw2 fixed, raw1 fixed but both need tweaking for speeds and so on
+
+- add bend mode which shifts the ROM values ->DONE TO TEST!
+
+///
+
+- finalise all sp0256 and use as model - how many modes now??:
+
+sp0256 allophones, sp0256TTS, sp0256vocabone, sp0256vocabtwo,
+sp0256_1219, sp0256rawone, sp0256rawtwo, sp0256bend,
+other excitations = 9+
+
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing!
+
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?
+
+** other
+
+- TTS votrax port and test 
+
+-  we need to fix x, y and z also! - x-select, y-inflection/pitch,
+   z-length - decide on this for all basics and integrate with audio.c
+   model
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code - ditch other lpc code
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- bends of TMS
+
+[- remap phoneme probability mapping for all chipsets  see Cater p.52] decided AGAINST
+
+- klatt notes/re-acquaint
+
+[- start on audio.c modes/abstraction if we like - but not all fits the same model]
+
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger - but we use trigger so..*
+
+*RAW/bend present LPC/usual but do pitch etc....*
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+* DONE
+
+- question of ADC extents
+
+//on old hardware - fine up to 64 but above we lose the end with +1 - from mutable clouds/warps
+
+- use generic multiplier, how does integral work in warps:
+
+#define MAKE_INTEGRAL_FRACTIONAL(x) \
+  int32_t x ## _integral = static_cast<int32_t>(x); \
+  float x ## _fractional = x - static_cast<float>(x ## _integral);
+
+eg.     float algorithm = min(parameters_.modulation_algorithm * 8.0f, 5.999f);
+(for 6 algorithms 0-5?)
+
+why is scaled by 2.0
+
+  //  BIND(p->modulation_algorithm, ALGORITHM, true, 2.0f, 0.08f, false);  
+#define BIND(destination, NAME, unwrap, scale, lp_coefficient, attenuate) \
+  { \
+    lp_state_[ADC_ ## NAME ## _POT] += 0.33f * lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _POT) - lp_state_[ADC_ ## NAME ## _POT]); \
+    lp_state_[ADC_ ## NAME ## _CV] += lp_coefficient * (adc_.float_value(ADC_ ## NAME ## _CV) - lp_state_[ADC_ ## NAME ## _CV]); \
+    float pot = lp_state_[ADC_ ## NAME ## _POT]; \
+    if (unwrap) pot = UnwrapPot(pot); \
+    float cv = calibration_data_->offset[ADC_ ## NAME ## _CV] - lp_state_[ADC_ ## NAME ## _CV]; \
+    float value = attenuate ? (pot * pot * cv * scale) : (pot + cv * scale); \
+    CONSTRAIN(value, 0.0f, 1.0f); \
+    destination = value; \
+  }
+
+
+[- try different filter coeffs for ADC... (0.01f)]
+
+[- do we fit all in RAM? - removed samplerate.c with 8192 array!]
+
+- do we need to implement m_silent:   if (m_silent && m_filt.rpt <= 0)?? CHECK - it is used but doesn;t effect IGNORE
+
+- sp0256 vocab-splitDONE and testTODO - 2 banksTEST!-FIXED end ofDONE
+
+- join ROMs...DONE - TEST!DONE
+
+rom12=mattel (why is lost before "presents"?)FIXED was uint32!->aend
+rom19=score->fat/fast
+
+but glitches to blank when wind backFIXED
+
+- whether we do changes to x,y,z in audio.c on timer or in sp0256? DONE- in audio.c
+
+- Y,Z to add = pitch and length - length as repeat or as audio.c sample length before a newsay?DONE - length as repeat
+
+  
+* new progress
+
+** 2/1/2017
+
+- working on ROMS, TODO: extract rest of echo II female voices, rest
+  of speak and spellDONE
+
+-lpc_split adapted for: ./lpc_split D034 0 > roms/vocab_D034.h
+
+- LPC/roms - all the 2xxx ones to fix up and test, alongside D0->34DONE
+
+** 3/1
+
+5100 to check/trim all:
+
+vocab_2321.h-DONE
+vocab_2322.h-DONE
+vocab_2352.h-DONE
+vocab_2350.h-DONE
+vocab_2303.h-DONE
+vocab_2304.h-DONE
+
+5200 all d000-d034 - DONE but need to check against echo_female (all
+there are in D000 and D003) 
+
+- also groupings of these vocabs TODO - for example numbers, letters, allophones etc... so that banks make sense
+
+/////
+
+- new MAME votrax to PORT: started but filter issue...cur_va DONE -
+  seems to work but timing is not so solid and we need vocab dataDONEtotest
+
+- TODO - general below, ADC extent (eg. for modes, vocab) and vocabulary, how much
+  better does mame code sound for say echo II speech/5200 Dxxx samplesDONE
+
+- tested speak and spell on mame code sounds fine, some end glitch???
+
+- extent good till 128 at least
+
+- inverted ADC?
+
+- , do Y and speed swop - DONE!
+
+*- how we can bend TMS - other excitation-TRY with inverse filter in, X/Y/Z bendings, trigger=freeze?*
+
+** 4/1+
+
+- any changes for others in MAME? CHECK -> files are: TMS-NOchange, digitalk-NOchange DONE!
+
+///
+newvotrax:
+
+- proof of concept votrax working -. new mode... TODO: ARM port-compilesDONE, testTODO, all_vocabsTEST, TTS- see also deladriere code
+
+// wow.c, gorf.c - convert to arraysDONE - TEST!
+
+, bends-> pitch->m_rom_f1 (u8), phoneme length, change filters
+
+////
+
+- grouping of TMS vocabs and clear chipsets marked for arm mame code
+
+- bends of TMS - first mode and start from here
+
+- inversion of any ADC? - is flip bit in transform
+
+TMS, sp0256, votrax, sam. TODO: newsay for basic phonemes, TTS and vocabulary(if any)
+
+do we have vocab as in for allophones for TMS? NO
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where is crow lpc overlap?
+
+- all readme notes for modes -> modes.org
+
+** 5/1
+
+- Votrax ARM code in audio.c to test - WORKING!DONE but speed is a bit wierd - FIXED
+
+[- that we can abstract out same code in audio.c - later (and need
+  abstract out further as does bit shifts in some cases but place this
+  in generator code)] maybe not?
+
+//////////////////////////////////////////////////
+
+//-> TTS work-BELOW 0 TMS-TODO, VOTRAX-TODO, leave the rest!
+
+map 64x64 X and Y to position/ascii code for TTS leaves Z for length of ascii or buffer
+
+//->what are bends for each, organise vocabs
+
+// also question of phoneme probability mapping for all chipsets - recap how we did this for klatt
+
+// klatt notes
+
+** 6/1+
+
+- first three modes don;t seem to work - talkie, sp0256 and klatt ????
+- programming issue also most times???
+
+WHY?
+
+*sp0256 is fixed, talkie was ok, klatt was missing biquad, compiler changed but still issue in one of the inits - figure out?!!!*
+
+/// 
+
+
+- X/Y prototype for sp0256 TTS
+
+- test votrax vocabs and do as newsay - same for other vocabs we might have (sp0256, what else?)
+
+- other sp0256 roms - how these are handled
+
+- add/test all TTS on ARM
+
+/////
+
+- group TMS vocabs and mark chip // solution for this
+
+- test each init/mode - sp0256 as above, start with TMS -> vocab,TTS, phonemes, raw, other excitations for all, do we use talkie code?
+
+///
+
+- where we need inversion on X, Y, Z and speed? - this is marked in struct there!
+
+- where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where is crow lpc overlay?
+
+- all readme notes for modes -> modes.org
+
+- what are all the bends? - sp0256 pitch should subtract - or some kind of midpoint somehowDONE-to test
+
+- klatt re-acquaint
+
+- start on audio.c modes/abstraction and place bitshifts in generators
+
+** 7/1
+
+- new lpcreader for romsDONE - 3150,3220 for ti99 - sewermania and microsurgeonDONE - added to vocab_testroms.h
+
+** 8/1
+
+- TTS votrax with multiples - compiles on both - to TEST on lapDONE/ARM!
+
+- mapping/making TTS in_array should be in TTS/english2phoneme using
+  mapytoascii - arrays can also be there so no need to pass in ... but
+  when is mapping of X/Y called -> whole phrase only changes on end of
+  whole TTS phrase... - trigger to re-do whole/newsay but make mapping
+  faster and regular - mapping in audio.c makes sense so is
+  timed... also for all XY mappings - which are?
+
+- discs of TRON TMS5220 - in DownloadsDONE-15 vocab->end vocabs NOW?
+  or as have good technique with lpcr/runread? // but TRONSS is sp0256
+
+** 9/1 - 10/1
+
+- TTS votrax on lap not working - sounds wrong??? - template thing
+  matches for bitswap but is 64 bit read ok - looks reasonable as
+  matches phonemes
+
+- phonemes wrongly mapped (where?) or votrax is wrong_> floats, try
+  with vocab from gamesFINE = issue in mapping: as code from
+  deladriere was for SC02 which has different phoneme codes to SC01 -
+  FIX: done in parse.c, TO_TEST, LAP-DONE, *ARM!*
+
+*- bends for LPC is add or subtract values to each setting X/Y +-Z from vocab/rom and freeze on trigger*
+
+** 10/1 - 12/1
+
+*** sp0256
+
+- re-test sp0256 TTS additions on lapDONE and ARM - DONE but sp0256 speed is too fast - DIVIDE!DONEbutstilltotweak
+
+- prototypeDONE for TTS input into TTSinarray in audio.c and tested on
+  sp0256 (that array is also inited there) - seems to work but pitch bend changed now to selz
+
+- vocab in sp0256-DONEbut maybe split into 2 banks, 
+
+in sp0256lap:
+
+- other ROMs in sp0256_>
+
+m_rom12 = phrases are at 6->42
+m_rom19 = new code for extra roms added/fixed 5-74-allophone-are same as AL2- plus some phrases, 115-123, 
+
+- what can be bent? it is instruction based but there is pitch and co-effs
+
+from currah: The intonation bit seems to be a special feature of the Currah hardware (not a
+feature of the SP0256 voice chip itself). Unknown how it is implemented... it
+might modify the CLK passed to the SP0256... so, aside from the frequency, this
+would also alter the durations, ie. the length of a "100ms" pause would vary...
+or it might modify whatever kind of external low-pass and/or high-pass
+filter...? The intonation does increase step-by-step (rather than changing
+abruptly from low to high)... the stepping rate, and the max/min values are
+unknown?
+
+m_nsp->set_clock(dotclock / (2 << voice));-> sets sample rate only!
+
+
+m_rom19 and extras:
+
+we can access:
+
+  80h..BFh Allophones (same as 00h..3Fh on SP0256-AL2)    C0h "Enemy"
+  C1h "All clear"     C2h "Please"     C3h "Get off"      C4h "Open fire"
+  C5h "Watch out"     C6h "Mercy"      C7h "Hit it"       C8h "You blew it"
+  C9h "Do it again"   CAh "Incredible" FAh "U.F.O."       FBh "Monster!"
+
+but no further with extra voice.cpp vocab - banks? see http://atarihq.com/danb/files/o2doc.pdf
+
+*otherwise leave 19!* -> only possibility wrong roms but checkedSHA1 and
+003 does work to some extent, <<3 offsetsNO, what might signal a rom
+change?		
+
+check: /*  FIFO up the lower 10 bits of the data.                          */
+
+** 13/1 +
+
+- clean up sp0256 (crash proof on roms and ditch 019)DONE - but needs to be testedDONE
+
+- sp0256 vocab from book to addDONE - but we need to split into banks all vocab there!
+
+- sp0256 12 and 19 roms (switch banks there) to addDONE - to testDONE
+
+** 16/1 +
+
+- resurrecting crow/Lpc: lpcanalysis.c
+
+** 17/1 +
+
+GENERAL:
+
+- *do we not need to do a new_say when there is a change of mode to enter the new mode?* - done in audio.c/sp0256 -> TESTDONE
+
+- split sp0256 vocab into banks
+
+- test TTS votrax on ARM
+
+- raw sp0256 - code-driven and more bend style (eg. just pitch, amp and filters)
+-> work on 2 lap versions
+
+Instructions: http://spatula-city.org/~im14u2c/intv/tech/sp0256_instr_set.html
+
+- raw votrax
+
+- bends of all LPC - start with TMS as first mode and figure out prototype
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+ *** sp0256
+
+- do we need to implement  m_silent=
+
+  if (m_silent && m_filt.rpt <= 0)
+
+
+- check that all newsays trigger micro for new address... DONE - TEST!DONE
+
+- dealing with different roms in sp0256.c: - DONE, with some error checking - TEST!DONE
+
+m_romAL2 - all allophones/so for usual/vocab/TTS - reset and bank?
+m_rom12 - phrases are at 6->42 - total 36
+m_rom19 - 64-74 115-123 and 0-28 with ROM switch - total 46 - NOTE: these rely on the other 2 roms 003 and 004
+
+///
+
+clearly tabulate m_rom19:
+
+5->63 - allophones as AL2
+64->74 - game phrases
+115-123 - game phrases
+from here->255 odd allophones and repeats of phrases
+142 - watchout
+222 - enemy
+
+****  	m_page     = 0x8000 << 3; // was 0x1000 // this works for last phrases
+
+0->28 = phrases
+TOTAL: 18+28=49
+
+**** parameters
+
+- TODO: check example values/range from working lapDONE
+
+cnt is set to 0
+amp-int16 - upto say 1280+
+per-uint32 - 255
+
+*int16 b_coef -512 to +512 - or use the calc below with IQ for values of f->r say 0-255:*
+fprintf(stderr, "f->r2: %d f->r3 %d\n",f->r[2 + 2*i], f->r[3 + 2*i]);
+ 
+int16 f_coef -512 to +512 as above
+interp flag - 1 or 0
+
+*and handle pause - what else - how lenght/repeat counter works m_filt.rpt = repeat + 1;*
+
+- for simple version - handle changes of these parameters and pauses!
+
+	/* -------------------------------------------------------------------- */
+	/*  Decode the Amplitude and Period registers.  Force the 'cnt' to 0    */
+	/*  to get an initial impulse.  We compensate elsewhere by setting      */
+	/*  the repeat count to "repeat + 1".                                   */
+	/* -------------------------------------------------------------------- */
+	f->amp = (f->r[0] & 0x1F) << (((f->r[0] & 0xE0) >> 5) + 0);
+	f->cnt = 0;
+	f->per = f->r[1];
+	//	fprintf(stderr, "PER: %d\n",f->per);
+
+	/* -------------------------------------------------------------------- */
+	/*  Decode the filter coefficients from the quant table.                */
+	/* -------------------------------------------------------------------- */
+	for (i = 0; i < 6; i++)
+	{
+		#define IQ(x) (((x) & 0x80) ? qtbl[0x7F & -(x)] : -qtbl[(x)])
+
+		f->b_coef[stage_map[i]] = IQ(f->r[2 + 2*i]);
+		f->f_coef[stage_map[i]] = IQ(f->r[3 + 2*i]);
+	}
+
+	/*  Set the Interp flag based on whether we have interpolation parms    */
+
+	f->interp = f->r[14] || f->r[15];
+
+** 24/1
+
+- what needs to be tested/done? sp0256//TMS//TTS:
+
+-- - *check adc _selx etc. extents for arrays say in sp0256 as model* DONE
+
+- X/Y abstracted for settings (array of floats + length + constraints for each)
+
+what are the X/Y - say max 64 - in some cases each constraint (was it nvp/klatt?)
+
+** 26/1 +
+
+- *ADC extent - rom12->mattel=far right=0 CHECKED! - add one to left side= *37 for left side which has 0-36 !!!! ADJUST ALL FOR THIS and CHECK!*
+
+- CHECKS: new mode triggerCHECKEDtosomextent, sp0256-12-CHECKED, sp0256-19-CHECKED! --- the shift between them, CHECKED!
+
+** 30/1
+
+- sp0256 raw 1 and 2 versions DONE to test on ARM
+
+- also sp0256 following/ bend ROM settings
+
+- move xy for raw1 and raw2 into audio.c functions DONE// 
+
+- also new inits for both as they are now statics DONE// test ALL
+
+- sp0256 vocab-splitDONE - 2 banksDONE TEST!
+
+- join ROMs...DONE - TEST!
+
+** 31/1
+
+- tests and fixes for sp0256
+- looking at ADC extents
+
+- added bend mode which shifts the ROM values -> which roms? AL2/and/or/*12-19*? - x/y bend and z select! DONE - to TEST/DONE
+
+** 1/2 
+
+- tested sp0256 bend mode - working in principle but is only update at
+  end when we call micro? so replacing with bend of all freq
+  parameters (interpolation question?) DONE - makes more sense than
+  raw1 so maybe ditch raw1 - also question of freeze/toggle on trigger
+  in but we use trigger for newsay!TESTED - maybe some tweaks 
+
+- interpol adds 14 and 15 to amp and per! - see what kind of params
+  these are? - mostly 0 so can leave out
+
+- sp0256 AL2 - how to re=map allophones as all pauses are at one end
+  and we need to reverse - simply reverse - RE_TEST!DONE
+
+- ported sp0256_lapraw1, raw2 to ARM-DONE-> TEST BASICS!DONE- raw2 fixed, raw1 fixed/ditch but both need tweaking for speeds and so on
+
+- clean audio.c to newdiscard.cDONE
+
+//// WED EVE:
+
+sp0256.c* // sp0256bend.c* // sp0256raw.c* - check all extentsDONE - test all!
+
+- ditch raw1DONE, tweak and clean all sp0256 for release  DONE
+
+CHECK- what needs be inverted-ALL inverted now in audio.c but we need
+to check this - doesn't work as then we lose 0 so now invert in sp0256
+files
+
+mode: allophonesYES, TTS-glitches somewhereCHECKWHY, vocabone.two fine, 
+
+** 2/2+ TODO:
+
+- *fixed major bug in TTS with char/counter - still to test ALL! - still a crash FIXED I hope*
+
+- retrigger also of TTS to test - DONE
+
+- check again how ADC works with CV in... - with reversal works as it should -> ZERO is far left and has MOST CV influence!DONE
+
+- *removed RAW mode*
+
+- sp0256: test RAW and bend, ADC extentsDONE-adjusting for each mode - test with extra hardware
+
+- re-test all sp0256 modes, triggers and extents DONE-all good so far - stress test TTS!DONE
+
+- new hardware tests for ADC extents - extra board TODO
+
+////
+
+- announce 20 march equinox release and do soundclouds
+
+** 6/2+
+
+- TEST pass excitation buffer/inverse filter to sp0256 filter for testing! IN PROGRESS but GLITCHY!
+
+- - where is inverse filter? -   LPC_residual function? TEST! _> lpcerror in audio.c
+
+- where to go after sp0256? ->
+
+// TODO: 
+
+VOTRAX modes and tweaks:
+
+- TTS votrax port and test - DONE, STRESS TEST TO DO but seems ok - one question is general length of TTSinarray which could be 32 instead!TODO
+
+- raw votrax-raw code, parameter code, bending of vocabs, vocab votrax modesDONE_TEST, also Y(not on TTS) and Z on votrax 
+
+-- pitch bending has glitches at certain frequencies? z should be for length
+
+somehow votrax is not quite THERE!
+
+** 13/2+
+
+- stress test VOTRAX TTS-DONE, sely=pitch and selz on votrax - not
+  TTS - could have z as TTS length there in alt TTS version - also for
+  all TTS!!!
+
+- selz for other votrax - clock ratioFINISHandTEST, or length of phoneme?
+
+- raw votrax parameter codeDONE-to TEST, bending of vocabs-TODO-part_way - incorp. into audio.cDONE-TEST!
+
+/////
+
+- clean up this with what has been done - TODO also from README.org ->
+  sp0256-mostly_done, VOTRAX // TMS, digitalker, Klatt and variants, SAM etc.
+
++ also double TTS modes as to length, utility modes such as inverse
+  filter (also test inverse filter as freeze - how as we have no TRIGGER?)
+
+////
+
+- start on TMS modes:
+
+-- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code RE_TEST!
+
+-- TMS vocabs and chipsets worked out
+
+** 15/2
+
+- suspected hardware issue but was board fault (to FIX on rest of boards)
+
+- all X/y/exy param things need freeze and toggle on trigger (how works with other sense of trigger?)
+
+best way of dealing with this: trigger stores value or toggle freeze /unfreeze
+
+- still working on votrax rawparam as is quite noisy
+
+** 16/2+
+
+- check that we hit extents - policy on this for each set eg. >x 
+
+- mode list +: utility and strange/experimental modes, compost modes (start/end/triggerforlastmodeparam?/backwards?)
+
+** 27/2+
+
+// fixed bug in votrax_bend, fixed bug in votrax gorf/wow resetsTEST,
+fixed same bug in 256 vocab resetsTEST, changed x/y trigger thing and
+is better, some tweaks in votrax and speed of all votrax in audio.c,
+still not happy with bending of votrax so maybe ditch or...
+
+votrax bend questions: that parameters are very tight (4 bits) and
+cannot exceed these values, bend makes more sense for
+ROM/vocab->GORF/TEST -DONE
+
+- bends for votrax to resolveDONE
+- sely and selz on votrax (TTS uses XandY)DONE
+
+** 28/2 +
+
+- fixing votrax bend - might need some tweaks, change param and deal with X/Y:
+
+xy can be pitch + length of phoneme DONE - test with allDONE
+
+question of wrap on all? TEST!
+
+- pitch is seperate in votrax as extra paramDONE, keep as == on pitch checkDONE, pitch bend is more or less in right place
+
+*test each modeXX and clean up votrax codeDONE, clean up audio.c for first modesDONE*
+
+///
+
+- policy for selx so don't have to repeat eg. real extent etc - struct for each exy mode or?DONE - in audio.c/h
+
+*TODO- put all selects on Z so leaves x/y* - DONE for votrax, TODO for sp0256DONE-TEST
+
+*also for trigger for LPC in we can do freeze of coeffs - for later modes as in raven*
+
+** 1/3+ 
+
+*** sp0256
+
+- re-look at sp0256bend - moved changes into sample loop. toggle is still new phraseDONE
+- check speed of inverse_filter -> sp0256 DONE
+*- inverse filtering levels and noise - we need some way of gating - silence detection but leave for now*
+- sp0256 - also bends to say qtbl - would this make senseTEST-NO!, *what other bends to imagine*
+
+- policy for extents (how far we go beyond)DONE - *some kind of extent
+  test code = clear vocab as best - for say 150 we need to +4* - test
+  on other hardwareDONE
+
+*** TMS
+
+- cleaning up vocabs, removed talko code - lpc.c from MakefileDONE
+
+*- TMS: test coeff switching - no reset just reassign*
+
+-  selx is bend, sely is bank, selz is phrase - trigger re_inits this TEST
+
+- for multiple bends (eg x/y bends) we need stock vocab *which?* rather than all banks
+
+- bends so far is pitch bend - TEST!
+
+bends: energy, pitch and m_current_pitch, bends to tables, k_coeffs, length of thing, using the
+wrong coeff set (only across 5200 and 5100 variants itself)
+
+see//m_current_energy, m_current_pitch, m_current_k[0], m_current_k[1], m_current_k[2], m_current_k[3], m_current_k[4], m_current_k[5], m_current_k[6], m_current_k[7], m_current_k[8], m_current_k[9])
+
+also more general (for sp0256, votrax also) is if bends are applied continuously or to new phoneme or both?
+
+TMS TTS with allphons:
+
+- TMS TTS code/mappings -> DONE testing in lpc_say but sounds
+  choppy???// also signal end of with 255->DONE - testing in lpc_say -
+  but may not be so in TMS5220 code TEST!DONE
+
+** 2/3
+
+DONEtrimmed code to speed up development for now...
+
+DONEclicks on some vocabs is actually at beginning rather than at
+end? - how to fix - was in reset in new_say but test now that we can
+move across coeffsDONE
+
+- test new TMS banks codeDONE-but need to do individual tests
+
+- bends for TMS: pitchDONE, energyNO=volume, excitation_data=too subtle, coeffs, length as done
+
+coeffs: m_current_k is read from coeffs tables - we would need to bend
+all (up to how many differs for 5100, 5200) with x/y set up
+
+modes as follows:
+
+1- full tms with pitch bendDONE
+4- eg. allphon mode with both bends TESTED/DONE
+6- TTS for TMS TEST-DONE
+
+*** fixed
+
+- bug in TTS initialisation which was in sp0256 and reduced size to 16 for TTSinarray
+- also fake trigger start in audio.c for testing purposes
+- back to trimmed TMS
+*maybe change all TTS so phoneme select is on Z and x axis is Y so we can keep x as bend* - TODO for sp0256 and votrax *DONE*
+
+** 3/3 TODO
+
+- test TTS mapping - sp0256 OK (retrospeak mappings), others not so (check for each - votrax, TMS)
+
+TMS - checks out in TTS, check allophones match allphon vocab
+http://www.99er.net/files/TextToSpeech_Draft.pdf - seems so but only
+choppy when we test on lap...
+
+votrax - checks out in TTS, checks out in lap compile of newvotrax with fixed phrase
+
+// test phrases on both TMS and votrax on board - ready for testing but no PSU at home
+
+try all output_count-1 in parse.c
+
+- test all modes so far// rest of TMS modes
+
+*** TMS TODO
+
+- leave as is (as all FIFO stuff etc. in tms5220.cpp is not needed for simple speechrom access)
+
+- test if certain vocabs should be 5220
+- // TEST> do we need to zero coeffs here?
+- look at latest tms5220.cpp and m_zpar, old_zpar code? more for interpolation?DONE
+
+*** fixed
+
+- in votrax wow vocab was all starting with length - removed now
+
+** 6/3
+
+*** TODO: exponential pitch - where do we need this (I guess on any pitch bend) - lookup as we always have reduced scale..
+
+- are rawparams also exp for each but with different values?
+
+sp0256: // period/pitch -70 to +70
+
+votrax: pitch bend is from -8 to +64
+
+TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+
+// leave for now until we have these first 3 sets of modes...
+
+*** TTS
+
+- working on TMS, to test on votrax nowTESTED/DONE
+
+*** TODO
+
+- look at how bends are applied for sp0256 and votrax (constant, per phonetic element)
+
+*- if we are inverting then going over extent doesn't make sense. CLEAN UP ALL EXTENTS AND TEST*
+
+  // with exy=0.0 idx=16// exy=0.95 idx=0
+  exy=1.0f-_sely; // no multiplier and inverted here
+  m_new_frame_energy_idx = exy*16.0f; /
+
+*** TMS TODO
+
+- leave as is (as all FIFO stuff etc. in tms5220.cpp is not needed for simple speechrom access)DONE
+
+- test if certain vocabs should be 5220 DONE and fixed length of echo_female vocabDONE
+
+- // TEST> do we need to zero coeffs here? *NO!*DONE
+
+
+/// - draft these out to inc into audio.c and test
+
+2-  full tms with length bend - bend length on selx TEST-DONE
+
++ 8 bit and high quality mode for full tms as mode 1 (as we have it is undefined - defined as 12 bits now) TEST-DONE
+
+////
+
++ also calculations for shorter lengths in interpol scheme - TEST just with define for now *NO!*
+
+/////
+3+- subsections of vocabs with both bends TODO - which vocabs? - allphons we have already and ...
+
+4+- X/Y bends on subsection of vocab TODO - which vocabs? - allphons and ...
+
+++ bends of tables on specific vocabs
+
+5+- raw raw mode DONE - starting on parse_frame_raw - and - pitch
+bend on selz as these are just frame bends - *should be for 3 different coeff sets - 5100, 5200 and 5220*
+
+still not happy with x/y selection in any case
+
+** 7/3 
+
+*** GENERAL - DONE
+
+- how can we measure frequency and test 1v/oct? tested in test_wave with DC PSU and scope - WORKING!
+
+- testing extents with DC power supply: SELXx, SELZx, Yx, MODEx, SPEEDx -DONE
+
+ - *exponential pitch and speed* - lookups // all pitch mods // any other mods (exy?) - look at mode by mode 
+
+logspeed[1024] and logpitch[128] in resources.c
+
+where we put the pitch stuff - in each mode// test speed change also...DONE_TO_TEST!
+
+update these with mult by logpitch:
+
+sp0256: // period/pitch -70 to +70-DONE
+
+votrax: pitch bend is from -8 to +64
+
+TMS: from -50 to +50 // if (m_pitch_count >= (m_current_pitch+((_selx*100.0f)-50))) m_pitch_count = 0; // TEST - pitch bend
+
+- still not happy with x/y selecting protocol
+
+- move inversion of exy out of audio.c DONE - so is no inversion/extent issue
+
+*** TMS - DONE
+
+- added 5220 bend mode (simply copy but when we are happy with X/Y - changed to trigger as freeze/unfreeze)
+*5220 bend is same but with diff coeff only*DONE
+
+/////++ bends of tables on specific vocabs. tables are: energyNO, pitch, LPC and chirp - bend all or just 1?
+
+as example for 5100 try: all in process()
+
+bend pitchtable - for 5100 table is 32 - DONE for 5100 and seems to work ok
+bend ktable - TEST - not very interesting so leave off
+bend chirptable - TEST - DONE but may need some tweaking
+
+TODO: 5200 variants of these which work/...
+
+** 8/3 
+
+- check clean extent for 64 modes - should be ok as fine for greater...DONE
+
+- tweak speeds for each mode? - where normal speed should be for each mode - sp0256DONE=10KHz, votraxDONE=20KHz, TMS-DONE=8KHz, digitalker=9000
+
+- changed length code to loggy in votraxDONE
+
+- check logarithmic for pitch bends - tms=byID so no logDONE, sp0256DONE, votraxDONETEST
+
+** 9/3
+
+- test votrax with pitch bend - fixes there and in other votrax cases...DONE
+
+- DONEcheck filter stuff on lap (clock doesn't change filter coeffs just
+  ratio between m_sclock and m_cclock) - as bend instead of lengthTEST!DONE
+
+///
+
+- new bends/TMS modes in tms5200x.h to incorporate in audio.cDONE,
+  TESTED and FIXED (bugs in array access for pitchtables) 
+
+*** TODO
+
+/// select/add new vocabs for these new TMS modes
+
+*/// all with tms_newsay_specific - at moment 0 for 5100, 1 for 5200 to change and add*
+
+*TODO for TMS when we use full vocabs:*
+
+extra vocabs for tmsbend5200, tms5100ktablebend,
+tms5100pitchtablebend, tms5200ktablebend, tmsbend5100,
+tms5200pitchtablebend, tms5100kandpitchtablebend,
+tms5200kandpitchtablebend
+
+tms_newsay_specific(u8 whichbank); is new vocab selection make these in audio.c
+
+- when we need full vocab on TMS: allphon and tms_newsay_specific(1); // TODO this will change with full vocab to
+  tms_newsay_specific(37)
+
+/////
+
+SAM:
+
+- get new code baseDONE
+- starting on SAM: vocablist_sam is 32 banks by 42 vocabs sely and selzDONE
+
+- sort out SAM mess with repeats and singmode - singmode doesn't seem to do muchDONE - will use for pitch mode outlined in sam.c
+- reciter.c is text to speech alsoNON
+- bends for SPEED     PITCH     THROAT    MOUTH see readme notes belowDONE
+
+- singmode is 1 or 0, speed and pitch we can vary within rendersamsamplesTESTED, mouth and throat is only effecting frame TODO
+
+DIGI:
+
+- digitalker changed so skips one sample at end of get_sample - needs clean upDONE // and changed pitch and selz for vocab
+
+- watch speed DONE
+
+** 13/3
+
+*** digi
+
+- code for LAP for ROM testing: gcc digitalker.c -DLAP -o digi
+- speed is /128 there but for 8k samplerate so /32DONE
+
+*** SAM
+
+- working on sam.c, render.c. List of modes to work on/seperate out in
+  sam.c - FIRST DONE, TO TEST, then break out rest of modesBELOW
+
+- render.c -> 	//	k=5; /// ????? TODO - in our out?
+
+- for pitch we set at 64-middle and then we vary this// do modus and
+  log pitch in render.cDONE TO TEST - also note that pitch is anyways
+  >>4 so range is very limited and we could use a much smaller lookup
+  with no floats but anyways
+
+*** general
+
+- in general we need selx,y,z in each generator in audio.c or doesn't
+  make sense in some cases (esp. if we have selx, sely there for
+  exy) - BREAKING out - To TEST and then implement - now just in mode
+  0 - seems to work DONE
+
+** 14/3
+
+- test first SAM modeDONE, implement rest of modes:
+
+0-selx-pitch//sely-bank//selz-phrase - modus=1 DONE
+1-selx-speedd//sely-bank//selz-phrase - modus=2 DONE
+
+2-TTS with selx as pitch - use other TTS rather than this one in reciter - modus=1 DONE
+3-TTS with selx as speed - modus=4 DONE
+
+////
+
+4-y/z select of phonemes with selx as pitch - modus=1  DONE
+5-as above with speedd - modus=4 DONE
+8-singing mode with constant pitch=selx there - modus=0 - just change pitch hereDONE
+
+////
+6-larger selected vocab on selz (say 128) with speed AND pitch on x/y - modus=3 DONE samxy
+
+7- all x params as x/y axis with z as selected vocab - modus=8 DONE
+
+9-possible bends of tables? - which tables? - frequency tables DONE
+
+*** digitalker
+
+- digitalker basic mode with bends=on pitch(which is speed) and repeats
+- new rom modes (say 3 modes) - sort vocab first
+
+- modes: basic pitch and speed ADDED, tested (not bending but
+  straight - *also check we have this for all chipsets so is a bit
+  like singing = :CHECK tms, votrax, sp0256*
+
+- *TODO: table bends: delta1 and 2 (16+16), pitch_vals (32) - DONE to test in audio.c with singmode*
+
+- *digitalker - added new roms to sort = length of vocabs and how these are addressed*
+
+- *add roms for each new mode in newsay*
+
+// so 3 roms with x/y bend as is, 3 roms with straightest, 1 rom with each set of bends on xy = 9 modes
+
+** 15/3 +
+
+- if other modes table bends should be with pitchlog (try in digitalker)DONE
+
+- SAM selected vocab
+
+/////
+
+- tested/fixed all new digitalker
+
+- added new singmodes (sort audio.c list so makes more sense)
+
+- nearly all pitch bends are logarithmic - question if we should do
+  this for freq/filter - i guess so... done in TMS: pitchk_tabled5100
+  only
+
+- check which way length knob should go 
+
+- clear all modes so far in terms of logs, vocabs, settings etc...
+
+simpleklatt.c : raw frame - ported to generator but length and some wierdness
+
+*- NOTE: what needs to be done for cleaning up/final touches: TMS roms
+all included and set up, take care of changemode triggering!*
+
+*TODO: SAM selected vocab, digitalker ROM code, logarithmic bendsDONE, what is knob orientation for repeat/length of phonemeLONG->SHORT_DONE, 
+
+*Klatt breakdown:*
+
+1-simpleklatt.c+parwave= raw frames - check T0 and duration - what we can change on z if we have xy params
+
+2-nvp.c= phoneme frames - check T0 and duration
+
+3-rsynth-2.0-port-fullklatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
+
+4-rsynth-2.0-port-TTS for fullklatt?: TODO // would need to break down all from wav_file >??? - 	xlate_file();	PhonemeToWaveData();
+
+// potentially 4 klatt modes some with bends... 
+
+- or we use other TTS/mapped and figure out phoneme transitions
+
+- what parameters we have also (f0, choices excitation, parallel/cascade etc.. *LIST with all klatt notes* )
+
+** 16/3
+
+***  dissecting TTS-> Klatt/rsynth-2.0-port based also on README.org notes
+
+also how we can do TTS or 2 phonemes with transitions (which we did have) without pWavbuffer and all mallocs etc...
+
+~/rsync2016/projects/earthvoice2/TTS_ADC_V002/lib/rsynth-2.0-port/ or ratts
+
+- TTS english2phoneme gives phones for ->
+
+- say.c (void PhonemeToWaveData(char *phone, int len, int verbose))
+
+phonemetowave calls phone_to_elm to generate frame and then holmes to interpol and generate samples
+
+- holmes is where frames are interpolated from phonemes/element list (our elm list)
+- parwave (nsynth.c) generates frames and samples
+
+**** notes
+
+- maybe is doable for TTS as we have holmes for single samples...
+- re-adapt for say.c and also new english2phoneme (where we map to numbers and not to a string)
+
+*** potential Klatt parameters for fullklatt 
+
+flutter?
+
+now klatt_params - see also http://linguistics.berkeley.edu/plab/guestwiki/index.php?title=Klatt_Synthesizer_Parameters
+
+Klatt derivative glottal wave? KLGLOT88, other glottal models in klsyn?
+
+- is klglott in klsyn?
+
+/*  Vwave is the differentiated glottal flow waveform, there is a weak
+    spectral zero around 800 Hz, magic constants a,b reset pitch-synch */
+
+KLGLOT88 is based on LF and is in KLSYN88 (which nvp is based on apparently)...
+
+and there is flutter in this parwave but also in the klatt/parwave we use:
+
+[[file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file:%20PARWAVE.CPP][file:~/projects/ERD_modules/worm/docs/www.laps.ufpa.br/aldebaro/classes/04procvoz1sem/Klatts/Klatt-C-Windows-F0flutter/Src/parwave.cpp::file: PARWAVE.CPP]]
+
+- other klatt params (basic pitch=F0hz10), length of phoneme list, flutter, skew?)
+
+- commented pitch bend, pulled out to single sample and now try to change array of test_elm in main.cTESTING?DONE - glitchy but?
+
+- MITTalk/dectalk/klattalk - lists of targets in appendix tables
+
+how long is klatt wavetable ? in the example there are 100 sample but we can always set this...
+
+note that sampled_source is not in rsynth code but in
+simpleklatt/parwave (where is this from?)... check also klsyn - this
+doesn't have it /// but klsyn does have triangular and square sources...
+
+need to collate all of klatt sources/parameters and code bases...
+
+- check klatt params: rsynth, nvp, simpleklatt:
+
+nfcascade (how man cascading resonators): rsynth=2 but defaults to 5?,
+nvp=6 resonators all pre-set, simpleklatt=parwave/we set to ALL
+PARALLEL so NO cascade...
+
+- inverse filtered source
+
+- SELZ is pitch bend DONEbutcommented, and pulled down to single sample, put phoneme sel in main
+
+- SELX is phoneme, SELY->pos, SELZ->length/or/stress/pitch and SPEED=dur of each or keep speed as speed!TODO
+
+Todo speed etc... triggers
+
+we need maybe length of sentence, and x,y for phoneme and position
+(but also stress and dur for each phoneme?) - trigger will take care
+of length
+
+and/or another klatt mode for similar but basic single klatt with more modulation (length of sample also?)
+
+excitation sources
+
+**** from README:
+
+- from command line options: flutter, base F0, tilt db, msec per
+  frame, number of formants in cascade - but default is parallel, impulse glottal source bool // holmes =
+  -S <d> [1] Speed (1.0 is 'normal') -K <lg> [1] Parameter filter
+  'fraction'
+
+- for example we can vary base (as top in holmes) dynamically, also values like duration we can alter
+
+- in rsynth: def_pars.c (what is pars.def for? - is default frame definition)
+
+long samp_rate = 32000;
+
+void init_synth(void)
+{
+	//double mSec_per_frame = 10;
+  float mSec_per_frame = 8; // 10?
+	//int impulse = 0;
+	int impulse = 1;
+	//int casc = 1;
+	int casc = 2;
+	klatt_global.samrate = samp_rate;
+	klatt_global.quiet_flag = TRUE;
+	klatt_global.glsource = NATURAL;// IMPULSIVE doesn't work - but is set below!
+	klatt_global.f0_flutter = 0;
+
+	//	klatt_global.quiet_flag, "Quiet - minimal messages",
+	//	impulse,                 "Impulse glottal source",
+	//	casc,                    "Number cascade formants",
+	//	klatt_global.f0_flutter, "F0 flutter",
+	//	mSec_per_frame,         "mSec per frame",
+	//	def_pars.TLTdb,          "Tilt dB",
+	//	def_pars.F0hz10,         "Base F0 in 0.1Hz",
+
+	if (casc > 0)
+	{
+		klatt_global.synthesis_model = CASCADE_PARALLEL;
+		klatt_global.nfcascade = casc;
+	}
+	else
+		klatt_global.synthesis_model = ALL_PARALLEL;
+
+	if (impulse)
+		klatt_global.glsource = IMPULSIVE;
+
+	klatt_global.nspfr = (klatt_global.samrate * mSec_per_frame) / 1000;
+}
+
+- and rsynth in docs:
+
+ double mSec_per_frame = 10;
+ int impulse = 0;
+ int casc = 0;
+ klatt_global.samrate = samp_rate;
+ klatt_global.quiet_flag = TRUE;
+ klatt_global.glsource = NATURAL;
+ klatt_global.f0_flutter = 0;
+
+- NATURAL changes impulses but in doc/klatt code we have natural
+  sampled source - but doesn't work - option is 2 - fixed as SAMPLE_FACTOR was very small - mult * 2.0
+
+** 17/3 - 21/3
+
+basics for each of these:
+
+1-simpleklatt.c+parwave= raw frames - check duration - what we can
+change on z if we have xy params - can be frame duration or F0hz10; /*
+Voicing fund freq in Hz = first param (but somehow need contours
+here - snap to contours)
+
+2-nvp.c= phoneme frames - some fixes, could have vocab (see ipa.py and
+accompanying) and/or TTS (in both cases we would need pitch and length data)
+
+vocab would need to be translated by:
+
+: espeak -v en --ipa "worm" -q
+
+then into our numbers (python lookup) and add pitch and length ->
+
+*TODO: script this so takes ipa list and makes arrays for our code...*
+
+*test_speakIpa.py*
+
+*mistake in last 2 with 49!-FIXED*
+
+- different voices
+
+////
+
+3-rsynth-2.0-port-fullklatt now as klatt/holmes.c=klatt_get_sample // test_elm list of phonemes // single phoneme with transition
+
+test_elm ported in (DONE) and basic tests with x as xaxis, y as length, z as phoneme in list *CRACKLES/clicks _ FIX-DONE*
+
+TODO: singing mode, pitch changes at start of phrase or all through (but we need to keep consistent length)
+
+also maybe vocab for klatt as fixed test_elms so then we can bend
+more *TODO: how did we generate the first test_elm?: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: see below*
+
+- different voices
+
+/////
+
+4-rsynth-2.0-port-TTS for fullklatt?
+
+** 20/3
+
+- so we need to generate vocabs for nvp and fullklatt/elm - see above
+
+- re-test also 256 TTS as we changed some code there...
+
+- TODO: figure out XYZ for Klatt modes, *why sounds so throaty*, check
+  sanity of holmes.c vs. other rsynth/klatt versions->checking and
+  changes in klatt_get_sample and get_sample_TTS to CHECK! - check dur
+  (one more and...)?
+
+*** klatt TTS:
+
+- and TTS code to test for fullklatt: after some tests malloc seems solid for PhonemeToWaveData(testphone, 6) in say.c/holmes.cDONE
+
+- next step is to generate in parse.c and test this - works but only
+  for very short sequences so figure how to restrict this as TTS
+  length should be reduced // maybe remove numbers and capitals here
+
+** 21/3
+
+- test rsynth code on lap to check what is causing breathiness
+
+- fix nvp vocab generation:
+
+- nvp vocab needs pitch and duration code from other NVP
+
+- generate test_elm vocab lists for fullklatt: /root/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0: 
+
+with length... ->DONE *test example vocab in holmes.c*
+
+////
+
+- lastphoneme and newphoneme in holmes.c for single phoneme code - DONE _single
+- reduce size of TTS for klattDONE - stress TEST still CRASHES - one
+  mistake in NRL_list - still... seems OK for some compiles maybe?
+
+- on lap test parse.c/elm generation - tested and also output accords with other english2phoneme for rsynthTTS-DONE
+
+** 22/3
+
+- *ditch klatt TTS and concentrate on vocab and bends for all*
+
+- test nvp/fullklatt vocabsTESTED and *add full vocabs and selection code*
+
+- nvp vocab sounds a bit strange (added length and pitchinc) but maybe
+  try with larger vocab! nvp also seems quite breathy
+
+- what we need to do to complete nvp/klatt - per sample bends, breathiness
+
+** 23/3+24/3
+
+- test new rsynth: fixing, suggested samplerate is 8k-12k maybe for all klatt!FIXED/TESTED-TODO: add bendsDONE, add vocab
+
+- vocabs for nvp and klatt - implement and test vocab lists selectionTESTEDnvpTESTEDall - *need to add full vocabs for all three*
+
+rsynth: bend frequency and...rsynth->samples_frame DONE 
+
+*** klatt-based modes:
+
+1-[simpleklatt -xy and selz is rough length of frame]
+
+2-klatt- nelm list with x/y/z no bends ALL but means can change slowly
+
+       maybe do nelm list with changing pitch/length on each sample
+
+[klattTTS]
+
+3-klattsingle - TODO faster - clicks?FIXED
+
+4-klattvocab - all bends done
+
+///
+
+5-nvp- xy done
+
+6-nvpvocab - xy done - also added return start of vocab trigger
+
+/////
+
+7rsynthy - is with vocab and xy bends
+
+8/9==>TODO: rsynthy for nelm list and single phonemes as in klatt DONE
+
+** 25/3 TODO+
+
+- length bends - long to short on all modes
+
+- when we should re-init klatt in all klatt-based modes?DONE
+
+- rsynthy with nelm list and single phonemes as in klattDONE
+
+- summarise all klatt-based modes - add any singing modes (ie. non bends but pure pitch)DONE
+
+** 27/3 +
+
+/// klattt
+
+- changes to Klatt voices - croaky-fry(also low F0), female, NOTES?
+
+flutter, skew->klsyn/tilt, where is wavetable from? natural_samples[]? ->
+from docs/klatt (which we use as simpleklatt) - seems also very noisy? check out possibilities here - FIXED
+
+klsyn: The variable 'sk', "skew to alternate periods", is the number
+        of 25 microsecond increments to be added to and subtracted
+        from successive fundamental period durations in order to
+        simulate one aspect of vocal fry, the tendency for alternate
+        periods to be more similar in duration than adjacent periods.
+
+- how can we shimmer the wavetable (see shimmer in Klatt 1990 female voice: http://www.fon.hum.uva.nl/david/ma_ssp/doc/Klatt-1990-JAS000820.pdf
+
+///
+
+- FIXED: new klatt sing modes TEST, re-inits, rsynthy with nelm list and single phonemes as in klattDONE_TESTED
+
+** 29/3////30/3
+
+- vocab as 1000 most common words... try testing this first? -> nvp, klatt, rsynthy
+
+- and/or vocab as selected makes more sense (say 128 words + phrases???)
+
+*- what can be varied with each of klatt voices: and how - on basis of fixed voice parameters?*
+
+-- rsynth: just base freq which we multiply
+
+-- nvp:   framer.glottalOpenQuotient=glotty; // fraction between 0 and 1 of a voice cycle that the glottis is open (allows voice turbulance, alters f1...)
+  framer.voiceTurbulenceAmplitude=turby;
+  framer.preFormantGain=prefgain;
+  framer.vibratoPitchOffset=vpoffset;
+  framer.vibratoSpeed=vspeed;
+
+  framer.voicePitch - when this is not from vocab
+
+[ignore voices otherwise]
+
+-- klatt: 
+
+  is F0 base? 		def_pars.F0hz10=1200;//         "Base F0 in 0.1Hz",
+  see notes above:
+	klatt_global.f0_flutter = 2.0f;
+	def_pars.TLTdb=10;
+	def_pars.Kskew=10;
+
+ and different sources such as IMPULSIVE, and length of cascade
+
+*** vocabs - redo
+
+*ALL Are 128 0-127 long!*
+
+for nvp:  python test_speakIpa.py with vocab list in /root/test -> nvp_vocab.hREDONE-TESTDONE
+
+for klatt: vocab list is also in /root/test and run with in rsynth-2-un/rsynth-2.0 ./say -> klatt_vocab.hREDONE-TESTDONE
+
+for rsynth: 2005 - python speakyr.py using vocab in /root/test -> rsynthy_vocab.hREDONE-TESTDONE
+
+** 31/3+
+
+- still check all length long->short (fixed for all klatts and few others) *DONE*
+
+TODO:
+
+- digitalker ROM modes - ssr1, AND scorpion - DONE - both added - *TEST*
+
+////ssr1=0-64
+////ssr2=0-figure out as skip some
+///scorpion=0-44
+
+- in sam.c sam_newsay_xy(void) // TODO new custom selected vocab - is just basic select now *DONE-TEST*
+
+
+*** tubes.c - question of interpolation, data, newsay 
+
+- has excitation, TODO: newsay, duration, interpol
+
+- raw mode (max and min for each as other modes like this), phoneme mode, bends (pitch?)
+
+- extracting data from diphones.xml in postures_demo.py (T60 or?) we have:
+
+: for s, p in repertoire.postures.iteritems():
+:        print s, p.targets, p.duration, p.transition
+
+to use as basis for frames and interpolation
+
+for each we have:
+
+<symbol name="duration" value="87.2"/>
+<symbol name="transition" value="30"/>
+<symbol name="qssa" value="43.6"/>
+<symbol name="qssb" value="43.6"/>
+
+how are these used?
+
+this data is now in posture.h
+
+**** older tubes notes:
+
+do we want phonemes here?
+
+*where are we at: question of list of frames in earlier version and where this came from, how we manipulate, all notes above?*
+
+*looks like frames are from: [[file:~/projects/ERD_modules/worm/docs/temped/diphones.degas]]*
+
+*also other frames in py-trm and diphones.xml*
+
+*control rate interpolation of params by storing lastframe TODO!*
+
+tube and ntube: open tube=reflection with inversion(mouth), closed=without inversion (but glottis opens and closes!)
+
+TRM tube notes assembled...
+
+seems to work but lots of messiness with mallocs and possibly slow to adjust:
+
+inlinings, what else - do we need interpolate/filter:
+
+what is sampleRateRatio=    32000 / (float)sampleRate;
+
+sampleRate = controlRate=4.0 * controlPeriod;
+
+	controlPeriod =
+	    rintf((c * TOTAL_SECTIONS * 100.0) /(length * controlRate));
+
+samplerate calced in test.c is 19478 - try without interpol = rougher but no sense to interpol twice for speed
+
+issues: generator and interpolation, linked list and generation of params, changing major parameters
+
+start with just one list = input_frame and do without interpolation, then implement as lastblah
+
+*working but need to do generation of new parameters and interpolation*
+
+*** RavenTube in raven.c
+*** Ntube in ntube.c
+** 4/4+
+
+- also more tests as a few at slow speeds seem to drop audio altogether - maybe fixedFIXED
+
+** 5/4++
+
+- tubes.c is close but could break further into frames so less interpolation _ LEAVE AS IS
+
+** 6/4++
+
+- TEST all klatt vocabs and fix nvp silence - DONE but nvp is always a
+  bit STRANGE sounding with wierd dissonances-FIXED to some degree
+
+- check sam selected vocabDONE
+
+//////
+- TODO for tubes: singing mode (straight freq and length)DONE, bendmode-TEST-crashes, FIXEDnow
+
+raw xy mode (16 params + reset volume thing in that) - how do we find
+limits for the 16 params... also template for that is where - now in templateDONE -> add on T60 - TO TEST-DONE
+
+child_params copied in to tubes.c from py-trm stuff
+
+- compost -> in audio.c and samplerate.c STARTED-> fill in modes and TEST!
+
+/////
+
+- klatt and tubes -/all extra voices/bends if we need these - add up
+  to 64 modes! 61+tubesing, 62tubebend, 63tuberaw - lose klattTTS +
+  compost gives us 64 total OR????
+
+////
+
+*- decide on all/any voices/klatt and tubes and implement*
+
+- new interpolation scheme seems to work now in samplerate.c: shift
+  out old audio.c and start to rework with new struct so is also all a
+  bit cleaner (will need to fix tms passing vocab issue and xy
+  generatorsNEARLY_DONE, also some like sam_xy which need wrapping)
+
+- keep only tubes.c and ditch other tube code so we can easily
+  finish modes - also as we have extra TMS modes and compost
+
+** 7/4+
+
+- compost in progress - some tests still -> FIXED - test in full
+
+- new list of modes - wrappings of newsays etc. with parameters
+
+- ditch klattTTS with reduced set problem
+
+- test all modes as we add them
+
+** 11/4+
+
+*** voices/bends in klatt/tube modes
+
+only one with raw bending of voice is tubes - otherwise we will need seperate voices
+
+see if we can add xy voice bends to vocabs...
+
+- tubes.c: no vocab...
+
+-- added extra params to raw and bend which change some voice elements - we could have different wavetables for voices/bend wavetable?
+-- seems a bit volatile on bends - reduced gain/inc. damping...
+
+-- bends CRASH - FIXED but esp. bend is quite dull, also extent of
+tubes.c postures is quite high...TRIM? - *TODO - DONE-trimmed as many
+only varied in length
+
+-- for voices we can also change wavetable for glottis - say 16 wavetables available as const - *TODO - in progress - extra tablesDONE
+
+also we should put length as first of xy on all bends/raw/etc... DONE
+
+*- klatt: as primary here*
+
+sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter, tilt, skew
+
+- rsynth: - not so important but make sure is set ok 
+
+    pars.F4hz = 3900;
+    pars.B4hz = 400;
+    pars.F5hz = 4700;
+    pars.B5hz = 150;
+    pars.F6hz = 4900;
+    pars.B6hz = 150;
+
+    pars.B4phz = 500;
+    pars.B5phz = 600;
+    pars.B6phz = 800;
+
+    pars.BNhz = 500;
+
+- nvp: vibrato is not so important but make sure is set ok 
+
+  // ====================== glott, pfgain, vpof, vspeed, vpit, outgain, envpitch, voiceamp, turby
+       change_nvpparams(&framer, 0.1f, 1.0f, 0.0f, 0.0f, 128.0f, 1.0f, 0.0f, 1.0f, 1.0f); // envpitch=endVoicePitch is unused, 
+
+test_midiSing.py -> frame.preFormantGain=2.0
+frame.voiceAmplitude=1.0
+frame.vibratoPitchOffset=0.125
+frame.vibratoSpeed=5.5
+
+frame.preFormantGain=1.0
+frame.vibratoPitchOffset=0.1
+frame.vibratoSpeed=5.5
+frame.voicePitch=150
+
+or just: frame.preFormantGain=1.0 TRY variations and leave vibrato, glottal and turby are also only interesting ones
+
+** 12/4++
+
+- no inversion in xy in samplerate.c so we need to invert when we need to in each case CHECK!
+
+- added basics of wavetables but need to fill these out. swap length also on bend and rawDONE-test all tube modes - bend one is somehow lacking
+
+- straight nvp does crash/go into silence -> FIXED bug in NVP! *DONE*
+
+- is raspiness at higher speeds property of sinc or overprocessing -
+  try with simple wavetable/singles-code is there, how to speed up -
+  delay length/width? - re-check now as delay_size was too low, try
+  sinc table with say 8*8 - still no JOY so stay with LINEAR *DONE*
+
+** 13/4+ 
+
+- check voices on rsynth and nvpIN PROCESS- leave as isX, how to approach klatt voices?
+
+klatt we have:
+
+sources:SAMPLE, NATURAL, IMPULSIVE, TRIANGULAR, WAVETABLE, flutter,
+tilt, skew - *DONE* leave this as IS... as they don;t change so much overall
+quality
+
+- revert xy samplerate to simple linear interpolation which we will stick with DONE - TO TEST-DONE
+
+*- for wrapping in tms - newsay_specific if we want to add extra bend vocab modes?*
+
+- check and confirm last klatt modes and then start to add all modes 
+
+- test each, check extents (logpitch/speed), check adc filtering/smoothing
+
+- shifts in compostDONE-TEST! and new frozen compost!DONE_TEST
+
+** 17/4
+
+- check extents, add/check all modes
+- tms vocabs to add/sort and check all TODO
+
+*** espeak -> dissection 1.48
+
+: make speak: and use as ./speak "help" -w test.wav (crashes on portaudio)
+
+speak.cpp -> 		InitText(0);
+		SpeakNextClause(f_text,p_text,0); // file
+		if(WavegenFile() != 0)
+
+--> synthesize.cpp: int SpeakNextClause(FILE *f_in, const void *text_in, int control)
+Generate(phoneme_list,&n_phoneme_list,0);
+
+
+--- where are frames stored?--
+
+wavegen --> 		Wavegen stuff/// synthesis
+
+[
+but it compiles espeak.cpp which has:
+
+espeak_Synth(p_text,max,0,POS_CHARACTER,0,synth_flags,NULL,NULL);
+]
+
+*** now 1.10
+
+: ./speak "help" -v english -w test.wav
+
+[after we copied cp -R ../espeak-data/* /usr/share/espeak-data ]
+
+- so use this as our model now - vocab only
+
+// the queue of operations passed to wavegen from sythesize
+long wcmdq[N_WCMDQ][4];
+int wcmdq_head=0;
+int wcmdq_tail=0;
+
+// dospect etc is in Generate
+
+wavegenfill???
+
+what we need is frames after all dictionaries/voice stuff????
+
+can we isolate parameters for wavegen ///???
+
+
+runs:
+
+			if(WavegenFile() != 0)
+				break;   // finished, wavegen command queue is empty
+
+			if(Generate(phoneme_list,1)==0)
+				SpeakNextClause(NULL,NULL,1);
+
+Generate is all DoSpect etc...
+
+Generate works on phoneme list which is created in SpeakNextClause and translators:
+
+typedef struct {
+	PHONEME_TAB *ph; -> phoneme.h [is this used? yes]
+	unsigned char env;    // pitch envelope number
+	unsigned char tone;
+	unsigned char type;
+	unsigned char prepause;
+	unsigned char amp;
+	unsigned char tone_ph;   // tone phoneme to use with this vowel
+	unsigned char newword;   // 1=start of word, 2=end of clause
+	unsigned char synthflags;
+	short length;  // length_mod
+	short pitch1;  // pitch, 0-4095 within the Voice's pitch range
+	short pitch2;
+	short sourceix;  // ix into the original source text string, only set at the start of a word
+} PHONEME_LIST;
+
+typedef struct {
+	unsigned int mnemonic;      /* 1st char in l.s.byte */
+	unsigned int flags;
+
+	unsigned short std_length;              // for vowels, in mS
+	unsigned short  spect;
+	unsigned short  before;
+	unsigned short  after;
+
+	unsigned char  code;
+	unsigned char  type;          /* vowel, etc */
+	unsigned char  start_type;
+	unsigned char  end_type;
+	
+	unsigned char  length_mod;
+	unsigned char  reduce_to;
+	unsigned char  vowel_follows;  // change to this if a vowel follows
+	unsigned char  link_out;       // insert linking phoneme if a vowel follows
+	
+} PHONEME_TAB;
+
+
+wavegen - wavegenfill - uses? wcmdq - frames? but how are these represented....
+
+- we have long wcmdq[N_WCMDQ][4];
+
+where:
+
+[0] is CMD = 1, 2, 3, 5
+[1] is length
+[2] and [3] are pitch [2] as pointer (to a pitch env?) (if WCMD_PITCH
+is CMD = 2) or amplitude pointer (1) or peak_t pointer -> array of
+these peaks and then we need to record this as:
+
+so we can print/store all these values... TEST! but there are more cmds: 6 and 8
+
+typedef struct {
+   short pkfreq;
+   short pkheight;
+   short pkwidth;
+   short pkright;
+}  peak_t;
+
+so we have for each frame:
+
+u8 CMD, short length, 
+pitch1, pitch2,  (pitchenv)? 
+ampenv, amp value --> both of these envelopes are pointers into phondata which is largish file (char) - could be converted to const and then we have index in 
+and peak_ts above --->>>> #define N_PEAKS   9
+
+each vocab is list of these frames and how many frames...
+
+**** TODO for this frame list
+
+- phondata as const - nearly DONE
+
+- struct for each frame and how we can fill out list of frames
+
+typedef struct {
+  unsigned char CMD;
+  short length;
+  long value;
+  long index;
+  peak_t peak_ts[9];
+} speaker;
+
+
+- how to print each frame for a specific vocab
+
+playwave????
+
+- test singular set of frames and how we init - wavegen and this list
+
+- full test and strip down on lap -> wavegen, synthesize? and phondata->data!
+
+*** approaches?
+
+- port including all TTS and with various files such as phon, dict and voice as const data
+
+- port synth, wavegen and have vocabulary as phoneme list (before or after speaknextclause)
+
+// where does dictionaries come in?
+
+- or just wavegen and list of wcmdq broken down which makes more sense for vocab - eg. list of frames
+
+** 18/4
+
+- how to make sp0256sing say stay without variation and why is so steppy
+  on CV - could just be as we have a limited range 8-255 for the
+  pitch? DONE
+
+- what causes the variation (other than amp and filter?)DONE
+
+** 19/4/++++
+
+*REMEMBER TO ADD INIT IN MAIN ALWAYS*
+
+*** sp0256 final tests
+
+- we need to limit each sp0256 vocab to 75 odd - REDUCED to 88 and 90 each
+
+- fixed vocab bug and added cnt thing as modus 3
+
+- bend mode with trigger as re-trigger phrase (can do this in samplerate only) as replacing trigger modeDONE
+
+- 0-15 for TTS changed in audio.c (as 16 is always EOF)
+
+*** votrax 
+
+- compared float and double on lapSAME and on lap all works well - re-check any differences in generate there
+- why sounds worse at higher speeds? interpol - tried decreasing final low pass
+- wrappings and fixing nearly all newsaysDONE-TO TEST-DONE and fix in TTS
+- gorf vocab is maybe too long?? slips a bit but...
+- lots of fixes DONE
+
+*** TMS modes
+
+** 20/4
+
+- flash overflow with digitalk and all TMS vocabs so no room for espeak... 
+- got rid of extra unused roms in sp0256 TEST - now doesn't overflow but must be close and we leave espeak OUT!
+
+** 25/4 +/26.4
+
+- wrapped sam generators - test one by one and figure out pitch/speed log stuff! TODO!
+/////
+
+- TMS - divide up vocabs say > 128, DONE - TEST
+
+- TMS - check exy on each bend/param ??????
+
+- with -O2 we overflow flash by 3716 bytes, with -0s is fine... TEST
+  with -Os // trimmed all so far (printf and CMSIS-in tube removed,
+  klattTTS removed) - one TMS vocab is enough to solve overflow... - removed TALKO and fits with -O2 on T60 (test on x220)
+
+- TMS= wrapping of selection = keyword "fix" // allphon would be bank=52
+
+** 01/06 + re-appraisal
+
+- what modes do we still need to test/refine? -> *wrapping of lots of TMS see above*
+
+- what needs to be cleaned/changed for full vocabs (TMS, triggers in audio.c for changes etc.)
+
+- order all modes in audio.c test all modes without compost
+
+- test and finish compost
+
+- full tests and manual 
+
+*** SAM
+
+- sam_phon, sam_phons and sam_phonsing have exy as y and z->sel so we need to fix new pitch mode for those on x instead! was this DONE?
+
+- fixed new modus for extra phon modes - still somehow croaky on pitch ???, also some bugs fixed DONE
+- fixed TTS by adding new SAM mode as it didn't like spaces...
+
+- what should pitch/speed logs be? - leave as is...
+
+** 12/6 - what needs to be done...
+
+- we have on t60 makefile for testcode only -> Makefile.test - sync up Makefiles across t60 and x220
+
+*DONE:*
+
+- started testing sam modes and manual modes format work 
+- sam_newsay_param fixed for custom vocab, changed exy scheme for phoneme code so pitch etc. changes are on X!
+
+- TMS trimmed out male1 and male 2 so 65 banks as overflowed flash on
+  T60 and we need space for extra code... but still too large - test
+  all with -Os or with x220 - maybe we can add vocabs back in if we can...
+
+- started wrapping TMS modes and add to header - DONE - TO TEST!
+
+*TODO:*
+
+- check sam modes - start model for modes documentationX
+
+- clean and figure out all TMS modes: additional wrapped tms modes for other vocabs (see how many modes we have)
+
+- check later Klatt modes - what are klatt modes we still need to add and test in audio.c (from old_audio.c)?
+- check all TODO and mark as done in files... cleaning up in general
+
+FINAL:
+- changes in audio.c for triggers
+- compost
+- document each mode for the manual BELOW as we test
+- re-test everything again
+- more release recordings
+
+** 13/6
+
+- Z ->ADC filter (in samplerate.c) as 0.01f - seems ok for stability and max extent of say 128
+
+- TMS: on RAW if we need to invert certain parameters or keep all consistent?
+
+- digitalker_sing - fixed length sely bug +1
+
+- nvp - removed packed attribute as this means it fails work under -Os but may be inverse in -O2???
+
+- porting in from oldaudio all klatt/nvp/rsynth and still needs to be checked DONE
+
+- rsynthelm={0, 1.0f, rsynth_get_sample, rsynth_newsay_elm, 0, 0}; // TODO port own version of exy for elmDONE - TO TEST!
+
+** 14/6
+
+- fixed bug (int/char) in rsynthelm - and we could also do more singing elm with absolute pitch!
+
+** 15/6 
+
+- modes test and doku - sp0256 019 rom has blanks as we need other roms - 003 and 004 DONE
+
+- fixed compost bugs for reversing, added inversion in modes and compost mode selectionTO TEST
+
+- TODO: check number of modes and simplify defines for this including compost modes
+
+- TODO: add interpolation on compost writing based on samplerate.c so is not so fastDONE and changed interpolation size of delay_buffer TO_TEST DONE
+
+- TODO: what to trim -> remove tube.c as also bad on volume changes -
+  but also we realize that all of the audio_buffer was in flash too - still now we are at the limit with all in DONE
+
+
+*** added to makefile for discard of unused code:
+
+-fsingle-precision-constant -fsigned-char -Wdouble-promotion -ffunction-sections -fdata-sections
+
+
+*** question of cutting modes - also as we have NO FLASH
+
+cut modes to::::
+
+1-&sp0256er, &sp0256TTSer, &sp0256vocaboneer, &sp0256vocabtwoer,
+&sp02561219er, &sp0256bender????, =6
+
+2-&votraxer, &votraxTTSer, &votraxgorfer,
+&votraxwower, &votraxwowfilterbender, &votraxbender, &votraxparamer, = 7
+
+3-&sambanks0er, &sambanks1er, &samTTSer, &samphoner, &samphonser,
+&samxyer, &samparamer, &sambender, = 8
+
+4-&tmser, &tmsphoner,
+&tmsttser, &tmsbendlengther, &tmsraw5100er, &tmsraw5200er,
+&tmsraw5220er, &tmsbend5100er, &tmsbend5200er,
+&tms5100kandpitchtablebender, &tms5200kandpitchtablebender, = 11
+
+5-&digitalker, &digitalker_bendpitchvals, = 2
+
+6-&rsynthy, &rsynthelm, &rsynthsingle, &klatter, &klattsingle, &klattvocab,
+&nvper, &nvpvocaber, = 8
+
+&composter, 1
+
+** 16/6+
+
+- sp0256 roms added, fixed and also in sp0256bend - TEST THAT ONE-DONE
+
+- all tests, compost bugs further fixed, new toggle freeze compost mode
+
+- more fixes in compost
+
+- removed extra TTS condition mode for SAM in audio.c and placed change for spaces in parse.c RE_CHECK thisDONE
+
+- shifted multiple klatt inits to main.cTESTED
+
+- fixed max bug in sam.c
+
+////
+
+- some changes across all with new statics etc..
+
+- fix modes at 61 as in audio.c but we have a *CRASH* under certain circumstances - not sure if is in single mode or transition across...
+
+- moved audio_buffer to ccmdata and still crash with/without compost
+  (likely error in mode or transition within groups of modes)
+
+- re-TESTING so far modes: 5X, all TTS modes=8X, 17X, 30X, 25X
+
+TODO:
+
+- fixed bug in tms/tts retrigger tms5200.c TO TEST
+
+- rsynthelm - and we could also do more singing elm with absolute pitch!
+
+- check all extents MAX for float over - done for sp0256 all, tms, digitalker, rysnth2-port/klatt, rsynth2005, nvp
+
+- re-test klatt single mode
+
+- test each mode individually and transition between modes in one
+  group (also between all TTS - what might they share?- inarray is
+  just ascii, rest is not shared I think)
+
+sam, digitalker-L, TMS, SP0256-L, votrax, klatt=nvp-L, simpleklatt, rsynth-2, rsynth-2005, compost in principle
+
+::: sam,, nvp and klatt group as probable problems - and maybe in INIT as we had before:
+
+- note that in klatt we don't init the mallocy element stuff any more so that is not an issue//get rid of all we don't use in makefile
+
+- nvp has funny passing around/packed business so is also most suspect _ TRY again with packed
+
+- where the problem might be: what leaks between modes (newsay setup-rom stuff),
+  variables which should not be shared (static), memory leakage
+
+// tested all nvp and transitions on lap, also sp0256 (not bends - but most fits), digitalker (no bend)
+
+** 17/6 +
+
+- do individual tests for new code above: tmsttsX, nvpX, klatt single modeX, 21-24sam modes21X, DONE
+
+- tests removal of all sections of each init/generate code in
+  main/audio.c and still crashes each time...// but didn't do make
+  clean between so maybe...
+
+- tests removal of all TTS code, test no audio_buffer access, stack
+  increase to 0x1000 - nothing helps
+
+- 0-15 runs fine, 0-45crash, 0-20finesofar (make clean always)
+
+- changes in sam AND larger stack - re-test 0-24 CRASH!, 0-21 seems ok, try 0-23 CRASH
+
+tried all stack changes but could just be out of memory... wordlists all stay in RAM...
+
+for stack we need 0x1000
+
+- TODO: try and put fixed RAM like wordlists in CCM - but not so easy as we need to init from flash...: http://www.openstm32.org/Using+CCM+Memory
+
+so maybe for uninitialised arrays  - we cannot do this in flash as we do not know the address until linking...
+
+*and/or place stack in CCM*
+
+- confusion over elm_ptr and const in rsynth 2005 error - fix/does it still work?DONE
+
+- make more global buffers to reduce stack eg. for tts stuff
+
+....
+
+- gdb: http://fab.cba.mit.edu/classes/863.13/tutorials/EmbeddedProgramming/stm32.html (but maybe too slow)
+
+- figure out from test code how text, data, bss work for flash etc...
+
+** 18/6
+
+- fixed as was size of exy array in main (but we also made changes
+  across both x220 (here) and t60 versions (archived)
+
+- now TODO: further tests of each mode, extents in manual, code trims
+
+** 19/6
+
+- cutting down on x220 code base so compiles with full tms vocab --- still overflow...
+- cut duplicate code for compost and cutting in tms - in progress and test: kandpitchbends, raw, bend, and modus renewed
+
+addr is still too high
+
+- testing TMS vocabs from 0->37 49,51,55,59,61 all fine
+
+question if each bank should be same size?
+
+now we compile on x220 with -Os and all fits on
+
+TODO: 
+
+- re-test all modes and changes above
+
+** 20/6 // 21/6
+
+- added extra tms bend vocab on 5200 so now we have 64 modes. 0-63
+
+TODO:
+
+- check modes as above - all tms first=0->61:DONE , check rsynth elm
+  -- fixed length of elm bug there, reducing sam volume in render.c,
+  fixed phon list bug in sam, changed digitalker length code, fixed
+  bug in rsynthysing, less glitchy version of sp0256bender, raised
+  volume of all TMS
+
+- fixed possible bug in parse_frame_bend_5200() tms5200x.c, test changes in compost for selz - TESTED
+
+- question if to reduce digitalker and nvp volume 
+- simpleklatt could be somehow improved
+- nvp distorts quite badly on speed - but is maybe ok
+- we need to compare all volumes?
+
+- FULL test is fine so far....
+
+IN CODE:
+
+- check each set of exy extents for each mode//also all TTS lengthDONE
+
+- check logic of tms modeDONE-re-checkAGAIN and all mode/modus changes
+
+- check sanity of each file/mode including compost> audio.c/compostX, samplerate, >DONE
+
+- check logspeed/pitch for each mode
+- check testy comments, clean up
+
+////
+
+- final testing individual modes and whole thing again
+- HW program and HW tests - full once code is ready
+
+** 24/6 
+
+- check sanity/modus/modes for:
+
+sp0256.o: DONE
+
+- why we took out rpt counter sample= 0 in sp0256 and 0256bend?
+- removed return in lpc12
+- evaluation of vocab resets 
+- check modus==3 for vocabs / cnt thing again?DONE
+
+sp0256bend.o: DONE
+
+- small bug in new exy stuff fixed - DONE
+
+////
+
+simpleklatt.o /and/ parwave.o : DONE 
+
+- try with   globals->synthesis_model = 1; // all_parallel - try for other = 0 - but we will also need to deal with nfcascade
+- checking frame array - min and size is fine, check matches upDONE
+
+sam.o /and/ render.o: DONE
+
+- added missing singmodes in sam, we don't need x=y=0 as is done in parser1
+- fixed potential bug in u8 sam_get_sample_bend in render.c with X and y - TESTED
+
+////
+
+tms5200x.o  
+
+- re-test frame bends as fixed potential bug thereDONE
+- checked all modus fine
+- *we could also try differing coeffs for vocabs as maybe some match better*
+
+- what varies across coeffs and check this again - 5110=5 pitch bits =32 5200=6 pitch bits =64, kbits checked, 
+
+digitalker.o: checked exy - pitchvals, CHECK logic of get_Sample against mame/mess DONE
+
+nvp.o: checked, changed nvp to logspeed TESTED
+
+newvotrax.o: checked modus, fixed bug to reset   m_cclock = m_mainclock / 36.0f; 
+
+rsynth_2005/holmes.o:    if (once==1){ // question of this ONCE? in rsynthsingleDONE, recheck logic of getsampleCHECKED, check >nelm vs >=checked
+
+rsynth_2005/elements.o rsynth_2005/opsynth.o XXX
+
+klatt: $(rsynth-portDIR)/holmes.o: DONE: change test_elm in main.c
+for new phraseTEST, checked selx/y, check logic of getsampleDONE, check
+if nelm for vocabs should be +1?
+
+for new phrase we use:  ~/rsync2016/projects/ERD_modules/worm/docs/rsynth-2-un/rsynth-2.0 which reads vocab from /root/test
+
+$(rsynth-portDIR)/nsynth.o: hardcoded CASCADES tested
+
+$(rsynth-portDIR)/def_pars.o XXX
+$(rsynth-portDIR)/elements.o XXX
+
+say.c was removed from makefile 
+
+////
+
+TTS stuff: $(ttsd)/parse.o: DONE 
+$(ttsd)/saynum.o XXX
+$(ttsd)/newenglish.o XXX
+$(ttsd)/phoneme.o XXX
+$(ttsd)/spellwor.o  XXX
+
+** 26/6 +
+
+- redo compost newsay as restart mode TESTED
+
+- remove and backup ROMS - DONE
+
+** 5/7 
+
+- test of fixes above:
+
+sp0256= modus==3?check modus==3 for vocabs / cnt thing again DONE
+
+/////
+
+tms: volume reduced was sample<<2 now <<1
+
+- fixed possible bug in parse_frame_bend_5200() tms5200x.c-> checked
+
+sp0256: checked and volume reduced...
+
+- re-check sanity of composting modes - change on oldsel business
+
+simpleklatt: now with nfcascade and impulsive, reducing range of certain params... maybe as free/unfreeze situation DONE
+
+rsynth2005: added extra trigger to reset ONCE
+
+check >nelm vs >= - no great difference?
+
+** 6/7
+
+- improve simpleklatt - tunings of some values and put back to trigger start modeDONE
+
+- changing some volumes in tms so basic is louder, bends and lowbit don't distort
+
+- tested some tms coeffs and changed french one 2352_1 and 2352_2
+
+** 11/7+
+
+- test code with wavetable only runs with logspeed as not in FLASH??? DONE
+
+- test code is for ADCs and trigger DONE - 29 tested with basic code and ready for next tests with WORM code...
+  
+
+** 18/7+ 21/7
+
+&0tmser, &1tmslowbiter, &2tmssinger, &3tmsbendlengther, &4tmsphoner,
+&5tmsphonsinger, &6tmsttser, &7tmsraw5100er, &8tmsraw5200er,
+&9tmsraw5220er, &10tmsbend5100er, &11tmsbend5200er, &12tmsbend5200erx,
+&13tms5100pitchtablebender, &14tms5200pitchtablebender,
+&15tms5200pitchtablebenderx, &16tms5100ktablebender,
+&17tms5200ktablebender, &18tms5100kandpitchtablebender,
+&19tms5200kandpitchtablebender, &20tms5200kandpitchtablebenderx,
+
+&21sp0256er, &22sp0256singer, &23sp0256TTSer, &24sp0256vocaboneer,
+&25sp0256vocabtwoer, &26sp02561219er, &27sp0256bender, 
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, 
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+&49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+&53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+&58simpleklatter, 
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+&62composter, &63compostfrer}; // 64 modes
+
+check threshold and trigger in general...
+
+- trigger simplified into audio.c 
+- trigger/newsay changed in tms5200x.c
+
+** 25/7 & 26/7 TESTINGS
+
+- TMS: 0->20 // volumes for lowbitFIXED, length in mode 3FIXED,
+  raw/bends are rough in places on 5200/5220 but not so much for 5100,
+  bug in kandpitchFIXED
+
+- SP0256/intel: 21-27 // increasing volumes - maybe check distortion on
+  scopeTODO-all <<2 to test, pitch is a bit warbly, reduced volume in bendFIXED
+
+- VOTRAX: 28-35 // harshness at high speeds - low pass, not quite
+  right TO FIX! - some changes (removed f3 and f4 on basic phonemes)
+  but re-test maybe...
+
+- SAM: 36-45 // fixed large glitch on some phrases - can fine tune volumes
+
+- DIGITALKER: 46-48 // fine
+
+- RSYNTHY: 49-61 50rsynthelm-glitch at end or startFIXED, rawmode58 is
+  wierd-reduced samplerate and fixed volume, fixed some glitch in nvp
+  by reducing samplerate
+
+- finished first set of rough tests, still decided against
+  interpolation as this is not the issue
+
+** 31/7
+
+- DONEre-testings - checking group of modes volumes on scope -
+  TMS=13Vpp(lowbit=10-12v), sp0256/intel=12Vpp, votrax-put in peak/no
+  distort also, digitalker - fixed bug in length, ALL VOLS approx 10Vpp
+
+- DONE: add peaks for all modes where necessary: rsynthy has, klatt
+  has, simpleklatt has, tms not needed, sp0256has, vot has, sam no
+  need, digitalker no need
+
+- glitch in rsynthy elements to fix=FIXED/major bug in element list
+
+- re-try f3 and f4 back in votrax REVERTED DONE
+
+** 1/8 ->
+
+- all files and re-test each mode/full - no defines in tms/all tested
+
+checked volumes/sanity/focus on problems: 
+
+TMS: vocab_spkspelltwo_1 issue FIXED, checked 0,1,4-10 of *TMS vocabs so far TODO*
+
+sp0256: testing 21->27 // small changes 
+
+VOT: 28-35 tested. &34votraxparamer->volume?NON. fixed some length and phoneme bugs
+
+SAM: 36-45 tested and keep volume as is... re-check pitch and 45/bendCHECKED
+
+DIGI: all fine - but re-test with full tests
+
+RSYNTHY: retry &58simpleklatter with different settings-stay with cascade/small changes - 49-61: checked
+
+- checked all MAXED extents
+
+** FINAL TODO:
+
+- check each TTS mapping so for: TMS-X, VOTRAX-X, SAM-X, 256-X DONE
+
+- image for modulargrid - DONE
+
+- run through each mode/all modes - test all and test trigger in eachDONE
+
+- samples: work through 1501->1522 and 1524+ (some chosen already)
+
+- check all volumes/levels on scope... DONE
+
+////////////////
+
+- sanity-checked all - tweaks to nvp, digitalker
+
+/check all array extents DONE
+
+///17/8+
+
+- check TMS vocabs DONE-fixed pauses on acorn1/59mode
+////
+
+- check each mode again checked=TMS:0,1,2,3,4,5,6,7,8,9,10,11,12,13,14 - 15is low vol/and marked as phoneme in manual(=16there as always +1)?
+-20DONE
+
+&21sp0256erX, &22sp0256singerX, &23sp0256TTSer, &24sp0256vocaboneerX,
+&25sp0256vocabtwoerX, &26sp02561219erX, &27sp0256benderX, 
+
+*TESTING STILL TODO:*
+
+&28votraxer,
+&29votraxTTSer, &30votraxgorfer, &31votraxwower,
+&32votraxwowfilterbender, &33votraxbender, &34votraxparamer,
+&35votraxsinger, 
+
+&36sambanks0er, &37sambanks1er, &38samTTSer,
+&39samTTSser, &40samphoner, &41samphonser, &42samphonsinger,
+&43samxyer, &44samparamer, &45sambender, 
+
+&46digitalker,
+&47digitalker_sing, &48digitalker_bendpitchvals, 
+
+&49rsynthy,
+&50rsynthelm, &51rsynthsingle, &52rsynthysing, 
+
+&53klatter,
+&54klattsingle, &55klattsinglesing, &56klattvocab, &57klattvocabsing,
+
+&58simpleklatter, 
+
+&59nvper, &60nvpvocaber, &61nvpvocabsing,
+
+&62composter, &63compostfrer}; // 64 modes
+
+
+*TO FIX and re-test:*
+
+7tmsraw5100er - seems bit lacking, 
+256 phonemes are a bit strange on end?
+
+- looking at 256.cpp:
+
+			/* ------------------------------------------------------------ */
+			/*  If our repeat count expired, emulate the microsequencer.    */
+			/* ------------------------------------------------------------ */
+			if (m_filt.rpt <= 0)
+				micro();
+
+whereas we always run micro... -> this makes no difference (tested on lap with diffs and multiples... and variations of...)
+
+all 256 checked against cpp...
+
+////
+
+- check compost
+
+finally remove TESTY and check tms on this for shorter loadings
+
+full tests, uncomment retrigger code
+
+- announce OCT
+
+
+* FINAL/FURTHER TODO-DONE
+
+- ADCs for 0-127 we need to max/multiply 132.0f
+
+- check all logarithmics for length(64 or 1024 is necessary) and if is needed...
+- check all extents and how much parameter per knob...
+- Q of len-1 for input in TTS/parse.c? for most gens - RE_TEST!
+- put back in missing TMS vocabs+ new modes=newsay_specific, changemode triggering, all vocabs and check TESTING/TODO marked code/cleanup
+- test/document each mode
+
+- HW tests: test programmingDONE, finish build, test all = maybe code one
+  test mode for quick upload: TESTING: ADC extents, CV ins, trigger in
+  with say wavetable code
+
+* KLATT/rsynth notes
+
+** our ported rsynth-2.0-port (from TTS)
+
+to test on lap:
+
+: gcc darray.c def_pars.c elements.c holmes.c nsynth.c phtoelm.c say.c trie.c -olapr -I. -I.. -DLAP -std=gnu99 -lm 
+
+we have the same breathiness with new holmes/nsynth as previous but now we can test vocabs and sort this maybe...
+
+check nsynth etc. against originalCHECKED
+
+** rsynth-2-un
+
+shows elements...
+
+is as our port
+
+** rsynth-2
+
+????
+
+** rsynth-2005-12-16
+
+shows also our elements (different to rsynth-2 and has longer list) and works on lap
+
+uses different klatt scheme (see holmes and also opsynth) but *could be ported*
+
+// port in progress: compiles but we need to break down frame:DONE vocab - needs work to abstract TEST first!
+
+// use rsynth-2005 for vocab generation
+
+* TTS 
+
+: gcc newenglish.c parse.c phoneme.c saynum.c spellwor.c -o teets -std=c99 -DLAP
+
+parse has main in it.
+
+TODO: test with 256, with SAM, add klatt/TMS/votrax phoneme mappings
+and function, and test all, test encapsulation, port to arm and test
+there (X/Y)
+
+//256: tested on lap, code is there for TTS in ARM version but I guess
+needs to be checked (changed and use as template for SAM etc.)
+
+** NOTES:
+
+ASCII is values:
+
+0-9= 47->57
+space= 32
+caps=65-90
+lowercase=97-122
+
+TOTAL: 64 with 2 spaces at start
+
+CHECK sp0256 end 255//////////!!!!!!!!!!!!!!!!!!!!!!!!
+
+make array of these values to remap 64x64
+
+{32, 32, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 65, 66, 67, 68, 69, 70,
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87,
+88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
+109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122};
+
+/////
+
+** TMS phoneme list:
+
+there are 125 allophons plus pause - TODO: check these
+
+convert-> from user guide! test first before we convert
+
+{0AE1, 1AE1, 2AH1, 3AH1, 4AW1, 5AW1, 6E1 , 7E1N, 8EH1, 9EH1, 10ER1, 11I1 , 12I1N, 13OO1,
+14OW1, 15U1 , 16U1N, 17UH1, 18UH1, 19UH1, 20Y1 , 21Y1N, 22ER1, 23OW1, 24Y2 , 25AE2, 26AH2, 27AI2,
+28AR2, 29AU2, 30AW2, 31E2 , 32EER, 33EH2, 34EHR, 35EI2, 36ER2, 37I2 , 38OI2, 39OO2, 40OOR, 41OR2,
+42OW2, 43U2 , 44UH2, 45UU2, 46AE3, 47AH3, 48AI3, 49AR3, 50AU3, 51AW3, 52E3 , 53EEL, 54EER, 55EH3,
+56EHR, 57EI3, 58ER3, 59I3 , 60ILL, 61ING, 62OI3, 63OO3, 64OOR, 65OR3, 66OW3, 67U3 , 68UH3, 69ULL,
+70UHL, 71UU3, 72L , 73L- , 74LL , 75M , 76MM , 77N , 78NN , 79NG1, 80NG2, 81R , 82W , 83WH , 84Y , 85B
+, 86BB , 87D , 88DD , 89G1 , 90G2 , 91GG , 92J , 93JJ , 94THV, 95THV, 96V , 97VV , 98Z , 99ZZ , 100ZH
+, 101ZH-, 102K2 , 103KH , 104KH-, 105KH1, 106KH2, 107P , 108PH , 109PH-, 110T , 111TH , 112TH-, 113CH , 114F ,
+115FF , 116HI , 117HO , 118HUH, 119S , 120SS , 121SH , 122SH-, 123THF, 124THF};
+
+plus
+126. Pause1 <short pause>
+127. Pause2 <long pause>
+
+** Klatt phoneme list - maybe leave
+
+we started on this in parse.c
+
+69 phonemes in Elements.def
+
+{END, Q, P, PY, PZ, T, TY, TZ, K, KY, KZ, B, BY, BZ, D, DY, DZ, G, GY, GZ, M, N, NG, F, TH, S, SH, X, H, V, QQ, DH, DI, Z, ZZ, ZH, CH, CI, J, JY, L, LL, RX, R, W, Y, I, E, AA, U, O, OO, A, EE, ER, AR, AW, UU, AI, IE, OI, OU, OV, OA, IA, IB, AIR, OOR, OR};
+
+[see also ipa.py]
+
+- where do we find this? elements ones or other????
+
+- need to re-acquaint with all of klatt - where we have phonemes earlier in whole process!?
+
+** votrax sco1vs02 phoneme list:
+
+from deladriere but we converted - but is for 02
+
+{0x05, 0x07,'0x08,0x05,0x03' , 0x0A, 0x0C, 0x0E,"0x12,0x11,0x11" ,
+0x11,0x16', 0x15, '0x14,0x16,0x16', 0x1c, '0x0C,0x23',
+0x1B,'0x0F,0x0D,0x0B,0x03' ,'0x0F,0x10,0x11,0x16' ,
+'0x11,0x19,0x0F,0x07,0x06' , 0x27 , 0x24, 0x28, 0x25, '0x29,0x2c',
+0x26, 0x34, 0x33, 0x35, 0x36, 0x30, 0x2f, 0x32, 0x2f, 0x2c, 0x37,
+0x38, 0x39, 0x20, 0x23, 0x04, 0x1d, '0x28,0x2D,0x32' , '0x25,0x31',
+0x23, 0, 0}
+
+SC01//enum Phonemes {	EH3, EH2, EH1, PA0, DT, A1,  A2,  ZH, 	AH2,    I3,  I2,  I1,  M,  N,   B,   V,	CH,     SH,  Z,   AW1, NG, AH1, OO1, OO,	L,      K,   J,   H,   G,  F,   D,   S,	A,      AY,  Y1,  UH3, AH, P,   O,   I,	U,      Y,   T,   R,   E,  W,   AE,  AE1,	AW2,    UH2, UH1, UH,  O2, O1,  IU,  U1,	THV,    TH,  ER,  EH,  E1, AW,  PA1, STOP};
+
+
+*question of accuracy and how to deal with multiples - convert multiples in parse.c but how to we flag multiple*
+
+//NRL: IY, IH, EY, EH, AE, AA, AO, OW, UH, UW, ER, AX, AH, AY, AW, OY, p, b, t, d, k, g, f, v, TH, DH, s, z, SH, ZH, h, m, n, NG, l, w, y, r, CH, j, WH, PAUSE, ""
+
+from: 
+
+#phoneme strings adapted to match the SSI-263 phoneme chart and diphthong set
+
+phons = {'AA': "0x0E", 'AE': "0x2E", 'AH':"0x1B", 'AO':"0x12,0x11,0x11", 'AR': "0x0C,0x1C",
+         'AW': '0x0F,0x10,0x11,0x16', 'AX':'0x0C,0x23', 'AY': '0x0F,0x0D,0x0B,0x03', 'B': '0x24', 'CH': '0x28,0x2D,0x32',
+         'D': '0x25', 'DH': '0x36', 'EH': '0x0A', 'EL': '0x0A,0x20', 'EN': '0x0A,0x38',
+         'ER': '0x1C', 'EY': '0x08,0x05,0x03', 'F': '0x34', 'G': '0x26', 'HH': '0x2C',
+         'IH': '0x07', 'IR': '0x07,0x1D', 'IY': '0x05', 'JH': '0x25,0x31', 'K': '0x29,0x2C',
+         'L': '0x20', 'M': '0x37', 'N': '0x38', 'NG': '0x39', 'OW': '0x11,0x16',
+         'OY': '0x11,0x19,0x0F,0x07,0x06', 'P': '0x27', 'R': '0x1D', 'S': '0x30', 'SH': '0x32',
+         'T': '0x28', 'TH': '0x35', 'UH': '0x15', 'UR': '0x16,0x1C', 'UW': '0x14,0x16,0x16',
+         'V': '0x33', 'W': '0x23', 'Y': '0x04', 'Z': '0x2F', 'ZH': '0x2F', 'SIL': '0'}
+
+
+* phonemes probability map high->low ABANDON
+
+** TMS
+
+** SP0256
+
+** VOTRAX
+
+const char *const votrax_sc01_device::s_phone_table[64] =
+{
+	"EH3",  "EH2",  "EH1",  "PA0",  "DT",   "A1",   "A2",   "ZH",
+	"AH2",  "I3",   "I2",   "I1",   "M",    "N",    "B",    "V",
+	"CH",   "SH",   "Z",    "AW1",  "NG",   "AH1",  "OO1",  "OO",
+	"L",    "K",    "J",    "H",    "G",    "F",    "D",    "S",
+	"A",    "AY",   "Y1",   "UH3",  "AH",   "P",    "O",    "I",
+	"U",    "Y",    "T",    "R",    "E",    "W",    "AE",   "AE1",
+	"AW2",  "UH2",  "UH1",  "UH",   "O2",   "O1",   "IU",   "U1",
+	"THV",  "TH",   "ER",   "EH",   "E1",   "AW",   "PA1",  "STOP"
+};
+
+from book:
+
+27, 0d, 2a, 2b, 32, 1f, 1e, 2e, 3c, 18, 01, 38, 24, 12, 0c, 19, 20,
+0f, 2d, 25, 1d, 1b, 0e, TONE, 16, 17, BIKE, 13, 14, 11, 1c, 28, 22,
+26, 10, 1a, 39, 36, 37. 35, 07
+
+but we need to group/cross off phonemes
+
+///
+
+- but maybe use other method as we don't know where to put other phonemes not in book list
+- flaw is that TTS method doesn't use all of each phoneme
+- awky and -DLAP version of TTS ?
+
+* TMS ROMS
+
+classify each ROM in LPC/roms directory
+
+** 5100-speak and spell
+** 5200- early echo II, disks of TRON????, TI99/4 
+** 5220- later echo II, BBC MICRO
+
+* notes from README.org
+
+- source/filter model we have sources as: input straight (fine for
+oscillation or noise in), inverse filtered in, inv in as triggered
+wavetable, inverse filtered audio buffer, audio buffer (and toggle off
+write on use of audio buffer), physical glottal model, stored
+wavetable as in raven, generators eg. pulse, square, and original
+(eg. TMS, Klatt)
+
+* main modes overview - otherwise see modes.org
+
+** basic modes to do with suggested extensions - 64 modes
+
+1. TMS -> vocab,TTS?, phonemes, raw
+2. SP0256 -> roms?,TTS, phonemes, vocab is done, raw
+4. votrax -> TTS, phonemes, vocab is roms, raw
+5. SAM -> TTS, vocab(ported already) - see sam.c for modes
+
+3. digitalker - 3 roms - to detail how much vocab we have
+
+bends if any=pitch _and_ repeats/zero_count, also possible bend of any
+   tables
+
+how large is vocab in that rom? small
+
+what is that rom from? SCORPION... other roms? mazerblaNO!, SSR1, SSR2
+
+/////
+
+6. klatt/nvp variations RE_ACQUAINT with multiple bends, TTS in situ or not, various glottal sources
+
+fullklatt/simpleklatt/nvp
+
+//// end 24 MARCH
+
+10. tube and ntube/glottal/wavetable and wormed tubes: RavenTube in
+    raven.c, Ntube in ntube.c and full glottis and tube in tube.c - 3 tube sets
+
+12. compost as last modes - startX, endY in compost buffer and Z as last mode
+    still writing or NOT-but no poti changes HOW? - 2 stages with
+    oldX.Y for example. 
+
+if start>end then we run backwards between the two points
+
+13. compost as //wormed// wavetable. 
+
+/////////////////end next week
+
+13. worming of all XY modes above
+
+*xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx* end next + HW tests and cleanups
+
+*/////////// we leave from below and any LPC work for RAVEN which could have 2 inputs?*
+
+xx. wavetables and worm through wavetables
+
+9. vosim/fof etc.
+11. voicform?
+
+
+////////////////////////////
+
+
+7. LPC vocoder -> where is code for this? lpcanalysis?
+
+see in README: 8.1 LPC vocoder/source - crossover with different sources and pitch following/off on ...
+
+:lpc4.c now!????
+
+wavetable and other insources and live LPC filter from IN (to vocode with WHAT?)! also window size variable?
+
+potential also for live TMS/LPC recodings with pitch or add manual pitch:=
+
+lookups and how this could work based on : using encoder - calc.m and
+  romgen from talkie with freemat and online convertor - use 8 KHz 16
+  bit mono recordings to encode words for lpc.c
+
+pitch up and pitch down (we get pitch from auto-correlation), transpose coeffs in time
+
+8. vocoder
+
+- vocoder also with compost AND with live generation of selected algos as VOICE and with INPUT as INSTRUMENT//EXCITATION
+
+vocoder - channelv?, testvoc? svf? wvocoder - check all notes
+
+14. extra/experimental modes for proposed raw RAVEN (without filtering) - excitations/wavetables
+
+15. utility modes such as raw LPC error out
+
+* chipsets/emulation/roms
+
+rom data structure - only makes sense for TMS
+
+- array pointer of pointers
+- number of entries/length 
+- chip ident (enum)
+
+*** 5100//522x
+
+LIST!
+
+*** sp0256
+
+256_roms.h - 
+
+m_rom_256_012 - ?
+
+m_rom_256_al2 - 64 allophones
+
+vocab?
+
+*** digitalker
+
+digitalker_roms.h - 
+
+m_rom (rename!)?
+
+*** votrax 
+
+- one rom with lots of vocab
+
+* new mode notes for manual
+
+MAJOR MODE
+
+| MODE # | TYPE    | TITLE          | X           | Y              | Z       | TRIGGER       | NOTES                   |
+|--------+---------+----------------+-------------+----------------+---------+---------------+-------------------------|
+
+how modes are numbered
+
+
+** SAM
+
+explain types of each sub-mode
+
+own notes = T tested
+
+types of mode: vocab, TTS, phoneme, worm=bend, raw
+
+| MODE # | TYPE    | TITLE          | X      | Y              | Z       | TRIGGER       | NOTES                   |
+|--------+---------+----------------+--------+----------------+---------+---------------+-------------------------|
+|        | vocab   | sambanks0er    | pitch  | bank           | phrase  | phrase start  | T                       |
+|        | vocab   | sambanks1er    | length | bank           | phrase  | phrase start  | T                       |
+|        | TTS     | samTTSer       | pitch  | position       | letter  | re-phrase TTS | T                       |
+|        | TTS     | samTTSser      | length | position       | letter  | re-phrase TTS | T                       |
+|        | phoneme | samphoner      | pitch  | position       | phoneme | phrase start  | T start is phoneme list |
+|        | phoneme | samphonser     | length | position       | phoneme | phrase start  | T start is phoneme list |
+|        | phoneme | sampphonsinger | pitch  | position       | phoneme | phrase start  | T pitch is absolute     |
+|        | vocab   | samxyer        | pitch  | length         | phrase  | phrase start  | T selected vocab        |
+|        | worm    | samparamer     | x-axis | param          | phrase  | phrase start  | T selected vocab        |
+|        | worm    | sambender      | x-axis | frequency data | phrase  | phrase start  | T selected vocab        |
+  
+** DIGITALKER
+
+| MODE # | TYPE  | TITLE                    | X      | Y      | Z      | TRIGGER      | NOTES               |
+|--------+-------+--------------------------+--------+--------+--------+--------------+---------------------|
+|        | vocab | digitalker               | pitch  | length | phrase | phrase start | T                   |
+|        | vocab | digitalkersing           | pitch  | length | phrase | phrase start | T pitch is absolute |
+|        | worm  | digitalker_bendpitchvals | x-axis | param  | phrase | phrase start | T worm pitchtable   |
+
+** TMS
+
+| MODE # | TYPE    | TITLE                 | X      | Y        | Z       | TRIGGER       | NOTES                               |
+|--------+---------+-----------------------+--------+----------+---------+---------------+-------------------------------------|
+|        | vocab   | tmser                 | pitch  | bank     | phrase  | phrase start  | T                                   |
+|        | vocab   | tmslowbiter           | pitch  | bank     | phrase  | phrase start  | T low bitrate                       |
+|        | vocab   | tmssinger             | pitch  | bank     | phrase  | phrase start  | T pitch is absolute                 |
+|        | phoneme | tmsphoner             | pitch  | length   | phoneme | phoneme start | T                                   |
+|        | phoneme | tmsphonsinger         | pitch  | length   | phoneme | phoneme start | T pitch is absolute                 |
+|        | TTS     | tmsTTSer              | pitch  | position | letter  | re-phrase TTS | T                                   |
+|        | vocab   | tmsbendlength         | length | bank     | phrase  | phrase start  | T length starts at true             |
+|        | raw     | tmsraw5100            | x-axis | param    | pitch   | retrigger     | T 5100 chipset raw codes            |
+|        | raw     | tmsraw5200            | x-axis | param    | pitch   | retrigger     | T 5200 chipset raw codes            |
+|        | raw     | tmsraw5220            | x-axis | param    | pitch   | retrigger     | T 5220 chipset raw codes            |
+|        | worm    | tmsbend5100           | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm                 |
+|        | worm    | tmsbend5200           | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm                 |
+|        | worm    | tms5100pitchtable     | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of pitchtable   |
+|        | worm    | tms5200pitchtable     | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of pitchtable   |
+|        | worm    | tms5100ktable         | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of ktable       |
+|        | worm    | tms5200ktable         | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of ktable       |
+|        | worm    | tms5100kandpitchtable | x-axis | worm     | phrase  | retrigger     | T 5100 chipset worm of k/pitchtable |
+|        | worm    | tms5200kandpitchtable | x-axis | worm     | phoneme | retrigger     | T 5200 chipset worm of k/pitchtable |
+
+NOTES: on RAW if we need to invert certain parameters or keep all consistent, also where we bend volume as can be wierd
+
+** SP0256
+
+| MODE # | TYPE    | TITLE            | X     | Y        | Z       | TRIGGER       | NOTES                      |
+|--------+---------+------------------+-------+----------+---------+---------------+----------------------------|
+|        | phoneme | sp0256er         | pitch | length   | phoneme | phoneme start | T                          |
+|        | TTS     | sp0256TTSer      | pitch | position | letter  | re-phrase TTS | T                          |
+|        | phoneme | sp0256singer     | pitch | length   | phoneme | phoneme start | T pitch/length is absolute |
+|        | vocab   | sp0256vocaboneer | pitch | length   | phrase  | phrase start  | T                          |
+|        | vocab   | sp0256vocabtwoer | pitch | length   | phrase  | phrase start  | T                          |
+|        |         | sp02561219er     |       |          |         |               | T                          |
+|        |         | sp0256bender     |       |          |         |               | T noisy at first           |
+|        |         |                  |       |          |         |               |                            |
+
+** VOTRAX
+
+| MODE # | TYPE    | TITLE               | X      | Y        | Z       | TRIGGER         | NOTES               |
+|--------+---------+---------------------+--------+----------+---------+-----------------+---------------------|
+|        | phoneme | votraxer            | pitch  | length   | phoneme | phoneme start   | T                   |
+|        | TTS     | votraxTTSer         | pitch  | position | letter  | re-phrase TTS   | T                   |
+|        | vocab   | votraxgorfer        | pitch  | length   | phrase  | phrase start    | T gorf              |
+|        | vocab   | votraxwow           | pitch  | length   | phrase  | phrase start    | T wow               |
+|        | bend    | votraxwowfilterbend | pitch  | bend     | phrase  | phrase start    | T wow               |
+|        | bend    | votraxbender        | x-axis | bend     | phrase  | phrase start    | T gorf              |
+|        | raw     | votraxparamer       | x-axis | value    | pitch   | freeze unfreeze | T                   |
+|        | phoneme | votraxsinger        | pitch  | length   | phoneme | phoneme start   | T pitch is absolute |
+
+** KLATT
+
+| MODE # | TYPE    | TITLE           | X      | Y      | Z       | TRIGGER         | NOTES               |
+|--------+---------+-----------------+--------+--------+---------+-----------------+---------------------|
+|        | vocab   | rsynthy         | pitch  | length | phrase  | phrase start    | T                   |
+|        | phoneme | rsynthelm       | x-axis | length | phoneme | start of list   | T                   |
+|        | phoneme | rsynthsingle    | pitch  | length | phoneme | phoneme start   | T                   |
+|        | vocab   | rsynthysing     | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+|        | phoneme | klatter         | x-axis | length | phoneme | start of list   | T                   |
+|        | phoneme | klattsingle     | pitch  | length | phoneme | phoneme start   | T                   |
+|        | phoneme | klattsinglesing | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
+|        | vocab   | klattvocab      | pitch  | length | phrase  | phrase start    | T                   |
+|        | vocab   | klattvocabsing  | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+|        | raw     | simpleklatt     | x-axis | param  | length  | retrigger       | T                   |
+|        | phoneme | nvper           | pitch  | length | phoneme | retrigger       | T                   |
+|        | vocab   | nvpvocaber      | pitch  | length | phrase  | phrase start    | T                   |
+|        | vocab   | nvpvocabsing    | pitch  | length | phrase  | phrase start    | T pitch is absolute |
+
+// cut tubes OUT!
+
+|        | phoneme | tuber           | pitch  | length | phoneme | phoneme start   | T                   |
+|        | phoneme | tubsinger       | pitch  | length | phoneme | phoneme start   | T pitch is absolute |
+|        | bend    | tubbender       | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
+|        | raw     | tubrawer        | x-axis | param  | pitch   | freeze/unfreeze | wierd???keep or???  |
+|        | raw     | tubxyer         | x-axis | param  | phoneme | freeze/unfreeze | wierd???keep or???  |
+
+** COMPOST
+
+| MODE # | TYPE    | TITLE          | X     | Y   | Z    | TRIGGER       | NOTES |
+|--------+---------+----------------+-------+-----+------+---------------+-------|
+|        | compost | composter      | start | end | mode | restart mode  | T     |
+|        | compost | compost frozen | start | end | mode | toggle freeze | T     |
+
+
+* website/announce
+
+The WORM was for a long time desirous to speake, but the rule and
+or∣der of the Court enjoyned him silence, but now strutting and
+swelling, and impatient, of further delay, he broke out
+thus... [Maier]
+
+The eurorack-based ERD/WORM synth features software worming of
+emulated artificial human speech cores from the 70s to the 90s of the
+last century. Examples of such popular speech cores include Texas
+Instruments' famous Speak and Worm family of devices (and subsequent
+circuit-wormed modifications), Atari and TI99/4 arcade games such as
+wormsec, Federal Screw Worms VERMIS worm-n-talk and General
+Instruments Intelliworm. ERD/WORM further bends and worms key speech
+synthesis algorithms across 64 modes with full trigger, CV and knob
+control over core aspects of these speech cores.
+
+Six key speech cores are wormed and bent with a vocabulary of over
+4000 words and phrases, including basic allophones or phonemes which
+can be used to build new phrases as well as a Text to Speech engine
+for advanced textual constructions. A further set of COMPOST modes
+allows for sample-based re-working of constructed and wormed words and
+phrases.
+
+ERD/WORM is produced in Berlin by various worms and hands.
+
+This module is released in four batches in a strictly limited edition
+of 100. The first batch of 25 is now ready for order.
+
+Pricing: 275 euros with free, tracked worldwide shipping. x in stock of first batch.
+
+*** Sounds like:
+
+*** Technical and HOWTO
+
+12HP, 110mA at +12V, 18mA at -12V, 0mA at 5v. 5 CV inputs, 1
+audio/trigger input, 1 audio output, 20mm deep.
+
+Manual and layout at:
+
+With thanks to Ioana Vreme Moser for manual editing, layout and design
+and Kathrin Guenter for image.
+
+Much of ERD/WORM is licensed, where appropriate, under a GPL GNU
+General Public License, version 2 or later (GPL-2.0+). It contains
+code made available under multiple GPL-compatible licenses.
+
+*** older/notes
+
+the ERD/WORM voice speech synthesis module and celebrates the
+boneless, anti-geologic realm of non-human speech which the
+technologies of encoding and synthesis introduced.
+
+... worming, bending and breaking a compost of historical speech
+generation algorithms. Vocoding and speech applied worms have been
+broken out into future ERD/RAVEN and ERD/[z] modules.
+
+software simulated creation of non-human voices and vocalisations. The
+history of speech synthesis stresses the mundane, the military and the
+spectacular, commencing with Van Kempelen's 18th centuty rubber
+squeaking or speaking machine. The basic principle of simulating the
+vocal tract through electronic and physical means was submitted to the
+military demands of compression and encryption, segmenting out parts
+of the speech process and reducing redundancy. In the process
+communication becomes the business of circuit-bent human-worms,
+opening human and animal speech to the cut-up, to stammerings,
+stutterings and tics; to an extra-human, outer-word terrain of numbers
+burrowed and nibbled by the earth worms. ERD/WORM feasts on this
+electronic legacy.
+
+
+
+
+

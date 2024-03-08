@@ -1,0 +1,33 @@
+* black on gold edition with extra vocabs/maybe
+
+** where we can fit these vocab banks in - what is spare?
+
+there are 67 banks in first modes...
+
+- what modes use the full sets of banks?
+
+those which make use of newsay and newsay_lowbit
+
+- and how we could squeeze in more? across lowbits // assess lowbits mode...
+
+- vocabs are of different lengths but we need to keep identity of vocabs
+
+// TODO: test extents - how many banks we can fit in?
+
+** how we access these and know if we don't include them
+
+- using own tools like lpcread and lpcsay (re-acquaint - wierd values in lpcread but should be fine)
+
+- using ti_lpc which seems to guess locations well eg. for speak/math cd2392.vsm 
+
+** other options
+
+- bends of tables such as chirp for vocabs...
+
+- what we work towards in raven from WORM/TMS5xxx and others...?
+
+** is this the correct codebase or move to revival
+
+** programming header again...
+
+** new TMS encodings
