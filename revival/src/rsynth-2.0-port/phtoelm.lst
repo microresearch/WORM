@@ -1,0 +1,1569 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.eabi_attribute 27, 3
+   4              		.eabi_attribute 28, 1
+   5              		.fpu fpv4-sp-d16
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 4
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.thumb
+  16              		.file	"phtoelm.c"
+  17              		.text
+  18              	.Ltext0:
+  19              		.cfi_sections	.debug_frame
+  20              		.section	.text.enter,"ax",%progbits
+  21              		.align	1
+  22              		.thumb
+  23              		.thumb_func
+  25              	enter:
+  26              	.LFB115:
+  27              		.file 1 "lib/rsynth-2.0-port/phtoelm.c"
+   1:lib/rsynth-2.0-port/phtoelm.c **** #include <config.h>
+   2:lib/rsynth-2.0-port/phtoelm.c **** 
+   3:lib/rsynth-2.0-port/phtoelm.c **** /* phtoelm.c
+   4:lib/rsynth-2.0-port/phtoelm.c ****  */
+   5:lib/rsynth-2.0-port/phtoelm.c **** 
+   6:lib/rsynth-2.0-port/phtoelm.c **** #include "stm32f4xx.h"
+   7:lib/rsynth-2.0-port/phtoelm.c **** #include "platform_config.h"
+   8:lib/rsynth-2.0-port/phtoelm.c **** #include "hw_config.h"
+   9:lib/rsynth-2.0-port/phtoelm.c **** 
+  10:lib/rsynth-2.0-port/phtoelm.c **** #include <stdio.h>
+  11:lib/rsynth-2.0-port/phtoelm.c **** #include <ctype.h>
+  12:lib/rsynth-2.0-port/phtoelm.c **** #include <stdarg.h>
+  13:lib/rsynth-2.0-port/phtoelm.c **** #include <useconfig.h>
+  14:lib/rsynth-2.0-port/phtoelm.c **** #include <string.h>
+  15:lib/rsynth-2.0-port/phtoelm.c **** #include "elements.h"
+  16:lib/rsynth-2.0-port/phtoelm.c **** #include "phfeat.h"
+  17:lib/rsynth-2.0-port/phtoelm.c **** #include "darray.h"
+  18:lib/rsynth-2.0-port/phtoelm.c **** #include "trie.h"
+  19:lib/rsynth-2.0-port/phtoelm.c **** #include "phtoelm.h"
+  20:lib/rsynth-2.0-port/phtoelm.c **** //#include "hplay.h"
+  21:lib/rsynth-2.0-port/phtoelm.c **** #include "holmes.h"
+  22:lib/rsynth-2.0-port/phtoelm.c **** #include "nsynth.h"
+  23:lib/rsynth-2.0-port/phtoelm.c **** 
+  24:lib/rsynth-2.0-port/phtoelm.c **** 
+  25:lib/rsynth-2.0-port/phtoelm.c **** 
+  26:lib/rsynth-2.0-port/phtoelm.c **** trie_ptr phtoelm = NULL;
+  27:lib/rsynth-2.0-port/phtoelm.c **** 
+  28:lib/rsynth-2.0-port/phtoelm.c **** static Elm_ptr find_elm (char *s);
+  29:lib/rsynth-2.0-port/phtoelm.c **** 
+  30:lib/rsynth-2.0-port/phtoelm.c **** static Elm_ptr find_elm(char *s)
+  31:lib/rsynth-2.0-port/phtoelm.c **** {
+  32:lib/rsynth-2.0-port/phtoelm.c **** 	Elm_ptr e = Elements;
+  33:lib/rsynth-2.0-port/phtoelm.c **** 	while (e < Elements + num_Elements)
+  34:lib/rsynth-2.0-port/phtoelm.c **** 	{
+  35:lib/rsynth-2.0-port/phtoelm.c **** 		if (!strcmp(s, e->name))
+  36:lib/rsynth-2.0-port/phtoelm.c **** 		{
+  37:lib/rsynth-2.0-port/phtoelm.c **** 			return e;
+  38:lib/rsynth-2.0-port/phtoelm.c **** 		}
+  39:lib/rsynth-2.0-port/phtoelm.c **** 		e++;
+  40:lib/rsynth-2.0-port/phtoelm.c **** 	}
+  41:lib/rsynth-2.0-port/phtoelm.c **** 	return NULL;
+  42:lib/rsynth-2.0-port/phtoelm.c **** }
+  43:lib/rsynth-2.0-port/phtoelm.c **** 
+  44:lib/rsynth-2.0-port/phtoelm.c **** static void enter(char *p,...)
+  45:lib/rsynth-2.0-port/phtoelm.c **** {
+  28              		.loc 1 45 0
+  29              		.cfi_startproc
+  30              		@ args = 4, pretend = 16, frame = 24
+  31              		@ frame_needed = 0, uses_anonymous_args = 1
+  32              	.LVL0:
+  33 0000 0FB4     		push	{r0, r1, r2, r3}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 16
+  36              		.cfi_offset 0, -16
+  37              		.cfi_offset 1, -12
+  38              		.cfi_offset 2, -8
+  39              		.cfi_offset 3, -4
+  40 0002 2DE9F046 		push	{r4, r5, r6, r7, r9, sl, lr}
+  41              	.LCFI1:
+  42              		.cfi_def_cfa_offset 44
+  43              		.cfi_offset 4, -44
+  44              		.cfi_offset 5, -40
+  45              		.cfi_offset 6, -36
+  46              		.cfi_offset 7, -32
+  47              		.cfi_offset 9, -28
+  48              		.cfi_offset 10, -24
+  49              		.cfi_offset 14, -20
+  50 0006 87B0     		sub	sp, sp, #28
+  51              	.LCFI2:
+  52              		.cfi_def_cfa_offset 72
+  53 0008 0EAB     		add	r3, sp, #56
+  54 000a 53F8042B 		ldr	r2, [r3], #4
+  55              	.LVL1:
+  46:lib/rsynth-2.0-port/phtoelm.c **** 	va_list ap;
+  47:lib/rsynth-2.0-port/phtoelm.c **** 	
+  48:lib/rsynth-2.0-port/phtoelm.c **** 	char *s;
+  49:lib/rsynth-2.0-port/phtoelm.c **** 	char buf[20];
+  50:lib/rsynth-2.0-port/phtoelm.c **** 	char *x = buf + 1;
+  51:lib/rsynth-2.0-port/phtoelm.c **** 	
+  52:lib/rsynth-2.0-port/phtoelm.c **** 	va_start(ap, p);
+  56              		.loc 1 52 0
+  57 000e 0093     		str	r3, [sp, #0]
+  50:lib/rsynth-2.0-port/phtoelm.c **** 	char *x = buf + 1;
+  58              		.loc 1 50 0
+  59 0010 0DF10505 		add	r5, sp, #5
+  60              	.LVL2:
+  61              	.LBB5:
+  53:lib/rsynth-2.0-port/phtoelm.c **** 	
+  54:lib/rsynth-2.0-port/phtoelm.c **** 	//printf("-- p %s\n", p);
+  55:lib/rsynth-2.0-port/phtoelm.c **** 	
+  56:lib/rsynth-2.0-port/phtoelm.c **** 	//while ((s = va_arg(ap, char *)))
+  57:lib/rsynth-2.0-port/phtoelm.c **** 	while (1)
+  58:lib/rsynth-2.0-port/phtoelm.c **** 	{
+  59:lib/rsynth-2.0-port/phtoelm.c **** 		s = va_arg(ap, char *);
+  60:lib/rsynth-2.0-port/phtoelm.c **** 		if(s==NULL) break;
+  62              		.loc 1 60 0
+  63 0014 264E     		ldr	r6, .L15
+  64              	.LBB6:
+  65              	.LBB7:
+  33:lib/rsynth-2.0-port/phtoelm.c **** 	while (e < Elements + num_Elements)
+  66              		.loc 1 33 0
+  67 0016 DFF8B090 		ldr	r9, .L15+24
+  68              	.L14:
+  69              	.LBE7:
+  70              	.LBE6:
+  59:lib/rsynth-2.0-port/phtoelm.c **** 		s = va_arg(ap, char *);
+  71              		.loc 1 59 0
+  72 001a 009B     		ldr	r3, [sp, #0]
+  73 001c 1A1D     		adds	r2, r3, #4
+  74 001e 0092     		str	r2, [sp, #0]
+  75 0020 1F68     		ldr	r7, [r3, #0]
+  76              	.LVL3:
+  77              		.loc 1 60 0
+  78 0022 0FB3     		cbz	r7, .L3
+  79 0024 224C     		ldr	r4, .L15
+  80              	.LBB9:
+  81              	.LBB8:
+  33:lib/rsynth-2.0-port/phtoelm.c **** 	while (e < Elements + num_Elements)
+  82              		.loc 1 33 0
+  83 0026 4FF0F80A 		mov	sl, #248
+  84 002a 05E0     		b	.L4
+  85              	.LVL4:
+  86              	.L6:
+  35:lib/rsynth-2.0-port/phtoelm.c **** 		if (!strcmp(s, e->name))
+  87              		.loc 1 35 0
+  88 002c 3846     		mov	r0, r7
+  89 002e 2168     		ldr	r1, [r4, #0]
+  90 0030 FFF7FEFF 		bl	strcmp
+  91              	.LVL5:
+  92 0034 38B1     		cbz	r0, .L5
+  39:lib/rsynth-2.0-port/phtoelm.c **** 		e++;
+  93              		.loc 1 39 0
+  94 0036 F834     		adds	r4, r4, #248
+  95              	.LVL6:
+  96              	.L4:
+  33:lib/rsynth-2.0-port/phtoelm.c **** 	while (e < Elements + num_Elements)
+  97              		.loc 1 33 0
+  98 0038 D9F80030 		ldr	r3, [r9, #0]
+  99 003c 0AFB0363 		mla	r3, sl, r3, r6
+ 100 0040 9C42     		cmp	r4, r3
+ 101 0042 F3D3     		bcc	.L6
+ 102 0044 08E0     		b	.L7
+ 103              	.L5:
+ 104              	.LBE8:
+ 105              	.LBE9:
+  61:lib/rsynth-2.0-port/phtoelm.c **** 		//printf("-- va_arg %s\n", s);
+  62:lib/rsynth-2.0-port/phtoelm.c **** 		
+  63:lib/rsynth-2.0-port/phtoelm.c **** 		Elm_ptr e = find_elm(s);
+  64:lib/rsynth-2.0-port/phtoelm.c **** 		if (e)
+ 106              		.loc 1 64 0
+ 107 0046 3CB1     		cbz	r4, .L7
+  65:lib/rsynth-2.0-port/phtoelm.c **** 		{
+  66:lib/rsynth-2.0-port/phtoelm.c **** 			//printf("---- Find %s\n", s);
+  67:lib/rsynth-2.0-port/phtoelm.c **** 			
+  68:lib/rsynth-2.0-port/phtoelm.c **** 			*x++ = (e - Elements);
+ 108              		.loc 1 68 0
+ 109 0048 194B     		ldr	r3, .L15
+ 110 004a E41A     		subs	r4, r4, r3
+ 111              	.LVL7:
+ 112 004c E410     		asrs	r4, r4, #3
+ 113              	.LVL8:
+ 114 004e 194B     		ldr	r3, .L15+4
+ 115 0050 5C43     		muls	r4, r3, r4
+ 116 0052 05F8014B 		strb	r4, [r5], #1
+ 117              	.LVL9:
+ 118 0056 E0E7     		b	.L14
+ 119              	.LVL10:
+ 120              	.L7:
+  69:lib/rsynth-2.0-port/phtoelm.c **** 		}
+  70:lib/rsynth-2.0-port/phtoelm.c **** 		else
+  71:lib/rsynth-2.0-port/phtoelm.c **** 		{
+  72:lib/rsynth-2.0-port/phtoelm.c **** 			fprintf(stderr, "Cannot find %s\n", s);
+ 121              		.loc 1 72 0
+ 122 0058 174B     		ldr	r3, .L15+8
+ 123 005a 1B68     		ldr	r3, [r3, #0]
+ 124 005c D868     		ldr	r0, [r3, #12]
+ 125 005e 1749     		ldr	r1, .L15+12
+ 126 0060 3A46     		mov	r2, r7
+ 127 0062 FFF7FEFF 		bl	fprintf
+ 128              	.LVL11:
+ 129 0066 D8E7     		b	.L14
+ 130              	.LVL12:
+ 131              	.L3:
+ 132              	.LBE5:
+  73:lib/rsynth-2.0-port/phtoelm.c **** 		}
+  74:lib/rsynth-2.0-port/phtoelm.c **** 	}
+  75:lib/rsynth-2.0-port/phtoelm.c **** 	va_end(ap);
+  76:lib/rsynth-2.0-port/phtoelm.c **** 	buf[0] = (x - buf) - 1;
+ 133              		.loc 1 76 0
+ 134 0068 01AF     		add	r7, sp, #4
+ 135              	.LVL13:
+ 136 006a ED1B     		subs	r5, r5, r7
+ 137              	.LVL14:
+ 138 006c 013D     		subs	r5, r5, #1
+ 139 006e EDB2     		uxtb	r5, r5
+ 140 0070 8DF80450 		strb	r5, [sp, #4]
+  77:lib/rsynth-2.0-port/phtoelm.c **** 	x = malloc(buf[0] + 1);
+ 141              		.loc 1 77 0
+ 142 0074 68B2     		sxtb	r0, r5
+ 143 0076 0130     		adds	r0, r0, #1
+ 144 0078 FFF7FEFF 		bl	malloc
+ 145              	.LVL15:
+  78:lib/rsynth-2.0-port/phtoelm.c **** 	if(x){
+ 146              		.loc 1 78 0
+ 147 007c 0446     		mov	r4, r0
+ 148 007e 60B1     		cbz	r0, .L9
+  79:lib/rsynth-2.0-port/phtoelm.c **** 		memcpy(x, buf, buf[0] + 1);
+ 149              		.loc 1 79 0
+ 150 0080 9DF90420 		ldrsb	r2, [sp, #4]
+ 151 0084 3846     		mov	r0, r7
+ 152              	.LVL16:
+ 153 0086 2146     		mov	r1, r4
+ 154 0088 0132     		adds	r2, r2, #1
+ 155 008a FFF7FEFF 		bl	bcopy
+ 156              	.LVL17:
+  80:lib/rsynth-2.0-port/phtoelm.c **** 		trie_insert(&phtoelm, p, x);
+ 157              		.loc 1 80 0
+ 158 008e 0C48     		ldr	r0, .L15+16
+ 159 0090 0E99     		ldr	r1, [sp, #56]
+ 160 0092 2246     		mov	r2, r4
+ 161 0094 FFF7FEFF 		bl	trie_insert
+ 162              	.LVL18:
+ 163 0098 05E0     		b	.L1
+ 164              	.LVL19:
+ 165              	.L9:
+  81:lib/rsynth-2.0-port/phtoelm.c **** 	}else{
+  82:lib/rsynth-2.0-port/phtoelm.c **** 		fprintf(stderr, "memory shortage (enter)\n");
+ 166              		.loc 1 82 0
+ 167 009a 074B     		ldr	r3, .L15+8
+ 168 009c 1B68     		ldr	r3, [r3, #0]
+ 169 009e D868     		ldr	r0, [r3, #12]
+ 170              	.LVL20:
+ 171 00a0 0849     		ldr	r1, .L15+20
+ 172 00a2 FFF7FEFF 		bl	fprintf
+ 173              	.LVL21:
+ 174              	.L1:
+  83:lib/rsynth-2.0-port/phtoelm.c **** 	}
+  84:lib/rsynth-2.0-port/phtoelm.c **** }
+ 175              		.loc 1 84 0
+ 176 00a6 07B0     		add	sp, sp, #28
+ 177 00a8 BDE8F046 		pop	{r4, r5, r6, r7, r9, sl, lr}
+ 178 00ac 04B0     		add	sp, sp, #16
+ 179 00ae 7047     		bx	lr
+ 180              	.L16:
+ 181              		.align	2
+ 182              	.L15:
+ 183 00b0 00000000 		.word	Elements
+ 184 00b4 DF7BEFBD 		.word	-1108378657
+ 185 00b8 00000000 		.word	_impure_ptr
+ 186 00bc 00000000 		.word	.LC0
+ 187 00c0 00000000 		.word	.LANCHOR0
+ 188 00c4 10000000 		.word	.LC1
+ 189 00c8 00000000 		.word	num_Elements
+ 190              		.cfi_endproc
+ 191              	.LFE115:
+ 193              		.section	.text.phone_append,"ax",%progbits
+ 194              		.align	1
+ 195              		.global	phone_append
+ 196              		.thumb
+ 197              		.thumb_func
+ 199              	phone_append:
+ 200              	.LFB117:
+  85:lib/rsynth-2.0-port/phtoelm.c **** 
+  86:lib/rsynth-2.0-port/phtoelm.c **** static void enter_phonemes (void)
+  87:lib/rsynth-2.0-port/phtoelm.c **** {
+  88:lib/rsynth-2.0-port/phtoelm.c **** 	#include "phtoelm.def"
+  89:lib/rsynth-2.0-port/phtoelm.c **** }
+  90:lib/rsynth-2.0-port/phtoelm.c **** 
+  91:lib/rsynth-2.0-port/phtoelm.c **** int phone_append(darray_ptr p, int ch)
+  92:lib/rsynth-2.0-port/phtoelm.c **** {
+ 201              		.loc 1 92 0
+ 202              		.cfi_startproc
+ 203              		@ args = 0, pretend = 0, frame = 0
+ 204              		@ frame_needed = 0, uses_anonymous_args = 0
+ 205              	.LVL22:
+ 206 0000 10B5     		push	{r4, lr}
+ 207              	.LCFI3:
+ 208              		.cfi_def_cfa_offset 8
+ 209              		.cfi_offset 4, -8
+ 210              		.cfi_offset 14, -4
+ 211 0002 0C46     		mov	r4, r1
+ 212              	.LVL23:
+ 213              	.LBB12:
+ 214              	.LBB13:
+ 215              		.file 2 "lib/rsynth-2.0-port/darray.h"
+   1:lib/rsynth-2.0-port/darray.h **** /* darray.h
+   2:lib/rsynth-2.0-port/darray.h **** */
+   3:lib/rsynth-2.0-port/darray.h **** #if !defined(DARRAY_H)
+   4:lib/rsynth-2.0-port/darray.h **** #define DARRAY_H
+   5:lib/rsynth-2.0-port/darray.h **** typedef struct
+   6:lib/rsynth-2.0-port/darray.h ****  {char     *data;          /* the items */
+   7:lib/rsynth-2.0-port/darray.h ****   unsigned items;          /* number of slots used */
+   8:lib/rsynth-2.0-port/darray.h ****   unsigned alloc;          /* number of slots allocated */
+   9:lib/rsynth-2.0-port/darray.h ****   unsigned short esize;    /* size of items */
+  10:lib/rsynth-2.0-port/darray.h ****   unsigned short get;      /* number to get */
+  11:lib/rsynth-2.0-port/darray.h ****  } darray_t, *darray_ptr;
+  12:lib/rsynth-2.0-port/darray.h **** 
+  13:lib/rsynth-2.0-port/darray.h **** /* return pointer to nth item */
+  14:lib/rsynth-2.0-port/darray.h **** extern void *Darray_find (darray_t *a,unsigned n);
+  15:lib/rsynth-2.0-port/darray.h **** /* delete nth item */
+  16:lib/rsynth-2.0-port/darray.h **** extern int darray_delete (darray_t *a,unsigned n);
+  17:lib/rsynth-2.0-port/darray.h **** extern void darray_free  (darray_t *a);
+  18:lib/rsynth-2.0-port/darray.h **** 
+  19:lib/rsynth-2.0-port/darray.h **** static inline void darray_init(darray_t *a,unsigned size,unsigned get)
+  20:lib/rsynth-2.0-port/darray.h **** {
+  21:lib/rsynth-2.0-port/darray.h ****  a->esize = size;
+  22:lib/rsynth-2.0-port/darray.h ****  a->get   = get;
+  23:lib/rsynth-2.0-port/darray.h ****  a->items = a->alloc = 0;
+  24:lib/rsynth-2.0-port/darray.h ****  a->data = NULL;
+  25:lib/rsynth-2.0-port/darray.h **** }
+  26:lib/rsynth-2.0-port/darray.h **** 
+  27:lib/rsynth-2.0-port/darray.h **** static inline void *darray_find(darray_t *a,unsigned n)
+  28:lib/rsynth-2.0-port/darray.h **** {
+  29:lib/rsynth-2.0-port/darray.h ****  if (n < a->alloc && n < a->items)
+  30:lib/rsynth-2.0-port/darray.h ****   return (void *) (a->data + n * a->esize);
+  31:lib/rsynth-2.0-port/darray.h ****  return Darray_find(a,n);
+ 216              		.loc 2 31 0
+ 217 0004 4168     		ldr	r1, [r0, #4]
+ 218              	.LVL24:
+ 219 0006 FFF7FEFF 		bl	Darray_find
+ 220              	.LVL25:
+ 221              	.LBE13:
+ 222              	.LBE12:
+  93:lib/rsynth-2.0-port/phtoelm.c **** 	char *s = (char *) darray_find(p, p->items);
+  94:lib/rsynth-2.0-port/phtoelm.c **** 	*s = ch;
+ 223              		.loc 1 94 0
+ 224 000a 0470     		strb	r4, [r0, #0]
+  95:lib/rsynth-2.0-port/phtoelm.c **** 	return ch;
+  96:lib/rsynth-2.0-port/phtoelm.c **** }
+ 225              		.loc 1 96 0
+ 226 000c 2046     		mov	r0, r4
+ 227 000e 10BD     		pop	{r4, pc}
+ 228              		.cfi_endproc
+ 229              	.LFE117:
+ 231              		.section	.text.phone_to_elm,"ax",%progbits
+ 232              		.align	1
+ 233              		.global	phone_to_elm
+ 234              		.thumb
+ 235              		.thumb_func
+ 237              	phone_to_elm:
+ 238              	.LFB118:
+  97:lib/rsynth-2.0-port/phtoelm.c **** 
+  98:lib/rsynth-2.0-port/phtoelm.c **** //yama #if 0
+  99:lib/rsynth-2.0-port/phtoelm.c **** #if 1
+ 100:lib/rsynth-2.0-port/phtoelm.c **** #define StressDur(e,s) ((e->ud + (e->du - e->ud) * s / 3)*speed)
+ 101:lib/rsynth-2.0-port/phtoelm.c **** #else
+ 102:lib/rsynth-2.0-port/phtoelm.c **** #define StressDur(e,s) (s,((e->du + e->ud)/2)*speed)
+ 103:lib/rsynth-2.0-port/phtoelm.c **** #endif
+ 104:lib/rsynth-2.0-port/phtoelm.c **** 
+ 105:lib/rsynth-2.0-port/phtoelm.c **** unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
+ 106:lib/rsynth-2.0-port/phtoelm.c **** {
+ 239              		.loc 1 106 0
+ 240              		.cfi_startproc
+ 241              		@ args = 0, pretend = 0, frame = 16
+ 242              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243              	.LVL26:
+ 244 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 245              	.LCFI4:
+ 246              		.cfi_def_cfa_offset 36
+ 247              		.cfi_offset 4, -36
+ 248              		.cfi_offset 5, -32
+ 249              		.cfi_offset 6, -28
+ 250              		.cfi_offset 7, -24
+ 251              		.cfi_offset 8, -20
+ 252              		.cfi_offset 9, -16
+ 253              		.cfi_offset 10, -12
+ 254              		.cfi_offset 11, -8
+ 255              		.cfi_offset 14, -4
+ 256 0004 87B0     		sub	sp, sp, #28
+ 257              	.LCFI5:
+ 258              		.cfi_def_cfa_offset 64
+ 259 0006 0646     		mov	r6, r0
+ 260 0008 8846     		mov	r8, r1
+ 261 000a 1746     		mov	r7, r2
+ 262              	.LVL27:
+ 107:lib/rsynth-2.0-port/phtoelm.c **** 	int stress = 0;
+ 108:lib/rsynth-2.0-port/phtoelm.c **** 	char *s = phone;
+ 263              		.loc 1 108 0
+ 264 000c 0590     		str	r0, [sp, #20]
+ 265              	.LVL28:
+ 109:lib/rsynth-2.0-port/phtoelm.c **** 	unsigned t = 0;
+ 110:lib/rsynth-2.0-port/phtoelm.c **** 	char *limit = s + n;
+ 266              		.loc 1 110 0
+ 267 000e 00EB0109 		add	r9, r0, r1
+ 268              	.LVL29:
+ 111:lib/rsynth-2.0-port/phtoelm.c **** 	
+ 112:lib/rsynth-2.0-port/phtoelm.c **** 	
+ 113:lib/rsynth-2.0-port/phtoelm.c **** 	if (!phtoelm)
+ 269              		.loc 1 113 0
+ 270 0012 9A4B     		ldr	r3, .L40
+ 271 0014 1C68     		ldr	r4, [r3, #0]
+ 272 0016 002C     		cmp	r4, #0
+ 273 0018 40F02982 		bne	.L19
+ 274              	.LBB20:
+ 275              	.LBB21:
+ 276              		.file 3 "lib/rsynth-2.0-port/phtoelm.def"
+   1:lib/rsynth-2.0-port/phtoelm.def **** /* $Id: phtoelm.def,v 1.13 1994/11/08 13:30:50 a904209 Exp a904209 $
+   2:lib/rsynth-2.0-port/phtoelm.def **** */
+   3:lib/rsynth-2.0-port/phtoelm.def **** 
+   4:lib/rsynth-2.0-port/phtoelm.def **** //////////////////////////////
+   5:lib/rsynth-2.0-port/phtoelm.def **** // YEES		2011/11/28		// 
+   6:lib/rsynth-2.0-port/phtoelm.def **** //////////////////////////////
+   7:lib/rsynth-2.0-port/phtoelm.def **** 
+   8:lib/rsynth-2.0-port/phtoelm.def **** enter(" ","Q",NULL);
+ 277              		.loc 3 8 0
+ 278 001c 9848     		ldr	r0, .L40+4
+ 279              	.LVL30:
+ 280 001e 9949     		ldr	r1, .L40+8
+ 281              	.LVL31:
+ 282 0020 2246     		mov	r2, r4
+ 283              	.LVL32:
+ 284 0022 FFF7FEFF 		bl	enter
+ 285              	.LVL33:
+   9:lib/rsynth-2.0-port/phtoelm.def **** enter("p","P","PY","PZ",NULL);
+ 286              		.loc 3 9 0
+ 287 0026 0094     		str	r4, [sp, #0]
+ 288 0028 9748     		ldr	r0, .L40+12
+ 289 002a 9849     		ldr	r1, .L40+16
+ 290 002c 984A     		ldr	r2, .L40+20
+ 291 002e 994B     		ldr	r3, .L40+24
+ 292 0030 FFF7FEFF 		bl	enter
+ 293              	.LVL34:
+  10:lib/rsynth-2.0-port/phtoelm.def **** enter("t","T","TY","TZ",NULL);
+ 294              		.loc 3 10 0
+ 295 0034 0094     		str	r4, [sp, #0]
+ 296 0036 9848     		ldr	r0, .L40+28
+ 297 0038 9849     		ldr	r1, .L40+32
+ 298 003a 994A     		ldr	r2, .L40+36
+ 299 003c 994B     		ldr	r3, .L40+40
+ 300 003e FFF7FEFF 		bl	enter
+ 301              	.LVL35:
+  11:lib/rsynth-2.0-port/phtoelm.def **** enter("k","K","KY","KZ",NULL);
+ 302              		.loc 3 11 0
+ 303 0042 0094     		str	r4, [sp, #0]
+ 304 0044 9848     		ldr	r0, .L40+44
+ 305 0046 9949     		ldr	r1, .L40+48
+ 306 0048 994A     		ldr	r2, .L40+52
+ 307 004a 9A4B     		ldr	r3, .L40+56
+ 308 004c FFF7FEFF 		bl	enter
+ 309              	.LVL36:
+  12:lib/rsynth-2.0-port/phtoelm.def **** enter("b","B","BY","BZ",NULL);
+ 310              		.loc 3 12 0
+ 311 0050 0094     		str	r4, [sp, #0]
+ 312 0052 9948     		ldr	r0, .L40+60
+ 313 0054 9949     		ldr	r1, .L40+64
+ 314 0056 9A4A     		ldr	r2, .L40+68
+ 315 0058 9A4B     		ldr	r3, .L40+72
+ 316 005a FFF7FEFF 		bl	enter
+ 317              	.LVL37:
+  13:lib/rsynth-2.0-port/phtoelm.def **** enter("d","D","DY","DZ",NULL);
+ 318              		.loc 3 13 0
+ 319 005e 0094     		str	r4, [sp, #0]
+ 320 0060 9948     		ldr	r0, .L40+76
+ 321 0062 9A49     		ldr	r1, .L40+80
+ 322 0064 9A4A     		ldr	r2, .L40+84
+ 323 0066 9B4B     		ldr	r3, .L40+88
+ 324 0068 FFF7FEFF 		bl	enter
+ 325              	.LVL38:
+  14:lib/rsynth-2.0-port/phtoelm.def **** enter("g","G","GY","GZ",NULL);
+ 326              		.loc 3 14 0
+ 327 006c 0094     		str	r4, [sp, #0]
+ 328 006e 9A48     		ldr	r0, .L40+92
+ 329 0070 9A49     		ldr	r1, .L40+96
+ 330 0072 9B4A     		ldr	r2, .L40+100
+ 331 0074 9B4B     		ldr	r3, .L40+104
+ 332 0076 FFF7FEFF 		bl	enter
+ 333              	.LVL39:
+  15:lib/rsynth-2.0-port/phtoelm.def **** enter("m","M",NULL);
+ 334              		.loc 3 15 0
+ 335 007a 9B48     		ldr	r0, .L40+108
+ 336 007c 9B49     		ldr	r1, .L40+112
+ 337 007e 2246     		mov	r2, r4
+ 338 0080 FFF7FEFF 		bl	enter
+ 339              	.LVL40:
+  16:lib/rsynth-2.0-port/phtoelm.def **** enter("n","N",NULL);
+ 340              		.loc 3 16 0
+ 341 0084 9A48     		ldr	r0, .L40+116
+ 342 0086 9B49     		ldr	r1, .L40+120
+ 343 0088 2246     		mov	r2, r4
+ 344 008a FFF7FEFF 		bl	enter
+ 345              	.LVL41:
+  17:lib/rsynth-2.0-port/phtoelm.def **** enter("N","NG",NULL);
+ 346              		.loc 3 17 0
+ 347 008e 9948     		ldr	r0, .L40+120
+ 348 0090 9949     		ldr	r1, .L40+124
+ 349 0092 2246     		mov	r2, r4
+ 350 0094 FFF7FEFF 		bl	enter
+ 351              	.LVL42:
+  18:lib/rsynth-2.0-port/phtoelm.def **** enter("f","F",NULL);
+ 352              		.loc 3 18 0
+ 353 0098 9848     		ldr	r0, .L40+128
+ 354 009a 9949     		ldr	r1, .L40+132
+ 355 009c 2246     		mov	r2, r4
+ 356 009e FFF7FEFF 		bl	enter
+ 357              	.LVL43:
+  19:lib/rsynth-2.0-port/phtoelm.def **** enter("T","TH",NULL);
+ 358              		.loc 3 19 0
+ 359 00a2 7E48     		ldr	r0, .L40+32
+ 360 00a4 9749     		ldr	r1, .L40+136
+ 361 00a6 2246     		mov	r2, r4
+ 362 00a8 FFF7FEFF 		bl	enter
+ 363              	.LVL44:
+  20:lib/rsynth-2.0-port/phtoelm.def **** enter("s","S",NULL);
+ 364              		.loc 3 20 0
+ 365 00ac 9648     		ldr	r0, .L40+140
+ 366 00ae 9749     		ldr	r1, .L40+144
+ 367 00b0 2246     		mov	r2, r4
+ 368 00b2 FFF7FEFF 		bl	enter
+ 369              	.LVL45:
+  21:lib/rsynth-2.0-port/phtoelm.def **** enter("S","SH",NULL);
+ 370              		.loc 3 21 0
+ 371 00b6 9548     		ldr	r0, .L40+144
+ 372 00b8 9549     		ldr	r1, .L40+148
+ 373 00ba 2246     		mov	r2, r4
+ 374 00bc FFF7FEFF 		bl	enter
+ 375              	.LVL46:
+  22:lib/rsynth-2.0-port/phtoelm.def **** enter("h","H",NULL);
+ 376              		.loc 3 22 0
+ 377 00c0 9448     		ldr	r0, .L40+152
+ 378 00c2 9549     		ldr	r1, .L40+156
+ 379 00c4 2246     		mov	r2, r4
+ 380 00c6 FFF7FEFF 		bl	enter
+ 381              	.LVL47:
+  23:lib/rsynth-2.0-port/phtoelm.def **** enter("H","H",NULL);
+ 382              		.loc 3 23 0
+ 383 00ca 9348     		ldr	r0, .L40+156
+ 384 00cc 0146     		mov	r1, r0
+ 385 00ce 2246     		mov	r2, r4
+ 386 00d0 FFF7FEFF 		bl	enter
+ 387              	.LVL48:
+  24:lib/rsynth-2.0-port/phtoelm.def **** enter("v","V","QQ","V",NULL);
+ 388              		.loc 3 24 0
+ 389 00d4 0094     		str	r4, [sp, #0]
+ 390 00d6 9148     		ldr	r0, .L40+160
+ 391 00d8 9149     		ldr	r1, .L40+164
+ 392 00da 924A     		ldr	r2, .L40+168
+ 393 00dc 0B46     		mov	r3, r1
+ 394 00de FFF7FEFF 		bl	enter
+ 395              	.LVL49:
+  25:lib/rsynth-2.0-port/phtoelm.def **** enter("D","DH","QQ","DI",NULL);
+ 396              		.loc 3 25 0
+ 397 00e2 0094     		str	r4, [sp, #0]
+ 398 00e4 7948     		ldr	r0, .L40+80
+ 399 00e6 9049     		ldr	r1, .L40+172
+ 400 00e8 8E4A     		ldr	r2, .L40+168
+ 401 00ea 904B     		ldr	r3, .L40+176
+ 402 00ec FFF7FEFF 		bl	enter
+ 403              	.LVL50:
+  26:lib/rsynth-2.0-port/phtoelm.def **** enter("z","Z","QQ","ZZ",NULL);
+ 404              		.loc 3 26 0
+ 405 00f0 0094     		str	r4, [sp, #0]
+ 406 00f2 8F48     		ldr	r0, .L40+180
+ 407 00f4 8F49     		ldr	r1, .L40+184
+ 408 00f6 8B4A     		ldr	r2, .L40+168
+ 409 00f8 8F4B     		ldr	r3, .L40+188
+ 410 00fa FFF7FEFF 		bl	enter
+ 411              	.LVL51:
+  27:lib/rsynth-2.0-port/phtoelm.def **** enter("Z","ZH","QQ","ZH",NULL);
+ 412              		.loc 3 27 0
+ 413 00fe 0094     		str	r4, [sp, #0]
+ 414 0100 8C48     		ldr	r0, .L40+184
+ 415 0102 8E49     		ldr	r1, .L40+192
+ 416 0104 874A     		ldr	r2, .L40+168
+ 417 0106 0B46     		mov	r3, r1
+ 418 0108 FFF7FEFF 		bl	enter
+ 419              	.LVL52:
+  28:lib/rsynth-2.0-port/phtoelm.def **** enter("tS","CH","CI",NULL);
+ 420              		.loc 3 28 0
+ 421 010c 8C48     		ldr	r0, .L40+196
+ 422 010e 8D49     		ldr	r1, .L40+200
+ 423 0110 8D4A     		ldr	r2, .L40+204
+ 424 0112 2346     		mov	r3, r4
+ 425 0114 FFF7FEFF 		bl	enter
+ 426              	.LVL53:
+  29:lib/rsynth-2.0-port/phtoelm.def **** enter("CH","CH","CI",NULL);
+ 427              		.loc 3 29 0
+ 428 0118 8A48     		ldr	r0, .L40+200
+ 429 011a 0146     		mov	r1, r0
+ 430 011c 8A4A     		ldr	r2, .L40+204
+ 431 011e 2346     		mov	r3, r4
+ 432 0120 FFF7FEFF 		bl	enter
+ 433              	.LVL54:
+  30:lib/rsynth-2.0-port/phtoelm.def **** enter("dZ","J","JY","QQ","JY",NULL);
+ 434              		.loc 3 30 0
+ 435 0124 894D     		ldr	r5, .L40+208
+ 436 0126 0095     		str	r5, [sp, #0]
+ 437 0128 0194     		str	r4, [sp, #4]
+ 438 012a 8948     		ldr	r0, .L40+212
+ 439 012c 8949     		ldr	r1, .L40+216
+ 440 012e 2A46     		mov	r2, r5
+ 441 0130 7C4B     		ldr	r3, .L40+168
+ 442 0132 FFF7FEFF 		bl	enter
+ 443              	.LVL55:
+  31:lib/rsynth-2.0-port/phtoelm.def **** enter("j","J","JY","QQ","JY",NULL);
+ 444              		.loc 3 31 0
+ 445 0136 0095     		str	r5, [sp, #0]
+ 446 0138 0194     		str	r4, [sp, #4]
+ 447 013a 8748     		ldr	r0, .L40+220
+ 448 013c 8549     		ldr	r1, .L40+216
+ 449 013e 2A46     		mov	r2, r5
+ 450 0140 784B     		ldr	r3, .L40+168
+ 451 0142 FFF7FEFF 		bl	enter
+ 452              	.LVL56:
+  32:lib/rsynth-2.0-port/phtoelm.def **** enter("l","L",NULL);
+ 453              		.loc 3 32 0
+ 454 0146 8548     		ldr	r0, .L40+224
+ 455 0148 8549     		ldr	r1, .L40+228
+ 456 014a 2246     		mov	r2, r4
+ 457 014c FFF7FEFF 		bl	enter
+ 458              	.LVL57:
+  33:lib/rsynth-2.0-port/phtoelm.def **** enter("r","R",NULL);
+ 459              		.loc 3 33 0
+ 460 0150 8448     		ldr	r0, .L40+232
+ 461 0152 8549     		ldr	r1, .L40+236
+ 462 0154 2246     		mov	r2, r4
+ 463 0156 FFF7FEFF 		bl	enter
+ 464              	.LVL58:
+  34:lib/rsynth-2.0-port/phtoelm.def **** enter("rr","R","QQ","R",NULL);
+ 465              		.loc 3 34 0
+ 466 015a 0094     		str	r4, [sp, #0]
+ 467 015c 8348     		ldr	r0, .L40+240
+ 468 015e 8249     		ldr	r1, .L40+236
+ 469 0160 704A     		ldr	r2, .L40+168
+ 470 0162 0B46     		mov	r3, r1
+ 471 0164 FFF7FEFF 		bl	enter
+ 472              	.LVL59:
+  35:lib/rsynth-2.0-port/phtoelm.def **** enter("R","RX",NULL);
+ 473              		.loc 3 35 0
+ 474 0168 7F48     		ldr	r0, .L40+236
+ 475 016a 8149     		ldr	r1, .L40+244
+ 476 016c 2246     		mov	r2, r4
+ 477 016e FFF7FEFF 		bl	enter
+ 478              	.LVL60:
+  36:lib/rsynth-2.0-port/phtoelm.def **** enter("w","W",NULL);
+ 479              		.loc 3 36 0
+ 480 0172 8048     		ldr	r0, .L40+248
+ 481 0174 8049     		ldr	r1, .L40+252
+ 482 0176 2246     		mov	r2, r4
+ 483 0178 FFF7FEFF 		bl	enter
+ 484              	.LVL61:
+  37:lib/rsynth-2.0-port/phtoelm.def **** enter("W","W",NULL);
+ 485              		.loc 3 37 0
+ 486 017c 7E48     		ldr	r0, .L40+252
+ 487 017e 0146     		mov	r1, r0
+ 488 0180 2246     		mov	r2, r4
+ 489 0182 FFF7FEFF 		bl	enter
+ 490              	.LVL62:
+  38:lib/rsynth-2.0-port/phtoelm.def **** enter("X","X",NULL); 
+ 491              		.loc 3 38 0
+ 492 0186 7D48     		ldr	r0, .L40+256
+ 493 0188 0146     		mov	r1, r0
+ 494 018a 2246     		mov	r2, r4
+ 495 018c FFF7FEFF 		bl	enter
+ 496              	.LVL63:
+  39:lib/rsynth-2.0-port/phtoelm.def **** enter("%","QQ",NULL); /* stop-ness - not quite glottal stop */
+ 497              		.loc 3 39 0
+ 498 0190 7B48     		ldr	r0, .L40+260
+ 499 0192 6449     		ldr	r1, .L40+168
+ 500 0194 2246     		mov	r2, r4
+ 501 0196 FFF7FEFF 		bl	enter
+ 502              	.LVL64:
+  40:lib/rsynth-2.0-port/phtoelm.def **** enter("Y","Y",NULL);
+ 503              		.loc 3 40 0
+ 504 019a 7A48     		ldr	r0, .L40+264
+ 505 019c 0146     		mov	r1, r0
+ 506 019e 2246     		mov	r2, r4
+ 507 01a0 FFF7FEFF 		bl	enter
+ 508              	.LVL65:
+  41:lib/rsynth-2.0-port/phtoelm.def **** enter("I","I",NULL);
+ 509              		.loc 3 41 0
+ 510 01a4 7848     		ldr	r0, .L40+268
+ 511 01a6 0146     		mov	r1, r0
+ 512 01a8 2246     		mov	r2, r4
+ 513 01aa FFF7FEFF 		bl	enter
+ 514              	.LVL66:
+  42:lib/rsynth-2.0-port/phtoelm.def **** enter("IH","IB",NULL);
+ 515              		.loc 3 42 0
+ 516 01ae 7748     		ldr	r0, .L40+272
+ 517 01b0 7749     		ldr	r1, .L40+276
+ 518 01b2 2246     		mov	r2, r4
+ 519 01b4 FFF7FEFF 		bl	enter
+ 520              	.LVL67:
+  43:lib/rsynth-2.0-port/phtoelm.def **** enter("E","E",NULL);
+ 521              		.loc 3 43 0
+ 522 01b8 7648     		ldr	r0, .L40+280
+ 523 01ba 0146     		mov	r1, r0
+ 524 01bc 2246     		mov	r2, r4
+ 525 01be FFF7FEFF 		bl	enter
+ 526              	.LVL68:
+  44:lib/rsynth-2.0-port/phtoelm.def **** enter("EH","EE",NULL);
+ 527              		.loc 3 44 0
+ 528 01c2 7548     		ldr	r0, .L40+284
+ 529 01c4 7549     		ldr	r1, .L40+288
+ 530 01c6 2246     		mov	r2, r4
+ 531 01c8 FFF7FEFF 		bl	enter
+ 532              	.LVL69:
+  45:lib/rsynth-2.0-port/phtoelm.def **** enter("&","AA",NULL);
+ 533              		.loc 3 45 0
+ 534 01cc 7448     		ldr	r0, .L40+292
+ 535 01ce 7549     		ldr	r1, .L40+296
+ 536 01d0 2246     		mov	r2, r4
+ 537 01d2 FFF7FEFF 		bl	enter
+ 538              	.LVL70:
+  46:lib/rsynth-2.0-port/phtoelm.def **** enter("V","U",NULL);
+ 539              		.loc 3 46 0
+ 540 01d6 5248     		ldr	r0, .L40+164
+ 541 01d8 7349     		ldr	r1, .L40+300
+ 542 01da 2246     		mov	r2, r4
+ 543 01dc FFF7FEFF 		bl	enter
+ 544              	.LVL71:
+  47:lib/rsynth-2.0-port/phtoelm.def **** enter("0","O",NULL);
+ 545              		.loc 3 47 0
+ 546 01e0 7248     		ldr	r0, .L40+304
+ 547 01e2 7349     		ldr	r1, .L40+308
+ 548 01e4 2246     		mov	r2, r4
+ 549 01e6 FFF7FEFF 		bl	enter
+ 550              	.LVL72:
+  48:lib/rsynth-2.0-port/phtoelm.def **** enter("U","OO",NULL);
+ 551              		.loc 3 48 0
+ 552 01ea 6F48     		ldr	r0, .L40+300
+ 553 01ec 7149     		ldr	r1, .L40+312
+ 554 01ee 2246     		mov	r2, r4
+ 555 01f0 FFF7FEFF 		bl	enter
+ 556              	.LVL73:
+  49:lib/rsynth-2.0-port/phtoelm.def **** enter("@","A",NULL);
+ 557              		.loc 3 49 0
+ 558 01f4 7048     		ldr	r0, .L40+316
+ 559 01f6 7149     		ldr	r1, .L40+320
+ 560 01f8 2246     		mov	r2, r4
+ 561 01fa FFF7FEFF 		bl	enter
+ 562              	.LVL74:
+  50:lib/rsynth-2.0-port/phtoelm.def **** enter("i","EE",NULL);
+ 563              		.loc 3 50 0
+ 564 01fe 7048     		ldr	r0, .L40+324
+ 565 0200 6649     		ldr	r1, .L40+288
+ 566 0202 2246     		mov	r2, r4
+ 567 0204 FFF7FEFF 		bl	enter
+ 568              	.LVL75:
+  51:lib/rsynth-2.0-port/phtoelm.def **** enter("3","ER",NULL);
+ 569              		.loc 3 51 0
+ 570 0208 6E48     		ldr	r0, .L40+328
+ 571 020a 6F49     		ldr	r1, .L40+332
+ 572 020c 2246     		mov	r2, r4
+ 573 020e FFF7FEFF 		bl	enter
+ 574              	.LVL76:
+  52:lib/rsynth-2.0-port/phtoelm.def **** enter("A","AR",NULL);
+ 575              		.loc 3 52 0
+ 576 0212 6A48     		ldr	r0, .L40+320
+ 577 0214 6D49     		ldr	r1, .L40+336
+ 578 0216 2246     		mov	r2, r4
+ 579 0218 FFF7FEFF 		bl	enter
+ 580              	.LVL77:
+  53:lib/rsynth-2.0-port/phtoelm.def **** enter("AX","A",NULL);
+ 581              		.loc 3 53 0
+ 582 021c 6C48     		ldr	r0, .L40+340
+ 583 021e 6749     		ldr	r1, .L40+320
+ 584 0220 2246     		mov	r2, r4
+ 585 0222 FFF7FEFF 		bl	enter
+ 586              	.LVL78:
+  54:lib/rsynth-2.0-port/phtoelm.def **** enter("AH","AA",NULL);
+ 587              		.loc 3 54 0
+ 588 0226 6B48     		ldr	r0, .L40+344
+ 589 0228 5E49     		ldr	r1, .L40+296
+ 590 022a 2246     		mov	r2, r4
+ 591 022c FFF7FEFF 		bl	enter
+ 592              	.LVL79:
+  55:lib/rsynth-2.0-port/phtoelm.def **** enter("O","AW",NULL);
+ 593              		.loc 3 55 0
+ 594 0230 5F48     		ldr	r0, .L40+308
+ 595 0232 6949     		ldr	r1, .L40+348
+ 596 0234 2246     		mov	r2, r4
+ 597 0236 FFF7FEFF 		bl	enter
+ 598              	.LVL80:
+  56:lib/rsynth-2.0-port/phtoelm.def **** enter("OH","OO",NULL);
+ 599              		.loc 3 56 0
+ 600 023a 6848     		ldr	r0, .L40+352
+ 601 023c 5D49     		ldr	r1, .L40+312
+ 602 023e 2246     		mov	r2, r4
+ 603 0240 FFF7FEFF 		bl	enter
+ 604              	.LVL81:
+  57:lib/rsynth-2.0-port/phtoelm.def **** enter("UH","UU",NULL);
+ 605              		.loc 3 57 0
+ 606 0244 6648     		ldr	r0, .L40+356
+ 607 0246 6749     		ldr	r1, .L40+360
+ 608 0248 2246     		mov	r2, r4
+ 609 024a FFF7FEFF 		bl	enter
+ 610              	.LVL82:
+  58:lib/rsynth-2.0-port/phtoelm.def **** enter("u","UU",NULL);
+ 611              		.loc 3 58 0
+ 612 024e 6648     		ldr	r0, .L40+364
+ 613 0250 6449     		ldr	r1, .L40+360
+ 614 0252 2246     		mov	r2, r4
+ 615 0254 FFF7FEFF 		bl	enter
+ 616              	.LVL83:
+  59:lib/rsynth-2.0-port/phtoelm.def **** enter("o","OI",NULL);
+ 617              		.loc 3 59 0
+ 618 0258 6448     		ldr	r0, .L40+368
+ 619 025a 6549     		ldr	r1, .L40+372
+ 620 025c 2246     		mov	r2, r4
+ 621 025e FFF7FEFF 		bl	enter
+ 622              	.LVL84:
+  60:lib/rsynth-2.0-port/phtoelm.def **** enter("eI","AI","I",NULL);
+ 623              		.loc 3 60 0
+ 624 0262 6448     		ldr	r0, .L40+376
+ 625 0264 6449     		ldr	r1, .L40+380
+ 626 0266 484A     		ldr	r2, .L40+268
+ 627 0268 2346     		mov	r3, r4
+ 628 026a FFF7FEFF 		bl	enter
+ 629              	.LVL85:
+  61:lib/rsynth-2.0-port/phtoelm.def **** enter("aI","IE","I",NULL);
+ 630              		.loc 3 61 0
+ 631 026e 6348     		ldr	r0, .L40+384
+ 632 0270 6349     		ldr	r1, .L40+388
+ 633 0272 454A     		ldr	r2, .L40+268
+ 634 0274 2346     		mov	r3, r4
+ 635 0276 FFF7FEFF 		bl	enter
+ 636              	.LVL86:
+ 637 027a C3E0     		b	.L41
+ 638              	.L42:
+ 639              		.align	2
+ 640              	.L40:
+ 641 027c 00000000 		.word	.LANCHOR0
+ 642 0280 29000000 		.word	.LC2
+ 643 0284 2B000000 		.word	.LC3
+ 644 0288 2D000000 		.word	.LC4
+ 645 028c 2F000000 		.word	.LC5
+ 646 0290 31000000 		.word	.LC6
+ 647 0294 34000000 		.word	.LC7
+ 648 0298 37000000 		.word	.LC8
+ 649 029c 39000000 		.word	.LC9
+ 650 02a0 3B000000 		.word	.LC10
+ 651 02a4 3E000000 		.word	.LC11
+ 652 02a8 41000000 		.word	.LC12
+ 653 02ac 43000000 		.word	.LC13
+ 654 02b0 45000000 		.word	.LC14
+ 655 02b4 48000000 		.word	.LC15
+ 656 02b8 4B000000 		.word	.LC16
+ 657 02bc 4D000000 		.word	.LC17
+ 658 02c0 4F000000 		.word	.LC18
+ 659 02c4 52000000 		.word	.LC19
+ 660 02c8 55000000 		.word	.LC20
+ 661 02cc 57000000 		.word	.LC21
+ 662 02d0 59000000 		.word	.LC22
+ 663 02d4 5C000000 		.word	.LC23
+ 664 02d8 5F000000 		.word	.LC24
+ 665 02dc 61000000 		.word	.LC25
+ 666 02e0 63000000 		.word	.LC26
+ 667 02e4 66000000 		.word	.LC27
+ 668 02e8 69000000 		.word	.LC28
+ 669 02ec 6B000000 		.word	.LC29
+ 670 02f0 6D000000 		.word	.LC30
+ 671 02f4 6F000000 		.word	.LC31
+ 672 02f8 71000000 		.word	.LC32
+ 673 02fc 74000000 		.word	.LC33
+ 674 0300 76000000 		.word	.LC34
+ 675 0304 78000000 		.word	.LC35
+ 676 0308 7B000000 		.word	.LC36
+ 677 030c 7D000000 		.word	.LC37
+ 678 0310 7F000000 		.word	.LC38
+ 679 0314 82000000 		.word	.LC39
+ 680 0318 84000000 		.word	.LC40
+ 681 031c 86000000 		.word	.LC41
+ 682 0320 88000000 		.word	.LC42
+ 683 0324 8A000000 		.word	.LC43
+ 684 0328 8D000000 		.word	.LC44
+ 685 032c 90000000 		.word	.LC45
+ 686 0330 93000000 		.word	.LC46
+ 687 0334 95000000 		.word	.LC47
+ 688 0338 97000000 		.word	.LC48
+ 689 033c 9A000000 		.word	.LC49
+ 690 0340 9D000000 		.word	.LC50
+ 691 0344 A0000000 		.word	.LC51
+ 692 0348 A3000000 		.word	.LC52
+ 693 034c AB000000 		.word	.LC55
+ 694 0350 A6000000 		.word	.LC53
+ 695 0354 A9000000 		.word	.LC54
+ 696 0358 AE000000 		.word	.LC56
+ 697 035c B0000000 		.word	.LC57
+ 698 0360 B2000000 		.word	.LC58
+ 699 0364 B4000000 		.word	.LC59
+ 700 0368 B6000000 		.word	.LC60
+ 701 036c B8000000 		.word	.LC61
+ 702 0370 BB000000 		.word	.LC62
+ 703 0374 BE000000 		.word	.LC63
+ 704 0378 C0000000 		.word	.LC64
+ 705 037c C2000000 		.word	.LC65
+ 706 0380 C4000000 		.word	.LC66
+ 707 0384 C6000000 		.word	.LC67
+ 708 0388 C8000000 		.word	.LC68
+ 709 038c CA000000 		.word	.LC69
+ 710 0390 CD000000 		.word	.LC70
+ 711 0394 D0000000 		.word	.LC71
+ 712 0398 D2000000 		.word	.LC72
+ 713 039c D5000000 		.word	.LC73
+ 714 03a0 D8000000 		.word	.LC74
+ 715 03a4 DA000000 		.word	.LC75
+ 716 03a8 DD000000 		.word	.LC76
+ 717 03ac DF000000 		.word	.LC77
+ 718 03b0 E1000000 		.word	.LC78
+ 719 03b4 E3000000 		.word	.LC79
+ 720 03b8 E6000000 		.word	.LC80
+ 721 03bc E8000000 		.word	.LC81
+ 722 03c0 EA000000 		.word	.LC82
+ 723 03c4 EC000000 		.word	.LC83
+ 724 03c8 EE000000 		.word	.LC84
+ 725 03cc F1000000 		.word	.LC85
+ 726 03d0 F4000000 		.word	.LC86
+ 727 03d4 F7000000 		.word	.LC87
+ 728 03d8 FA000000 		.word	.LC88
+ 729 03dc FD000000 		.word	.LC89
+ 730 03e0 00010000 		.word	.LC90
+ 731 03e4 03010000 		.word	.LC91
+ 732 03e8 06010000 		.word	.LC92
+ 733 03ec 08010000 		.word	.LC93
+ 734 03f0 0A010000 		.word	.LC94
+ 735 03f4 0D010000 		.word	.LC95
+ 736 03f8 10010000 		.word	.LC96
+ 737 03fc 13010000 		.word	.LC97
+ 738 0400 16010000 		.word	.LC98
+ 739              	.L41:
+  62:lib/rsynth-2.0-port/phtoelm.def **** enter("oI","OI","I",NULL);
+ 740              		.loc 3 62 0
+ 741 0404 4C48     		ldr	r0, .L43
+ 742 0406 4D49     		ldr	r1, .L43+4
+ 743 0408 4D4A     		ldr	r2, .L43+8
+ 744 040a 2346     		mov	r3, r4
+ 745 040c FFF7FEFF 		bl	enter
+ 746              	.LVL87:
+  63:lib/rsynth-2.0-port/phtoelm.def **** enter("aU","OU","OV",NULL);
+ 747              		.loc 3 63 0
+ 748 0410 4C48     		ldr	r0, .L43+12
+ 749 0412 4D49     		ldr	r1, .L43+16
+ 750 0414 4D4A     		ldr	r2, .L43+20
+ 751 0416 2346     		mov	r3, r4
+ 752 0418 FFF7FEFF 		bl	enter
+ 753              	.LVL88:
+  64:lib/rsynth-2.0-port/phtoelm.def **** enter("OW","OO",NULL);
+ 754              		.loc 3 64 0
+ 755 041c 4C48     		ldr	r0, .L43+24
+ 756 041e 4D49     		ldr	r1, .L43+28
+ 757 0420 2246     		mov	r2, r4
+ 758 0422 FFF7FEFF 		bl	enter
+ 759              	.LVL89:
+  65:lib/rsynth-2.0-port/phtoelm.def **** enter("@U","OA","OV",NULL);
+ 760              		.loc 3 65 0
+ 761 0426 4C48     		ldr	r0, .L43+32
+ 762 0428 4C49     		ldr	r1, .L43+36
+ 763 042a 484A     		ldr	r2, .L43+20
+ 764 042c 2346     		mov	r3, r4
+ 765 042e FFF7FEFF 		bl	enter
+ 766              	.LVL90:
+  66:lib/rsynth-2.0-port/phtoelm.def **** enter("I@","IA","IB",NULL);
+ 767              		.loc 3 66 0
+ 768 0432 4B48     		ldr	r0, .L43+40
+ 769 0434 4B49     		ldr	r1, .L43+44
+ 770 0436 4C4A     		ldr	r2, .L43+48
+ 771 0438 2346     		mov	r3, r4
+ 772 043a FFF7FEFF 		bl	enter
+ 773              	.LVL91:
+  67:lib/rsynth-2.0-port/phtoelm.def **** enter("e@","AIR","IB",NULL);
+ 774              		.loc 3 67 0
+ 775 043e 4B48     		ldr	r0, .L43+52
+ 776 0440 4B49     		ldr	r1, .L43+56
+ 777 0442 494A     		ldr	r2, .L43+48
+ 778 0444 2346     		mov	r3, r4
+ 779 0446 FFF7FEFF 		bl	enter
+ 780              	.LVL92:
+  68:lib/rsynth-2.0-port/phtoelm.def **** enter("U@","OOR","IB",NULL);
+ 781              		.loc 3 68 0
+ 782 044a 4A48     		ldr	r0, .L43+60
+ 783 044c 4A49     		ldr	r1, .L43+64
+ 784 044e 464A     		ldr	r2, .L43+48
+ 785 0450 2346     		mov	r3, r4
+ 786 0452 FFF7FEFF 		bl	enter
+ 787              	.LVL93:
+  69:lib/rsynth-2.0-port/phtoelm.def **** enter("O@","OR","IB",NULL);
+ 788              		.loc 3 69 0
+ 789 0456 4948     		ldr	r0, .L43+68
+ 790 0458 4949     		ldr	r1, .L43+72
+ 791 045a 434A     		ldr	r2, .L43+48
+ 792 045c 2346     		mov	r3, r4
+ 793 045e FFF7FEFF 		bl	enter
+ 794              	.LVL94:
+  70:lib/rsynth-2.0-port/phtoelm.def **** enter("oU","OI","OV",NULL);
+ 795              		.loc 3 70 0
+ 796 0462 4848     		ldr	r0, .L43+76
+ 797 0464 3549     		ldr	r1, .L43+4
+ 798 0466 394A     		ldr	r2, .L43+20
+ 799 0468 2346     		mov	r3, r4
+ 800 046a FFF7FEFF 		bl	enter
+ 801              	.LVL95:
+ 802              	.L19:
+ 803              	.LBE21:
+ 804              	.LBE20:
+ 805              	.LBB22:
+ 806              	.LBB23:
+ 114:lib/rsynth-2.0-port/phtoelm.c **** 		enter_phonemes();
+ 115:lib/rsynth-2.0-port/phtoelm.c **** 	
+ 116:lib/rsynth-2.0-port/phtoelm.c **** 	while (s < limit && *s)
+ 117:lib/rsynth-2.0-port/phtoelm.c **** 	{
+ 118:lib/rsynth-2.0-port/phtoelm.c **** 		char *e = trie_lookup(&phtoelm, &s);
+ 119:lib/rsynth-2.0-port/phtoelm.c **** 		if (e)
+ 120:lib/rsynth-2.0-port/phtoelm.c **** 		{
+ 121:lib/rsynth-2.0-port/phtoelm.c **** 			int n = *e++;
+ 122:lib/rsynth-2.0-port/phtoelm.c **** 			while (n-- > 0)
+ 123:lib/rsynth-2.0-port/phtoelm.c **** 			{
+ 124:lib/rsynth-2.0-port/phtoelm.c **** 				int x = *e++;
+ 125:lib/rsynth-2.0-port/phtoelm.c **** 				Elm_ptr p = &Elements[x];
+ 126:lib/rsynth-2.0-port/phtoelm.c **** 				/* This works because only vowels have ud != du,
+ 127:lib/rsynth-2.0-port/phtoelm.c **** 				and we set stress just before a vowel
+ 128:lib/rsynth-2.0-port/phtoelm.c **** 				*/
+ 129:lib/rsynth-2.0-port/phtoelm.c **** 				phone_append(elm, x);
+ 130:lib/rsynth-2.0-port/phtoelm.c **** 				if (!(p->feat & vwl))
+ 131:lib/rsynth-2.0-port/phtoelm.c **** 					stress = 0;
+ 132:lib/rsynth-2.0-port/phtoelm.c **** 				t += phone_append(elm,StressDur(p,stress));
+ 133:lib/rsynth-2.0-port/phtoelm.c **** 				phone_append(elm, stress);
+ 134:lib/rsynth-2.0-port/phtoelm.c **** 			}
+ 135:lib/rsynth-2.0-port/phtoelm.c **** 		}
+ 136:lib/rsynth-2.0-port/phtoelm.c **** 		else
+ 137:lib/rsynth-2.0-port/phtoelm.c **** 		{
+ 138:lib/rsynth-2.0-port/phtoelm.c **** 			char ch = *s++;
+ 139:lib/rsynth-2.0-port/phtoelm.c **** 			switch (ch)
+ 140:lib/rsynth-2.0-port/phtoelm.c **** 			{
+ 141:lib/rsynth-2.0-port/phtoelm.c **** 				case '\'':                /* Primary stress */
+ 142:lib/rsynth-2.0-port/phtoelm.c **** 				stress = 3;
+ 143:lib/rsynth-2.0-port/phtoelm.c **** 				break;
+ 144:lib/rsynth-2.0-port/phtoelm.c **** 				case ',':                 /* Secondary stress */
+ 145:lib/rsynth-2.0-port/phtoelm.c **** 				stress = 2;
+ 807              		.loc 1 145 0 discriminator 1
+ 808 046e 0025     		movs	r5, #0
+ 809 0470 2C46     		mov	r4, r5
+ 810 0472 55E0     		b	.L38
+ 811              	.LVL96:
+ 812              	.L32:
+ 813              	.LBE23:
+ 118:lib/rsynth-2.0-port/phtoelm.c **** 		char *e = trie_lookup(&phtoelm, &s);
+ 814              		.loc 1 118 0
+ 815 0474 4448     		ldr	r0, .L43+80
+ 816 0476 05A9     		add	r1, sp, #20
+ 817 0478 FFF7FEFF 		bl	trie_lookup
+ 818              	.LVL97:
+ 119:lib/rsynth-2.0-port/phtoelm.c **** 		if (e)
+ 819              		.loc 1 119 0
+ 820 047c 98B3     		cbz	r0, .L21
+ 821              	.LVL98:
+ 822              	.LBB24:
+ 122:lib/rsynth-2.0-port/phtoelm.c **** 			while (n-- > 0)
+ 823              		.loc 1 122 0
+ 824 047e 0346     		mov	r3, r0
+ 105:lib/rsynth-2.0-port/phtoelm.c **** unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
+ 825              		.loc 1 105 0
+ 826 0480 90F900C0 		ldrsb	ip, [r0, #0]
+ 827              	.LVL99:
+ 828 0484 00EB0C0A 		add	sl, r0, ip
+ 829              	.LBB25:
+ 132:lib/rsynth-2.0-port/phtoelm.c **** 				t += phone_append(elm,StressDur(p,stress));
+ 830              		.loc 1 132 0
+ 831 0488 DFF80CB1 		ldr	fp, .L43+96
+ 832              	.LBE25:
+ 122:lib/rsynth-2.0-port/phtoelm.c **** 			while (n-- > 0)
+ 833              		.loc 1 122 0
+ 834 048c 26E0     		b	.L22
+ 835              	.LVL100:
+ 836              	.L24:
+ 837              	.LBB26:
+ 124:lib/rsynth-2.0-port/phtoelm.c **** 				int x = *e++;
+ 838              		.loc 1 124 0
+ 839 048e 13F9011F 		ldrsb	r1, [r3, #1]!
+ 840              	.LVL101:
+ 125:lib/rsynth-2.0-port/phtoelm.c **** 				Elm_ptr p = &Elements[x];
+ 841              		.loc 1 125 0
+ 842 0492 F822     		movs	r2, #248
+ 843 0494 3D48     		ldr	r0, .L43+84
+ 844 0496 02FB0102 		mla	r2, r2, r1, r0
+ 845              	.LVL102:
+ 129:lib/rsynth-2.0-port/phtoelm.c **** 				phone_append(elm, x);
+ 846              		.loc 1 129 0
+ 847 049a 3846     		mov	r0, r7
+ 848 049c 0392     		str	r2, [sp, #12]
+ 849 049e 0293     		str	r3, [sp, #8]
+ 850 04a0 FFF7FEFF 		bl	phone_append
+ 851              	.LVL103:
+ 130:lib/rsynth-2.0-port/phtoelm.c **** 				if (!(p->feat & vwl))
+ 852              		.loc 1 130 0
+ 853 04a4 039A     		ldr	r2, [sp, #12]
+ 854 04a6 1169     		ldr	r1, [r2, #16]
+ 131:lib/rsynth-2.0-port/phtoelm.c **** 					stress = 0;
+ 855              		.loc 1 131 0
+ 856 04a8 11F0805F 		tst	r1, #268435456
+ 857 04ac 08BF     		it	eq
+ 858 04ae 0024     		moveq	r4, #0
+ 859              	.LVL104:
+ 132:lib/rsynth-2.0-port/phtoelm.c **** 				t += phone_append(elm,StressDur(p,stress));
+ 860              		.loc 1 132 0
+ 861 04b0 92F90610 		ldrsb	r1, [r2, #6]
+ 862 04b4 92F90520 		ldrsb	r2, [r2, #5]
+ 863 04b8 521A     		subs	r2, r2, r1
+ 864 04ba 6243     		muls	r2, r4, r2
+ 865 04bc 0320     		movs	r0, #3
+ 866 04be 92FBF0F2 		sdiv	r2, r2, r0
+ 867 04c2 8918     		adds	r1, r1, r2
+ 868 04c4 DBF80020 		ldr	r2, [fp, #0]
+ 869 04c8 3846     		mov	r0, r7
+ 870 04ca 5143     		muls	r1, r2, r1
+ 871 04cc FFF7FEFF 		bl	phone_append
+ 872              	.LVL105:
+ 873 04d0 2D18     		adds	r5, r5, r0
+ 874              	.LVL106:
+ 133:lib/rsynth-2.0-port/phtoelm.c **** 				phone_append(elm, stress);
+ 875              		.loc 1 133 0
+ 876 04d2 3846     		mov	r0, r7
+ 877 04d4 2146     		mov	r1, r4
+ 878 04d6 FFF7FEFF 		bl	phone_append
+ 879              	.LVL107:
+ 880 04da 029B     		ldr	r3, [sp, #8]
+ 881              	.L22:
+ 882              	.LBE26:
+ 105:lib/rsynth-2.0-port/phtoelm.c **** unsigned int phone_to_elm(char *phone, int n, darray_ptr elm)
+ 883              		.loc 1 105 0 discriminator 1
+ 884 04dc C3EB0A02 		rsb	r2, r3, sl
+ 122:lib/rsynth-2.0-port/phtoelm.c **** 			while (n-- > 0)
+ 885              		.loc 1 122 0 discriminator 1
+ 886 04e0 002A     		cmp	r2, #0
+ 887 04e2 D4DC     		bgt	.L24
+ 888 04e4 1CE0     		b	.L38
+ 889              	.LVL108:
+ 890              	.L21:
+ 891              	.LBE24:
+ 892              	.LBB27:
+ 138:lib/rsynth-2.0-port/phtoelm.c **** 			char ch = *s++;
+ 893              		.loc 1 138 0
+ 894 04e6 059B     		ldr	r3, [sp, #20]
+ 895 04e8 13F8012B 		ldrb	r2, [r3], #1	@ zero_extendqisi2
+ 896              	.LVL109:
+ 897 04ec 0593     		str	r3, [sp, #20]
+ 139:lib/rsynth-2.0-port/phtoelm.c **** 			switch (ch)
+ 898              		.loc 1 139 0
+ 899 04ee 52B2     		sxtb	r2, r2
+ 900 04f0 A2F12703 		sub	r3, r2, #39
+ 901 04f4 062B     		cmp	r3, #6
+ 902 04f6 09D8     		bhi	.L26
+ 903 04f8 DFE803F0 		tbb	[pc, r3]
+ 904              	.L30:
+ 905 04fc 11       		.byte	(.L35-.L30)/2
+ 906 04fd 08       		.byte	(.L26-.L30)/2
+ 907 04fe 08       		.byte	(.L26-.L30)/2
+ 908 04ff 08       		.byte	(.L26-.L30)/2
+ 909 0500 06       		.byte	(.L27-.L30)/2
+ 910 0501 04       		.byte	(.L28-.L30)/2
+ 911 0502 12       		.byte	(.L38-.L30)/2
+ 912 0503 00       		.align	1
+ 913              	.L28:
+ 914              	.LVL110:
+ 915              		.loc 1 145 0
+ 916 0504 0224     		movs	r4, #2
+ 146:lib/rsynth-2.0-port/phtoelm.c **** 				break;
+ 917              		.loc 1 146 0
+ 918 0506 0BE0     		b	.L38
+ 919              	.LVL111:
+ 920              	.L27:
+ 147:lib/rsynth-2.0-port/phtoelm.c **** 				case '+':                 /* Tertiary stress */
+ 148:lib/rsynth-2.0-port/phtoelm.c **** 				stress = 1;
+ 921              		.loc 1 148 0
+ 922 0508 0124     		movs	r4, #1
+ 149:lib/rsynth-2.0-port/phtoelm.c **** 				break;
+ 923              		.loc 1 149 0
+ 924 050a 09E0     		b	.L38
+ 925              	.LVL112:
+ 926              	.L26:
+ 150:lib/rsynth-2.0-port/phtoelm.c **** 				case '-':                 /* hyphen in input */
+ 151:lib/rsynth-2.0-port/phtoelm.c **** 				break;
+ 152:lib/rsynth-2.0-port/phtoelm.c **** 				default:
+ 153:lib/rsynth-2.0-port/phtoelm.c **** 				fprintf(stderr, "Ignoring %c in '%.*s'\n", ch, n, phone);
+ 927              		.loc 1 153 0
+ 928 050c 204B     		ldr	r3, .L43+88
+ 929 050e 1B68     		ldr	r3, [r3, #0]
+ 930 0510 0096     		str	r6, [sp, #0]
+ 931 0512 D868     		ldr	r0, [r3, #12]
+ 932              	.LVL113:
+ 933 0514 1F49     		ldr	r1, .L43+92
+ 934 0516 4346     		mov	r3, r8
+ 935 0518 FFF7FEFF 		bl	fprintf
+ 936              	.LVL114:
+ 154:lib/rsynth-2.0-port/phtoelm.c **** 				break;
+ 937              		.loc 1 154 0
+ 938 051c 00E0     		b	.L38
+ 939              	.LVL115:
+ 940              	.L35:
+ 142:lib/rsynth-2.0-port/phtoelm.c **** 				stress = 3;
+ 941              		.loc 1 142 0
+ 942 051e 0324     		movs	r4, #3
+ 943              	.LVL116:
+ 944              	.L38:
+ 945              	.LBE27:
+ 946              	.LBE22:
+ 116:lib/rsynth-2.0-port/phtoelm.c **** 	while (s < limit && *s)
+ 947              		.loc 1 116 0 discriminator 1
+ 948 0520 059B     		ldr	r3, [sp, #20]
+ 949 0522 4B45     		cmp	r3, r9
+ 950 0524 03D2     		bcs	.L39
+ 116:lib/rsynth-2.0-port/phtoelm.c **** 	while (s < limit && *s)
+ 951              		.loc 1 116 0 is_stmt 0 discriminator 2
+ 952 0526 93F90030 		ldrsb	r3, [r3, #0]
+ 953 052a 002B     		cmp	r3, #0
+ 954 052c A2D1     		bne	.L32
+ 955              	.L39:
+ 155:lib/rsynth-2.0-port/phtoelm.c **** 			}
+ 156:lib/rsynth-2.0-port/phtoelm.c **** 		}
+ 157:lib/rsynth-2.0-port/phtoelm.c **** 	}
+ 158:lib/rsynth-2.0-port/phtoelm.c **** 	return t;
+ 159:lib/rsynth-2.0-port/phtoelm.c **** }
+ 956              		.loc 1 159 0 is_stmt 1
+ 957 052e 2846     		mov	r0, r5
+ 958 0530 07B0     		add	sp, sp, #28
+ 959 0532 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 960              	.L44:
+ 961 0536 00BF     		.align	2
+ 962              	.L43:
+ 963 0538 19010000 		.word	.LC99
+ 964 053c 0A010000 		.word	.LC94
+ 965 0540 C8000000 		.word	.LC68
+ 966 0544 1C010000 		.word	.LC100
+ 967 0548 1F010000 		.word	.LC101
+ 968 054c 22010000 		.word	.LC102
+ 969 0550 25010000 		.word	.LC103
+ 970 0554 E3000000 		.word	.LC79
+ 971 0558 28010000 		.word	.LC104
+ 972 055c 2B010000 		.word	.LC105
+ 973 0560 2E010000 		.word	.LC106
+ 974 0564 31010000 		.word	.LC107
+ 975 0568 CD000000 		.word	.LC70
+ 976 056c 34010000 		.word	.LC108
+ 977 0570 37010000 		.word	.LC109
+ 978 0574 3B010000 		.word	.LC110
+ 979 0578 3E010000 		.word	.LC111
+ 980 057c 42010000 		.word	.LC112
+ 981 0580 45010000 		.word	.LC113
+ 982 0584 48010000 		.word	.LC114
+ 983 0588 00000000 		.word	.LANCHOR0
+ 984 058c 00000000 		.word	Elements
+ 985 0590 00000000 		.word	_impure_ptr
+ 986 0594 4B010000 		.word	.LC115
+ 987 0598 00000000 		.word	speed
+ 988              		.cfi_endproc
+ 989              	.LFE118:
+ 991              		.global	phtoelm
+ 992              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 993              	.LC0:
+ 994 0000 43616E6E 		.ascii	"Cannot find %s\012\000"
+ 994      6F742066 
+ 994      696E6420 
+ 994      25730A00 
+ 995              	.LC1:
+ 996 0010 6D656D6F 		.ascii	"memory shortage (enter)\012\000"
+ 996      72792073 
+ 996      686F7274 
+ 996      61676520 
+ 996      28656E74 
+ 997              	.LC2:
+ 998 0029 2000     		.ascii	" \000"
+ 999              	.LC3:
+ 1000 002b 5100     		.ascii	"Q\000"
+ 1001              	.LC4:
+ 1002 002d 7000     		.ascii	"p\000"
+ 1003              	.LC5:
+ 1004 002f 5000     		.ascii	"P\000"
+ 1005              	.LC6:
+ 1006 0031 505900   		.ascii	"PY\000"
+ 1007              	.LC7:
+ 1008 0034 505A00   		.ascii	"PZ\000"
+ 1009              	.LC8:
+ 1010 0037 7400     		.ascii	"t\000"
+ 1011              	.LC9:
+ 1012 0039 5400     		.ascii	"T\000"
+ 1013              	.LC10:
+ 1014 003b 545900   		.ascii	"TY\000"
+ 1015              	.LC11:
+ 1016 003e 545A00   		.ascii	"TZ\000"
+ 1017              	.LC12:
+ 1018 0041 6B00     		.ascii	"k\000"
+ 1019              	.LC13:
+ 1020 0043 4B00     		.ascii	"K\000"
+ 1021              	.LC14:
+ 1022 0045 4B5900   		.ascii	"KY\000"
+ 1023              	.LC15:
+ 1024 0048 4B5A00   		.ascii	"KZ\000"
+ 1025              	.LC16:
+ 1026 004b 6200     		.ascii	"b\000"
+ 1027              	.LC17:
+ 1028 004d 4200     		.ascii	"B\000"
+ 1029              	.LC18:
+ 1030 004f 425900   		.ascii	"BY\000"
+ 1031              	.LC19:
+ 1032 0052 425A00   		.ascii	"BZ\000"
+ 1033              	.LC20:
+ 1034 0055 6400     		.ascii	"d\000"
+ 1035              	.LC21:
+ 1036 0057 4400     		.ascii	"D\000"
+ 1037              	.LC22:
+ 1038 0059 445900   		.ascii	"DY\000"
+ 1039              	.LC23:
+ 1040 005c 445A00   		.ascii	"DZ\000"
+ 1041              	.LC24:
+ 1042 005f 6700     		.ascii	"g\000"
+ 1043              	.LC25:
+ 1044 0061 4700     		.ascii	"G\000"
+ 1045              	.LC26:
+ 1046 0063 475900   		.ascii	"GY\000"
+ 1047              	.LC27:
+ 1048 0066 475A00   		.ascii	"GZ\000"
+ 1049              	.LC28:
+ 1050 0069 6D00     		.ascii	"m\000"
+ 1051              	.LC29:
+ 1052 006b 4D00     		.ascii	"M\000"
+ 1053              	.LC30:
+ 1054 006d 6E00     		.ascii	"n\000"
+ 1055              	.LC31:
+ 1056 006f 4E00     		.ascii	"N\000"
+ 1057              	.LC32:
+ 1058 0071 4E4700   		.ascii	"NG\000"
+ 1059              	.LC33:
+ 1060 0074 6600     		.ascii	"f\000"
+ 1061              	.LC34:
+ 1062 0076 4600     		.ascii	"F\000"
+ 1063              	.LC35:
+ 1064 0078 544800   		.ascii	"TH\000"
+ 1065              	.LC36:
+ 1066 007b 7300     		.ascii	"s\000"
+ 1067              	.LC37:
+ 1068 007d 5300     		.ascii	"S\000"
+ 1069              	.LC38:
+ 1070 007f 534800   		.ascii	"SH\000"
+ 1071              	.LC39:
+ 1072 0082 6800     		.ascii	"h\000"
+ 1073              	.LC40:
+ 1074 0084 4800     		.ascii	"H\000"
+ 1075              	.LC41:
+ 1076 0086 7600     		.ascii	"v\000"
+ 1077              	.LC42:
+ 1078 0088 5600     		.ascii	"V\000"
+ 1079              	.LC43:
+ 1080 008a 515100   		.ascii	"QQ\000"
+ 1081              	.LC44:
+ 1082 008d 444800   		.ascii	"DH\000"
+ 1083              	.LC45:
+ 1084 0090 444900   		.ascii	"DI\000"
+ 1085              	.LC46:
+ 1086 0093 7A00     		.ascii	"z\000"
+ 1087              	.LC47:
+ 1088 0095 5A00     		.ascii	"Z\000"
+ 1089              	.LC48:
+ 1090 0097 5A5A00   		.ascii	"ZZ\000"
+ 1091              	.LC49:
+ 1092 009a 5A4800   		.ascii	"ZH\000"
+ 1093              	.LC50:
+ 1094 009d 745300   		.ascii	"tS\000"
+ 1095              	.LC51:
+ 1096 00a0 434800   		.ascii	"CH\000"
+ 1097              	.LC52:
+ 1098 00a3 434900   		.ascii	"CI\000"
+ 1099              	.LC53:
+ 1100 00a6 645A00   		.ascii	"dZ\000"
+ 1101              	.LC54:
+ 1102 00a9 4A00     		.ascii	"J\000"
+ 1103              	.LC55:
+ 1104 00ab 4A5900   		.ascii	"JY\000"
+ 1105              	.LC56:
+ 1106 00ae 6A00     		.ascii	"j\000"
+ 1107              	.LC57:
+ 1108 00b0 6C00     		.ascii	"l\000"
+ 1109              	.LC58:
+ 1110 00b2 4C00     		.ascii	"L\000"
+ 1111              	.LC59:
+ 1112 00b4 7200     		.ascii	"r\000"
+ 1113              	.LC60:
+ 1114 00b6 5200     		.ascii	"R\000"
+ 1115              	.LC61:
+ 1116 00b8 727200   		.ascii	"rr\000"
+ 1117              	.LC62:
+ 1118 00bb 525800   		.ascii	"RX\000"
+ 1119              	.LC63:
+ 1120 00be 7700     		.ascii	"w\000"
+ 1121              	.LC64:
+ 1122 00c0 5700     		.ascii	"W\000"
+ 1123              	.LC65:
+ 1124 00c2 5800     		.ascii	"X\000"
+ 1125              	.LC66:
+ 1126 00c4 2500     		.ascii	"%\000"
+ 1127              	.LC67:
+ 1128 00c6 5900     		.ascii	"Y\000"
+ 1129              	.LC68:
+ 1130 00c8 4900     		.ascii	"I\000"
+ 1131              	.LC69:
+ 1132 00ca 494800   		.ascii	"IH\000"
+ 1133              	.LC70:
+ 1134 00cd 494200   		.ascii	"IB\000"
+ 1135              	.LC71:
+ 1136 00d0 4500     		.ascii	"E\000"
+ 1137              	.LC72:
+ 1138 00d2 454800   		.ascii	"EH\000"
+ 1139              	.LC73:
+ 1140 00d5 454500   		.ascii	"EE\000"
+ 1141              	.LC74:
+ 1142 00d8 2600     		.ascii	"&\000"
+ 1143              	.LC75:
+ 1144 00da 414100   		.ascii	"AA\000"
+ 1145              	.LC76:
+ 1146 00dd 5500     		.ascii	"U\000"
+ 1147              	.LC77:
+ 1148 00df 3000     		.ascii	"0\000"
+ 1149              	.LC78:
+ 1150 00e1 4F00     		.ascii	"O\000"
+ 1151              	.LC79:
+ 1152 00e3 4F4F00   		.ascii	"OO\000"
+ 1153              	.LC80:
+ 1154 00e6 4000     		.ascii	"@\000"
+ 1155              	.LC81:
+ 1156 00e8 4100     		.ascii	"A\000"
+ 1157              	.LC82:
+ 1158 00ea 6900     		.ascii	"i\000"
+ 1159              	.LC83:
+ 1160 00ec 3300     		.ascii	"3\000"
+ 1161              	.LC84:
+ 1162 00ee 455200   		.ascii	"ER\000"
+ 1163              	.LC85:
+ 1164 00f1 415200   		.ascii	"AR\000"
+ 1165              	.LC86:
+ 1166 00f4 415800   		.ascii	"AX\000"
+ 1167              	.LC87:
+ 1168 00f7 414800   		.ascii	"AH\000"
+ 1169              	.LC88:
+ 1170 00fa 415700   		.ascii	"AW\000"
+ 1171              	.LC89:
+ 1172 00fd 4F4800   		.ascii	"OH\000"
+ 1173              	.LC90:
+ 1174 0100 554800   		.ascii	"UH\000"
+ 1175              	.LC91:
+ 1176 0103 555500   		.ascii	"UU\000"
+ 1177              	.LC92:
+ 1178 0106 7500     		.ascii	"u\000"
+ 1179              	.LC93:
+ 1180 0108 6F00     		.ascii	"o\000"
+ 1181              	.LC94:
+ 1182 010a 4F4900   		.ascii	"OI\000"
+ 1183              	.LC95:
+ 1184 010d 654900   		.ascii	"eI\000"
+ 1185              	.LC96:
+ 1186 0110 414900   		.ascii	"AI\000"
+ 1187              	.LC97:
+ 1188 0113 614900   		.ascii	"aI\000"
+ 1189              	.LC98:
+ 1190 0116 494500   		.ascii	"IE\000"
+ 1191              	.LC99:
+ 1192 0119 6F4900   		.ascii	"oI\000"
+ 1193              	.LC100:
+ 1194 011c 615500   		.ascii	"aU\000"
+ 1195              	.LC101:
+ 1196 011f 4F5500   		.ascii	"OU\000"
+ 1197              	.LC102:
+ 1198 0122 4F5600   		.ascii	"OV\000"
+ 1199              	.LC103:
+ 1200 0125 4F5700   		.ascii	"OW\000"
+ 1201              	.LC104:
+ 1202 0128 405500   		.ascii	"@U\000"
+ 1203              	.LC105:
+ 1204 012b 4F4100   		.ascii	"OA\000"
+ 1205              	.LC106:
+ 1206 012e 494000   		.ascii	"I@\000"
+ 1207              	.LC107:
+ 1208 0131 494100   		.ascii	"IA\000"
+ 1209              	.LC108:
+ 1210 0134 654000   		.ascii	"e@\000"
+ 1211              	.LC109:
+ 1212 0137 41495200 		.ascii	"AIR\000"
+ 1213              	.LC110:
+ 1214 013b 554000   		.ascii	"U@\000"
+ 1215              	.LC111:
+ 1216 013e 4F4F5200 		.ascii	"OOR\000"
+ 1217              	.LC112:
+ 1218 0142 4F4000   		.ascii	"O@\000"
+ 1219              	.LC113:
+ 1220 0145 4F5200   		.ascii	"OR\000"
+ 1221              	.LC114:
+ 1222 0148 6F5500   		.ascii	"oU\000"
+ 1223              	.LC115:
+ 1224 014b 49676E6F 		.ascii	"Ignoring %c in '%.*s'\012\000"
+ 1224      72696E67 
+ 1224      20256320 
+ 1224      696E2027 
+ 1224      252E2A73 
+ 1225              		.section	.bss.phtoelm,"aw",%nobits
+ 1226              		.align	2
+ 1227              		.set	.LANCHOR0,. + 0
+ 1230              	phtoelm:
+ 1231 0000 00000000 		.space	4
+ 1232              		.text
+ 1233              	.Letext0:
+ 1234              		.file 4 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/include/stdint-gcc.h"
+ 1235              		.file 5 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/include/stddef.h"
+ 1236              		.file 6 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/include/stdarg.h"
+ 1237              		.file 7 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/includ
+ 1238              		.file 8 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/includ
+ 1239              		.file 9 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/includ
+ 1240              		.file 10 "<built-in>"
+ 1241              		.file 11 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/inclu
+ 1242              		.file 12 "lib/rsynth-2.0-port/elements.h"
+ 1243              		.file 13 "lib/rsynth-2.0-port/trie.h"
+ 1244              		.file 14 "./lib/CMSIS/Include/core_cm4.h"
+ 1245              		.file 15 "./inc/systick.h"
+ 1246              		.file 16 "lib/rsynth-2.0-port/holmes.h"
+ 1247              		.file 17 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/inclu
+ 1248              		.file 18 "/opt/ARM/arm-linaro-eabi-4.6/lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/inclu
+DEFINED SYMBOLS
+                            *ABS*:00000000 phtoelm.c
+     /tmp/ccKe2Yab.s:21     .text.enter:00000000 $t
+     /tmp/ccKe2Yab.s:25     .text.enter:00000000 enter
+     /tmp/ccKe2Yab.s:183    .text.enter:000000b0 $d
+     /tmp/ccKe2Yab.s:194    .text.phone_append:00000000 $t
+     /tmp/ccKe2Yab.s:199    .text.phone_append:00000000 phone_append
+     /tmp/ccKe2Yab.s:232    .text.phone_to_elm:00000000 $t
+     /tmp/ccKe2Yab.s:237    .text.phone_to_elm:00000000 phone_to_elm
+     /tmp/ccKe2Yab.s:641    .text.phone_to_elm:0000027c $d
+     /tmp/ccKe2Yab.s:741    .text.phone_to_elm:00000404 $t
+     /tmp/ccKe2Yab.s:905    .text.phone_to_elm:000004fc $d
+     /tmp/ccKe2Yab.s:963    .text.phone_to_elm:00000538 $d
+     /tmp/ccKe2Yab.s:1230   .bss.phtoelm:00000000 phtoelm
+     /tmp/ccKe2Yab.s:1226   .bss.phtoelm:00000000 $d
+                     .debug_frame:00000010 $d
+     /tmp/ccKe2Yab.s:912    .text.phone_to_elm:00000503 $d
+     /tmp/ccKe2Yab.s:912    .text.phone_to_elm:00000504 $t
+
+UNDEFINED SYMBOLS
+strcmp
+fprintf
+malloc
+bcopy
+trie_insert
+Elements
+_impure_ptr
+num_Elements
+Darray_find
+trie_lookup
+speed

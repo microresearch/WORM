@@ -1,0 +1,44 @@
+
+main.elf:     file format elf32-littlearm
+main.elf
+architecture: armv7e-m, flags 0x00000102:
+EXEC_P, D_PAGED
+start address 0x08002445
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x08000000 paddr 0x08000000 align 2**16
+         filesz 0x000eee40 memsz 0x000eee40 flags rwx
+    LOAD off    0x00100000 vaddr 0x20000000 paddr 0x080eee40 align 2**16
+         filesz 0x00006838 memsz 0x0000b1a0 flags rw-
+    LOAD off    0x00000000 vaddr 0x10000000 paddr 0x10000000 align 2**16
+         filesz 0x00000000 memsz 0x00010000 flags rw-
+private flags = 5000400: [Version5 EABI] [hard-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .isr_vector   00000188  08000000  08000000  00010000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  1 .text         0001d600  080001c0  080001c0  000101c0  2**6
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .init_array   00000008  0801d7c0  0801d7c0  0002d7c0  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .fini_array   00000004  0801d7c8  0801d7c8  0002d7c8  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  4 .flash        000d1674  0801d7cc  0801d7cc  0002d7cc  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  5 .data         00006838  20000000  080eee40  00100000  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+  6 .bss          00003768  20006838  080f5678  00106838  2**2
+                  ALLOC
+  7 ._user_heap_stack 00001200  20009fa0  080f8de0  00106838  2**0
+                  ALLOC
+  8 .ccm_data     00010000  10000000  10000000  00110000  2**1
+                  ALLOC
+  9 .ARM.attributes 00000030  00000000  00000000  00106838  2**0
+                  CONTENTS, READONLY
+ 10 .comment      0000009f  00000000  00000000  00106868  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+no symbols
+
+
